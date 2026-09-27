@@ -21,11 +21,9 @@ class MainActivity : Activity() {
     private lateinit var rowOverlay: LinearLayout
     private lateinit var rowBattery: LinearLayout
     private lateinit var rowNotify: LinearLayout
-    private lateinit var rowA11y: LinearLayout
     private lateinit var pillOverlay: TextView
     private lateinit var pillBattery: TextView
     private lateinit var pillNotify: TextView
-    private lateinit var pillA11y: TextView
     private lateinit var btnStart: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,11 +33,9 @@ class MainActivity : Activity() {
         rowOverlay = findViewById(R.id.row_overlay)
         rowBattery = findViewById(R.id.row_battery)
         rowNotify = findViewById(R.id.row_notify)
-        rowA11y = findViewById(R.id.row_a11y)
         pillOverlay = findViewById(R.id.pill_overlay)
         pillBattery = findViewById(R.id.pill_battery)
         pillNotify = findViewById(R.id.pill_notify)
-        pillA11y = findViewById(R.id.pill_a11y)
         btnStart = findViewById(R.id.btn_start)
 
         rowOverlay.setOnClickListener {
@@ -90,21 +86,6 @@ class MainActivity : Activity() {
             }
         }
 
-        rowA11y.setOnClickListener {
-            val enabled = isA11yEnabled() && XiTingA11yService.instance != null
-            if (!enabled) {
-                try {
-                    startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                } catch (_: Exception) {
-                }
-            } else {
-                Toast.makeText(this, "无障碍层已开启，黑幕可盖住手势条", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        val footer = findViewById<TextView>(R.id.tv_footer)
-        footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
-
         btnStart.setOnClickListener {
             if (!Settings.canDrawOverlays(this)) {
                 Toast.makeText(this, "请先授予悬浮窗权限", Toast.LENGTH_SHORT).show()
@@ -139,12 +120,5 @@ class MainActivity : Activity() {
         val notifyOk = Build.VERSION.SDK_INT < 33 ||
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         setPill(pillNotify, notifyOk, "已开启", "去开启")
-        val settingsOn = isA11yEnabled()
-        val bound = XiTingA11yService.instance != null
-        when {
-            settingsOn && bound -> setPill(pillA11y, true, "已开启", "已开启")
-            settingsOn -> setPill(pillA11y, false, "需重新开关", "需重新开关")
-            else -> setPill(pillA11y, false, "去开启", "去开启")
-        }
     }
 }

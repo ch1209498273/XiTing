@@ -223,60 +223,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/row_a11y"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_row_a11y" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="无障碍全屏黑幕"
-                    android:textColor="#FF111418"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="黑幕盖住手势条，实现真全黑"
-                    android:textColor="#FF5F6570"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/pill_a11y"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_pill_off"
-                android:paddingStart="12dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="5dp"
-                android:textColor="#FF5F6570"
-                android:textSize="12sp" />
-        </LinearLayout>
-
         <!-- 主按钮 -->
         <Button
             android:id="@+id/btn_start"
@@ -313,7 +259,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="5dp"
-                android:text="· 真息屏续播：看剧时直接按电源键，1~2秒后声音自动回来，最省电\n· 黑幕遮罩：点悬浮球，全黑防误触，双击任意处恢复\n· 声音被清理？电池加白 + 最近任务加锁 + 允许自启动"
+                android:text="· 真息屏续播：看剧时直接按电源键，1~2秒后声音自动回来，最省电\n· 黑幕遮罩：点悬浮球全黑防误触；轻点屏幕解锁，点按钮返回\n· 声音被清理？电池加白 + 最近任务加锁 + 允许自启动"
                 android:textColor="#FF444B54"
                 android:textSize="13sp" />
         </LinearLayout>

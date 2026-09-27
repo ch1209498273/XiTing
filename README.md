@@ -1,8 +1,6 @@
 <div align="center">
 
-# 息屏听剧 XiTing
-
-**看剧时一键熄屏，声音继续 —— 任意视频App可用**
+<img src=".github/assets/banner.svg" width="720"/>
 
 [下载最新版](https://github.com/ch1209498273/XiTing/releases/latest) · [使用说明](#使用) · [常见问题](#faq)
 
@@ -22,6 +20,13 @@
 
 专为 ColorOS 深度适配：状态栏、导航栏、手势条全部盖黑，和真息屏一样干净。
 
+## 效果一览
+
+| 视频App播放中 | 点「息屏」悬浮球 | 息屏听剧中 |
+|:---:|:---:|:---:|
+| <img src=".github/assets/s1.png" width="236"/> | <img src=".github/assets/s2.png" width="236"/> | <img src=".github/assets/s3.png" width="236"/> |
+| 正常看剧 | 黑幕就位·防误触 | 背光关闭·声音继续 |
+
 ## 使用
 
 1. 安装后打开App，按提示完成四项授权
@@ -29,6 +34,33 @@
 3. 视频App里点悬浮球，或直接按电源键
 
 > 双击黑屏任意位置恢复画面 · 通知栏可随时退出
+
+## 工作原理
+
+**黑幕模式**：黑幕作为有焦点的全屏不透明窗口，携带 `screenBrightness = BRIGHTNESS_OVERRIDE_OFF` —— 系统据此**物理关闭背光**，同时通过 `WindowInsetsController` 隐藏系统栏。视频App全程以为自己在前台，所以照常出声。
+
+**真息屏模式**：熄屏广播到达后，向系统注入标准媒体键（`dispatchMediaKeyEvent`），由视频App自己的 MediaSession 恢复播放；片尾被掐断时，3分钟保活窗口内自动续上。
+
+<details>
+<summary>流程图（点开）</summary>
+
+```mermaid
+flowchart LR
+    subgraph M1 [黑幕模式]
+        A1[视频App播放] --> B1[点悬浮球]
+        B1 --> C1[黑幕窗口<br/>焦点 + 不透明 + 背光OFF]
+        C1 --> D1[系统栏隐藏]
+        C1 --> E1[双击恢复]
+    end
+    subgraph M2 [真息屏模式]
+        A2[按电源键] --> B2[SCREEN_OFF<br/>熄屏前在播?]
+        B2 -->|是| C2[注入播放媒体键<br/>1s / 2.5s / 4.5s / 7s]
+        C2 --> D2[MediaSession恢复出声]
+        D2 --> E2[片尾保活<br/>3分钟巡检×5次]
+    end
+```
+
+</details>
 
 ## FAQ
 

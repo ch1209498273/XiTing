@@ -14,6 +14,12 @@ class XiTingA11yService : AccessibilityService() {
     companion object {
         private const val TAG = "XiTing"
         var instance: XiTingA11yService? = null
+
+        // 保留常量以维持与自用版同一份MainActivity（跳过引擎本身已剥离）
+        const val KEY_ADS_MODE = "ads_mode"
+        const val MODE_OFF = 0
+        const val MODE_CURATED = 1
+        const val MODE_ALL = 2
     }
 
     private var black: BlackOverlay? = null

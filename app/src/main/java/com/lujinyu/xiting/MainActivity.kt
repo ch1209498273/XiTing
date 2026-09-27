@@ -91,7 +91,7 @@ class MainActivity : Activity() {
         }
 
         rowA11y.setOnClickListener {
-            val enabled = isA11yEnabled()
+            val enabled = isA11yEnabled() && XiTingA11yService.instance != null
             if (!enabled) {
                 try {
                     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -139,6 +139,12 @@ class MainActivity : Activity() {
         val notifyOk = Build.VERSION.SDK_INT < 33 ||
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         setPill(pillNotify, notifyOk, "已开启", "去开启")
-        setPill(pillA11y, isA11yEnabled(), "已开启", "去开启")
+        val settingsOn = isA11yEnabled()
+        val bound = XiTingA11yService.instance != null
+        when {
+            settingsOn && bound -> setPill(pillA11y, true, "已开启", "已开启")
+            settingsOn -> setPill(pillA11y, false, "需重新开关", "需重新开关")
+            else -> setPill(pillA11y, false, "去开启", "去开启")
+        }
     }
 }

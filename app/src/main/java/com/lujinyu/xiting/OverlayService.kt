@@ -32,6 +32,7 @@ import android.view.WindowManager
 import android.util.Log
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 
 /**
  * 息屏听剧核心服务：
@@ -51,6 +52,7 @@ class OverlayService : Service() {
         private const val ACTION_TOGGLE = "com.lujinyu.xiting.TOGGLE"
         private const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         private const val ACTION_RESUME_TOGGLE = "com.lujinyu.xiting.RESUME_TOGGLE"
+        private const val ACTION_TEST_TOGGLE = "com.lujinyu.xiting.TEST_TOGGLE"
         private const val PREFS = "xiiting_prefs"
         private const val KEY_AUTO_RESUME = "auto_resume_on_screen_off"
 
@@ -111,6 +113,10 @@ class OverlayService : Service() {
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
+            ACTION_TEST_TOGGLE -> {
+                Log.d(TAG, "TEST_TOGGLE broadcast received")
+                toggleOverlay()
+            }
 
             Intent.ACTION_SCREEN_ON -> {
                     // 用户亮屏了：取消所有待执行的续播/保活，别干扰正常操作
@@ -233,6 +239,7 @@ class OverlayService : Service() {
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Intent.ACTION_SCREEN_ON)
+            addAction(ACTION_TEST_TOGGLE) // UAT测试钩子：广播直接切换黑幕，绕开adb点击注入的不稳定
         }
         if (Build.VERSION.SDK_INT >= 33) {
             registerReceiver(screenOffReceiver, filter, Context.RECEIVER_EXPORTED)
@@ -244,6 +251,7 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
+            ACTION_TEST_TOGGLE -> toggleOverlay() // 测试广播
             ACTION_RESUME_TOGGLE -> {
                 val cur = prefs.getBoolean(KEY_AUTO_RESUME, true)
                 prefs.edit().putBoolean(KEY_AUTO_RESUME, !cur).apply()
@@ -365,6 +373,9 @@ class OverlayService : Service() {
             a11y.toggleBlack()
         } else {
             Log.d(TAG, "toggleOverlay via app overlay (a11y off)")
+            main.post {
+                Toast.makeText(this, "无障碍未生效，已用兼容模式（状态栏可能残留）", Toast.LENGTH_LONG).show()
+            }
             if (black?.isShowing == true) {
                 black?.hide()
                 black = null

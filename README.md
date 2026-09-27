@@ -85,6 +85,8 @@ cd XiTing && gradle assembleDebug
 
 要求 JDK 17+、Android SDK 36。
 
-## 声明
+## 许可
 
-本项目仅供学习交流，请支持正版与内容创作者。与 YouTube、Google 及任何视频平台无关联。
+非商业许可：个人学习交流可自由使用与分享（需保留署名）；**任何商业用途均被禁止**；禁止移除或篡改应用内署名与溯源标识（构建ID/水印）。详见 [LICENSE](LICENSE)。
+
+本项目与 YouTube、Google 及任何视频平台无关联。

@@ -1,3 +1,4 @@
+// XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/.trace
 package com.lujinyu.xiting
 
 import android.app.Notification
@@ -110,6 +111,7 @@ class OverlayService : Service() {
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
+
             Intent.ACTION_SCREEN_ON -> {
                     // 用户亮屏了：取消所有待执行的续播/保活，别干扰正常操作
                     Log.d(TAG, "SCREEN_ON: cancel pending resume/keepalive")

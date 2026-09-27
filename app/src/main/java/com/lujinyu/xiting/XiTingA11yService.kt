@@ -1,3 +1,4 @@
+// XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/.trace
 package com.lujinyu.xiting
 
 import android.accessibilityservice.AccessibilityService

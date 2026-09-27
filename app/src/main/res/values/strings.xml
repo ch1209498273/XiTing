@@ -3,5 +3,5 @@
     <string name="app_name">息屏听剧</string>
     <string name="tile_label">息屏听剧</string>
     <string name="a11y_label">息屏听剧·全屏黑幕</string>
-    <string name="a11y_desc">提供全屏黑幕层级（把黑幕置于系统栏之上，实现真黑屏）。本App不读取屏幕内容，不联网，不收集任何数据。</string>
+    <string name="a11y_desc">提供全屏黑幕层级（把黑幕置于系统栏之上，实现真黑屏）。本App不联网，不收集任何数据。</string>
 </resources>

@@ -1,3 +1,4 @@
+// XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/.trace
 package com.lujinyu.xiting
 
 import android.Manifest
@@ -100,6 +101,9 @@ class MainActivity : Activity() {
                 Toast.makeText(this, "无障碍层已开启，黑幕可盖住手势条", Toast.LENGTH_SHORT).show()
             }
         }
+
+        val footer = findViewById<TextView>(R.id.tv_footer)
+        footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
 
         btnStart.setOnClickListener {
             if (!Settings.canDrawOverlays(this)) {

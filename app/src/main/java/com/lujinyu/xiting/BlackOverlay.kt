@@ -1,4 +1,4 @@
-// XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/.trace
+// XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/trace.json
 package com.lujinyu.xiting
 
 import android.content.Context
@@ -21,20 +21,22 @@ import android.widget.TextView
 /**
  * 黑屏遮罩：全屏纯黑窗口，吞掉所有触摸防误触。
  *
- * 交互（两段式解锁，代替双击）：
+ * 交互（两段式解锁）：
  *   锁定态：全黑 + 背光物理关闭（screenBrightness=OFF）
- *   轻点屏幕 → 解除锁定：背光恢复到用户亮度，中央浮现「点击返回视频」按钮
+ *   轻点屏幕 → 解除锁定：背光恢复到用户亮度，浮现「点击返回视频」按钮
  *   点按钮 → 返回视频；5秒无操作 → 自动重新锁定（背光再关）
  *
+ * 系统栏隐藏（实测重要）：insets隐藏只做一次、绝不周期性重复调用——
+ * ColorOS 16上反复调用hide()反而会让系统栏重新显示（真机A/B实测结论）。
+ *
  * @param windowType TYPE_APPLICATION_OVERLAY（普通悬浮窗）或
- *                   TYPE_ACCESSIBILITY_OVERLAY（无障碍服务层，系统栏之上）
+ *                   TYPE_ACCESSIBILITY_OVERLAY（无障碍服务层）
  */
 class BlackOverlay(private val context: Context, private val windowType: Int) {
 
     companion object {
         private const val TAG = "XiTing"
         private const val RELLOCK_DELAY_MS = 5000L
-        private const val ASSERT_INTERVAL_MS = 1500L
     }
 
     private val wm =
@@ -49,23 +51,6 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var unlockPill: TextView? = null
     private var awake = false
     private val relockRunnable = Runnable { sleep() }
-
-    /** 防线重申：ColorOS会在布局更新/一段时间后悄悄恢复系统栏与亮度，周期性打回 */
-    private val assertRunnable = object : Runnable {
-        override fun run() {
-            val f = frame ?: return
-            val l = lp ?: return
-            try {
-                if (!awake) {
-                    l.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
-                    l.buttonBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
-                }
-                try { wm.updateViewLayout(f, l) } catch (_: Exception) {}
-                hideSystemBars(f)
-            } catch (_: Exception) {}
-            main.postDelayed(this, ASSERT_INTERVAL_MS)
-        }
-    }
 
     fun show(onDismiss: () -> Unit) {
         if (isShowing) return
@@ -94,7 +79,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             textSize = 16f
             setTextColor(Color.WHITE)
             gravity = Gravity.CENTER
-            background = io_bg_unlock(context)
+            background = unlockPillBg(context)
             visibility = View.INVISIBLE
             alpha = 0f
             setPadding(
@@ -103,7 +88,6 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             )
         }
         pill.setOnClickListener {
-            main.removeCallbacks(relockRunnable)
             hide()
             onDismiss()
         }
@@ -131,8 +115,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
             windowType,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                 or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                 or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
             PixelFormat.OPAQUE
@@ -155,9 +138,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             this.lp = lp
             unlockPill = pill
             isShowing = true
-            Log.d(TAG, "black overlay added, type=$windowType, backlight override OFF")
+            Log.i(TAG, "black overlay added, type=$windowType, backlight override OFF")
             hideSystemBars(f)
-            main.postDelayed(assertRunnable, ASSERT_INTERVAL_MS)
             f.post {
                 hint.animate().alpha(0f).setStartDelay(2500).setDuration(800).start()
             }
@@ -166,7 +148,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
     }
 
-    /** 系统栏隐藏：insets申请 + legacy immersive 双保险，ColorOS需要周期性重申 */
+    /** 系统栏隐藏（v1.6.0验证过的方式：insets申请一次即持续生效，绝不周期重复调用） */
     private fun hideSystemBars(f: FrameLayout) {
         try {
             if (Build.VERSION.SDK_INT >= 30) {
@@ -190,7 +172,6 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
 
     fun hide() {
         main.removeCallbacks(relockRunnable)
-        main.removeCallbacks(assertRunnable)
         awake = false
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }
         frame = null
@@ -207,11 +188,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         val l = lp ?: return
         l.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
         try { wm.updateViewLayout(f, l) } catch (_: Exception) {}
-        hideSystemBars(f)
         unlockPill?.visibility = View.VISIBLE
         unlockPill?.animate()?.alpha(1f)?.setDuration(200)?.start()
         main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
-        Log.d(TAG, "awake: 解除锁定，背光恢复")
+        Log.i(TAG, "awake: 解除锁定，背光恢复")
     }
 
     /** 重新锁定：背光再次关闭 */
@@ -224,13 +204,12 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         l.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
         l.buttonBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
         try { wm.updateViewLayout(f, l) } catch (_: Exception) {}
-        hideSystemBars(f)
         unlockPill?.animate()?.alpha(0f)?.setDuration(200)
             ?.withEndAction { unlockPill?.visibility = View.INVISIBLE }?.start()
-        Log.d(TAG, "sleep: 重新锁定")
+        Log.i(TAG, "sleep: 重新锁定")
     }
 
-    private fun io_bg_unlock(context: Context) = android.graphics.drawable.GradientDrawable().apply {
+    private fun unlockPillBg(context: Context) = android.graphics.drawable.GradientDrawable().apply {
         shape = android.graphics.drawable.GradientDrawable.RECTANGLE
         cornerRadius = 28f * context.resources.displayMetrics.density
         setColor(0xE61E8E5A.toInt())

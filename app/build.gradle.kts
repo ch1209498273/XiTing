@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -11,15 +13,8 @@ android {
         applicationId = "com.lujinyu.xiting"
         minSdk = 26
         targetSdk = 35
-        versionCode = 13
-        versionName = "2.0.0"
-
-        // 公开发布版：广告跳过引擎在代码层被禁用（MainActivity会据此隐藏入口）
-        buildConfigField("boolean", "ADS_ENABLED", "false")
-    }
-
-    buildFeatures {
-        buildConfig = true
+        versionCode = 14
+        versionName = "2.1.0"
     }
 
     buildTypes {
@@ -36,6 +31,6 @@ android {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }

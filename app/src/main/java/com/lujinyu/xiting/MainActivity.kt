@@ -21,12 +21,10 @@ class MainActivity : Activity() {
     private lateinit var rowBattery: LinearLayout
     private lateinit var rowNotify: LinearLayout
     private lateinit var rowA11y: LinearLayout
-    private lateinit var rowAds: LinearLayout
     private lateinit var pillOverlay: TextView
     private lateinit var pillBattery: TextView
     private lateinit var pillNotify: TextView
     private lateinit var pillA11y: TextView
-    private lateinit var pillAds: TextView
     private lateinit var btnStart: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,16 +35,11 @@ class MainActivity : Activity() {
         rowBattery = findViewById(R.id.row_battery)
         rowNotify = findViewById(R.id.row_notify)
         rowA11y = findViewById(R.id.row_a11y)
-        rowAds = findViewById(R.id.row_ads)
         pillOverlay = findViewById(R.id.pill_overlay)
         pillBattery = findViewById(R.id.pill_battery)
         pillNotify = findViewById(R.id.pill_notify)
         pillA11y = findViewById(R.id.pill_a11y)
-        pillAds = findViewById(R.id.pill_ads)
         btnStart = findViewById(R.id.btn_start)
-
-        // github公开版：广告跳过引擎已剥离，⑥行隐藏
-        rowAds.visibility = if (BuildConfig.ADS_ENABLED) View.VISIBLE else View.GONE
 
         rowOverlay.setOnClickListener {
             if (!Settings.canDrawOverlays(this)) {
@@ -108,19 +101,6 @@ class MainActivity : Activity() {
             }
         }
 
-        rowAds.setOnClickListener {
-            val sp = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-            val next = (sp.getInt(XiTingA11yService.KEY_ADS_MODE, XiTingA11yService.MODE_CURATED) + 1) % 3
-            sp.edit().putInt(XiTingA11yService.KEY_ADS_MODE, next).apply()
-            val label = when (next) {
-                XiTingA11yService.MODE_OFF -> "已关闭"
-                XiTingA11yService.MODE_CURATED -> "主流视频App"
-                else -> "全部App（含开屏广告）"
-            }
-            Toast.makeText(this, "广告自动跳过：$label", Toast.LENGTH_SHORT).show()
-            refreshStates()
-        }
-
         btnStart.setOnClickListener {
             if (!Settings.canDrawOverlays(this)) {
                 Toast.makeText(this, "请先授予悬浮窗权限", Toast.LENGTH_SHORT).show()
@@ -156,17 +136,5 @@ class MainActivity : Activity() {
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         setPill(pillNotify, notifyOk, "已开启", "去开启")
         setPill(pillA11y, isA11yEnabled(), "已开启", "去开启")
-
-        if (BuildConfig.ADS_ENABLED) {
-            val mode = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-                .getInt(XiTingA11yService.KEY_ADS_MODE, XiTingA11yService.MODE_CURATED)
-            pillAds.setBackgroundResource(R.drawable.bg_pill_off)
-            pillAds.setTextColor(getColor(android.R.color.darker_gray))
-            pillAds.text = when (mode) {
-                XiTingA11yService.MODE_OFF -> "已关闭"
-                XiTingA11yService.MODE_CURATED -> "视频App"
-                else -> "全部App"
-            }
-        }
     }
 }

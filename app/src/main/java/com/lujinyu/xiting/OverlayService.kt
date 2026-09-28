@@ -135,7 +135,9 @@ class OverlayService : Service() {
                     Log.i(TAG, "SCREEN_ON: cancel pending resume/keepalive")
                     main.removeCallbacksAndMessages(null)
                     if (screenSessionStart > 0) {
-                        Stats.addDelta(applicationContext, System.currentTimeMillis() - screenSessionStart)
+                        val now = System.currentTimeMillis()
+                        Stats.addDelta(applicationContext, now - screenSessionStart)
+                        SessionLog.add(applicationContext, ListenSession(screenSessionStart, now, now - screenSessionStart, SessionLog.MODE_SCREEN_OFF))
                         screenSessionStart = 0
                     }
                 }

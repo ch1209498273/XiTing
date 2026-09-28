@@ -176,7 +176,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         main.removeCallbacks(relockRunnable)
         awake = false
         if (sessionStart > 0) {
-            Stats.addDelta(context, System.currentTimeMillis() - sessionStart)
+            val now = System.currentTimeMillis()
+            Stats.addDelta(context, now - sessionStart)
+            SessionLog.add(context, ListenSession(sessionStart, now, now - sessionStart, SessionLog.MODE_BLACK))
             sessionStart = 0
         }
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }

@@ -1,8 +1,0 @@
-{
-  "tag_name": "v2.5.0",
-  "target_commitish": "main",
-  "name": "息屏听剧 v2.5.0",
-  "body": "## v2.5.0 · 新增节能统计\n\n- 主界面新增统计卡片：累计息屏听剧时长/次数 + 估算省电量（mAh，按OLED屏幕功耗估算）\n- 黑幕模式与真息屏模式的听剧时长都会自动累计\n- 数据仅存本地\n\n覆盖安装即可。",
-  "draft": false,
-  "prerelease": false
-}

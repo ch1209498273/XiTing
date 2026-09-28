@@ -50,6 +50,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var lp: WindowManager.LayoutParams? = null
     private var unlockPill: TextView? = null
     private var awake = false
+    private var sessionStart = 0L
     private val relockRunnable = Runnable { sleep() }
 
     fun show(onDismiss: () -> Unit) {
@@ -138,6 +139,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             this.lp = lp
             unlockPill = pill
             isShowing = true
+            sessionStart = System.currentTimeMillis()
             Log.i(TAG, "black overlay added, type=$windowType, backlight override OFF")
             hideSystemBars(f)
             f.post {
@@ -173,6 +175,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     fun hide() {
         main.removeCallbacks(relockRunnable)
         awake = false
+        if (sessionStart > 0) {
+            Stats.addDelta(context, System.currentTimeMillis() - sessionStart)
+            sessionStart = 0
+        }
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }
         frame = null
         lp = null

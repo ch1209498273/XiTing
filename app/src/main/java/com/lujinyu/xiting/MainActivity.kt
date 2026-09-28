@@ -25,6 +25,8 @@ class MainActivity : Activity() {
     private lateinit var pillBattery: TextView
     private lateinit var pillNotify: TextView
     private lateinit var btnStart: Button
+    private lateinit var statsLine1: TextView
+    private lateinit var statsLine2: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +39,8 @@ class MainActivity : Activity() {
         pillBattery = findViewById(R.id.pill_battery)
         pillNotify = findViewById(R.id.pill_notify)
         btnStart = findViewById(R.id.btn_start)
+        statsLine1 = findViewById(R.id.stats_line1)
+        statsLine2 = findViewById(R.id.stats_line2)
 
         rowOverlay.setOnClickListener {
             if (!Settings.canDrawOverlays(this)) {
@@ -99,6 +103,17 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         refreshStates()
+        refreshStats()
+    }
+
+    private fun refreshStats() {
+        val (totalMs, count) = Stats.totals(this)
+        val minutes = totalMs / 60000
+        val h = minutes / 60
+        val m = minutes % 60
+        val dur = if (h > 0) "${h}小时${m}分钟" else "${m}分钟"
+        statsLine1.text = "累计息屏听剧 $dur（$count 次）"
+        statsLine2.text = "估算省电 ≈ ${Stats.estimatedMah(totalMs)} mAh（按OLED屏幕功耗估算）"
     }
 
     private fun isA11yEnabled(): Boolean =

@@ -52,6 +52,7 @@ class OverlayService : Service() {
         private const val ACTION_TOGGLE = "com.lujinyu.xiting.TOGGLE"
         private const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         private const val ACTION_RESUME_TOGGLE = "com.lujinyu.xiting.RESUME_TOGGLE"
+        private const val ACTION_TEST_TOGGLE = "com.lujinyu.xiting.TEST_TOGGLE"
         private const val PREFS = "xiiting_prefs"
         private const val KEY_AUTO_RESUME = "auto_resume_on_screen_off"
 
@@ -63,11 +64,13 @@ class OverlayService : Service() {
     private lateinit var wm: WindowManager
     private lateinit var prefs: SharedPreferences
     private lateinit var audioManager: AudioManager
+    private var wakeLock: android.os.PowerManager.WakeLock? = null
     private val main = Handler(Looper.getMainLooper())
     private val pollHandler = Handler(Looper.getMainLooper())
 
     /** 保活监控计数：YouTube等App会在片尾/中途把后台播放掐掉，息屏后3分钟内自动再救 */
     private var keepAliveTicks = 0
+    private var screenSessionStart = 0L
     private var keepAliveDispatches = 0
 
     private var bubble: TextView? = null
@@ -110,15 +113,23 @@ class OverlayService : Service() {
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
+            ACTION_TEST_TOGGLE -> {
+                Log.i(TAG, "TEST_TOGGLE broadcast received")
+                toggleOverlay()
+            }
 
             Intent.ACTION_SCREEN_ON -> {
                     // 用户亮屏了：取消所有待执行的续播/保活，别干扰正常操作
-                    Log.d(TAG, "SCREEN_ON: cancel pending resume/keepalive")
+                    Log.i(TAG, "SCREEN_ON: cancel pending resume/keepalive")
                     main.removeCallbacksAndMessages(null)
+                    if (screenSessionStart > 0) {
+                        Stats.addDelta(applicationContext, System.currentTimeMillis() - screenSessionStart)
+                        screenSessionStart = 0
+                    }
                 }
 
                 Intent.ACTION_SCREEN_OFF -> {
-                    Log.d(TAG, "SCREEN_OFF received, overlayOn=${isAnyBlackShowing()}")
+                    Log.i(TAG, "SCREEN_OFF received, overlayOn=${isAnyBlackShowing()}")
 
                     // 遮罩还开着说明屏幕是被电源键强制熄灭的：撤掉遮罩，唤醒后直接回到视频画面
                     if (isAnyBlackShowing()) {
@@ -127,13 +138,24 @@ class OverlayService : Service() {
                     }
 
                     if (!prefs.getBoolean(KEY_AUTO_RESUME, true)) {
-                        Log.d(TAG, "auto resume disabled by user, skip")
+                        Log.i(TAG, "auto resume disabled by user, skip")
                         return
                     }
                     val agoMs = SystemClock.elapsedRealtime() - lastAudioActiveAt
                     if (agoMs > 4000) {
-                        Log.d(TAG, "skip resume: no audio in last ${agoMs}ms")
+                        Log.i(TAG, "skip resume: no audio in last ${agoMs}ms")
                         return
+                    }
+
+                    // 关键：持有部分唤醒锁，防止ColorOS在息屏瞬间冻结本App，
+                    // 否则后续的媒体键注入回调永远不会执行（真机实测踩坑）
+                    val pm = getSystemService(POWER_SERVICE) as android.os.PowerManager
+                    wakeLock?.release()
+                    wakeLock = pm.newWakeLock(
+                        android.os.PowerManager.PARTIAL_WAKE_LOCK, "XiTing:resume"
+                    ).apply {
+                        setReferenceCounted(false)
+                        acquire(35 * 1000L) // 35秒后自动释放，覆盖续播+保活窗口
                     }
 
                     // 视频App暂停有先后、各家响应的键也不同，多试几轮；
@@ -148,7 +170,8 @@ class OverlayService : Service() {
                     // 保活监控：12秒后开始，每8秒巡检一次，共约3分钟。
                     // YouTube等App会在片尾把后台播放掐断，这里自动再注入PLAY救回
                     main.postDelayed(keepAliveTick, 12000)
-                    Log.d(TAG, "resume attempts scheduled (lastAudioActiveAgo=${agoMs}ms)")
+                    screenSessionStart = System.currentTimeMillis()
+                    Log.i(TAG, "resume attempts scheduled (lastAudioActiveAgo=${agoMs}ms)")
                 }
             }
         }
@@ -158,17 +181,17 @@ class OverlayService : Service() {
         override fun run() {
             keepAliveTicks++
             if (keepAliveTicks > 25) {
-                Log.d(TAG, "keepalive: 3min window over, stop monitoring")
+                Log.i(TAG, "keepalive: 3min window over, stop monitoring")
                 return
             }
             if (audioManager.isMusicActive) {
-                Log.d(TAG, "keepalive tick $keepAliveTicks: playing, ok")
+                Log.i(TAG, "keepalive tick $keepAliveTicks: playing, ok")
             } else if (keepAliveDispatches < 5) {
                 keepAliveDispatches++
-                Log.d(TAG, "keepalive tick $keepAliveTicks: silent, re-dispatch PLAY #$keepAliveDispatches")
+                Log.i(TAG, "keepalive tick $keepAliveTicks: silent, re-dispatch PLAY #$keepAliveDispatches")
                 tryResume(false)
             } else {
-                Log.d(TAG, "keepalive: still silent after $keepAliveDispatches tries, give up")
+                Log.i(TAG, "keepalive: still silent after $keepAliveDispatches tries, give up")
                 reportResumeResult()
                 return
             }
@@ -180,7 +203,7 @@ class OverlayService : Service() {
     private fun tryResume(usePlayPause: Boolean) {
         if (isAnyBlackShowing()) return // 遮罩模式下屏幕没真息，无需恢复
         if (audioManager.isMusicActive) {
-            Log.d(TAG, "already playing, skip dispatch")
+            Log.i(TAG, "already playing, skip dispatch")
             return
         }
         try {
@@ -188,16 +211,16 @@ class OverlayService : Service() {
                 if (usePlayPause) KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE else KeyEvent.KEYCODE_MEDIA_PLAY
             audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, code))
             audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, code))
-            Log.d(TAG, "dispatched media key: ${if (usePlayPause) "PLAY_PAUSE" else "PLAY"}")
+            Log.i(TAG, "dispatched media key: ${if (usePlayPause) "PLAY_PAUSE" else "PLAY"}")
         } catch (e: Exception) {
-            Log.d(TAG, "dispatch failed: $e")
+            Log.i(TAG, "dispatch failed: $e")
         }
     }
 
     /** 多轮注入后仍没声音：发条提醒，告诉用户该App不支持这条路 */
     private fun reportResumeResult() {
         val active = audioManager.isMusicActive
-        Log.d(TAG, "resume check: isMusicActive=$active")
+        Log.i(TAG, "resume check: isMusicActive=$active")
         if (active) return
         try {
             val pi = PendingIntent.getActivity(
@@ -225,6 +248,11 @@ class OverlayService : Service() {
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         audioManager.registerAudioPlaybackCallback(playbackCallback, null)
         audioPollRunnable.run()
+        // 常驻部分唤醒锁：服务运行期间保持CPU唤醒、防止ColorOS冻结进程
+        // （「熄屏挂机」类工具的标准做法；退出助手即释放，不白白耗电）
+        wakeLock = (getSystemService(POWER_SERVICE) as android.os.PowerManager)
+            .newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "XiTing:service")
+            .apply { setReferenceCounted(false); acquire() }
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
@@ -232,6 +260,7 @@ class OverlayService : Service() {
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Intent.ACTION_SCREEN_ON)
+            addAction(ACTION_TEST_TOGGLE) // UAT测试钩子：广播直接切换黑幕，绕开adb点击注入的不稳定
         }
         if (Build.VERSION.SDK_INT >= 33) {
             registerReceiver(screenOffReceiver, filter, Context.RECEIVER_EXPORTED)
@@ -243,6 +272,7 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
+            ACTION_TEST_TOGGLE -> toggleOverlay() // 测试广播
             ACTION_RESUME_TOGGLE -> {
                 val cur = prefs.getBoolean(KEY_AUTO_RESUME, true)
                 prefs.edit().putBoolean(KEY_AUTO_RESUME, !cur).apply()
@@ -331,7 +361,7 @@ class OverlayService : Service() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    Log.d(TAG, "bubble ACTION_UP, moved=$moved")
+                    Log.i(TAG, "bubble ACTION_UP, moved=$moved")
                     if (moved) {
                         // 位置记忆
                         prefs.edit().putInt("bubble_x", lp.x).putInt("bubble_y", lp.y).apply()
@@ -347,9 +377,9 @@ class OverlayService : Service() {
         try {
             wm.addView(tv, lp)
             bubble = tv
-            Log.d(TAG, "bubble added at $lp.x,$lp.y")
+            Log.i(TAG, "bubble added at $lp.x,$lp.y")
         } catch (e: Exception) {
-            Log.d(TAG, "bubble add failed: $e")
+            Log.i(TAG, "bubble add failed: $e")
             // 无悬浮窗权限时会到这里；主界面有引导
         }
     }
@@ -358,7 +388,7 @@ class OverlayService : Service() {
 
     /** 黑幕/恢复 切换（悬浮球、通知、快捷磁贴共用） */
     fun toggleOverlay() {
-        Log.d(TAG, "toggleOverlay via app overlay")
+        Log.i(TAG, "toggleOverlay via app overlay")
         if (black?.isShowing == true) {
             black?.hide()
             black = null

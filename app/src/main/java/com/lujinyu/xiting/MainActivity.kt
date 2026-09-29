@@ -203,11 +203,27 @@ class MainActivity : Activity() {
             .edit().putInt("listen_mode", mode).apply()
         refreshModeUI()
         refreshStates()
-        Toast.makeText(
-            this,
-            if (mode == 1) "已选真息屏模式：看剧时点悬浮球即锁屏听剧" else "已选黑幕模式：看剧时点悬浮球即全屏黑幕",
-            Toast.LENGTH_SHORT
-        ).show()
+        if (mode == 1) {
+            // 选真息屏：未激活一键锁屏时立刻引导激活，避免"选了但悬浮球没反应"
+            val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+            val admin = android.content.ComponentName(this, LockReceiver::class.java)
+            if (!dpm.isAdminActive(admin)) {
+                startActivity(
+                    android.content.Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                        putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
+                        putExtra(
+                            android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                            "激活后：看剧时点悬浮球即锁屏听剧（真息屏），声音自动恢复。"
+                        )
+                    }
+                )
+                Toast.makeText(this, "请点击「激活」完成一键锁屏授权", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "已选真息屏模式：看剧时点悬浮球即锁屏听剧", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(this, "已选黑幕模式：看剧时点悬浮球即全屏黑幕", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun refreshModeUI() {

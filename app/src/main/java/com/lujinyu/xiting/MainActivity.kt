@@ -177,16 +177,43 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         }
 
         // 主按钮=助手服务控制（启动/停止）：看剧时的动作在悬浮球上
+        // 通知栏「退出助手」/磁贴退出同样视为用户主动停止
+        // （标志在服务端ACTION_EXIT里清除）
+
         cardBlack.setOnClickListener {
             if (OverlayService.isRunning) {
                 startService(Intent(this, OverlayService::class.java).setAction(OverlayService.ACTION_EXIT))
+                getSharedPreferences("xiiting_prefs", MODE_PRIVATE).edit().putBoolean("assistant_wanted", false).apply()
                 Toast.makeText(this, "助手已停止", Toast.LENGTH_SHORT).show()
             } else {
                 startForegroundService(Intent(this, OverlayService::class.java))
+                getSharedPreferences("xiiting_prefs", MODE_PRIVATE).edit().putBoolean("assistant_wanted", true).apply()
                 Toast.makeText(this, "助手已启动，看剧时点悬浮球即可", Toast.LENGTH_SHORT).show()
             }
             postRefresh()
         }
+
+        // 定时关闭：15/30/60分钟，到点自动收黑幕
+        pageHome.findViewById<View>(R.id.timer_chip).setOnClickListener {
+            val items = arrayOf("15分钟", "30分钟", "60分钟", "取消定时")
+            android.app.AlertDialog.Builder(this)
+                .setTitle("定时关闭")
+                .setItems(items) { _, which ->
+                    val minutes = when (which) {
+                        0 -> 15L; 1 -> 30L; 2 -> 60L; else -> 0L
+                    }
+                    startService(
+                        Intent(this, OverlayService::class.java)
+                            .setAction(OverlayService.ACTION_SET_TIMER)
+                            .putExtra(OverlayService.EXTRA_MINUTES, minutes)
+                    )
+                    postRefresh()
+                }
+                .show()
+        }
+
+        // 防杀保活指南
+        pageHome.findViewById<View>(R.id.row_keepalive).setOnClickListener { showKeepAliveGuide() }
 
         val footer = pageHome.findViewById<TextView>(R.id.tv_footer)
         footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
@@ -194,6 +221,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     override fun onResume() {
         super.onResume()
+        // 助手被系统清理后（更新/后台清理），打开App时自动恢复；
+        // 用户主动停止的（assistant_wanted=false）不复活
+        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        if (!OverlayService.isRunning && prefs.getBoolean("assistant_wanted", false)) {
+            startForegroundService(Intent(this, OverlayService::class.java))
+        }
         refreshStates()
         refreshHomeStats()
         if (tab == TAB_STATS) renderStats()
@@ -237,6 +270,46 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         setPill(pageHome.findViewById(R.id.pill_overlay), overlayOk, "已开启", "去开启")
         setPill(pageHome.findViewById(R.id.pill_battery), batteryOk, "已加白", "去加白")
         setPill(pageHome.findViewById(R.id.pill_notify), notifyOk, "已开启", "去开启")
+
+        val remain = OverlayService.instance?.timerRemainingMs() ?: 0
+        pageHome.findViewById<TextView>(R.id.timer_state).text =
+            if (remain > 0) "剩余 ${remain / 60000 + 1} 分钟" else "未设置"
+    }
+
+    /** 防杀保活指南：ColorOS后台限制的分步设置引导 */
+    private fun showKeepAliveGuide() {
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        val batteryOk = pm.isIgnoringBatteryOptimizations(packageName)
+        android.app.AlertDialog.Builder(this)
+            .setTitle("防杀保活设置")
+            .setMessage(
+                "系统会清理后台应用导致悬浮球消失，按以下三步设置后可长期稳定：\n\n" +
+                    "1. 电池白名单（${if (batteryOk) "已完成 ✓" else "未完成"}）——点下方「去电池设置」\n\n" +
+                    "2. 自启动：点「去应用详情」→ 耗电管理 → 允许自启动/完全后台行为\n\n" +
+                    "3. 最近任务加锁：下拉最近任务，在息屏听剧卡片上点锁图标"
+            )
+            .setPositiveButton("去电池设置") { _, _ ->
+                try {
+                    startActivity(
+                        Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$packageName"))
+                    )
+                } catch (e: Exception) {
+                    try {
+                        startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                    } catch (_: Exception) {
+                    }
+                }
+            }
+            .setNeutralButton("去应用详情") { _, _ ->
+                try {
+                    startActivity(
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
+                    )
+                } catch (_: Exception) {
+                }
+            }
+            .setNegativeButton("知道了", null)
+            .show()
     }
 
     private fun setPill(pill: TextView, on: Boolean, onText: String, offText: String) {

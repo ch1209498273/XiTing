@@ -60,6 +60,44 @@
                 android:tint="#FFFFFFFF" />
         </LinearLayout>
 
+        <!-- 定时关闭 -->
+        <LinearLayout
+            android:id="@+id/timer_chip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_card"
+            android:elevation="1dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="14dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="定时关闭"
+                android:textColor="#FF111418"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/timer_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:text="未设置"
+                android:textColor="#FF8A9099"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="›"
+                android:textColor="#FF8A9099"
+                android:textSize="16sp" />
+        </LinearLayout>
+
         <!-- 使用提示 -->
         <TextView
             android:layout_width="match_parent"
@@ -312,6 +350,35 @@
                     android:text="去开启"
                     android:textColor="#FF5F6570"
                     android:textSize="11sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#FFF2F4F6" />
+
+            <LinearLayout
+                android:id="@+id/row_keepalive"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="防杀保活设置"
+                    android:textColor="#FF111418"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="指南 ›"
+                    android:textColor="#FF1E8E5A"
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 

@@ -49,6 +49,11 @@ class OverlayService : Service() {
         private const val NOTIF_ID = 1
         private const val ACTION_TOGGLE = "com.lujinyu.xiting.TOGGLE"
         const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
+        const val ACTION_SET_TIMER = "com.lujinyu.xiting.SET_TIMER"
+        const val EXTRA_MINUTES = "minutes"
+        private const val ACTION_MEDIA_PREV = "com.lujinyu.xiting.MEDIA_PREV"
+        private const val ACTION_MEDIA_PLAYPAUSE = "com.lujinyu.xiting.MEDIA_PLAYPAUSE"
+        private const val ACTION_MEDIA_NEXT = "com.lujinyu.xiting.MEDIA_NEXT"
         private const val PREFS = "xiiting_prefs"
 
         var instance: OverlayService? = null
@@ -135,6 +140,7 @@ class OverlayService : Service() {
             Log.i(TAG, "来电监听已注册")
         }
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
+        prefs.edit().putBoolean("assistant_wanted", true).apply()
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
         showBubble()
@@ -152,7 +158,11 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
+            ACTION_SET_TIMER -> handleSetTimer(intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0)
+            ACTION_MEDIA_PREV, ACTION_MEDIA_PLAYPAUSE, ACTION_MEDIA_NEXT ->
+                intent?.action?.let { dispatchMediaKey(it) }
             ACTION_EXIT -> {
+                prefs.edit().putBoolean("assistant_wanted", false).apply()
                 hideAllBlack()
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
@@ -266,6 +276,42 @@ class OverlayService : Service() {
 
     // ---------- 黑屏遮罩 ----------
 
+    // 睡眠定时器：到期自动关闭黑幕（0=未设置）
+    @Volatile
+    private var timerEndAt = 0L
+
+    fun timerRemainingMs(): Long =
+        if (timerEndAt > 0) (timerEndAt - System.currentTimeMillis()).coerceAtLeast(0) else 0
+
+    private val timerTick: Runnable = Runnable {
+        if (timerEndAt <= 0) return@Runnable
+        if (System.currentTimeMillis() >= timerEndAt) {
+            timerEndAt = 0
+            if (isAnyBlackShowing()) {
+                hideAllBlack()
+                Toast.makeText(this, "定时结束，黑幕已关闭", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "定时已到期", Toast.LENGTH_SHORT).show()
+            }
+            refreshNotification()
+        } else {
+            refreshNotification()
+            main.postDelayed(timerTick, 30_000)
+        }
+    }
+
+    private fun handleSetTimer(minutes: Long) {
+        timerEndAt = if (minutes <= 0) 0 else System.currentTimeMillis() + minutes * 60_000
+        main.removeCallbacks(timerTick)
+        if (timerEndAt > 0) {
+            main.postDelayed(timerTick, 30_000)
+            Toast.makeText(this, "定时关闭：${minutes}分钟后", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "定时关闭已取消", Toast.LENGTH_SHORT).show()
+        }
+        refreshNotification()
+    }
+
     /** 黑幕/恢复 切换（悬浮球、通知、快捷磁贴共用） */
     fun toggleOverlay() {
         Log.i(TAG, "toggleOverlay via app overlay")
@@ -277,6 +323,19 @@ class OverlayService : Service() {
             black?.show { refreshNotification() }
         }
         refreshNotification()
+    }
+
+    private fun dispatchMediaKey(action: String) {
+        try {
+            val code = when (action) {
+                ACTION_MEDIA_PREV -> KeyEvent.KEYCODE_MEDIA_PREVIOUS
+                ACTION_MEDIA_NEXT -> KeyEvent.KEYCODE_MEDIA_NEXT
+                else -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+            }
+            audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, code))
+            audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, code))
+        } catch (_: Exception) {
+        }
     }
 
     // ---------- 通知 ----------
@@ -297,15 +356,26 @@ class OverlayService : Service() {
             this, 1, Intent(this, OverlayService::class.java).setAction(ACTION_TOGGLE),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
+        val mediaPi: (String, Int) -> PendingIntent = { action, rc ->
+            PendingIntent.getService(
+                this, rc, Intent(this, OverlayService::class.java).setAction(action),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        }
         val exitPi = PendingIntent.getService(
             this, 2, Intent(this, OverlayService::class.java).setAction(ACTION_EXIT),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
+        val remainMin = timerRemainingMs() / 60000
+        val timerText = if (timerEndAt > 0) " · 定时${remainMin + 1}分钟后关闭" else ""
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
             .setContentTitle("息屏听剧助手运行中")
-            .setContentText("看剧时点悬浮球，黑屏听剧声音继续")
+            .setContentText("点悬浮球黑屏听剧，声音继续$timerText")
             .setContentIntent(openPi)
+            .addAction(R.drawable.ic_media_prev, "上一集", mediaPi(ACTION_MEDIA_PREV, 10))
+            .addAction(R.drawable.ic_media_pause, "播放/暂停", mediaPi(ACTION_MEDIA_PLAYPAUSE, 11))
+            .addAction(R.drawable.ic_media_next, "下一集", mediaPi(ACTION_MEDIA_NEXT, 12))
             .addAction(0, if (isAnyBlackShowing()) "恢复画面" else "息屏听剧", togglePi)
             .addAction(0, "退出助手", exitPi)
             .setOngoing(true)

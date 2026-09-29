@@ -50,6 +50,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var frame: FrameLayout? = null
     private var lp: WindowManager.LayoutParams? = null
     private var unlockPill: TextView? = null
+    private var badgeListener: ((Int) -> Unit)? = null
     private var awake = false
     private var sessionStart = 0L          // 墙钟：用于记录起始时间与按天归属
     private var sessionStartElapsed = 0L   // 单调时钟：用于时长计算，不受时间跳变/跨天影响
@@ -102,6 +103,38 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
                 Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
             ).apply { bottomMargin = (110 * density).toInt() }
         )
+
+        // 未读通知角标（需用户授予「通知使用权」，未授权时不显示）
+        val badge = TextView(context).apply {
+            textSize = 12f
+            setTextColor(Color.WHITE)
+            gravity = Gravity.CENTER
+            background = unlockPillBg(context)
+            (background as android.graphics.drawable.GradientDrawable).setColor(0x66000000)
+            visibility = View.GONE
+        }
+        f.addView(
+            badge,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.TOP or Gravity.END
+            ).apply {
+                topMargin = (36 * density).toInt()
+                marginEnd = (16 * density).toInt()
+            }
+        )
+        badgeListener = { n ->
+            main.post {
+                if (n > 0) {
+                    badge.text = "🔔 $n"
+                    badge.visibility = View.VISIBLE
+                } else {
+                    badge.visibility = View.GONE
+                }
+            }
+        }
+        NotificationBadge.register(badgeListener!!)
 
         val gd = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
@@ -188,6 +221,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             SessionLog.add(context, ListenSession(sessionStart, now, dur, SessionLog.MODE_BLACK))
             sessionStart = 0
         }
+        badgeListener?.let { NotificationBadge.unregister(it) }
+        badgeListener = null
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }
         frame = null
         lp = null

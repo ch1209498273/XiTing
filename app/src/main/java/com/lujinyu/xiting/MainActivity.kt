@@ -248,6 +248,7 @@ class MainActivity : Activity() {
         refreshStates()
         refreshHomeStats()
         if (tab == TAB_STATS) renderStats()
+        refreshAdminUI()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -481,6 +482,41 @@ class MainActivity : Activity() {
     private fun bindAbout() {
         pageAbout.findViewById<TextView>(R.id.about_version).text =
             "版本 ${BuildConfig.VERSION_NAME} · 构建ID ${BuildConfig.BUILD_ID}"
+        // 一键锁屏授权：显示状态，点按切换（激活/取消）
+        pageAbout.findViewById<View>(R.id.about_admin).setOnClickListener {
+            val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+            val admin = android.content.ComponentName(this, LockReceiver::class.java)
+            if (dpm.isAdminActive(admin)) {
+                dpm.removeActiveAdmin(admin)
+                Toast.makeText(this, "已取消一键锁屏授权（真息屏请改按电源键）", Toast.LENGTH_LONG).show()
+            } else {
+                startActivity(
+                    android.content.Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                        putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
+                        putExtra(
+                            android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                            "激活后：看剧时点悬浮球即锁屏听剧（真息屏），声音自动恢复。"
+                        )
+                    }
+                )
+            }
+            pageAbout.postDelayed({ refreshAdminUI() }, 600)
+        }
+    }
+
+    private fun refreshAdminUI() {
+        val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+        val admin = android.content.ComponentName(this, LockReceiver::class.java)
+        val active = dpm.isAdminActive(admin)
+        pageAbout.findViewById<TextView>(R.id.about_admin_state).text =
+            if (active) "已激活 · 点按取消" else "未激活 · 点按开启（真息屏悬浮球需要）"
+        pageAbout.findViewById<TextView>(R.id.about_admin_pill).text = if (active) "已激活" else "未激活"
+        pageAbout.findViewById<TextView>(R.id.about_admin_pill).setBackgroundResource(
+            if (active) R.drawable.bg_pill_on else R.drawable.bg_pill_off
+        )
+        pageAbout.findViewById<TextView>(R.id.about_admin_pill).setTextColor(
+            if (active) 0xFF157A4C.toInt() else 0xFF5F6570.toInt()
+        )
     }
 
     // ───────────────────────── 通用 ─────────────────────────

@@ -430,11 +430,19 @@ class OverlayService : Service() {
      * 黑幕模式=全屏黑幕；真息屏模式=锁屏（设备管理员force-lock，激活一次后可用）。
      */
     fun runSelectedMode() {
+        Log.i(TAG, "runSelectedMode: mode=$listenMode")
         if (listenMode == 1) {
             val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
             val admin = android.content.ComponentName(this, LockReceiver::class.java)
-            if (dpm.isAdminActive(admin)) {
-                dpm.lockNow() // 真息屏：SCREEN_OFF广播接自动续播链路
+            val active = dpm.isAdminActive(admin)
+            Log.i(TAG, "真息屏: adminActive=$active")
+            if (active) {
+                try {
+                    dpm.lockNow() // 真息屏：SCREEN_OFF广播接自动续播链路
+                    Log.i(TAG, "lockNow 已执行")
+                } catch (e: Exception) {
+                    Log.e(TAG, "lockNow失败: $e")
+                }
             } else {
                 // 首次使用：引导激活一键锁屏（标准设备管理员流程，可随时在系统设置里停用）
                 startActivity(

@@ -110,9 +110,58 @@ class OverlayService : Service() {
         }
     }
 
+    // 静音保活：ColorOS(hans冻结管理器)会在锁屏后冻结后台进程并强制释放唤醒锁，
+    // 导致自动续播永远无法执行（真机日志：ForceReleaseWakeLock + 广播被忽略）。
+    // 持续播放一条数字静音音轨（PCM全零，人耳不可闻），让系统始终视本应用
+    // 为"正在播放音频"从而豁免冻结——息屏挂机类应用在OPPO上的标准做法。
+    // 用SONIFICATION通道：不占用音乐流，不污染isMusicActive判定。
+    private var silentTrack: android.media.AudioTrack? = null
+
+    private fun startSilentKeepAlive() {
+        if (silentTrack != null) return
+        try {
+            val sampleRate = 8000
+            val frames = sampleRate / 4 // 0.25秒
+            val buf = ByteArray(frames * 2) // 16bit mono 全零 = 数字静音
+            val attrs = android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            val fmt = android.media.AudioFormat.Builder()
+                .setEncoding(android.media.AudioFormat.ENCODING_PCM_16BIT)
+                .setSampleRate(sampleRate)
+                .setChannelMask(android.media.AudioFormat.CHANNEL_OUT_MONO)
+                .build()
+            val track = android.media.AudioTrack(
+                attrs, fmt, buf.size,
+                android.media.AudioTrack.MODE_STATIC, AudioManager.AUDIO_SESSION_ID_GENERATE
+            )
+            track.write(buf, 0, buf.size)
+            track.setLoopPoints(0, frames, -1)
+            track.play()
+            silentTrack = track
+            Log.i(TAG, "静音保活已启动（防hans冻结）")
+        } catch (e: Exception) {
+            Log.w(TAG, "静音保活启动失败: $e")
+        }
+    }
+
+    private fun stopSilentKeepAlive() {
+        try {
+            silentTrack?.stop()
+            silentTrack?.release()
+        } catch (_: Exception) {
+        }
+        silentTrack = null
+    }
+
     private val playbackCallback = object : AudioManager.AudioPlaybackCallback() {
         override fun onPlaybackConfigChanged(configs: MutableList<AudioPlaybackConfiguration>) {
-            if (configs.isNotEmpty()) lastAudioActiveAt = SystemClock.elapsedRealtime()
+            // 过滤掉自己的静音保活轨（SONIFICATION），只统计外部真实媒体
+            val external = configs.any {
+                it.audioAttributes.usage != android.media.AudioAttributes.USAGE_ASSISTANCE_SONIFICATION
+            }
+            if (external) lastAudioActiveAt = SystemClock.elapsedRealtime()
         }
     }
 
@@ -287,6 +336,7 @@ class OverlayService : Service() {
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
         showBubble()
+        startSilentKeepAlive()
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Intent.ACTION_SCREEN_ON)
@@ -330,6 +380,7 @@ class OverlayService : Service() {
         }
         main.removeCallbacksAndMessages(null)
         pollHandler.removeCallbacksAndMessages(null)
+        stopSilentKeepAlive()
         hideAllBlack()
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
         bubble = null

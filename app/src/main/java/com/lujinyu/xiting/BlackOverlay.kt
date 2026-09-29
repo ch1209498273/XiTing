@@ -7,6 +7,7 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.view.Gravity
 import android.view.GestureDetector
@@ -50,7 +51,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var lp: WindowManager.LayoutParams? = null
     private var unlockPill: TextView? = null
     private var awake = false
-    private var sessionStart = 0L
+    private var sessionStart = 0L          // 墙钟：用于记录起始时间与按天归属
+    private var sessionStartElapsed = 0L   // 单调时钟：用于时长计算，不受时间跳变/跨天影响
     private val relockRunnable = Runnable { sleep() }
 
     fun show(onDismiss: () -> Unit) {
@@ -140,6 +142,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             unlockPill = pill
             isShowing = true
             sessionStart = System.currentTimeMillis()
+            sessionStartElapsed = SystemClock.elapsedRealtime()
             Log.i(TAG, "black overlay added, type=$windowType, backlight override OFF")
             hideSystemBars(f)
             f.post {
@@ -177,8 +180,12 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         awake = false
         if (sessionStart > 0) {
             val now = System.currentTimeMillis()
-            Stats.addDelta(context, now - sessionStart)
-            SessionLog.add(context, ListenSession(sessionStart, now, now - sessionStart, SessionLog.MODE_BLACK))
+            // 时长用单调时钟：就算系统时间被改/跨天，记录的也是真实经过的时间。
+            // 只有设备中途重启（elapsed回绕为负）才退回墙钟差。
+            val elapsed = SystemClock.elapsedRealtime() - sessionStartElapsed
+            val dur = if (elapsed >= 0) elapsed else now - sessionStart
+            Stats.addDelta(context, dur)
+            SessionLog.add(context, ListenSession(sessionStart, now, dur, SessionLog.MODE_BLACK))
             sessionStart = 0
         }
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }

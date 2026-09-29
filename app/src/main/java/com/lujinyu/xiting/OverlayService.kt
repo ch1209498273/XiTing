@@ -87,7 +87,8 @@ class OverlayService : Service() {
 
     /** 保活监控计数：YouTube等App会在片尾/中途把后台播放掐掉，息屏后3分钟内自动再救 */
     private var keepAliveTicks = 0
-    private var screenSessionStart = 0L
+    private var screenSessionStart = 0L           // 墙钟：记录起始
+    private var screenSessionStartElapsed = 0L    // 单调时钟：算时长用
     private var keepAliveDispatches = 0
 
     private var bubble: TextView? = null
@@ -136,8 +137,10 @@ class OverlayService : Service() {
                     main.removeCallbacksAndMessages(null)
                     if (screenSessionStart > 0) {
                         val now = System.currentTimeMillis()
-                        Stats.addDelta(applicationContext, now - screenSessionStart)
-                        SessionLog.add(applicationContext, ListenSession(screenSessionStart, now, now - screenSessionStart, SessionLog.MODE_SCREEN_OFF))
+                        val elapsed = SystemClock.elapsedRealtime() - screenSessionStartElapsed
+                        val dur = if (elapsed >= 0) elapsed else now - screenSessionStart
+                        Stats.addDelta(applicationContext, dur)
+                        SessionLog.add(applicationContext, ListenSession(screenSessionStart, now, dur, SessionLog.MODE_SCREEN_OFF))
                         screenSessionStart = 0
                     }
                 }
@@ -185,6 +188,7 @@ class OverlayService : Service() {
                     // YouTube等App会在片尾把后台播放掐断，这里自动再注入PLAY救回
                     main.postDelayed(keepAliveTick, 12000)
                     screenSessionStart = System.currentTimeMillis()
+                    screenSessionStartElapsed = SystemClock.elapsedRealtime()
                     Log.i(TAG, "resume attempts scheduled (lastAudioActiveAgo=${agoMs}ms)")
                 }
             }

@@ -1,6 +1,7 @@
 package com.lujinyu.xiting
 
 import android.content.Context
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -20,10 +21,13 @@ object SessionLog {
 
     private const val FILE = "sessions.json"
     private const val MAX = 500
+    private const val TAG = "XiTing"
 
-    // 单次听剧超过12小时视为失控会话（进程异常、时钟跳变）：
-    // 读入时整条丢弃，写入时封顶，防止一条脏数据撑爆整张统计图
-    private const val MAX_SESSION_MS = 12L * 3600 * 1000
+    // 旧版本用墙钟差算时长，时钟跳变/跨天会记出「87小时」这类失真数据。
+    // v2.9.1起时长在记录点就用单调时钟（elapsedRealtime）计算，本身不可能失真；
+    // 这里只做一次性迁移：剔除历史上为负或超过24小时（一块电池物理上撑不到）的旧记录并回写存档。
+    // 迁移之后读写路径不再改动任何数据——统计如实按记录展示。
+    private const val LEGACY_MAX_MS = 24L * 3600 * 1000
 
     const val MODE_BLACK = 0
     const val MODE_SCREEN_OFF = 1
@@ -33,24 +37,32 @@ object SessionLog {
         if (!f.exists()) return emptyList()
         return try {
             val arr = JSONArray(f.readText())
-            (0 until arr.length()).map { i ->
+            val all = (0 until arr.length()).map { i ->
                 val o = arr.getJSONObject(i)
                 ListenSession(
                     o.getLong("s"), o.getLong("e"),
                     o.getLong("d"), o.getInt("m")
                 )
-            }.filter { it.durationMs in 1..MAX_SESSION_MS }
-                .sortedByDescending { it.start }
+            }
+            val valid = all.filter { it.durationMs in 0..LEGACY_MAX_MS }
+            if (valid.size != all.size) {
+                write(context, valid)
+                Log.w(TAG, "统计迁移：剔除${all.size - valid.size}条旧版失真记录")
+            }
+            valid.sortedByDescending { it.start }
         } catch (_: Exception) {
             emptyList()
         }
     }
 
     fun add(context: Context, session: ListenSession) {
-        val d = session.durationMs.coerceIn(0, MAX_SESSION_MS)
-        if (d < 1000) return // 太短不计
+        if (session.durationMs < 1000) return // 不足1秒：误触不算听剧
         val list = sessions(context).toMutableList()
-        list.add(0, session.copy(durationMs = d))
+        list.add(0, session)
+        write(context, list)
+    }
+
+    private fun write(context: Context, list: List<ListenSession>) {
         val arr = JSONArray()
         list.take(MAX).forEach {
             arr.put(

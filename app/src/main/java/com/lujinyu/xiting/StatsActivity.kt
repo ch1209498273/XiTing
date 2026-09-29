@@ -192,7 +192,7 @@ class StatsActivity : Activity() {
 
     private fun fmtDur(ms: Long): String {
         val totalMin = ms / 60000
-        if (totalMin < 1) return "<1分钟"
+        if (ms < 60000) return "${ms / 1000}秒"
         val h = totalMin / 60
         val m = totalMin % 60
         return if (h > 0) "${h}小时${m}分" else "${m}分钟"

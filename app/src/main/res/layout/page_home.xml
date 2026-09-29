@@ -44,6 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:id="@+id/hero_sub"
                     android:text="点一下，屏幕全黑声音继续"
                     android:textColor="#B8FFFFFF"
                     android:textSize="13sp" />
@@ -121,6 +122,16 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/badge_black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="✓ 当前模式"
+                    android:textColor="#FF1E8E5A"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -162,6 +173,17 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/badge_screen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="✓ 当前模式"
+                    android:textColor="#FF1E8E5A"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -175,7 +197,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="黑幕下轻点屏幕唤醒 · 来电自动退出黑幕"
+            android:id="@+id/hint_line"
+            android:text="已选黑幕模式：看剧时点悬浮球即可全屏黑幕"
             android:textColor="#FFB0B6BE"
             android:textSize="11sp" />
 

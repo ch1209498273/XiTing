@@ -86,6 +86,7 @@ class MainActivity : Activity() {
         bindHome()
         bindStats()
         bindAbout()
+        refreshModeUI()
         switchTab(TAB_HOME)
     }
 
@@ -189,21 +190,9 @@ class MainActivity : Activity() {
         }
 
         cardBlack.setOnClickListener { toggleBlackAction(cardBlack) }
-        // 黑幕模式卡：与大按钮相同的动作
-        pageHome.findViewById<View>(R.id.tile_black).setOnClickListener { toggleBlackAction(it) }
-        // 真息屏模式卡：App无法替用户按电源键，点击弹用法说明
-        pageHome.findViewById<View>(R.id.tile_screen).setOnClickListener {
-            android.app.AlertDialog.Builder(this)
-                .setTitle("真息屏模式")
-                .setMessage(
-                    "看剧时直接按电源键熄屏即可，1~2秒后声音自动恢复；" +
-                        "片尾被掐断也会自动续播下一集。\n\n" +
-                        "如果熄屏后没有声音恢复，说明这个App不响应系统媒体键，" +
-                        "请改用黑幕模式（任意App都可用）。"
-                )
-                .setPositiveButton("知道了", null)
-                .show()
-        }
+        // 模式卡=选择器：选中的模式决定悬浮球与大按钮的行为
+        pageHome.findViewById<View>(R.id.tile_black).setOnClickListener { selectMode(0) }
+        pageHome.findViewById<View>(R.id.tile_screen).setOnClickListener { selectMode(1) }
 
         val footer = pageHome.findViewById<TextView>(R.id.tv_footer)
         footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
@@ -243,6 +232,37 @@ class MainActivity : Activity() {
         }, if (bootstrap) 1500 else 600)
     }
 
+    /** 选择听剧模式（0=黑幕 1=真息屏）：悬浮球与大按钮都按它执行 */
+    private fun selectMode(mode: Int) {
+        getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+            .edit().putInt("listen_mode", mode).apply()
+        refreshModeUI()
+        Toast.makeText(
+            this,
+            if (mode == 1) "已选真息屏模式：看剧时点悬浮球即锁屏听剧" else "已选黑幕模式：看剧时点悬浮球即全屏黑幕",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun refreshModeUI() {
+        val mode = getSharedPreferences("xiiting_prefs", MODE_PRIVATE).getInt("listen_mode", 0)
+        pageHome.findViewById<LinearLayout>(R.id.tile_black).setBackgroundResource(
+            if (mode == 0) R.drawable.bg_card_selected else R.drawable.bg_card
+        )
+        pageHome.findViewById<LinearLayout>(R.id.tile_screen).setBackgroundResource(
+            if (mode == 1) R.drawable.bg_card_selected else R.drawable.bg_card
+        )
+        pageHome.findViewById<View>(R.id.badge_black).visibility = if (mode == 0) View.VISIBLE else View.GONE
+        pageHome.findViewById<View>(R.id.badge_screen).visibility = if (mode == 1) View.VISIBLE else View.GONE
+        pageHome.findViewById<TextView>(R.id.hint_line).text =
+            if (mode == 1)
+                "已选真息屏模式：看剧时点悬浮球锁屏（首次需激活一键锁屏），或直接按电源键"
+            else
+                "已选黑幕模式：看剧时点悬浮球即可全屏黑幕"
+        pageHome.findViewById<TextView>(R.id.hero_sub).text =
+            if (mode == 1) "点一下，锁屏听剧最省电" else "点一下，屏幕全黑声音继续"
+    }
+
     override fun onResume() {
         super.onResume()
         refreshStates()
@@ -254,7 +274,10 @@ class MainActivity : Activity() {
         super.onWindowFocusChanged(hasFocus)
         // 黑幕窗口盖上/拿走都会改变本窗口焦点：恰好作为状态刷新时机，
         // 否则从黑幕上解锁回来，胶囊会停留在「黑幕开启中」
-        if (hasFocus) refreshStates()
+        if (hasFocus) {
+            refreshStates()
+            refreshModeUI()
+        }
     }
 
     private fun postRefresh() {

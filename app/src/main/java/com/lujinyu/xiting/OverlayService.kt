@@ -53,8 +53,10 @@ class OverlayService : Service() {
         const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         private const val ACTION_RESUME_TOGGLE = "com.lujinyu.xiting.RESUME_TOGGLE"
         const val ACTION_START_BLACK = "com.lujinyu.xiting.START_BLACK"
+        const val ACTION_RUN_MODE = "com.lujinyu.xiting.RUN_MODE"
         private const val PREFS = "xiiting_prefs"
         private const val KEY_AUTO_RESUME = "auto_resume_on_screen_off"
+        const val KEY_LISTEN_MODE = "listen_mode"
 
         var instance: OverlayService? = null
             private set
@@ -300,8 +302,10 @@ class OverlayService : Service() {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
             ACTION_START_BLACK ->
-                // 主界面「一键息屏听剧」：onStartCommand在onCreate之后主线程执行，可直接上黑幕
-                if (!isAnyBlackShowing()) toggleOverlay()
+                // 主界面「一键息屏听剧」：onStartCommand在onCreate之后主线程执行，直接执行所选模式
+                runSelectedMode()
+
+            ACTION_RUN_MODE -> runSelectedMode()
             ACTION_RESUME_TOGGLE -> {
                 val cur = prefs.getBoolean(KEY_AUTO_RESUME, true)
                 prefs.edit().putBoolean(KEY_AUTO_RESUME, !cur).apply()
@@ -398,7 +402,7 @@ class OverlayService : Service() {
                         // 位置记忆
                         prefs.edit().putInt("bubble_x", lp.x).putInt("bubble_y", lp.y).apply()
                     } else {
-                        toggleOverlay()
+                        runSelectedMode()
                     }
                     true
                 }
@@ -417,6 +421,37 @@ class OverlayService : Service() {
     }
 
     // ---------- 黑屏遮罩 ----------
+
+    /** 当前所选听剧模式：0=黑幕 1=真息屏 */
+    private val listenMode: Int get() = prefs.getInt(KEY_LISTEN_MODE, 0)
+
+    /**
+     * 执行所选模式（悬浮球、通知、磁贴、主界面大按钮共用）。
+     * 黑幕模式=全屏黑幕；真息屏模式=锁屏（设备管理员force-lock，激活一次后可用）。
+     */
+    fun runSelectedMode() {
+        if (listenMode == 1) {
+            val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+            val admin = android.content.ComponentName(this, LockReceiver::class.java)
+            if (dpm.isAdminActive(admin)) {
+                dpm.lockNow() // 真息屏：SCREEN_OFF广播接自动续播链路
+            } else {
+                // 首次使用：引导激活一键锁屏（标准设备管理员流程，可随时在系统设置里停用）
+                startActivity(
+                    android.content.Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                        putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
+                        putExtra(
+                            android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                            "用于悬浮球触发真息屏（锁屏听剧）。激活后点悬浮球即锁屏，声音自动恢复。"
+                        )
+                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
+        } else {
+            toggleOverlay()
+        }
+    }
 
     /** 黑幕/恢复 切换（悬浮球、通知、快捷磁贴共用） */
     fun toggleOverlay() {

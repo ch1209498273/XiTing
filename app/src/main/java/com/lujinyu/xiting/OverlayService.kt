@@ -374,6 +374,7 @@ class OverlayService : Service() {
         var startX = 0
         var startY = 0
         var moved = false
+        var downAt = 0L
 
         tv.setOnTouchListener { v, e ->
             when (e.actionMasked) {
@@ -383,6 +384,7 @@ class OverlayService : Service() {
                     startX = lp.x
                     startY = lp.y
                     moved = false
+                    downAt = SystemClock.elapsedRealtime()
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -397,8 +399,11 @@ class OverlayService : Service() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    Log.i(TAG, "bubble ACTION_UP, moved=$moved")
-                    if (moved) {
+                    // 短按（<250ms）即使有轻微位移也按点击处理：手持抖动超过
+                    // 触摸容差很常见，不能让点击被当成拖动吞掉
+                    val quickTap = SystemClock.elapsedRealtime() - downAt < 250
+                    Log.i(TAG, "bubble ACTION_UP, moved=$moved, quickTap=$quickTap")
+                    if (moved && !quickTap) {
                         // 位置记忆
                         prefs.edit().putInt("bubble_x", lp.x).putInt("bubble_y", lp.y).apply()
                     } else {

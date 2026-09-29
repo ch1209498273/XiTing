@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFFFF"
+    android:background="#FFF7F8FA"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
@@ -19,7 +19,7 @@
             android:layout_gravity="center"
             android:text="息屏听剧"
             android:textColor="#FF111418"
-            android:textSize="17sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView

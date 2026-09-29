@@ -1,503 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFFFF"
     android:fitsSystemWindows="true"
-    android:scrollbars="none">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <!-- 应用栏 -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="16dp">
+        android:layout_height="56dp"
+        android:background="#FFFFFFFF">
 
-        <!-- 顶部：大标题 + 状态 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="息屏听剧"
-                    android:textColor="#FF111418"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="看剧时一键熄屏，声音继续"
-                    android:textColor="#FF8A9099"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/pill_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_pill_off"
-                android:paddingStart="12dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="5dp"
-                android:text="未运行"
-                android:textColor="#FF5F6570"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- 主操作：一键息屏听剧 -->
-        <LinearLayout
-            android:id="@+id/card_black"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:background="@drawable/bg_hero"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="20dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="一键息屏听剧"
-                    android:textColor="#FFFFFFFF"
-                    android:textSize="21sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="点一下，屏幕全黑声音继续"
-                    android:textColor="#B8FFFFFF"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/pill_black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_pill_hero_off"
-                    android:paddingStart="12dp"
-                    android:paddingTop="4dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="4dp"
-                    android:text="未开启"
-                    android:textColor="#FFFFFFFF"
-                    android:textSize="11sp" />
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_row_overlay"
-                android:tint="#FFFFFFFF" />
-        </LinearLayout>
-
-        <!-- 两种模式 -->
         <TextView
+            android:id="@+id/appbar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="两种模式"
+            android:layout_gravity="center"
+            android:text="息屏听剧"
             android:textColor="#FF111418"
             android:textSize="17sp"
             android:textStyle="bold" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card"
-                android:elevation="1dp"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_icon_green"
-                    android:contentDescription="@null"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_row_overlay"
-                    android:tint="#FF1E8E5A" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="黑幕模式"
-                    android:textColor="#FF111418"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="任意App · 防误触"
-                    android:textColor="#FF8A9099"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card"
-                android:elevation="1dp"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_icon_blue"
-                    android:contentDescription="@null"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_mode_screen"
-                    android:tint="#FF3D7EFF" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="真息屏模式"
-                    android:textColor="#FF111418"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="按电源键 · 最省电"
-                    android:textColor="#FF8A9099"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </LinearLayout>
-
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/pill_status"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="黑幕下轻点屏幕唤醒 · 来电自动退出黑幕"
-            android:textColor="#FFB0B6BE"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_pill_off"
+            android:paddingStart="10dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="4dp"
+            android:text="未运行"
+            android:textColor="#FF5F6570"
             android:textSize="11sp" />
 
-        <!-- 节能统计 -->
-        <LinearLayout
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="#FFECEEF1" />
+    </FrameLayout>
+
+    <!-- 内容区：三个页签 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <include
+            android:id="@+id/page_home"
+            layout="@layout/page_home" />
+
+        <include
+            android:id="@+id/page_stats"
+            layout="@layout/page_stats"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/page_about"
+            layout="@layout/page_about"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#FFECEEF1" />
+
+    <!-- 底部导航栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:background="#FFFFFFFF"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/nav_icon_home"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_nav_home" />
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="节能统计"
-                android:textColor="#FF111418"
-                android:textSize="17sp"
-                android:textStyle="bold" />
-
-            <TextView
+                android:id="@+id/nav_label_home"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="查看明细 ›"
-                android:textColor="#FF1E8E5A"
-                android:textSize="13sp" />
+                android:layout_marginTop="2dp"
+                android:text="首页"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/stats_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card"
-            android:elevation="1dp"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="18dp">
+            android:id="@+id/nav_stats"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <ImageView
+                android:id="@+id/nav_icon_stats"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_nav_stats" />
+
+            <TextView
+                android:id="@+id/nav_label_stats"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="今日"
-                    android:textColor="#FF8A9099"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/home_today"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="0秒"
-                    android:textColor="#FF111418"
-                    android:textSize="19sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="34dp"
-                android:background="#FFECEEF1" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="近7天"
-                    android:textColor="#FF8A9099"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/home_week"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="0秒"
-                    android:textColor="#FF111418"
-                    android:textSize="19sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="34dp"
-                android:background="#FFECEEF1" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="累计"
-                    android:textColor="#FF8A9099"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/home_all"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="0秒"
-                    android:textColor="#FF1E8E5A"
-                    android:textSize="19sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                android:layout_marginTop="2dp"
+                android:text="统计"
+                android:textSize="10sp" />
         </LinearLayout>
-
-        <!-- 服务与权限 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="服务与权限"
-            android:textColor="#FF111418"
-            android:textSize="17sp"
-            android:textStyle="bold" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card"
-            android:elevation="1dp"
-            android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
+            android:id="@+id/nav_about"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btn_service"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="@null"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:gravity="center_vertical|start"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp"
-                android:text="启动助手"
-                android:textAllCaps="false"
-                android:textColor="#FF111418"
-                android:textSize="15sp" />
+            <ImageView
+                android:id="@+id/nav_icon_about"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_nav_about" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
-
-            <LinearLayout
-                android:id="@+id/row_overlay"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="悬浮窗权限"
-                    android:textColor="#FF111418"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/pill_overlay"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_pill_off"
-                    android:paddingStart="10dp"
-                    android:paddingTop="3dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="3dp"
-                    android:text="去开启"
-                    android:textColor="#FF5F6570"
-                    android:textSize="11sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
-
-            <LinearLayout
-                android:id="@+id/row_battery"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="电池后台加白"
-                    android:textColor="#FF111418"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/pill_battery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_pill_off"
-                    android:paddingStart="10dp"
-                    android:paddingTop="3dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="3dp"
-                    android:text="去加白"
-                    android:textColor="#FF5F6570"
-                    android:textSize="11sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
-
-            <LinearLayout
-                android:id="@+id/row_notify"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="通知权限"
-                    android:textColor="#FF111418"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/pill_notify"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_pill_off"
-                    android:paddingStart="10dp"
-                    android:paddingTop="3dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="3dp"
-                    android:text="去开启"
-                    android:textColor="#FF5F6570"
-                    android:textSize="11sp" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/nav_label_about"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="关于"
+                android:textSize="10sp" />
         </LinearLayout>
-
-        <!-- 关于 -->
-        <TextView
-            android:id="@+id/btn_about"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="关于息屏听剧 · 使用说明 / 隐私 / 开源 ›"
-            android:textColor="#FF8A9099"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/tv_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="完全离线 · 不收集任何数据"
-            android:textColor="#FFC3C8CF"
-            android:textSize="10sp" />
     </LinearLayout>
-</ScrollView>
+</LinearLayout>

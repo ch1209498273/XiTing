@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFFFF"
-    android:fitsSystemWindows="true"
     android:scrollbars="none">
 
     <LinearLayout
@@ -11,33 +10,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/btn_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="8dp"
-                android:text="←"
-                android:textColor="#FF111418"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="节能统计"
-                android:textColor="#FF111418"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"

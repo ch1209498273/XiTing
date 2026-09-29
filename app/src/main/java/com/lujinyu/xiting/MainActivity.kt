@@ -31,8 +31,9 @@ class MainActivity : Activity() {
     private lateinit var cardBlack: LinearLayout
     private lateinit var pillBlack: TextView
     private lateinit var btnService: Button
-    private lateinit var statsLine1: TextView
-    private lateinit var statsLine2: TextView
+    private lateinit var homeToday: TextView
+    private lateinit var homeWeek: TextView
+    private lateinit var homeAll: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +49,9 @@ class MainActivity : Activity() {
         cardBlack = findViewById(R.id.card_black)
         pillBlack = findViewById(R.id.pill_black)
         btnService = findViewById(R.id.btn_service)
-        statsLine1 = findViewById(R.id.stats_line1)
-        statsLine2 = findViewById(R.id.stats_line2)
+        homeToday = findViewById(R.id.home_today)
+        homeWeek = findViewById(R.id.home_week)
+        homeAll = findViewById(R.id.home_all)
         findViewById<LinearLayout>(R.id.stats_card).setOnClickListener { openStats() }
 
         rowOverlay.setOnClickListener {
@@ -149,6 +151,13 @@ class MainActivity : Activity() {
         refreshStats()
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // 黑幕窗口盖上/拿走都会改变本窗口焦点：恰好作为状态刷新时机，
+        // 否则从黑幕上解锁回来，胶囊会停留在「黑幕开启中」
+        if (hasFocus) refreshStates()
+    }
+
     private fun openStats() {
         startActivity(Intent(this, StatsActivity::class.java))
     }
@@ -161,15 +170,18 @@ class MainActivity : Activity() {
             set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
         }
         val todayStart = cal.timeInMillis
+        val weekStart = todayStart - 7L * 24 * 3600 * 1000
         var todayMs = 0L
+        var weekMs = 0L
         var allMs = 0L
         sessions.forEach { s ->
             allMs += s.durationMs
             if (s.start >= todayStart) todayMs += s.durationMs
+            if (s.start >= weekStart) weekMs += s.durationMs
         }
-        val todayMin = todayMs / 60000
-        statsLine1.text = "今日息屏听剧 ${todayMin} 分钟"
-        statsLine2.text = "累计 ${fmtDur(allMs)} · 估算省电 ≈ ${Stats.estimatedMah(allMs)} mAh · 点看明细"
+        homeToday.text = fmtDur(todayMs)
+        homeWeek.text = fmtDur(weekMs)
+        homeAll.text = fmtDur(allMs)
     }
 
     private fun fmtDur(ms: Long): String {
@@ -205,10 +217,10 @@ class MainActivity : Activity() {
             pillStatus.text = "未运行"
         }
 
-        // 黑幕状态胶囊
+        // 主按钮状态胶囊（绿底白字/白底绿字）
         val blackOn = OverlayService.instance?.isAnyBlackShowing() == true
-        pillBlack.setBackgroundResource(if (blackOn) R.drawable.bg_pill_on else R.drawable.bg_pill_off)
-        pillBlack.setTextColor(if (blackOn) 0xFF157A4C.toInt() else 0xFF5F6570.toInt())
+        pillBlack.setBackgroundResource(if (blackOn) R.drawable.bg_pill_hero_on else R.drawable.bg_pill_hero_off)
+        pillBlack.setTextColor(if (blackOn) 0xFF1E8E5A.toInt() else 0xFFFFFFFF.toInt())
         pillBlack.text = if (blackOn) "黑幕开启中" else "未开启"
 
         // 助手开关按钮

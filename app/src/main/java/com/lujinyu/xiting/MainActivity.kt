@@ -13,7 +13,6 @@ import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -54,8 +53,7 @@ class MainActivity : Activity() {
 
     // 首页控件
     private lateinit var cardBlack: LinearLayout
-    private lateinit var pillBlack: TextView
-    private lateinit var btnService: Button
+    private lateinit var heroTitle: TextView
     private lateinit var homeToday: TextView
     private lateinit var homeWeek: TextView
     private lateinit var homeAll: TextView
@@ -119,8 +117,7 @@ class MainActivity : Activity() {
 
     private fun bindHome() {
         cardBlack = pageHome.findViewById(R.id.card_black)
-        pillBlack = pageHome.findViewById(R.id.pill_black)
-        btnService = pageHome.findViewById(R.id.btn_service)
+        heroTitle = pageHome.findViewById(R.id.hero_title)
         homeToday = pageHome.findViewById(R.id.home_today)
         homeWeek = pageHome.findViewById(R.id.home_week)
         homeAll = pageHome.findViewById(R.id.home_all)
@@ -180,17 +177,19 @@ class MainActivity : Activity() {
             }
         }
 
-        btnService.setOnClickListener {
+        // 主按钮=助手服务控制（启动/停止）：看剧时的动作在悬浮球上
+        cardBlack.setOnClickListener {
             if (OverlayService.isRunning) {
                 startService(Intent(this, OverlayService::class.java).setAction(OverlayService.ACTION_EXIT))
+                Toast.makeText(this, "助手已停止", Toast.LENGTH_SHORT).show()
             } else {
                 startForegroundService(Intent(this, OverlayService::class.java))
+                Toast.makeText(this, "助手已启动，看剧时点悬浮球即可", Toast.LENGTH_SHORT).show()
             }
             postRefresh()
         }
 
-        cardBlack.setOnClickListener { toggleBlackAction(cardBlack) }
-        // 模式卡=选择器：选中的模式决定悬浮球与大按钮的行为
+        // 模式卡=选择器：选中的模式决定悬浮球的行为
         pageHome.findViewById<View>(R.id.tile_black).setOnClickListener { selectMode(0) }
         pageHome.findViewById<View>(R.id.tile_screen).setOnClickListener { selectMode(1) }
 
@@ -198,45 +197,12 @@ class MainActivity : Activity() {
         footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
     }
 
-    /** 一键黑幕：大按钮与黑幕模式卡共用 */
-    private fun toggleBlackAction(anchor: View) {
-        val bootstrap = !OverlayService.isRunning
-        when {
-            // 一键：拉起助手并直接上黑幕（与悬浮球的区别：不用先手动启动助手）
-            bootstrap -> {
-                startForegroundService(
-                    Intent(this, OverlayService::class.java)
-                        .setAction(OverlayService.ACTION_START_BLACK)
-                )
-                Toast.makeText(this, "助手启动中，黑幕马上覆盖全屏…", Toast.LENGTH_SHORT).show()
-            }
-            else -> OverlayService.instance?.toggleOverlay()
-        }
-        postRefresh()
-        // 结果核对式反馈：黑幕（z序高于Toast）会盖住即时提示，
-        // 所以成功时保持沉默，只有「该黑没黑」才提示原因
-        val wantBlack = !bootstrap ||
-            OverlayService.instance?.isAnyBlackShowing() == true
-        anchor.postDelayed({
-            if (OverlayService.isRunning &&
-                wantBlack &&
-                OverlayService.instance?.isAnyBlackShowing() != true
-            ) {
-                Toast.makeText(
-                    this,
-                    "黑幕没弹出来：请到「服务与权限」确认悬浮窗权限后重试",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            refreshStates()
-        }, if (bootstrap) 1500 else 600)
-    }
-
-    /** 选择听剧模式（0=黑幕 1=真息屏）：悬浮球与大按钮都按它执行 */
+    /** 选择听剧模式（0=黑幕 1=真息屏）：悬浮球按它执行 */
     private fun selectMode(mode: Int) {
         getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
             .edit().putInt("listen_mode", mode).apply()
         refreshModeUI()
+        refreshStates()
         Toast.makeText(
             this,
             if (mode == 1) "已选真息屏模式：看剧时点悬浮球即锁屏听剧" else "已选黑幕模式：看剧时点悬浮球即全屏黑幕",
@@ -259,8 +225,6 @@ class MainActivity : Activity() {
                 "已选真息屏模式：看剧时点悬浮球锁屏（首次需激活一键锁屏），或直接按电源键"
             else
                 "已选黑幕模式：看剧时点悬浮球即可全屏黑幕"
-        pageHome.findViewById<TextView>(R.id.hero_sub).text =
-            if (mode == 1) "点一下，锁屏听剧最省电" else "点一下，屏幕全黑声音继续"
     }
 
     override fun onResume() {
@@ -295,13 +259,14 @@ class MainActivity : Activity() {
             pillStatus.setTextColor(0xFF5F6570.toInt())
             pillStatus.text = "未运行"
         }
-        btnService.text = if (running) "停止助手" else "启动助手"
-
-        // 主按钮状态胶囊（绿底白字/白底绿字）
-        val blackOn = OverlayService.instance?.isAnyBlackShowing() == true
-        pillBlack.setBackgroundResource(if (blackOn) R.drawable.bg_pill_hero_on else R.drawable.bg_pill_hero_off)
-        pillBlack.setTextColor(if (blackOn) 0xFF1E8E5A.toInt() else 0xFFFFFFFF.toInt())
-        pillBlack.text = if (blackOn) "黑幕开启中" else "未开启"
+        // 主按钮=助手控制：文案随运行状态与所选模式变化
+        val mode = getSharedPreferences("xiiting_prefs", MODE_PRIVATE).getInt("listen_mode", 0)
+        heroTitle.text = if (running) "息屏听剧运行中" else "启动息屏听剧"
+        pageHome.findViewById<TextView>(R.id.hero_sub).text = when {
+            !running -> "启动后，看剧时点悬浮球即可息屏听剧"
+            mode == 1 -> "看剧时点悬浮球即锁屏 · 点此停止助手"
+            else -> "看剧时点悬浮球即全屏黑幕 · 点此停止助手"
+        }
 
         val overlayOk = Settings.canDrawOverlays(this)
         val pm = getSystemService(POWER_SERVICE) as PowerManager

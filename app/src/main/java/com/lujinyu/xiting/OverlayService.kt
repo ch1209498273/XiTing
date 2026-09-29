@@ -110,58 +110,9 @@ class OverlayService : Service() {
         }
     }
 
-    // 静音保活：ColorOS(hans冻结管理器)会在锁屏后冻结后台进程并强制释放唤醒锁，
-    // 导致自动续播永远无法执行（真机日志：ForceReleaseWakeLock + 广播被忽略）。
-    // 持续播放一条数字静音音轨（PCM全零，人耳不可闻），让系统始终视本应用
-    // 为"正在播放音频"从而豁免冻结——息屏挂机类应用在OPPO上的标准做法。
-    // 用SONIFICATION通道：不占用音乐流，不污染isMusicActive判定。
-    private var silentTrack: android.media.AudioTrack? = null
-
-    private fun startSilentKeepAlive() {
-        if (silentTrack != null) return
-        try {
-            val sampleRate = 8000
-            val frames = sampleRate / 4 // 0.25秒
-            val buf = ByteArray(frames * 2) // 16bit mono 全零 = 数字静音
-            val attrs = android.media.AudioAttributes.Builder()
-                .setUsage(android.media.AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
-            val fmt = android.media.AudioFormat.Builder()
-                .setEncoding(android.media.AudioFormat.ENCODING_PCM_16BIT)
-                .setSampleRate(sampleRate)
-                .setChannelMask(android.media.AudioFormat.CHANNEL_OUT_MONO)
-                .build()
-            val track = android.media.AudioTrack(
-                attrs, fmt, buf.size,
-                android.media.AudioTrack.MODE_STATIC, AudioManager.AUDIO_SESSION_ID_GENERATE
-            )
-            track.write(buf, 0, buf.size)
-            track.setLoopPoints(0, frames, -1)
-            track.play()
-            silentTrack = track
-            Log.i(TAG, "静音保活已启动（防hans冻结）")
-        } catch (e: Exception) {
-            Log.w(TAG, "静音保活启动失败: $e")
-        }
-    }
-
-    private fun stopSilentKeepAlive() {
-        try {
-            silentTrack?.stop()
-            silentTrack?.release()
-        } catch (_: Exception) {
-        }
-        silentTrack = null
-    }
-
     private val playbackCallback = object : AudioManager.AudioPlaybackCallback() {
         override fun onPlaybackConfigChanged(configs: MutableList<AudioPlaybackConfiguration>) {
-            // 过滤掉自己的静音保活轨（SONIFICATION），只统计外部真实媒体
-            val external = configs.any {
-                it.audioAttributes.usage != android.media.AudioAttributes.USAGE_ASSISTANCE_SONIFICATION
-            }
-            if (external) lastAudioActiveAt = SystemClock.elapsedRealtime()
+            if (configs.isNotEmpty()) lastAudioActiveAt = SystemClock.elapsedRealtime()
         }
     }
 
@@ -336,7 +287,6 @@ class OverlayService : Service() {
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
         showBubble()
-        startSilentKeepAlive()
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Intent.ACTION_SCREEN_ON)
@@ -380,7 +330,6 @@ class OverlayService : Service() {
         }
         main.removeCallbacksAndMessages(null)
         pollHandler.removeCallbacksAndMessages(null)
-        stopSilentKeepAlive()
         hideAllBlack()
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
         bubble = null
@@ -493,9 +442,16 @@ class OverlayService : Service() {
             val active = dpm.isAdminActive(admin)
             Log.i(TAG, "真息屏: adminActive=$active")
             if (active) {
+                // 锁屏后hans会冻结本进程：进程内的延迟注入不可靠。
+                // 趁进程还活着预布精确闹钟（setAlarmClock系统最高优先级、冻结豁免），
+                // 由ResumeAlarmReceiver按时注入播放键并自链续约3分钟保活窗口
+                val base = System.currentTimeMillis()
+                longArrayOf(1000L, 3000L, 6000L, 10000L).forEachIndexed { i, delay ->
+                    ResumeAlarmReceiver.schedule(this, i, base + delay)
+                }
                 try {
-                    dpm.lockNow() // 真息屏：SCREEN_OFF广播接自动续播链路
-                    Log.i(TAG, "lockNow 已执行")
+                    dpm.lockNow() // 真息屏：锁屏；续播由闹钟接收器完成
+                    Log.i(TAG, "lockNow 已执行，续播闹钟已预布")
                 } catch (e: Exception) {
                     Log.e(TAG, "lockNow失败: $e")
                 }

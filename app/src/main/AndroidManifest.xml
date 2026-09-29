@@ -45,6 +45,10 @@
         </service>
 
         <receiver
+            android:name=".ResumeAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".LockReceiver"
             android:permission="android.permission.BIND_DEVICE_ADMIN"
             android:exported="true">

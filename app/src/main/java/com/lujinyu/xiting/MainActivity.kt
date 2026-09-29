@@ -28,7 +28,8 @@ class MainActivity : Activity() {
     private lateinit var pillBattery: TextView
     private lateinit var pillNotify: TextView
     private lateinit var pillStatus: TextView
-    private lateinit var btnOverlayToggle: Button
+    private lateinit var cardBlack: LinearLayout
+    private lateinit var pillBlack: TextView
     private lateinit var btnService: Button
     private lateinit var statsLine1: TextView
     private lateinit var statsLine2: TextView
@@ -44,7 +45,8 @@ class MainActivity : Activity() {
         pillBattery = findViewById(R.id.pill_battery)
         pillNotify = findViewById(R.id.pill_notify)
         pillStatus = findViewById(R.id.pill_status)
-        btnOverlayToggle = findViewById(R.id.btn_overlay_toggle)
+        cardBlack = findViewById(R.id.card_black)
+        pillBlack = findViewById(R.id.pill_black)
         btnService = findViewById(R.id.btn_service)
         statsLine1 = findViewById(R.id.stats_line1)
         statsLine2 = findViewById(R.id.stats_line2)
@@ -98,14 +100,37 @@ class MainActivity : Activity() {
             }
         }
 
-        btnOverlayToggle.setOnClickListener {
+        cardBlack.setOnClickListener {
+            val bootstrap = !OverlayService.isRunning
             when {
-                !OverlayService.isRunning ->
-                    Toast.makeText(this, "请先点下方「启动助手」", Toast.LENGTH_SHORT).show()
-                OverlayService.instance?.isAnyBlackShowing() == true -> OverlayService.instance?.toggleOverlay()
+                // 一键：拉起助手并直接上黑幕（与悬浮球的区别：不用先手动启动助手）
+                bootstrap -> {
+                    startForegroundService(
+                        Intent(this, OverlayService::class.java)
+                            .setAction(OverlayService.ACTION_START_BLACK)
+                    )
+                    Toast.makeText(this, "助手启动中，黑幕马上覆盖全屏…", Toast.LENGTH_SHORT).show()
+                }
                 else -> OverlayService.instance?.toggleOverlay()
             }
             postRefresh()
+            // 结果核对式反馈：黑幕（z序高于Toast）会盖住即时提示，
+            // 所以成功时保持沉默，只有「该黑没黑」才提示原因
+            val wantBlack = !bootstrap ||
+                OverlayService.instance?.isAnyBlackShowing() == true
+            cardBlack.postDelayed({
+                if (OverlayService.isRunning &&
+                    wantBlack &&
+                    OverlayService.instance?.isAnyBlackShowing() != true
+                ) {
+                    Toast.makeText(
+                        this,
+                        "黑幕没弹出来：请点上方「悬浮窗权限」确认授权后重试",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                refreshStates()
+            }, if (bootstrap) 1500 else 600)
         }
 
         btnService.setOnClickListener {
@@ -149,6 +174,7 @@ class MainActivity : Activity() {
 
     private fun fmtDur(ms: Long): String {
         val totalMin = ms / 60000
+        if (totalMin < 1) return "<1分钟"
         val h = totalMin / 60
         val m = totalMin % 60
         return if (h > 0) "${h}小时${m}分" else "${m}分钟"
@@ -179,24 +205,11 @@ class MainActivity : Activity() {
             pillStatus.text = "未运行"
         }
 
-        // 黑幕模式按钮
-        when {
-            !running -> {
-                btnOverlayToggle.text = "先启动助手"
-                btnOverlayToggle.isEnabled = false
-                btnOverlayToggle.alpha = 0.5f
-            }
-            OverlayService.instance?.isAnyBlackShowing() == true -> {
-                btnOverlayToggle.text = "解除黑幕"
-                btnOverlayToggle.isEnabled = true
-                btnOverlayToggle.alpha = 1f
-            }
-            else -> {
-                btnOverlayToggle.text = "开启黑幕"
-                btnOverlayToggle.isEnabled = true
-                btnOverlayToggle.alpha = 1f
-            }
-        }
+        // 黑幕状态胶囊
+        val blackOn = OverlayService.instance?.isAnyBlackShowing() == true
+        pillBlack.setBackgroundResource(if (blackOn) R.drawable.bg_pill_on else R.drawable.bg_pill_off)
+        pillBlack.setTextColor(if (blackOn) 0xFF157A4C.toInt() else 0xFF5F6570.toInt())
+        pillBlack.text = if (blackOn) "黑幕开启中" else "未开启"
 
         // 助手开关按钮
         btnService.text = if (running) "停止助手" else "启动助手"
@@ -212,6 +225,9 @@ class MainActivity : Activity() {
         // 页脚水印
         val footer = findViewById<TextView>(R.id.tv_footer)
         footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
+        findViewById<TextView>(R.id.btn_about).setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
+        }
     }
 
     private fun postRefresh() {

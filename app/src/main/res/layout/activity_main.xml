@@ -115,12 +115,14 @@
                 android:textSize="20sp" />
         </LinearLayout>
 
-        <!-- 黑幕模式 -->
+        <!-- 黑幕模式（整卡可点） -->
         <LinearLayout
+            android:id="@+id/card_black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_card"
+            android:foreground="?android:attr/selectableItemBackground"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -146,7 +148,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="黑幕模式"
+                        android:text="一键息屏听剧"
                         android:textColor="#FF111418"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -155,24 +157,33 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="任意视频App · 全黑防误触 · 背光物理关闭"
+                        android:text="自动拉起助手并全屏黑幕 · 悬浮球随时解除"
                         android:textColor="#FF5F6570"
                         android:textSize="12sp" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/pill_black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_off"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text="未开启"
+                    android:textColor="#FF5F6570"
+                    android:textSize="12sp" />
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_overlay_toggle"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_btn_primary"
-                android:stateListAnimator="@null"
-                android:text="开启黑幕"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:lineSpacingExtra="3dp"
+                android:text="点卡片或悬浮球开关黑幕；黑幕下轻点屏幕解锁，点按钮返回视频。"
+                android:textColor="#FF5F6570"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <!-- 真息屏模式 -->
@@ -376,6 +387,20 @@
                 android:textColor="#FF444B54"
                 android:textSize="12sp" />
         </LinearLayout>
+
+        <!-- 关于入口 -->
+        <TextView
+            android:id="@+id/btn_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_card"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="关于息屏听剧 · 使用说明 / 隐私 / 开源 ›"
+            android:textColor="#FF444B54"
+            android:textSize="13sp" />
 
         <!-- 页脚 -->
         <TextView

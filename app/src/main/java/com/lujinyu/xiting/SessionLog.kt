@@ -21,6 +21,10 @@ object SessionLog {
     private const val FILE = "sessions.json"
     private const val MAX = 500
 
+    // 单次听剧超过12小时视为失控会话（进程异常、时钟跳变）：
+    // 读入时整条丢弃，写入时封顶，防止一条脏数据撑爆整张统计图
+    private const val MAX_SESSION_MS = 12L * 3600 * 1000
+
     const val MODE_BLACK = 0
     const val MODE_SCREEN_OFF = 1
 
@@ -35,16 +39,18 @@ object SessionLog {
                     o.getLong("s"), o.getLong("e"),
                     o.getLong("d"), o.getInt("m")
                 )
-            }.sortedByDescending { it.start }
+            }.filter { it.durationMs in 1..MAX_SESSION_MS }
+                .sortedByDescending { it.start }
         } catch (_: Exception) {
             emptyList()
         }
     }
 
     fun add(context: Context, session: ListenSession) {
-        if (session.durationMs < 1000) return // 太短不计
+        val d = session.durationMs.coerceIn(0, MAX_SESSION_MS)
+        if (d < 1000) return // 太短不计
         val list = sessions(context).toMutableList()
-        list.add(0, session)
+        list.add(0, session.copy(durationMs = d))
         val arr = JSONArray()
         list.take(MAX).forEach {
             arr.put(

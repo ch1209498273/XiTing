@@ -52,7 +52,7 @@ class OverlayService : Service() {
         private const val ACTION_TOGGLE = "com.lujinyu.xiting.TOGGLE"
         const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         private const val ACTION_RESUME_TOGGLE = "com.lujinyu.xiting.RESUME_TOGGLE"
-        private const val ACTION_TEST_TOGGLE = "com.lujinyu.xiting.TEST_TOGGLE"
+        const val ACTION_START_BLACK = "com.lujinyu.xiting.START_BLACK"
         private const val PREFS = "xiiting_prefs"
         private const val KEY_AUTO_RESUME = "auto_resume_on_screen_off"
 
@@ -130,11 +130,6 @@ class OverlayService : Service() {
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
-            ACTION_TEST_TOGGLE -> {
-                Log.i(TAG, "TEST_TOGGLE broadcast received")
-                toggleOverlay()
-            }
-
             Intent.ACTION_SCREEN_ON -> {
                     // 用户亮屏了：取消所有待执行的续播/保活，别干扰正常操作
                     Log.i(TAG, "SCREEN_ON: cancel pending resume/keepalive")
@@ -269,9 +264,15 @@ class OverlayService : Service() {
         audioPollRunnable.run()
         // 常驻部分唤醒锁：服务运行期间保持CPU唤醒、防止ColorOS冻结进程
         // （「熄屏挂机」类工具的标准做法；退出助手即释放，不白白耗电）
-        wakeLock = (getSystemService(POWER_SERVICE) as android.os.PowerManager)
-            .newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "XiTing:service")
-            .apply { setReferenceCounted(false); acquire() }
+        // 部分ROM会剥离WAKE_LOCK权限：拿不到时降级运行，绝不能拖垮服务
+        wakeLock = try {
+            (getSystemService(POWER_SERVICE) as android.os.PowerManager)
+                .newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "XiTing:service")
+                .apply { setReferenceCounted(false); acquire() }
+        } catch (e: Exception) {
+            Log.w(TAG, "唤醒锁获取失败，降级为无锁运行: $e")
+            null
+        }
         if (Build.VERSION.SDK_INT >= 31) {
             audioManager.addOnModeChangedListener(main::post, modeListener)
             Log.i(TAG, "来电监听已注册")
@@ -283,7 +284,6 @@ class OverlayService : Service() {
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Intent.ACTION_SCREEN_ON)
-            addAction(ACTION_TEST_TOGGLE) // UAT测试钩子：广播直接切换黑幕，绕开adb点击注入的不稳定
         }
         if (Build.VERSION.SDK_INT >= 33) {
             registerReceiver(screenOffReceiver, filter, Context.RECEIVER_EXPORTED)
@@ -295,7 +295,9 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
-            ACTION_TEST_TOGGLE -> toggleOverlay() // 测试广播
+            ACTION_START_BLACK ->
+                // 主界面「一键息屏听剧」：onStartCommand在onCreate之后主线程执行，可直接上黑幕
+                if (!isAnyBlackShowing()) toggleOverlay()
             ACTION_RESUME_TOGGLE -> {
                 val cur = prefs.getBoolean(KEY_AUTO_RESUME, true)
                 prefs.edit().putBoolean(KEY_AUTO_RESUME, !cur).apply()

@@ -188,41 +188,59 @@ class MainActivity : Activity() {
             postRefresh()
         }
 
-        cardBlack.setOnClickListener {
-            val bootstrap = !OverlayService.isRunning
-            when {
-                // 一键：拉起助手并直接上黑幕（与悬浮球的区别：不用先手动启动助手）
-                bootstrap -> {
-                    startForegroundService(
-                        Intent(this, OverlayService::class.java)
-                            .setAction(OverlayService.ACTION_START_BLACK)
-                    )
-                    Toast.makeText(this, "助手启动中，黑幕马上覆盖全屏…", Toast.LENGTH_SHORT).show()
-                }
-                else -> OverlayService.instance?.toggleOverlay()
-            }
-            postRefresh()
-            // 结果核对式反馈：黑幕（z序高于Toast）会盖住即时提示，
-            // 所以成功时保持沉默，只有「该黑没黑」才提示原因
-            val wantBlack = !bootstrap ||
-                OverlayService.instance?.isAnyBlackShowing() == true
-            cardBlack.postDelayed({
-                if (OverlayService.isRunning &&
-                    wantBlack &&
-                    OverlayService.instance?.isAnyBlackShowing() != true
-                ) {
-                    Toast.makeText(
-                        this,
-                        "黑幕没弹出来：请点上方「悬浮窗权限」确认授权后重试",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                refreshStates()
-            }, if (bootstrap) 1500 else 600)
+        cardBlack.setOnClickListener { toggleBlackAction(cardBlack) }
+        // 黑幕模式卡：与大按钮相同的动作
+        pageHome.findViewById<View>(R.id.tile_black).setOnClickListener { toggleBlackAction(it) }
+        // 真息屏模式卡：App无法替用户按电源键，点击弹用法说明
+        pageHome.findViewById<View>(R.id.tile_screen).setOnClickListener {
+            android.app.AlertDialog.Builder(this)
+                .setTitle("真息屏模式")
+                .setMessage(
+                    "看剧时直接按电源键熄屏即可，1~2秒后声音自动恢复；" +
+                        "片尾被掐断也会自动续播下一集。\n\n" +
+                        "如果熄屏后没有声音恢复，说明这个App不响应系统媒体键，" +
+                        "请改用黑幕模式（任意App都可用）。"
+                )
+                .setPositiveButton("知道了", null)
+                .show()
         }
 
         val footer = pageHome.findViewById<TextView>(R.id.tv_footer)
         footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
+    }
+
+    /** 一键黑幕：大按钮与黑幕模式卡共用 */
+    private fun toggleBlackAction(anchor: View) {
+        val bootstrap = !OverlayService.isRunning
+        when {
+            // 一键：拉起助手并直接上黑幕（与悬浮球的区别：不用先手动启动助手）
+            bootstrap -> {
+                startForegroundService(
+                    Intent(this, OverlayService::class.java)
+                        .setAction(OverlayService.ACTION_START_BLACK)
+                )
+                Toast.makeText(this, "助手启动中，黑幕马上覆盖全屏…", Toast.LENGTH_SHORT).show()
+            }
+            else -> OverlayService.instance?.toggleOverlay()
+        }
+        postRefresh()
+        // 结果核对式反馈：黑幕（z序高于Toast）会盖住即时提示，
+        // 所以成功时保持沉默，只有「该黑没黑」才提示原因
+        val wantBlack = !bootstrap ||
+            OverlayService.instance?.isAnyBlackShowing() == true
+        anchor.postDelayed({
+            if (OverlayService.isRunning &&
+                wantBlack &&
+                OverlayService.instance?.isAnyBlackShowing() != true
+            ) {
+                Toast.makeText(
+                    this,
+                    "黑幕没弹出来：请到「服务与权限」确认悬浮窗权限后重试",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            refreshStates()
+        }, if (bootstrap) 1500 else 600)
     }
 
     override fun onResume() {

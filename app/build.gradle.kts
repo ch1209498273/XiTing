@@ -16,7 +16,7 @@ plugins {
 val distId = (project.findProperty("dist") as String?) ?: "public-github"
 val buildId = UUID.randomUUID().toString().replace("-", "").take(8)
 val buildTs = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-val appVersion = "2.11.1"
+val appVersion = "2.11.2"
 
 android {
     namespace = "com.lujinyu.xiting"
@@ -26,7 +26,7 @@ android {
         applicationId = "com.lujinyu.xiting"
         minSdk = 26
         targetSdk = 35
-        versionCode = 30
+        versionCode = 31
         versionName = appVersion
 
         // 溯源水印：界面页脚 + 隐藏资产 + 资源表三处冗余

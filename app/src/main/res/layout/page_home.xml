@@ -60,135 +60,15 @@
                 android:tint="#FFFFFFFF" />
         </LinearLayout>
 
-        <!-- 两种模式 -->
+        <!-- 使用提示 -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="两种模式"
-            android:textColor="#FF111418"
-            android:textSize="17sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/tile_black"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card"
-                android:clickable="true"
-                android:focusable="true"
-                android:elevation="1dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_icon_green"
-                    android:contentDescription="@null"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_row_overlay"
-                    android:tint="#FF1E8E5A" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="黑幕模式"
-                    android:textColor="#FF111418"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/badge_black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="✓ 当前模式"
-                    android:textColor="#FF1E8E5A"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="任意App · 防误触"
-                    android:textColor="#FF8A9099"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/tile_screen"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card"
-                android:clickable="true"
-                android:focusable="true"
-                android:elevation="1dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_icon_blue"
-                    android:contentDescription="@null"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_mode_screen"
-                    android:tint="#FF3D7EFF" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="真息屏模式"
-                    android:textColor="#FF111418"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/badge_screen"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="✓ 当前模式"
-                    android:textColor="#FF1E8E5A"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="按电源键 · 最省电"
-                    android:textColor="#FF8A9099"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:id="@+id/hint_line"
-            android:text="已选黑幕模式：看剧时点悬浮球即可全屏黑幕"
+            android:text="看剧时点悬浮球即可黑屏听剧 · 黑幕下轻点屏幕唤醒 · 来电自动退出黑幕"
             android:textColor="#FFB0B6BE"
             android:textSize="11sp" />
+
 
         <!-- 节能统计 -->
         <LinearLayout

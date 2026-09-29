@@ -26,7 +26,7 @@ import java.util.Locale
  * 单Activity三页签结构：应用栏 + 内容区 + 底部导航。
  * 首页=主操作与服务；统计=节能统计（原StatsActivity）；关于=应用说明（原AboutActivity）。
  */
-class MainActivity : Activity() {
+class MainActivity : Activity() { // MARKER_TEST_9271
 
     companion object {
         private const val TAB_HOME = 0
@@ -84,7 +84,6 @@ class MainActivity : Activity() {
         bindHome()
         bindStats()
         bindAbout()
-        refreshModeUI()
         switchTab(TAB_HOME)
     }
 
@@ -189,58 +188,8 @@ class MainActivity : Activity() {
             postRefresh()
         }
 
-        // 模式卡=选择器：选中的模式决定悬浮球的行为
-        pageHome.findViewById<View>(R.id.tile_black).setOnClickListener { selectMode(0) }
-        pageHome.findViewById<View>(R.id.tile_screen).setOnClickListener { selectMode(1) }
-
         val footer = pageHome.findViewById<TextView>(R.id.tv_footer)
         footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
-    }
-
-    /** 选择听剧模式（0=黑幕 1=真息屏）：悬浮球按它执行 */
-    private fun selectMode(mode: Int) {
-        getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-            .edit().putInt("listen_mode", mode).apply()
-        refreshModeUI()
-        refreshStates()
-        if (mode == 1) {
-            // 选真息屏：未激活一键锁屏时立刻引导激活，避免"选了但悬浮球没反应"
-            val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
-            val admin = android.content.ComponentName(this, LockReceiver::class.java)
-            if (!dpm.isAdminActive(admin)) {
-                startActivity(
-                    android.content.Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                        putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
-                        putExtra(
-                            android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                            "激活后：看剧时点悬浮球即锁屏听剧（真息屏），声音自动恢复。"
-                        )
-                    }
-                )
-                Toast.makeText(this, "请点击「激活」完成一键锁屏授权", Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(this, "已选真息屏模式：看剧时点悬浮球即锁屏听剧", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            Toast.makeText(this, "已选黑幕模式：看剧时点悬浮球即全屏黑幕", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun refreshModeUI() {
-        val mode = getSharedPreferences("xiiting_prefs", MODE_PRIVATE).getInt("listen_mode", 0)
-        pageHome.findViewById<LinearLayout>(R.id.tile_black).setBackgroundResource(
-            if (mode == 0) R.drawable.bg_card_selected else R.drawable.bg_card
-        )
-        pageHome.findViewById<LinearLayout>(R.id.tile_screen).setBackgroundResource(
-            if (mode == 1) R.drawable.bg_card_selected else R.drawable.bg_card
-        )
-        pageHome.findViewById<View>(R.id.badge_black).visibility = if (mode == 0) View.VISIBLE else View.GONE
-        pageHome.findViewById<View>(R.id.badge_screen).visibility = if (mode == 1) View.VISIBLE else View.GONE
-        pageHome.findViewById<TextView>(R.id.hint_line).text =
-            if (mode == 1)
-                "已选真息屏模式：看剧时点悬浮球锁屏（首次需激活一键锁屏），或直接按电源键"
-            else
-                "已选黑幕模式：看剧时点悬浮球即可全屏黑幕"
     }
 
     override fun onResume() {
@@ -248,17 +197,13 @@ class MainActivity : Activity() {
         refreshStates()
         refreshHomeStats()
         if (tab == TAB_STATS) renderStats()
-        refreshAdminUI()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         // 黑幕窗口盖上/拿走都会改变本窗口焦点：恰好作为状态刷新时机，
         // 否则从黑幕上解锁回来，胶囊会停留在「黑幕开启中」
-        if (hasFocus) {
-            refreshStates()
-            refreshModeUI()
-        }
+        if (hasFocus) refreshStates()
     }
 
     private fun postRefresh() {
@@ -276,14 +221,11 @@ class MainActivity : Activity() {
             pillStatus.setTextColor(0xFF5F6570.toInt())
             pillStatus.text = "未运行"
         }
-        // 主按钮=助手控制：文案随运行状态与所选模式变化
-        val mode = getSharedPreferences("xiiting_prefs", MODE_PRIVATE).getInt("listen_mode", 0)
+        // 主按钮=助手控制：文案随运行状态变化
         heroTitle.text = if (running) "息屏听剧运行中" else "启动息屏听剧"
-        pageHome.findViewById<TextView>(R.id.hero_sub).text = when {
-            !running -> "启动后，看剧时点悬浮球即可息屏听剧"
-            mode == 1 -> "看剧时点悬浮球即锁屏 · 点此停止助手"
-            else -> "看剧时点悬浮球即全屏黑幕 · 点此停止助手"
-        }
+        pageHome.findViewById<TextView>(R.id.hero_sub).text =
+            if (running) "看剧时点悬浮球，黑屏听剧声音继续 · 点此停止助手"
+            else "启动后，看剧时点悬浮球即可息屏听剧"
 
         val overlayOk = Settings.canDrawOverlays(this)
         val pm = getSystemService(POWER_SERVICE) as PowerManager
@@ -482,41 +424,13 @@ class MainActivity : Activity() {
     private fun bindAbout() {
         pageAbout.findViewById<TextView>(R.id.about_version).text =
             "版本 ${BuildConfig.VERSION_NAME} · 构建ID ${BuildConfig.BUILD_ID}"
-        // 一键锁屏授权：显示状态，点按切换（激活/取消）
-        pageAbout.findViewById<View>(R.id.about_admin).setOnClickListener {
+        // 真息屏功能已移除：一次性撤销残留的一键锁屏授权（设备管理员）
+        try {
             val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
             val admin = android.content.ComponentName(this, LockReceiver::class.java)
-            if (dpm.isAdminActive(admin)) {
-                dpm.removeActiveAdmin(admin)
-                Toast.makeText(this, "已取消一键锁屏授权（真息屏请改按电源键）", Toast.LENGTH_LONG).show()
-            } else {
-                startActivity(
-                    android.content.Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                        putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
-                        putExtra(
-                            android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                            "激活后：看剧时点悬浮球即锁屏听剧（真息屏），声音自动恢复。"
-                        )
-                    }
-                )
-            }
-            pageAbout.postDelayed({ refreshAdminUI() }, 600)
+            if (dpm.isAdminActive(admin)) dpm.removeActiveAdmin(admin)
+        } catch (_: Exception) {
         }
-    }
-
-    private fun refreshAdminUI() {
-        val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
-        val admin = android.content.ComponentName(this, LockReceiver::class.java)
-        val active = dpm.isAdminActive(admin)
-        pageAbout.findViewById<TextView>(R.id.about_admin_state).text =
-            if (active) "已激活 · 点按取消" else "未激活 · 点按开启（真息屏悬浮球需要）"
-        pageAbout.findViewById<TextView>(R.id.about_admin_pill).text = if (active) "已激活" else "未激活"
-        pageAbout.findViewById<TextView>(R.id.about_admin_pill).setBackgroundResource(
-            if (active) R.drawable.bg_pill_on else R.drawable.bg_pill_off
-        )
-        pageAbout.findViewById<TextView>(R.id.about_admin_pill).setTextColor(
-            if (active) 0xFF157A4C.toInt() else 0xFF5F6570.toInt()
-        )
     }
 
     // ───────────────────────── 通用 ─────────────────────────

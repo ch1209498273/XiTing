@@ -277,7 +277,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             Log.i(TAG, "black overlay added, type=$windowType, backlight override OFF")
             hideSystemBars(f)
             f.post {
-                hint.animate().alpha(0f).setStartDelay(2500).setDuration(800).start()
+                hint.animate().alpha(0f).setStartDelay(8000).setDuration(1000).start()
             }
         } catch (e: Exception) {
             Log.d(TAG, "black overlay add FAILED: $e")

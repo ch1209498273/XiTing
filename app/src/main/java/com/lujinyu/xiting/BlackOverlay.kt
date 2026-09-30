@@ -70,6 +70,21 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         main.postDelayed(clockTick, 15_000)
     }
 
+    // OLED防烧屏：黑幕上的时钟/电量是长时间静止的亮区，同一片像素持续工作
+    // 有烧屏风险。每45秒把内容微移±2px（不可感知），让像素轮换休息。
+    private var infoCol: LinearLayout? = null
+    private var burnPhase = 0
+    private val burnInTick: Runnable = object : Runnable {
+        override fun run() {
+            burnPhase = (burnPhase + 1) % 4
+            val dx = floatArrayOf(0f, 2f, -2f, 1f)[burnPhase]
+            val dy = floatArrayOf(0f, -1f, 1f, 2f)[burnPhase]
+            infoCol?.translationX = dx
+            infoCol?.translationY = dy
+            main.postDelayed(this, 45_000)
+        }
+    }
+
     // 电量：注册即收到系统粘性广播，锁屏期间插拔充电线也能实时更新
     private val batteryReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctx: Context?, i: Intent?) {
@@ -193,6 +208,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         infoCol.addView(clockText)
         infoCol.addView(batteryText)
+        this.infoCol = infoCol
         f.addView(
             infoCol,
             FrameLayout.LayoutParams(
@@ -203,6 +219,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         )
         updateClock()
         main.postDelayed(clockTick, 15_000)
+        main.postDelayed(burnInTick, 45_000)
         context.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
         // 解锁方式：轻点直接解锁（跳过两段式确认）默认关
@@ -307,6 +324,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         } catch (_: Exception) {
         }
         main.removeCallbacks(clockTick)
+        main.removeCallbacks(burnInTick)
+        infoCol = null
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }
         frame = null
         lp = null

@@ -420,6 +420,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageStats.findViewById<TextView>(R.id.sum_week_count).text = "$weekCount 次"
         pageStats.findViewById<TextView>(R.id.sum_all).text = fmtDur(allMs)
         pageStats.findViewById<TextView>(R.id.sum_all_count).text = "$allCount 次"
+        pageStats.findViewById<TextView>(R.id.sum_extra).text =
+            "最长单次 ${fmtDur(sessions.maxOfOrNull { it.durationMs } ?: 0L)} · 共 $allCount 次息屏"
         updateMah()
 
         // 近7天柱状图（含今天，共7天）

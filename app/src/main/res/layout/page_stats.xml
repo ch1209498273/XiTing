@@ -159,16 +159,31 @@
                 android:contentDescription="@null"
                 android:src="@drawable/ic_row_battery" />
 
-            <TextView
-                android:id="@+id/sum_mah"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
                 android:layout_weight="1"
-                android:text="累计估算省电 ≈ 0 mAh"
-                android:textColor="#FF111418"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sum_mah"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="累计估算省电 ≈ 0 mAh"
+                    android:textColor="#FF111418"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/sum_extra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="最长单次 — · 共 0 次息屏"
+                    android:textColor="#FF8A9099"
+                    android:textSize="11sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- 近7天柱状图 -->

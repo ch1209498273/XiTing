@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="看剧时想闭眼听？这个App让任意视频App一键黑屏：背光物理关闭、触摸屏蔽、声音照常播放。\n\n两种模式：黑幕模式（点悬浮球）适合所有视频App；真息屏模式（按电源键）屏幕彻底关闭最省电，适合响应媒体键的App。来电会自动退出黑幕，不会漏接电话。\n\n节能统计实时显示你省下的屏幕电量。"
+                android:text="看剧时想闭眼听？点一下悬浮球，屏幕全黑：背光物理关闭、触摸屏蔽，声音照常播放——任意视频App可用。\n\n黑幕上显示时间与电量，夜间看时间不用亮屏；内容周期性微移，保护OLED屏幕；来电自动退出黑幕，不会漏接电话；支持定时关闭，睡前听剧到点自动停。\n\n通知栏可直接切集：上一集 / 播放暂停 / 下一集，不用亮屏。\n\n节能统计实时显示你省下的屏幕电量。所有数据仅保存在本机。"
                 android:textColor="#FF444B54"
                 android:textSize="13sp" />
         </LinearLayout>

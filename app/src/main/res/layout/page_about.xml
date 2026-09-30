@@ -125,5 +125,14 @@
                 android:textColor="#FF444B54"
                 android:textSize="13sp" />
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:text="完全离线 · 不收集任何数据"
+            android:textColor="#FFC3C8CF"
+            android:textSize="10sp" />
     </LinearLayout>
 </ScrollView>

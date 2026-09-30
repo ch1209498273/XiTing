@@ -438,27 +438,5 @@
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
-
-        <!-- 关于 -->
-        <TextView
-            android:id="@+id/btn_about"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="关于息屏听剧 · 使用说明 / 隐私 / 开源 ›"
-            android:textColor="#FF8A9099"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/tv_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="完全离线 · 不收集任何数据"
-            android:textColor="#FFC3C8CF"
-            android:textSize="10sp" />
     </LinearLayout>
 </ScrollView>

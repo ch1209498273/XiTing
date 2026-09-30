@@ -215,8 +215,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 防杀保活指南
         pageHome.findViewById<View>(R.id.row_keepalive).setOnClickListener { showKeepAliveGuide() }
 
-        val footer = pageHome.findViewById<TextView>(R.id.tv_footer)
-        footer.text = "完全离线 · 不收集任何数据 · v${BuildConfig.VERSION_NAME} · ID ${BuildConfig.BUILD_ID}"
+        // 页脚水印移至「关于」页签；主页不再放关于入口（与底部导航重复）
     }
 
     override fun onResume() {

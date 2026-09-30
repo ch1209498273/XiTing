@@ -455,20 +455,15 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 gravity = android.view.Gravity.CENTER_VERTICAL
                 setPadding(0, 14, 0, 14)
             }
-            val mode = modeBadge(s.mode)
             val left = TextView(this).apply {
-                text = "${df.format(Date(s.start))}\n${fmtDur(s.durationMs)} · $mode"
+                // 现在只有黑幕一种模式；仅历史真息屏记录保留标记，如实展示过去
+                val legacy = if (s.mode == SessionLog.MODE_SCREEN_OFF) " · 真息屏" else ""
+                text = "${df.format(Date(s.start))}\n${fmtDur(s.durationMs)}$legacy"
                 setTextColor(0xFF111418.toInt())
                 textSize = 13f
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
-            val right = TextView(this).apply {
-                text = mode
-                setTextColor(0xFF157A4C.toInt())
-                textSize = 12f
-            }
             row.addView(left)
-            row.addView(right)
             sessionList.addView(row)
         }
 
@@ -488,8 +483,6 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH))
         }
     }
-
-    private fun modeBadge(mode: Int): String = if (mode == SessionLog.MODE_SCREEN_OFF) "真息屏" else "黑幕"
 
     // ───────────────────────── 关于页签 ─────────────────────────
 

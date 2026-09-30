@@ -215,6 +215,19 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 防杀保活指南
         pageHome.findViewById<View>(R.id.row_keepalive).setOnClickListener { showKeepAliveGuide() }
 
+        // 轻点直接解锁：跳过两段式确认（默认关，防误触优先）
+        val switchDirect = pageHome.findViewById<android.widget.Switch>(R.id.switch_direct)
+        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        switchDirect.isChecked = prefs.getBoolean("direct_unlock", false)
+        switchDirect.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("direct_unlock", checked).apply()
+            Toast.makeText(
+                this,
+                if (checked) "已开启：黑幕下轻点屏幕直接解锁" else "已关闭：黑幕下轻点先唤醒，再点按钮退出",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
         // 页脚水印移至「关于」页签；主页不再放关于入口（与底部导航重复）
     }
 

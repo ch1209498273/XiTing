@@ -1,7 +1,10 @@
 // XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/trace.json
 package com.lujinyu.xiting
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Build
@@ -17,6 +20,7 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 
 /**
@@ -51,10 +55,37 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var lp: WindowManager.LayoutParams? = null
     private var unlockPill: TextView? = null
     private var badgeListener: ((Int) -> Unit)? = null
+    private var onDismissCallback: (() -> Unit)? = null
+    private var directUnlock = false          // 轻点直接解锁（跳过两段式）
+    private var clockText: TextView? = null
+    private var batteryText: TextView? = null
     private var awake = false
     private var sessionStart = 0L          // 墙钟：用于记录起始时间与按天归属
     private var sessionStartElapsed = 0L   // 单调时钟：用于时长计算，不受时间跳变/跨天影响
     private val relockRunnable = Runnable { sleep() }
+
+    // 黑幕时钟：每15秒刷新（分钟级精度足够）
+    private val clockTick: Runnable = Runnable {
+        updateClock()
+        main.postDelayed(clockTick, 15_000)
+    }
+
+    // 电量：注册即收到系统粘性广播，锁屏期间插拔充电线也能实时更新
+    private val batteryReceiver = object : BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, i: Intent?) {
+            val level = i?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
+            val scale = i?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1) ?: -1
+            if (level >= 0 && scale > 0) batteryText?.text = "电量 $level%"
+        }
+    }
+
+    private fun updateClock() {
+        val cal = java.util.Calendar.getInstance()
+        clockText?.text = String.format(
+            java.util.Locale.getDefault(), "%02d:%02d",
+            cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE)
+        )
+    }
 
     fun show(onDismiss: () -> Unit) {
         if (isShowing) return
@@ -75,7 +106,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.CENTER
-            )
+            ).apply { topMargin = (150 * density).toInt() } // 下移避让时钟
         )
 
         val pill = TextView(context).apply {
@@ -136,9 +167,56 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         NotificationBadge.register(badgeListener!!)
 
+        // 黑幕信息：时间 + 电量（暗色显示，夜间看时间/电量不用亮屏）
+        val infoCol = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+        clockText = TextView(context).apply {
+            textSize = 88f
+            setTextColor(0x30FFFFFF.toInt())
+            setTypeface(android.graphics.Typeface.DEFAULT_BOLD)
+            gravity = Gravity.CENTER
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        batteryText = TextView(context).apply {
+            textSize = 20f
+            setTextColor(0x28FFFFFF.toInt())
+            gravity = Gravity.CENTER
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        infoCol.addView(clockText)
+        infoCol.addView(batteryText)
+        f.addView(
+            infoCol,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER
+            )
+        )
+        updateClock()
+        main.postDelayed(clockTick, 15_000)
+        context.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+
+        // 解锁方式：轻点直接解锁（跳过两段式确认）默认关
+        directUnlock = context
+            .getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+            .getBoolean("direct_unlock", false)
+        onDismissCallback = onDismiss
+
         val gd = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                if (awake) sleep() else wake()
+                if (directUnlock) {
+                    hide()
+                    onDismissCallback?.invoke()
+                } else if (awake) sleep() else wake()
                 return true
             }
         })
@@ -223,6 +301,12 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         badgeListener?.let { NotificationBadge.unregister(it) }
         badgeListener = null
+        onDismissCallback = null
+        try {
+            context.unregisterReceiver(batteryReceiver)
+        } catch (_: Exception) {
+        }
+        main.removeCallbacks(clockTick)
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }
         frame = null
         lp = null

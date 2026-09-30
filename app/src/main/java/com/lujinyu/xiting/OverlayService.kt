@@ -253,7 +253,11 @@ class OverlayService : Service() {
                     val quickTap = SystemClock.elapsedRealtime() - downAt < 250
                     Log.i(TAG, "bubble ACTION_UP, moved=$moved, quickTap=$quickTap")
                     if (moved && !quickTap) {
-                        // 位置记忆
+                        // 贴边吸附：吸到最近的左右边缘，避免悬浮球悬在半空挡内容
+                        val margin = (8 * density).toInt()
+                        val w = resources.displayMetrics.widthPixels
+                        lp.x = if (lp.x + lp.width / 2 < w / 2) margin else w - tv.width - margin
+                        wm.updateViewLayout(tv, lp)
                         prefs.edit().putInt("bubble_x", lp.x).putInt("bubble_y", lp.y).apply()
                     } else {
                         toggleOverlay()

@@ -216,8 +216,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageHome.findViewById<View>(R.id.row_keepalive).setOnClickListener { showKeepAliveGuide() }
 
         // 轻点直接解锁：跳过两段式确认（默认关，防误触优先）
-        val switchDirect = pageHome.findViewById<android.widget.Switch>(R.id.switch_direct)
         val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val switchDirect = pageHome.findViewById<android.widget.Switch>(R.id.switch_direct)
         switchDirect.isChecked = prefs.getBoolean("direct_unlock", false)
         switchDirect.setOnCheckedChangeListener { _, checked ->
             prefs.edit().putBoolean("direct_unlock", checked).apply()
@@ -226,6 +226,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 if (checked) "已开启：黑幕下轻点屏幕直接解锁" else "已关闭：黑幕下轻点先唤醒，再点按钮退出",
                 Toast.LENGTH_SHORT
             ).show()
+        }
+
+        // 黑幕显示时间与电量（默认开；关闭后为纯黑）
+        val switchInfo = pageHome.findViewById<android.widget.Switch>(R.id.switch_info)
+        switchInfo.isChecked = prefs.getBoolean("black_info_show", true)
+        switchInfo.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("black_info_show", checked).apply()
+            OverlayService.instance?.reapplyBlack() // 黑幕显示中即时生效（无闪屏重挂）
         }
 
         // 页脚水印移至「关于」页签；主页不再放关于入口（与底部导航重复）

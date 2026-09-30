@@ -316,6 +316,14 @@ class OverlayService : Service() {
         refreshNotification()
     }
 
+    /** 黑幕显示中时重挂（设置变更即时生效；同帧先拆后挂，视觉无闪动） */
+    fun reapplyBlack() {
+        if (!isAnyBlackShowing()) return
+        hideAllBlack()
+        black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+        black?.show { refreshNotification() }
+    }
+
     /** 黑幕/恢复 切换（悬浮球、通知、快捷磁贴共用） */
     fun toggleOverlay() {
         Log.i(TAG, "toggleOverlay via app overlay")

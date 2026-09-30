@@ -182,6 +182,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         NotificationBadge.register(badgeListener!!)
 
+        val prefs = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+        val showInfo = prefs.getBoolean("black_info_show", true) // 时间/电量可关：纯黑偏好
+
         // 黑幕信息：时间 + 电量（暗色显示，夜间看时间/电量不用亮屏）
         val infoCol = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -208,24 +211,24 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         infoCol.addView(clockText)
         infoCol.addView(batteryText)
-        this.infoCol = infoCol
-        f.addView(
-            infoCol,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER
+        if (showInfo) {
+            this.infoCol = infoCol
+            f.addView(
+                infoCol,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.CENTER
+                )
             )
-        )
-        updateClock()
-        main.postDelayed(clockTick, 15_000)
-        main.postDelayed(burnInTick, 45_000)
-        context.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+            updateClock()
+            main.postDelayed(clockTick, 15_000)
+            main.postDelayed(burnInTick, 45_000)
+            context.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        }
 
         // 解锁方式：轻点直接解锁（跳过两段式确认）默认关
-        directUnlock = context
-            .getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-            .getBoolean("direct_unlock", false)
+        directUnlock = prefs.getBoolean("direct_unlock", false)
         onDismissCallback = onDismiss
 
         val gd = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {

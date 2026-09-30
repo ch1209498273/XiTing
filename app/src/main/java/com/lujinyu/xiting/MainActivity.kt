@@ -453,17 +453,25 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding(0, 14, 0, 14)
+                setPadding(0, 12, 0, 12)
             }
             val left = TextView(this).apply {
-                // 现在只有黑幕一种模式；仅历史真息屏记录保留标记，如实展示过去
-                val legacy = if (s.mode == SessionLog.MODE_SCREEN_OFF) " · 真息屏" else ""
-                text = "${df.format(Date(s.start))}\n${fmtDur(s.durationMs)}$legacy"
-                setTextColor(0xFF111418.toInt())
+                text = df.format(Date(s.start))
+                setTextColor(0xFF444B54.toInt())
                 textSize = 13f
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
+            val right = TextView(this).apply {
+                text = fmtDur(s.durationMs)
+                setTextColor(0xFF111418.toInt())
+                textSize = 13f
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
             row.addView(left)
+            row.addView(right)
             sessionList.addView(row)
         }
 
@@ -489,13 +497,6 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     private fun bindAbout() {
         pageAbout.findViewById<TextView>(R.id.about_version).text =
             "版本 ${BuildConfig.VERSION_NAME} · 构建ID ${BuildConfig.BUILD_ID}"
-        // 真息屏功能已移除：一次性撤销残留的一键锁屏授权（设备管理员）
-        try {
-            val dpm = getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
-            val admin = android.content.ComponentName(this, LockReceiver::class.java)
-            if (dpm.isAdminActive(admin)) dpm.removeActiveAdmin(admin)
-        } catch (_: Exception) {
-        }
     }
 
     // ───────────────────────── 通用 ─────────────────────────

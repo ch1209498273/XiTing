@@ -23,7 +23,8 @@ object SessionLog {
     private const val MAX = 500
     private const val TAG = "XiTing"
 
-    // 旧版本用墙钟差算时长，时钟跳变/跨天会记出「87小时」这类失真数据。
+    // 旧版本用墙钟差算时长，时钟跳变/跨天会产生失真记录；不足1分钟属误触。
+    // 两者在读取时过滤：历史秒级测试数据不再出现在统计与列表中。
     // v2.9.1起时长在记录点就用单调时钟（elapsedRealtime）计算，本身不可能失真；
     // 这里只做一次性迁移：剔除历史上为负或超过24小时（一块电池物理上撑不到）的旧记录并回写存档。
     // 迁移之后读写路径不再改动任何数据——统计如实按记录展示。
@@ -44,7 +45,7 @@ object SessionLog {
                     o.getLong("d"), o.getInt("m")
                 )
             }
-            val valid = all.filter { it.durationMs in 0..LEGACY_MAX_MS }
+            val valid = all.filter { it.durationMs >= 60_000 && it.durationMs <= LEGACY_MAX_MS }
             if (valid.size != all.size) {
                 write(context, valid)
                 Log.w(TAG, "统计迁移：剔除${all.size - valid.size}条旧版失真记录")
@@ -56,7 +57,7 @@ object SessionLog {
     }
 
     fun add(context: Context, session: ListenSession) {
-        if (session.durationMs < 1000) return // 不足1秒：误触不算听剧
+        if (session.durationMs < 60_000) return // 不足1分钟：误触/测试无统计意义
         val list = sessions(context).toMutableList()
         list.add(0, session)
         write(context, list)

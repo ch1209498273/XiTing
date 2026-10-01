@@ -710,8 +710,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val values = ArrayList<String>()
         labels.add("息屏（默认）")
         values.add("text")
-        for (i in 0..unlocked) {
-            labels.add(PetView.stageName(i))
+        // 全部形态都列出（含未解锁：可预览外观，但不能选中）
+        for (i in 0..4) {
+            labels.add(
+                if (i <= unlocked) PetView.stageName(i)
+                else "${PetView.stageName(i)}（🔒需${PetView.THRESHOLDS[i]}成长值）"
+            )
             values.add("pet_$i")
         }
         val current = prefs.getString("bubble_style", "text") ?: "text"
@@ -744,6 +748,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     row.addView(
                         BubblePetView(this@MainActivity).apply {
                             stage = position - 1
+                            if (position - 1 > unlocked) alpha = 0.3f  // 未解锁：灰暗预览
                             layoutParams = LinearLayout.LayoutParams((44 * density).toInt(), (44 * density).toInt())
                         }
                     )
@@ -765,10 +770,21 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         android.app.AlertDialog.Builder(this)
             .setTitle("悬浮球样式（实时预览）")
             .setAdapter(adapter) { d, which ->
+                val stageOfItem = which - 1
+                if (stageOfItem in 0..4 && stageOfItem > unlocked) {
+                    // 未解锁：可预览外观但不能选中
+                    Toast.makeText(
+                        this,
+                        "「${PetView.stageName(stageOfItem)}」尚未解锁 · 需 ${PetView.THRESHOLDS[stageOfItem]} 成长值",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@setAdapter
+                }
                 prefs.edit().putString("bubble_style", values[which]).apply()
                 OverlayService.instance?.rebuildBubble()
                 refreshBubbleStyleValue()
-                Toast.makeText(this, "悬浮球已切换为「${labels[which]}」，看右下角", Toast.LENGTH_SHORT).show()
+                val name = if (which == 0) "息屏" else PetView.stageName(stageOfItem)
+                Toast.makeText(this, "悬浮球已切换为「$name」，看右下角", Toast.LENGTH_SHORT).show()
                 d.dismiss()
             }
             .setNegativeButton("取消", null)

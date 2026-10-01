@@ -22,6 +22,7 @@ object EnergyStore {
 
     const val EXPIRE_MS = 3L * 24 * 3600 * 1000   // 3 天过期
     const val NEAR_EXPIRE_MS = 12L * 3600 * 1000  // 12 小时内临期（变色提醒）
+    const val MAX_PENDING = 200                   // 待收能量上限（满格后不再累积）
 
     private fun sp(ctx: Context) =
         ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
@@ -59,14 +60,17 @@ object EnergyStore {
         return valid
     }
 
-    /** 新增能量球（听剧结算 / 每日分享） */
+    /** 新增能量（听剧结算 / 每日分享）；满格（200）后不再累积，先收再产 */
     fun add(ctx: Context, value: Int) {
         if (value <= 0) return
+        val exist = pending(ctx)
+        val room = MAX_PENDING - exist.sumOf { it.value }
+        if (room <= 0) return
+        val v = value.coerceAtMost(room)
         val now = System.currentTimeMillis()
         // id 唯一性：取当前时间与现有最大 id+1 的较大者（防同毫秒并发）
-        val id = maxOf(now, (pending(ctx).maxOfOrNull { it.id } ?: 0L) + 1)
-        val list = pending(ctx) + PendingEnergy(id, value, now + EXPIRE_MS)
-        writePending(ctx, list)
+        val id = maxOf(now, (exist.maxOfOrNull { it.id } ?: 0L) + 1)
+        writePending(ctx, exist + PendingEnergy(id, v, now + EXPIRE_MS))
     }
 
     /** 收集一枚能量球，返回获得值（0=不存在/已过期） */

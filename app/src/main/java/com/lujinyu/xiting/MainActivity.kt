@@ -426,6 +426,20 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             }
             renderStats()
         }
+        // ? 说明：能量机制细节
+        pet.onHelp = {
+            android.app.AlertDialog.Builder(this)
+                .setTitle("能量说明")
+                .setMessage(
+                    "· 听剧每满 1 分钟产生 1 点能量（跨会话累计）\n" +
+                        "· 每日首次分享产生 5 点能量\n" +
+                        "· 待收能量上限 200 点，满格后不再累积——记得先收再听\n" +
+                        "· 能量产生后 3 天内有效，快过期的部分在条上显示为红色\n" +
+                        "· 点击能量条即全部收集，收下的能量转为成长值"
+                )
+                .setPositiveButton("知道了", null)
+                .show()
+        }
 
         // 进化提示（仅当上次记录的形态更低时弹一次）
         val seen = prefs.getInt("last_seen_stage", -1)
@@ -467,25 +481,43 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val density = resources.displayMetrics.density
         val size = (56 * density).toInt()
         for (i in 0..4) {
-            val pv = PetView(this).apply {
-                stage = i
-                thumbMode = true
+            // FrameLayout：全彩缩略图 + 角落锁标识（未解锁不影响查看）
+            val frame = android.widget.FrameLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(size, size).apply {
                     marginStart = (5 * density).toInt()
                     marginEnd = (5 * density).toInt()
                 }
-                // 未解锁：灰暗；选中的预览项：绿框高亮
-                if (i > currentStage) alpha = 0.25f
                 if (i == previewStage || (previewStage < 0 && i == currentStage)) {
                     setBackgroundResource(R.drawable.bg_thumb_selected)
                 }
+            }
+            val pv = PetView(this).apply {
+                stage = i
+                thumbMode = true
+                layoutParams = android.widget.FrameLayout.LayoutParams(size, size)
                 setOnClickListener {
                     previewStage = if (i == currentStage) -1 else i
                     galleryBuiltStage = -1 // 强制重建（刷新选中框）
                     renderStats()
                 }
             }
-            row.addView(pv)
+            frame.addView(pv)
+            if (i > currentStage) {
+                // 小锁角标（右下角，不遮挡主体）
+                frame.addView(
+                    TextView(this).apply {
+                        text = "🔒"
+                        textSize = 9f
+                        layoutParams = android.widget.FrameLayout.LayoutParams(
+                            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+                            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+                            android.view.Gravity.BOTTOM or android.view.Gravity.END
+                        )
+                        setBackgroundColor(0x66000000)
+                    }
+                )
+            }
+            row.addView(frame)
         }
         // 图鉴说明文字
         pageStats.findViewById<TextView>(R.id.gallery_info).text = when {
@@ -688,14 +720,9 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 分享给朋友（计入每日分享任务）
         page.findViewById<View>(R.id.row_share).setOnClickListener { sharePetStats() }
 
-        // 开源地址点击
-        page.findViewById<TextView>(R.id.about_repo).setOnClickListener {
-            try {
-                startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ch1209498273/XiTing"))
-                )
-            } catch (_: Exception) {
-            }
+        // 关于（二级页面：介绍/隐私/开源/许可）
+        page.findViewById<View>(R.id.row_about).setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
         }
 
         refreshBubbleStyleValue()

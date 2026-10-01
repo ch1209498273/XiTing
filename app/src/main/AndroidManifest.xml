@@ -24,6 +24,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false" />
+
         <service
             android:name=".OverlayService"
             android:exported="false"
@@ -52,10 +56,6 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
-
-        <receiver
-            android:name=".ResumeAlarmReceiver"
-            android:exported="false" />
 
         <receiver
             android:name=".BootReceiver"

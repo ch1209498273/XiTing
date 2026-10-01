@@ -60,6 +60,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     var hideProgress = false               // 预览非当前形态时隐藏进度条
     var pending: List<PendingEnergy> = emptyList()   // 待收集能量球
     var onCollectAll: (() -> Unit)? = null           // 收集全部回调（延迟到飞入动画后）
+    var onHelp: (() -> Unit)? = null                 // ? 说明图标点击回调
 
     // 收集动画内部状态
     private data class FlyBall(val value: Int, val sx: Float, val sy: Float, val startAt: Long)
@@ -138,15 +139,20 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         return Triple(cx, cy, r)
     }
 
-    /** 左侧固定能量条（待收集能量>0 时显示；点击即充能，不再超出界面） */
-    private fun energyBar(): RectF? {
-        if (pending.isEmpty() || thumbMode) return null
+    /** 左侧常驻能量条（电池：容量 200，点击即充能） */
+    private fun energyBar(): RectF {
         val h = height.toFloat()
         val bw = (h * 0.055f).coerceAtLeast(20f)
         val bh = h * 0.5f
         val bx = width * 0.06f
         val by = (h - bh) / 2f
         return RectF(bx, by, bx + bw, by + bh)
+    }
+
+    /** ? 问号说明图标中心（点击弹出能量机制说明） */
+    private fun helpCenter(): Pair<Float, Float> {
+        val bar = energyBar()
+        return Pair(bar.centerX(), bar.bottom + 46f)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -160,18 +166,27 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             MotionEvent.ACTION_UP -> {
                 val moved = Math.abs(event.x - downX) > 30 || Math.abs(event.y - downY) > 30
                 if (!moved) {
-                    // 命中左侧能量条（外扩点击区，好点）：点击即充能
+                    // ? 说明图标命中
+                    val (hx, hy) = helpCenter()
+                    val hdx = event.x - hx
+                    val hdy = event.y - hy
+                    if (hdx * hdx + hdy * hdy < 60f * 60f) {
+                        onHelp?.invoke()
+                        return true
+                    }
+                    // 命中能量条（外扩点击区）：点击即充能
                     val bar = energyBar()
-                    if (bar != null &&
-                        event.x in (bar.left - 50f)..(bar.right + 70f) &&
+                    if (event.x in (bar.left - 50f)..(bar.right + 70f) &&
                         event.y in (bar.top - 80f)..(bar.bottom + 60f)
                     ) {
                         val total = pending.sumOf { it.value }
-                        flyBalls.add(FlyBall(total, bar.centerX(), bar.centerY(), System.currentTimeMillis()))
-                        postDelayed({ onCollectAll?.invoke() }, 340)
+                        if (total > 0) {
+                            flyBalls.add(FlyBall(total, bar.centerX(), bar.centerY(), System.currentTimeMillis()))
+                            postDelayed({ onCollectAll?.invoke() }, 340)
+                        }
                         return true
                     }
-                    performClick() // 未命中能量条：原有放电效果
+                    performClick() // 未命中：原有放电效果
                 }
                 return true
             }
@@ -268,7 +283,9 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         when (stage) {
             STAGE_SPARK -> drawSpark(canvas, cx, cy, r, t, blinking)
             STAGE_BALL -> drawBall(canvas, cx, cy, r, t, blinking)
-            else -> drawCloud(canvas, cx, cy, r, t, blinking)
+            STAGE_CLOUD -> drawCloudSimple(canvas, cx, cy, r, t, blinking)
+            STAGE_STORM -> drawTornado(canvas, cx, cy, r, t, blinking)
+            else -> drawKing(canvas, cx, cy, r, t, blinking)
         }
 
         // 打瞌睡
@@ -288,37 +305,51 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             popPaint.alpha = 255
         }
 
-        // ───────── 能量系统：左侧固定能量条 + 充能动画 ─────────
+        // ───────── 能量系统：左侧常驻电池条（容量200）+ 充能动画 ─────────
         if (!thumbMode) {
             val bar = energyBar()
-            if (bar != null) {
-                val total = pending.sumOf { it.value }
-                val nearing = pending.any { it.expireAt - now < EnergyStore.NEAR_EXPIRE_MS }
-                val col = if (nearing) {
-                    if ((now / 400) % 2 == 0L) 0xFFFF7043.toInt() else 0xFFFFAB91.toInt()
-                } else 0xFFFFC94D.toInt()
-                val rr = bar.width() / 2f
-                // 光晕
-                glowPaint.shader = RadialGradient(
-                    bar.centerX(), bar.centerY(), bar.width() * 3f,
-                    (col and 0x00FFFFFF) or 0x33000000, Color.TRANSPARENT, Shader.TileMode.CLAMP
+            val total = pending.sumOf { it.value }.coerceAtMost(EnergyStore.MAX_PENDING)
+            val nearing = pending
+                .filter { it.expireAt - now < EnergyStore.NEAR_EXPIRE_MS }
+                .sumOf { it.value }.coerceAtMost(total)
+            val rr = bar.width() / 2f
+            // 轨道（常驻显示）
+            barTrackPaint.color = 0xFFECEEF1.toInt()
+            canvas.drawRoundRect(bar, rr, rr, barTrackPaint)
+            // 填充（从底部向上，按 200 容量比例）
+            val fillH = bar.height() * total / EnergyStore.MAX_PENDING.toFloat()
+            if (fillH > 1f) {
+                barFillPaint.color = 0xFFFFC94D.toInt()
+                canvas.drawRoundRect(
+                    RectF(bar.left, bar.bottom - fillH, bar.right, bar.bottom), rr, rr, barFillPaint
                 )
-                canvas.drawCircle(bar.centerX(), bar.centerY(), bar.width() * 3f, glowPaint)
-                // 轨道 + 满填充（代表待收集）
-                barTrackPaint.color = 0xFFF0F2F5.toInt()
-                canvas.drawRoundRect(bar, rr, rr, barTrackPaint)
-                barFillPaint.color = col
-                canvas.drawRoundRect(bar, rr, rr, barFillPaint)
-                // 两端光点
-                val hi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x55FFFFFF }
-                canvas.drawCircle(bar.centerX(), bar.top + bar.width() * 0.5f, bar.width() * 0.22f, hi)
-                // 数值（条上方，横排）
-                popPaint.alpha = 255
-                popPaint.textSize = 30f
-                popPaint.color = if (nearing) 0xFFE64A19.toInt() else 0xFFB8860B.toInt()
-                canvas.drawText("⚡$total", bar.centerX(), bar.top - 26f, popPaint)
-                popPaint.color = 0xFF1E8E5A.toInt()
+                // 临期段（底部，最早产生的最先过期）：红色警示
+                val redH = bar.height() * nearing / EnergyStore.MAX_PENDING.toFloat()
+                if (redH > 1f) {
+                    barFillPaint.color = 0xFFFF5252.toInt()
+                    canvas.drawRoundRect(
+                        RectF(bar.left, bar.bottom - redH, bar.right, bar.bottom), rr, rr, barFillPaint
+                    )
+                }
             }
+            // 数值（条上方 ⚡N/200）
+            popPaint.alpha = 255
+            popPaint.textSize = 26f
+            popPaint.color = if (nearing > 0) 0xFFE64A19.toInt() else 0xFFB8860B.toInt()
+            canvas.drawText("⚡$total", bar.centerX(), bar.top - 22f, popPaint)
+            popPaint.textSize = 18f
+            canvas.drawText("/200", bar.centerX(), bar.top - 2f, popPaint)
+            popPaint.color = 0xFF1E8E5A.toInt()
+            popPaint.textSize = 30f
+            // ? 说明图标
+            val (hx, hy) = helpCenter()
+            bodyPaint.color = 0xFFDDE1E6.toInt()
+            canvas.drawCircle(hx, hy, 24f, bodyPaint)
+            popPaint.color = 0xFF5F6570.toInt()
+            popPaint.textSize = 30f
+            popPaint.isFakeBoldText = true
+            canvas.drawText("?", hx, hy + 10f, popPaint)
+            popPaint.color = 0xFF1E8E5A.toInt()
 
             // 飞入动画：从能量条飞向精灵中心
             flyBalls.removeAll { now - it.startAt > 320 }
@@ -382,101 +413,88 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         if (!thumbMode) postInvalidateDelayed(33)
     }
 
-    // ─────────────────── 形态一：电火花 ───────────────────
+    // ─────────────────── 形态一：电火花（四角星形，区别于太阳） ───────────────────
     private fun drawSpark(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
-        // 放射刺
-        linePaint.color = 0xFFFFD54F.toInt()
-        linePaint.strokeWidth = if (sleepy) 3f else 5f
-        for (i in 0 until 8) {
-            val ang = (6.2831855f * i / 8) + t * 0.8f
-            val long = i % 2 == 0
-            val r1 = r * 1.08f
-            val r2 = r * if (long) 1.5f else 1.28f
-            linePaint.alpha = if (sleepy) 110 else 255
-            canvas.drawLine(
-                cx + cos(ang) * r1, cy + sin(ang) * r1,
-                cx + cos(ang) * r2, cy + sin(ang) * r2, linePaint
-            )
+        // 八角星轮廓：长尖+短凹交替（闪烁感），随时间轻微旋转呼吸
+        val spin = t * 0.3f
+        val breathe = 1f + 0.04f * sin(t * 3f)
+        val p = Path()
+        for (i in 0 until 16) {
+            val ang = (6.2831855f * i / 16) + spin
+            val rad = (if (i % 2 == 0) r * 1.15f else r * 0.5f) * breathe
+            val x = cx + cos(ang) * rad
+            val y = cy + sin(ang) * rad
+            if (i == 0) p.moveTo(x, y) else p.lineTo(x, y)
         }
-        linePaint.alpha = 255
-        // 身体
-        bodyPaint.shader = RadialGradient(
-            cx - r * 0.3f, cy - r * 0.35f, r * 1.5f,
-            if (sleepy) 0xFFCFD8DC.toInt() else 0xFFFFF9C4.toInt(),
-            if (sleepy) 0xFF90A4AE.toInt() else 0xFFFFB300.toInt(),
+        p.close()
+        bodyPaint.shader = android.graphics.LinearGradient(
+            cx - r, cy - r, cx + r, cy + r,
+            if (sleepy) 0xFFCFD8DC.toInt() else 0xFFFFF176.toInt(),
+            if (sleepy) 0xFF90A4AE.toInt() else 0xFFFFA000.toInt(),
             Shader.TileMode.CLAMP
         )
-        canvas.drawCircle(cx, cy, r, bodyPaint)
+        canvas.drawPath(p, bodyPaint)
         bodyPaint.shader = null
-        drawFace(canvas, cx, cy, r * 0.17f, blinking, fierce = false)
+        // 外描边亮边
+        linePaint.color = 0x88FFFFFF.toInt()
+        linePaint.strokeWidth = 2.5f
+        canvas.drawPath(p, linePaint)
+        // 中心亮核
+        bodyPaint.shader = RadialGradient(
+            cx, cy, r * 0.75f,
+            0xFFFFFFFF.toInt(), 0x00FFFFFF, Shader.TileMode.CLAMP
+        )
+        canvas.drawCircle(cx, cy, r * 0.72f, bodyPaint)
+        bodyPaint.shader = null
+        drawFace(canvas, cx, cy, r * 0.16f, blinking, fierce = false)
     }
 
-    // ─────────────────── 形态二：电球 ───────────────────
+    // ─────────────────── 形态二：电球（蓝紫等离子球，区别于太阳） ───────────────────
     private fun drawBall(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
-        // 轨道环（2 段旋转弧）
-        linePaint.color = 0xFFFFC107.toInt()
-        linePaint.strokeWidth = 5f
-        linePaint.alpha = if (sleepy) 90 else 230
-        val ring = RectF(cx - r * 1.35f, cy - r * 1.35f, cx + r * 1.35f, cy + r * 1.35f)
-        canvas.drawArc(ring, t * 70, 120f, false, linePaint)
-        canvas.drawArc(ring, 180 + t * 70, 120f, false, linePaint)
-        linePaint.alpha = 255
-        // 身体（径向渐变 + 内部亮核）
+        // 深空球体：中心亮紫蓝 → 边缘深紫
         bodyPaint.shader = RadialGradient(
-            cx - r * 0.32f, cy - r * 0.35f, r * 1.5f,
-            if (sleepy) 0xFFCFD8DC.toInt() else 0xFFFFFDE7.toInt(),
-            if (sleepy) 0xFF8FA3B0.toInt() else 0xFFFFA000.toInt(),
+            cx - r * 0.3f, cy - r * 0.32f, r * 1.55f,
+            if (sleepy) 0xFFCFD8DC.toInt() else 0xFFB388FF.toInt(),
+            if (sleepy) 0xFF78909C.toInt() else 0xFF3F1D96.toInt(),
             Shader.TileMode.CLAMP
         )
         canvas.drawCircle(cx, cy, r, bodyPaint)
         bodyPaint.shader = null
-        // 内亮核
-        bodyPaint.shader = RadialGradient(
-            cx - r * 0.2f, cy - r * 0.25f, r * 0.75f,
-            0x66FFFFFF, Color.TRANSPARENT, Shader.TileMode.CLAMP
-        )
-        canvas.drawCircle(cx - r * 0.15f, cy - r * 0.2f, r * 0.7f, bodyPaint)
-        bodyPaint.shader = null
-        // 左上边缘高光
-        linePaint.color = 0x99FFFFFF.toInt()
+        // 内部等离子电弧（两道锯齿电弧，随时间滑动）
+        linePaint.color = if (sleepy) 0x66E0E0E0.toInt() else 0xCCB2EBF2.toInt()
         linePaint.strokeWidth = 4f
-        canvas.drawArc(
-            RectF(cx - r * 0.95f, cy - r * 0.95f, cx + r * 0.95f, cy + r * 0.95f),
-            205f, 70f, false, linePaint
-        )
-        // 星芒（右上四点光，更闪耀）
+        for (arc in 0 until 2) {
+            val phase = t * 1.6f + arc * 2.4f
+            val ap = Path()
+            var first = true
+            for (k in 0 until 7) {
+                val kk = k / 6f
+                val ax = cx - r * 0.75f + r * 1.5f * kk
+                val ay = cy + sin(phase + kk * 9f) * r * 0.34f + (arc - 0.5f) * r * 0.4f
+                if (first) { ap.moveTo(ax, ay); first = false } else ap.lineTo(ax, ay)
+            }
+            canvas.drawPath(ap, linePaint)
+        }
+        // 外环绕电弧环（青蓝色，两段旋转）
+        linePaint.color = if (sleepy) 0x5580DEEA.toInt() else 0xCC00E5FF.toInt()
+        linePaint.strokeWidth = 5f
+        val ring = RectF(cx - r * 1.32f, cy - r * 1.32f, cx + r * 1.32f, cy + r * 1.32f)
+        canvas.drawArc(ring, -t * 80, 100f, false, linePaint)
+        canvas.drawArc(ring, 180 - t * 80, 100f, false, linePaint)
+        // 左上高光
         linePaint.color = 0x99FFFFFF.toInt()
         linePaint.strokeWidth = 3.5f
-        val sx = cx + r * 0.62f
-        val sy = cy - r * 0.62f
-        val sl = r * 0.22f
-        canvas.drawLine(sx - sl, sy, sx + sl, sy, linePaint)
-        canvas.drawLine(sx, sy - sl, sx, sy + sl, linePaint)
-        val sd = sl * 0.5f
-        canvas.drawLine(sx - sd, sy - sd, sx + sd, sy + sd, linePaint)
-        canvas.drawLine(sx - sd, sy + sd, sx + sd, sy - sd, linePaint)
+        canvas.drawArc(
+            RectF(cx - r * 0.92f, cy - r * 0.92f, cx + r * 0.92f, cy + r * 0.92f),
+            205f, 62f, false, linePaint
+        )
         drawFace(canvas, cx, cy, r * 0.17f, blinking, fierce = false)
     }
 
-    // ─────────────────── 形态三/四/五：云系 ───────────────────
-    private fun drawCloud(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
-        val isStorm = stage >= STAGE_STORM
-        val isKing = stage == STAGE_KING
-
-        val mainColor = when {
-            sleepy -> 0xFFCFD8DC.toInt()
-            isKing -> 0xFFF2ECFF.toInt()
-            isStorm -> 0xFFDCEAFF.toInt()
-            else -> 0xFFEAF4FF.toInt()
-        }
-        val shadowColor = when {
-            sleepy -> 0xFF90A4AE.toInt()
-            isKing -> 0xFFB49CE8.toInt()
-            isStorm -> 0xFF9FB6E8.toInt()
-            else -> 0xFFBCD8F0.toInt()
-        }
-
-        // 云的形状（5 圆 + 底矩形）：先画阴影层（下移），再画主体
+    // ─────────────────── 形态三：雷云精灵（积云 + 闪电） ───────────────────
+    private fun drawCloudSimple(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
+        val mainColor = if (sleepy) 0xFFCFD8DC.toInt() else 0xFFEAF4FF.toInt()
+        val shadowColor = if (sleepy) 0xFF90A4AE.toInt() else 0xFFBCD8F0.toInt()
         val puffs = arrayOf(
             floatArrayOf(-0.78f, 0.10f, 0.46f),
             floatArrayOf(-0.32f, -0.22f, 0.60f),
@@ -497,78 +515,127 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         drawPuffs(r * 0.10f, shadowPaint)
         bodyPaint.color = mainColor
         drawPuffs(0f, bodyPaint)
-
-        // 顶部边缘高光
         if (!sleepy) {
-            linePaint.color = if (isKing) 0xAAFFE082.toInt() else 0x88FFFFFF.toInt()
+            linePaint.color = 0x88FFFFFF.toInt()
             linePaint.strokeWidth = 3.5f
             canvas.drawArc(
                 RectF(cx - r * 0.9f, cy - r * 0.95f, cx + r * 0.35f, cy + r * 0.3f),
                 185f, 85f, false, linePaint
             )
+            boltPaint.color = 0xFF7FC4FF.toInt()
+            val sway = sin(t * 2.6f) * r * 0.04f
+            drawBolt(canvas, cx + sway, cy + r * 0.5f, r * 0.42f)
         }
+        drawFace(canvas, cx, cy - r * 0.12f, r * 0.16f, blinking, fierce = false)
+    }
 
-        // 风暴云腹
-        if (isStorm && !sleepy) {
-            bodyPaint.color = if (isKing) 0x338A6FC9 else 0x2E5E7BAE
+    // ─────────────────── 形态四：风暴之灵（龙卷风——完全区别于云） ───────────────────
+    private fun drawTornado(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
+        // 龙卷：多层水平椭圆，宽度从顶到底递减，形成漏斗旋涡
+        val layers = 8
+        for (i in 0 until layers) {
+            val k = i / (layers - 1f)                 // 0=顶 1=底
+            val w = r * (1.28f - 0.98f * k) * (1f + 0.05f * sin(t * 5f + i))  // 呼吸旋涡
+            val y = cy - r * 0.85f + k * r * 1.6f
+            val hh = r * 0.30f * (1f - 0.45f * k)
+            val shade = 0.55f + 0.45f * (1f - k)      // 顶部亮底部深
+            bodyPaint.color = if (sleepy) 0xFFB0BEC5.toInt() else
+                android.graphics.Color.rgb(
+                    (0xD8 * shade + 40).toInt().coerceIn(0, 255),
+                    (0xE6 * shade + 30).toInt().coerceIn(0, 255),
+                    245
+                )
+            canvas.drawOval(RectF(cx - w, y - hh / 2, cx + w, y + hh / 2), bodyPaint)
+        }
+        // 旋涡速度线（斜向弧，旋转感）
+        if (!sleepy) {
+            linePaint.color = 0x88FFFFFF.toInt()
+            linePaint.strokeWidth = 3f
+            for (i in 0 until 3) {
+                val k = 0.25f + i * 0.25f
+                val w = r * (1.22f - 0.95f * k)
+                val y = cy - r * 0.85f + k * r * 1.6f
+                canvas.drawArc(RectF(cx - w, y - r * 0.12f, cx + w, y + r * 0.12f), 200f + t * 60, 90f, false, linePaint)
+            }
+            // 侧向闪电
+            boltPaint.color = 0xFF8FD0FF.toInt()
+            drawBolt(canvas, cx + r * 0.95f, cy - r * 0.1f, r * 0.36f)
+            drawBolt(canvas, cx - r * 0.98f, cy + r * 0.25f, r * 0.3f)
+        }
+        // 脸在龙卷中上部
+        drawFace(canvas, cx, cy - r * 0.3f, r * 0.15f, blinking, fierce = true)
+    }
+
+    // ─────────────────── 形态五：雷霆之王（雷电双翼 + 金冠 + 大金闪电） ───────────────────
+    private fun drawKing(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
+        val mainColor = if (sleepy) 0xFFCFD8DC.toInt() else 0xFFF2ECFF.toInt()
+        val shadowColor = if (sleepy) 0xFF90A4AE.toInt() else 0xFFB49CE8.toInt()
+        // 雷电双翼（左右各 3 根锯齿羽翼，从云侧向外展开）
+        if (!sleepy) {
+            val wingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFC94D.toInt() }
+            val wingPaint2 = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xE6B388FF.toInt() }
+            for (side in intArrayOf(-1, 1)) {
+                for (f in 0 until 3) {
+                    val fp = Path()
+                    val baseX = cx + side * r * 0.85f
+                    val baseY = cy - r * 0.15f + f * r * 0.30f
+                    val tipX = cx + side * r * (1.55f + f * 0.12f)
+                    val tipY = baseY - r * 0.55f + f * r * 0.18f
+                    val midX = (baseX + tipX) / 2 + side * r * 0.15f
+                    val midY = (baseY + tipY) / 2
+                    // 锯齿羽翼：三段折线
+                    fp.moveTo(baseX, baseY)
+                    fp.lineTo(midX, midY - r * 0.14f)
+                    fp.lineTo(midX + side * r * 0.1f, midY + r * 0.02f)
+                    fp.lineTo(tipX, tipY)
+                    fp.lineTo(midX + side * r * 0.05f, midY + r * 0.16f)
+                    fp.lineTo(baseX, baseY + r * 0.2f)
+                    fp.close()
+                    canvas.drawPath(fp, if (f % 2 == 0) wingPaint else wingPaint2)
+                }
+            }
+        }
+        // 主体云
+        val puffs = arrayOf(
+            floatArrayOf(-0.68f, 0.10f, 0.44f),
+            floatArrayOf(-0.25f, -0.24f, 0.58f),
+            floatArrayOf(0.25f, -0.30f, 0.60f),
+            floatArrayOf(0.68f, 0.02f, 0.5f)
+        )
+        fun drawPuffs(dy: Float, paint: Paint) {
+            for (p in puffs) {
+                canvas.drawCircle(cx + p[0] * r, cy + p[1] * r + dy, p[2] * r, paint)
+            }
             canvas.drawRoundRect(
-                RectF(cx - r * 0.95f, cy + r * 0.12f, cx + r * 0.95f, cy + r * 0.5f),
-                r * 0.24f, r * 0.24f, bodyPaint
+                RectF(cx - r * 0.95f, cy - r * 0.1f + dy, cx + r * 0.95f, cy + r * 0.5f + dy),
+                r * 0.28f, r * 0.28f, paint
             )
         }
-
-        // 云下闪电：普通1道 / 风暴3道 / 之王大金闪电+双紫电
+        shadowPaint.color = shadowColor
+        drawPuffs(r * 0.10f, shadowPaint)
+        bodyPaint.color = mainColor
+        drawPuffs(0f, bodyPaint)
+        // 金边高光
         if (!sleepy) {
-            when {
-                isKing -> {
-                    boltPaint.color = 0xFFFFC94D.toInt()
-                    drawBolt(canvas, cx, cy + r * 0.5f, r * 0.62f)
-                    boltPaint.color = 0xFFB388FF.toInt()
-                    drawBolt(canvas, cx - r * 0.62f, cy + r * 0.55f, r * 0.4f)
-                    drawBolt(canvas, cx + r * 0.62f, cy + r * 0.6f, r * 0.36f)
-                }
-                isStorm -> {
-                    boltPaint.color = 0xFF8FD0FF.toInt()
-                    val sway = sin(t * 2.6f) * r * 0.04f
-                    drawBolt(canvas, cx + sway, cy + r * 0.5f, r * 0.46f)
-                    drawBolt(canvas, cx - r * 0.58f, cy + r * 0.55f, r * 0.34f)
-                    drawBolt(canvas, cx + r * 0.58f, cy + r * 0.58f, r * 0.3f)
-                }
-                else -> {
-                    boltPaint.color = 0xFF7FC4FF.toInt()
-                    val sway = sin(t * 2.6f) * r * 0.04f
-                    drawBolt(canvas, cx + sway, cy + r * 0.5f, r * 0.42f)
-                }
-            }
+            linePaint.color = 0xAAFFE082.toInt()
+            linePaint.strokeWidth = 3.5f
+            canvas.drawArc(
+                RectF(cx - r * 0.85f, cy - r * 0.9f, cx + r * 0.3f, cy + r * 0.25f),
+                185f, 80f, false, linePaint
+            )
         }
-
-        // 风暴光圈（断裂弧环）
-        if (isStorm && !sleepy) {
-            linePaint.strokeWidth = 4.5f
-            linePaint.color = if (isKing) 0x88FFC94D.toInt() else 0x88A8C8FF.toInt()
-            val aura = RectF(cx - r * 1.3f, cy - r * 0.9f, cx + r * 1.3f, cy + r * 0.9f)
-            for (i in 0 until 4) {
-                canvas.drawArc(aura, t * 50 + i * 90f, 55f, false, linePaint)
-            }
+        // 中央大金闪电 + 侧紫电
+        if (!sleepy) {
+            boltPaint.color = 0xFFFFC94D.toInt()
+            drawBolt(canvas, cx, cy + r * 0.45f, r * 0.58f)
+            boltPaint.color = 0xFFB388FF.toInt()
+            drawBolt(canvas, cx - r * 0.5f, cy + r * 0.5f, r * 0.36f)
+            drawBolt(canvas, cx + r * 0.5f, cy + r * 0.55f, r * 0.32f)
         }
-
-        // 之王：金冠
-        if (isKing && !sleepy) {
-            drawCrown(canvas, cx, cy - r * 0.8f, r * 0.6f)
-        } else if (isStorm && !sleepy) {
-            // 风暴之灵：头顶火花冠
-            linePaint.color = 0xFF8FD0FF.toInt()
-            linePaint.strokeWidth = 4f
-            for (i in 0 until 5) {
-                val ang = 3.1415927f + (1.5707964f * (i + 1) / 6)
-                val bx = cx + cos(ang) * r * 0.8f
-                val by = cy + sin(ang) * r * 0.55f - r * 0.18f
-                canvas.drawLine(bx, by, bx + cos(ang) * r * 0.16f, by + sin(ang) * r * 0.16f, linePaint)
-            }
-        }
-
-        // 脸（风暴起带眉毛=帅气）
-        drawFace(canvas, cx, cy - r * 0.12f, r * 0.16f, blinking, fierce = isStorm)
+        // 金冠
+        if (!sleepy) drawCrown(canvas, cx, cy - r * 0.78f, r * 0.58f)
+        // 脸（王者自信）
+        drawFace(canvas, cx, cy - r * 0.1f, r * 0.15f, blinking, fierce = true)
     }
 
     // ─────────────────── 金冠 ───────────────────

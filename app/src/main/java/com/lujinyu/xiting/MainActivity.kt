@@ -366,8 +366,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             listPage++
             renderList()
         }
-        // 分享战绩：系统分享面板 + 分享任务（解锁精灵装扮）
-        pageStats.findViewById<View>(R.id.pet_share).setOnClickListener { sharePetStats() }
+
     }
 
     /** 每日分享任务：每天首次分享 +30 成长值（精灵成长值 = 听剧分钟 + 分享奖励） */
@@ -461,9 +460,6 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         if (seen != stage) prefs.edit().putInt("last_seen_stage", stage).apply()
 
         // 文案
-        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-            .format(java.util.Date(now))
-        val sharedToday = prefs.getString("last_share_date", "") == today
         pageStats.findViewById<TextView>(R.id.pet_caption).text =
             if (pet.sleepy) {
                 "${PetView.stageName(stage)} 打瞌睡了 · 听一集唤醒它"
@@ -472,9 +468,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             } else {
                 "${PetView.stageName(stage)} · 成长值 $gp / ${PetView.THRESHOLDS[stage + 1]}"
             }
-        pageStats.findViewById<TextView>(R.id.pet_share).text =
-            if (sharedToday) "今日分享已完成 ✓ · 明天再来 ›"
-            else "每日分享 · 得 $SHARE_GP_PER_DAY 能量 ›"
+        // 分享入口在「设置」页（统计页不再重复）
         pet.startAnimating()
         buildGallery(stage)
     }
@@ -527,13 +521,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             }
             row.addView(frame)
         }
-        // 图鉴说明文字
-        pageStats.findViewById<TextView>(R.id.gallery_info).text = when {
-            previewStage < 0 -> "点图鉴可预览后续形态"
-            previewStage == currentStage -> "${PetView.stageName(previewStage)} · 当前形态"
-            previewStage < currentStage -> "预览中：${PetView.stageName(previewStage)}（已解锁）"
-            else -> "预览中：${PetView.stageName(previewStage)}（未解锁 · 需 ${PetView.THRESHOLDS[previewStage]} 成长值）"
-        }
+        // 图鉴选中说明合并进主文案（上方 caption 已显示，不另占行）
     }
 
     private var galleryPreviewBuilt = -2
@@ -871,6 +859,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val totalMin = ms / 60000
         val h = totalMin / 60
         val m = totalMin % 60
-        return if (h > 0) "${h}时${m}分" else "${m}分钟"
+        return when {
+            h >= 100 -> "${h}时"          // 超长丢分钟，保证三卡单行不换行
+            h > 0 -> "${h}时${m}分"
+            else -> "${m}分钟"
+        }
     }
 }

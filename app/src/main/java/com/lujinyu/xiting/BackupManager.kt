@@ -50,30 +50,85 @@ object BackupManager {
             val bytes = obj.toString().toByteArray()
 
             val resolver = ctx.contentResolver
-            // 先删旧的同名备份（避免堆积）
-            resolver.query(
-                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-                arrayOf(MediaStore.Downloads._ID),
-                "${MediaStore.Downloads.DISPLAY_NAME}=?",
-                arrayOf(FILE_NAME), null
-            )?.use { c ->
-                while (c.moveToNext()) {
-                    val id = c.getLong(0)
-                    val uri = Uri.withAppendedPath(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id.toString())
-                    resolver.delete(uri, null, null)
+            // 先删旧的同名备份（避免堆积）。写入中断会留下 pending 行或孤儿行
+            // （media_type=0、无属主），常规查询看不见它们，但 insert 会因 _data
+            // 路径唯一约束失败，备份从此每次静默报错——模拟器/真机均实测出现过
+            cleanupOldBackup(resolver)
+            try {
+                insertAndWrite(resolver, FILE_NAME, bytes)
+                Log.i(TAG, "备份已写入 Downloads/XiTing（gp=$gp）")
+            } catch (e: android.database.sqlite.SQLiteConstraintException) {
+                // 孤儿行占路：按 _data 精确清一次再试；仍冲突则换时间戳文件名兜底
+                cleanupOrphanRows(resolver)
+                try {
+                    insertAndWrite(resolver, FILE_NAME, bytes)
+                    Log.i(TAG, "清理孤儿行后备份成功（gp=$gp）")
+                } catch (e2: Exception) {
+                    val fallback = "XiTing-backup-${System.currentTimeMillis()}.json"
+                    insertAndWrite(resolver, fallback, bytes)
+                    Log.w(TAG, "主备份名被占用，改用 $fallback")
                 }
             }
-            val values = ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, FILE_NAME)
-                put(MediaStore.Downloads.MIME_TYPE, "application/json")
-                put(MediaStore.Downloads.RELATIVE_PATH, REL_DIR)
-            }
-            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values) ?: return
-            resolver.openOutputStream(uri)?.use { it.write(bytes) }
-            Log.i(TAG, "备份已写入 Downloads/XiTing（gp=$gp）")
         } catch (e: Exception) {
             Log.w(TAG, "备份失败: $e")
         }
+    }
+
+    /** 删除同名备份（API 30+ 时包含 pending/回收站行） */
+    private fun cleanupOldBackup(resolver: android.content.ContentResolver) {
+        val findUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI
+        if (Build.VERSION.SDK_INT >= 30) {
+            val bundle = android.os.Bundle().apply {
+                putStringArrayList(
+                    android.content.ContentResolver.QUERY_ARG_SQL_SELECTION,
+                    arrayListOf("${MediaStore.Downloads.DISPLAY_NAME}=?")
+                )
+                putStringArrayList(
+                    android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,
+                    arrayListOf(FILE_NAME)
+                )
+                putInt(MediaStore.QUERY_ARG_MATCH_PENDING, MediaStore.MATCH_INCLUDE)
+                putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
+            }
+            resolver.query(findUri, arrayOf(MediaStore.Downloads._ID), bundle, null)?.use { c ->
+                while (c.moveToNext()) {
+                    resolver.delete(Uri.withAppendedPath(findUri, c.getLong(0).toString()), null, null)
+                }
+            }
+        } else {
+            resolver.query(
+                findUri, arrayOf(MediaStore.Downloads._ID),
+                "${MediaStore.Downloads.DISPLAY_NAME}=?", arrayOf(FILE_NAME), null
+            )?.use { c ->
+                while (c.moveToNext()) {
+                    resolver.delete(Uri.withAppendedPath(findUri, c.getLong(0).toString()), null, null)
+                }
+            }
+        }
+    }
+
+    /** 清理写入中断留下的孤儿行（media_type=0、无属主），只按 _data 精确匹配 */
+    private fun cleanupOrphanRows(resolver: android.content.ContentResolver) {
+        try {
+            val filesUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            val base = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .absolutePath
+            val path = "$base/$REL_DIR/$FILE_NAME"
+            resolver.delete(filesUri, "_data=?", arrayOf(path))
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun insertAndWrite(resolver: android.content.ContentResolver, name: String, bytes: ByteArray) {
+        val values = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, name)
+            put(MediaStore.Downloads.MIME_TYPE, "application/json")
+            put(MediaStore.Downloads.RELATIVE_PATH, REL_DIR)
+        }
+        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+            ?: throw IllegalStateException("MediaStore insert 返回 null")
+        resolver.openOutputStream(uri)?.use { it.write(bytes) }
+            ?: throw IllegalStateException("输出流打开失败")
     }
 
     /** 读取本机备份（若存在且为本设备创建）；返回 null 表示无可用备份 */
@@ -82,19 +137,23 @@ object BackupManager {
         return try {
             val resolver = ctx.contentResolver
             var found: JSONObject? = null
+            // 前缀匹配：兼容主名 XiTing-backup.json 与孤儿兜底名 XiTing-backup-<ts>.json
             resolver.query(
                 MediaStore.Downloads.EXTERNAL_CONTENT_URI,
                 arrayOf(MediaStore.Downloads._ID, MediaStore.Downloads.DATE_ADDED),
-                "${MediaStore.Downloads.DISPLAY_NAME}=?",
-                arrayOf(FILE_NAME), "${MediaStore.Downloads.DATE_ADDED} DESC"
+                "${MediaStore.Downloads.DISPLAY_NAME} LIKE ?",
+                arrayOf("XiTing-backup%.json"), "${MediaStore.Downloads.DATE_ADDED} DESC"
             )?.use { c ->
-                if (c.moveToFirst()) {
+                while (c.moveToNext()) {
                     val id = c.getLong(0)
                     val uri = Uri.withAppendedPath(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id.toString())
-                    resolver.openInputStream(uri)?.use { input ->
-                        val text = input.readBytes().toString(Charsets.UTF_8)
-                        found = JSONObject(text)
+                    try {
+                        resolver.openInputStream(uri)?.use { input ->
+                            found = JSONObject(input.readBytes().toString(Charsets.UTF_8))
+                        }
+                    } catch (_: Exception) {
                     }
+                    if (found != null) break
                 }
             }
             val obj = found

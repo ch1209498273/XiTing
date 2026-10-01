@@ -298,7 +298,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             } else {
                 android.app.AlertDialog.Builder(this)
                     .setTitle("备份来自其他设备")
-                    .setMessage("该备份成长值 $gp，设备ID与本机不一致（换机场景）。确定恢复吗？")
+                    .setMessage("该备份成长值 $gp，设备ID与本机不一致（换机，或从旧签名版本迁移）。确定恢复吗？")
                     .setPositiveButton("恢复") { _, _ -> doRestore(obj, gp) }
                     .setNegativeButton("取消", null)
                     .show()

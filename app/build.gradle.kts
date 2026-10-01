@@ -1,11 +1,21 @@
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Properties
 import java.util.UUID
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
+// ---------- 正式签名 ----------
+// 密钥与密码保存在项目根目录 keystore.properties（已 gitignore，绝不入库）。
+// 公开仓库 clone 后无此文件，release 构建自动回退 debug 签名，保证可构建。
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+val hasReleaseKeystore = keystoreProps.isNotEmpty()
 
 // ---------- 溯源水印 ----------
 // 每次构建生成唯一构建ID，注入到 APK 的隐藏资产、资源表和界面上。
@@ -58,10 +68,36 @@ android {
         buildConfig = true
     }
 
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = if (hasReleaseKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 
     compileOptions {

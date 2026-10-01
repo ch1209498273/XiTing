@@ -4,5 +4,6 @@ app/build/
 local.properties
 *.apk
 *.aab
-_rel.json
-_r.json
+keystore.properties
+keystore/
+*.jks

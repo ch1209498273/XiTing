@@ -370,6 +370,15 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             val dur = if (elapsed >= 0) elapsed else now - sessionStart
             Stats.addDelta(context, dur)
             SessionLog.add(context, ListenSession(sessionStart, now, dur, SessionLog.MODE_BLACK))
+            // 听剧产生能量球：每满 1 分钟 1 点能量（含跨会话余数累积，不浪费零头）
+            try {
+                val sp = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+                val carry = sp.getLong("energy_carry_ms", 0) + dur
+                val energy = (carry / 60000).toInt()
+                sp.edit().putLong("energy_carry_ms", carry % 60000).apply()
+                if (energy > 0) EnergyStore.add(context, energy)
+            } catch (_: Exception) {
+            }
             sessionStart = 0
         }
         badgeListener?.let { NotificationBadge.unregister(it) }

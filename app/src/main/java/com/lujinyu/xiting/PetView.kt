@@ -10,6 +10,7 @@ import android.graphics.RadialGradient
 import android.graphics.RectF
 import android.graphics.Shader
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import kotlin.math.abs
 import kotlin.math.cos
@@ -56,6 +57,19 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     var totalMah = 0
     var progress = 0f      // 距下一形态进度 0..1（final 时无用）
     var thumbMode = false  // 图鉴缩略模式：静态单帧、无粒子/进度条/光晕动画
+    var hideProgress = false               // 预览非当前形态时隐藏进度条
+    var pending: List<PendingEnergy> = emptyList()   // 待收集能量球
+    var onCollect: ((Long) -> Unit)? = null          // 收集回调（延迟到飞入动画后）
+
+    // 收集动画内部状态
+    private data class FlyBall(val value: Int, val sx: Float, val sy: Float, val startAt: Long)
+    private data class Popup(val text: String, val startAt: Long)
+    private val flyBalls = mutableListOf<FlyBall>()
+    private val popups = mutableListOf<Popup>()
+    private var pulseUntil = 0L
+    private var downX = 0f
+    private var downY = 0f
+    private val ballPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private var bornAt = System.currentTimeMillis()
     private var blinkUntil = 0L
@@ -104,6 +118,71 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
         if (visibility == VISIBLE) startAnimating()
+    }
+
+    /** 当前帧精灵几何（绘制与点击命中共用） */
+    private fun geometry(): Triple<Float, Float, Float> {
+        val t = (System.currentTimeMillis() - bornAt) / 1000f
+        val cx = width / 2f
+        val cy = height / 2f - 20f + (if (thumbMode) 20f else sin(t * 2.2f) * 8f)
+        val h = height.toFloat()
+        val r = h * if (thumbMode) {
+            arrayOf(0.20f, 0.26f, 0.32f, 0.37f, 0.42f)[stage]
+        } else when (stage) {
+            STAGE_SPARK -> 0.15f
+            STAGE_BALL -> 0.21f
+            STAGE_CLOUD -> 0.27f
+            STAGE_STORM -> 0.33f
+            else -> 0.38f
+        }
+        return Triple(cx, cy, r)
+    }
+
+    /** 能量球位置：环绕精灵一圈（固定位置——移动的球难以点击） */
+    private fun ballLayout(cx: Float, cy: Float, r: Float, n: Int): List<Pair<Float, Float>> {
+        val out = ArrayList<Pair<Float, Float>>(n)
+        if (n == 0) return out
+        for (i in 0 until n) {
+            val ang = -1.5707964f + 6.2831855f * i / n
+            val rr = r * 1.5f + (if (i % 2 == 0) r * 0.12f else 0f)
+            out.add(Pair(cx + cos(ang) * rr, cy + sin(ang) * rr * 0.92f))
+        }
+        return out
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (thumbMode) return super.onTouchEvent(event)
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                downX = event.x
+                downY = event.y
+                return true
+            }
+            MotionEvent.ACTION_UP -> {
+                val moved = Math.abs(event.x - downX) > 30 || Math.abs(event.y - downY) > 30
+                if (!moved) {
+                    val (cx, cy, r) = geometry()
+                    val balls = pending.take(8)
+                    val poss = ballLayout(cx, cy, r, balls.size)
+                    val br = (height * 0.085f).coerceAtLeast(14f)
+                    for (i in balls.indices) {
+                        val dx = event.x - poss[i].first
+                        val dy = event.y - poss[i].second
+                        if (dx * dx + dy * dy < (br * 2.8f) * (br * 2.8f)) {
+                            // 命中能量球：飞入动画 + 延迟回调
+                            val pe = balls[i]
+                            flyBalls.add(FlyBall(pe.value, poss[i].first, poss[i].second, System.currentTimeMillis()))
+                            postDelayed({ onCollect?.invoke(pe.id) }, 340)
+                            return true
+                        }
+                    }
+                    performClick() // 未命中球：原有放电效果
+                }
+                return true
+            }
+            MotionEvent.ACTION_MOVE -> return true // 交给外层 ScrollView 拦截滚动
+        }
+        return super.onTouchEvent(event)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -214,8 +293,87 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             popPaint.alpha = 255
         }
 
+        // ───────── 能量球系统（充能/收集） ─────────
+        if (!thumbMode) {
+            val br = (height * 0.085f).coerceAtLeast(14f)
+            // 待收集能量球（环绕，缓慢旋转）
+            val balls = pending.take(8)
+            val poss = ballLayout(cx, cy, r, balls.size)
+            for (i in balls.indices) {
+                val (bx, by) = poss[i]
+                val pe = balls[i]
+                val nearing = pe.expireAt - now < EnergyStore.NEAR_EXPIRE_MS
+                // 临期（12小时内）橙红闪烁提醒过期
+                val col = if (nearing) {
+                    if ((now / 400) % 2 == 0L) 0xFFFF7043.toInt() else 0xFFFFAB91.toInt()
+                } else 0xFFFFC94D.toInt()
+                glowPaint.shader = RadialGradient(
+                    bx, by, br * 2.1f, (col and 0x00FFFFFF) or 0x44000000, Color.TRANSPARENT, Shader.TileMode.CLAMP
+                )
+                canvas.drawCircle(bx, by, br * 2.1f, glowPaint)
+                bodyPaint.color = col
+                canvas.drawCircle(bx, by, br, bodyPaint)
+                // 球面高光
+                val hi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x66FFFFFF }
+                canvas.drawCircle(bx - br * 0.3f, by - br * 0.35f, br * 0.32f, hi)
+                // 球上数字
+                popPaint.alpha = 255
+                popPaint.textSize = br * 0.85f
+                canvas.drawText("+${pe.value}", bx, by - br * 1.35f, popPaint)
+                popPaint.textSize = 30f
+            }
+            // 待收集提示
+            if (pending.size > 0) {
+                val tp = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = 0xFF8A9099.toInt()
+                    textSize = 26f
+                    textAlign = Paint.Align.CENTER
+                }
+                canvas.drawText("⚡ ${pending.size} 个能量待收集 · 点击收集（3天过期）", cx, 34f, tp)
+            }
+
+            // 飞入动画：收集的球飞向精灵中心
+            flyBalls.removeAll { now - it.startAt > 320 }
+            flyBalls.forEach { fb ->
+                val k = ((now - fb.startAt) / 300f).coerceIn(0f, 1f)
+                val ease = k * k * (3 - 2 * k)   // smoothstep
+                val fx = fb.sx + (cx - fb.sx) * ease
+                val fy = fb.sy + (cy - fb.sy) * ease
+                val fr = br * (1f - 0.5f * ease)
+                ballPaint.color = 0xFFFFC94D.toInt()
+                ballPaint.alpha = (255 * (1f - 0.6f * ease)).toInt()
+                canvas.drawCircle(fx, fy, fr, ballPaint)
+                ballPaint.alpha = 255
+                if (k >= 1f) {
+                    pulseUntil = now + 450
+                    popups.add(Popup("+${fb.value}", now))
+                }
+            }
+
+            // 充能脉冲：扩散光环
+            if (now < pulseUntil) {
+                val pt = 1f - (pulseUntil - now) / 450f
+                linePaint.color = 0xFFFFE082.toInt()
+                linePaint.alpha = (200 * (1f - pt)).toInt().coerceIn(0, 255)
+                linePaint.strokeWidth = 6f * (1f - pt) + 2.5f
+                canvas.drawCircle(cx, cy, r * (1.0f + 0.85f * pt), linePaint)
+                linePaint.alpha = 255
+            }
+
+            // 浮字 +N
+            popups.removeAll { now - it.startAt > 900 }
+            popups.forEach { pu ->
+                val k = ((now - pu.startAt) / 900f).coerceIn(0f, 1f)
+                popPaint.alpha = (255 * (1f - k)).toInt().coerceIn(0, 255)
+                popPaint.textSize = 34f
+                canvas.drawText(pu.text, cx, cy - r - 20f - k * 70f, popPaint)
+                popPaint.alpha = 255
+                popPaint.textSize = 30f
+            }
+        }
+
         // 成长进度条（底部，最终形态不显示）
-        if (!thumbMode && stage < STAGE_KING) {
+        if (!thumbMode && !hideProgress && stage < STAGE_KING) {
             val barW = width * 0.55f
             val barH = 12f
             val left = cx - barW / 2

@@ -63,6 +63,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     private var range = RANGE_ALL
     private var listPage = 0
     private var galleryBuiltStage = -1
+    private var previewStage = -1   // -1=显示当前形态；>=0=图鉴预览的形态
     private var todayMs = 0L
     private var weekMs = 0L
     private var allMs = 0L
@@ -386,20 +387,22 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             .format(java.util.Date())
         val last = prefs.getString("last_share_date", "")
         if (last != today) {
-            val nb = prefs.getInt("share_bonus_gp", 0) + SHARE_GP_PER_DAY
-            prefs.edit().putInt("share_bonus_gp", nb).putString("last_share_date", today).apply()
-            Toast.makeText(this, "每日分享完成 · 精灵 +$SHARE_GP_PER_DAY 成长值 ⚡", Toast.LENGTH_SHORT).show()
+            prefs.edit().putString("last_share_date", today).apply()
+            EnergyStore.add(this, SHARE_GP_PER_DAY) // 分享产生能量球，回统计页收集
+            Toast.makeText(this, "每日分享完成 · 获得 $SHARE_GP_PER_DAY 能量，回统计页收集 ⚡", Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(this, "今日分享奖励已领取，明天再来（每天一次）", Toast.LENGTH_SHORT).show()
         }
         renderStats()
     }
 
-    /** 成长值体系：GP = 听剧分钟 + 每日分享奖励；展示进度与每日任务状态 */
+    /** 成长值体系：成长值=已收集能量；听剧/分享产生能量球待收集（3天过期） */
     private fun refreshPetPanel(allMs: Long, sessions: List<ListenSession>, now: Long) {
         val pet = pageStats.findViewById<PetView>(R.id.pet_view)
         val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-        val gp = allMs / 60000 + prefs.getInt("share_bonus_gp", 0)
+        // 旧版成长值（听剧分钟+分享奖励）一次性迁入已收集总量
+        EnergyStore.migrateIfNeeded(this, allMs / 60000, prefs.getInt("share_bonus_gp", 0))
+        val gp = EnergyStore.collectedTotal(this).toLong()
         val stage = PetView.stageOf(gp)
         pet.stage = stage
         val lastSessionAt = sessions.maxOfOrNull { it.start } ?: 0L
@@ -410,6 +413,19 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             val hi = PetView.THRESHOLDS[stage + 1]
             ((gp - lo).toFloat() / (hi - lo)).coerceIn(0f, 1f)
         } else 1f
+
+        // 图鉴预览：选中非当前形态时主精灵切换为该形态
+        pet.stage = if (previewStage >= 0) previewStage else stage
+        pet.hideProgress = previewStage >= 0 && previewStage != stage
+        // 能量球装载与收集回调（回调在飞入动画完成后触发）
+        pet.pending = EnergyStore.pending(this)
+        pet.onCollect = { id ->
+            val v = EnergyStore.collect(this, id)
+            if (v > 0) {
+                Toast.makeText(this, "充能 +$v 成长值 ⚡", Toast.LENGTH_SHORT).show()
+            }
+            renderStats()
+        }
 
         // 进化提示（仅当上次记录的形态更低时弹一次）
         val seen = prefs.getInt("last_seen_stage", -1)
@@ -436,39 +452,51 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             }
         pageStats.findViewById<TextView>(R.id.pet_share).text =
             if (sharedToday) "今日分享已完成 ✓ · 明天再来 ›"
-            else "每日分享 · 精灵 +$SHARE_GP_PER_DAY 成长值 ›"
+            else "每日分享 · 得 $SHARE_GP_PER_DAY 能量 ›"
         pet.startAnimating()
         buildGallery(stage)
     }
 
-    /** 形态图鉴：5 个缩略图，已解锁亮色 / 未解锁灰暗，点击查看信息 */
+    /** 形态图鉴：点击缩略图预览该形态（含未解锁），再点一次恢复当前形态 */
     private fun buildGallery(currentStage: Int) {
-        if (galleryBuiltStage == currentStage) return
+        if (galleryBuiltStage == currentStage && galleryPreviewBuilt == previewStage) return
         galleryBuiltStage = currentStage
+        galleryPreviewBuilt = previewStage
         val row = pageStats.findViewById<LinearLayout>(R.id.thumb_row)
         row.removeAllViews()
         val density = resources.displayMetrics.density
-        val size = (58 * density).toInt()
+        val size = (56 * density).toInt()
         for (i in 0..4) {
             val pv = PetView(this).apply {
                 stage = i
                 thumbMode = true
                 layoutParams = LinearLayout.LayoutParams(size, size).apply {
-                    marginStart = (6 * density).toInt()
-                    marginEnd = (6 * density).toInt()
+                    marginStart = (5 * density).toInt()
+                    marginEnd = (5 * density).toInt()
                 }
+                // 未解锁：灰暗；选中的预览项：绿框高亮
                 if (i > currentStage) alpha = 0.25f
+                if (i == previewStage || (previewStage < 0 && i == currentStage)) {
+                    setBackgroundResource(R.drawable.bg_thumb_selected)
+                }
                 setOnClickListener {
-                    pageStats.findViewById<TextView>(R.id.gallery_info).text = when {
-                        i == currentStage -> "★ ${PetView.stageName(i)} · 当前形态（${PetView.THRESHOLDS[i]} 成长值）"
-                        i < currentStage -> "✓ ${PetView.stageName(i)} · 已解锁"
-                        else -> "🔒 ${PetView.stageName(i)} · 需 ${PetView.THRESHOLDS[i]} 成长值解锁"
-                    }
+                    previewStage = if (i == currentStage) -1 else i
+                    galleryBuiltStage = -1 // 强制重建（刷新选中框）
+                    renderStats()
                 }
             }
             row.addView(pv)
         }
-}
+        // 图鉴说明文字
+        pageStats.findViewById<TextView>(R.id.gallery_info).text = when {
+            previewStage < 0 -> "点图鉴可预览后续形态"
+            previewStage == currentStage -> "${PetView.stageName(previewStage)} · 当前形态"
+            previewStage < currentStage -> "预览中：${PetView.stageName(previewStage)}（已解锁）"
+            else -> "预览中：${PetView.stageName(previewStage)}（未解锁 · 需 ${PetView.THRESHOLDS[previewStage]} 成长值）"
+        }
+    }
+
+    private var galleryPreviewBuilt = -2
 
     private fun selectRange(r: Int) {
         range = r

@@ -50,71 +50,55 @@ object BackupManager {
             val bytes = obj.toString().toByteArray()
 
             val resolver = ctx.contentResolver
-            // 先删旧的同名备份（避免堆积）。写入中断会留下 pending 行或孤儿行
-            // （media_type=0、无属主），常规查询看不见它们，但 insert 会因 _data
-            // 路径唯一约束失败，备份从此每次静默报错——模拟器/真机均实测出现过
-            cleanupOldBackup(resolver)
+            // 先自愈命名：写入中断会留下孤儿行（media_type=0、无属主）占住正名路径，
+            // 导致 insert 被去重成 "XiTing-backup (N).json" 越堆越多、而正名文件永远陈旧
+            // （模拟器与真机均实测出现）。每次备份前释放正名路径并清掉历史去重副本。
+            healBackupNames(resolver)
             try {
                 insertAndWrite(resolver, FILE_NAME, bytes)
                 Log.i(TAG, "备份已写入 Downloads/XiTing（gp=$gp）")
             } catch (e: android.database.sqlite.SQLiteConstraintException) {
-                // 孤儿行占路：按 _data 精确清一次再试；仍冲突则换时间戳文件名兜底
-                cleanupOrphanRows(resolver)
-                try {
-                    insertAndWrite(resolver, FILE_NAME, bytes)
-                    Log.i(TAG, "清理孤儿行后备份成功（gp=$gp）")
-                } catch (e2: Exception) {
-                    val fallback = "XiTing-backup-${System.currentTimeMillis()}.json"
-                    insertAndWrite(resolver, fallback, bytes)
-                    Log.w(TAG, "主备份名被占用，改用 $fallback")
-                }
+                // 兜底：仍冲突则换时间戳文件名，保证数据不丢
+                val fallback = "XiTing-backup-${System.currentTimeMillis()}.json"
+                insertAndWrite(resolver, fallback, bytes)
+                Log.w(TAG, "主备份名被占用，改用 $fallback")
             }
         } catch (e: Exception) {
             Log.w(TAG, "备份失败: $e")
         }
     }
 
-    /** 删除同名备份（API 30+ 时包含 pending/回收站行） */
-    private fun cleanupOldBackup(resolver: android.content.ContentResolver) {
-        val findUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI
-        if (Build.VERSION.SDK_INT >= 30) {
-            val bundle = android.os.Bundle().apply {
-                putStringArrayList(
-                    android.content.ContentResolver.QUERY_ARG_SQL_SELECTION,
-                    arrayListOf("${MediaStore.Downloads.DISPLAY_NAME}=?")
-                )
-                putStringArrayList(
-                    android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,
-                    arrayListOf(FILE_NAME)
-                )
-                putInt(MediaStore.QUERY_ARG_MATCH_PENDING, MediaStore.MATCH_INCLUDE)
-                putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
-            }
-            resolver.query(findUri, arrayOf(MediaStore.Downloads._ID), bundle, null)?.use { c ->
-                while (c.moveToNext()) {
-                    resolver.delete(Uri.withAppendedPath(findUri, c.getLong(0).toString()), null, null)
-                }
-            }
-        } else {
+    /** 备份命名自愈：先清历史去重副本（自有行，可删），再尝试释放正名路径
+     *  （卸载残留的无主行可能删不动——失败不影响后续写入，只是继续用去重名） */
+    private fun healBackupNames(resolver: android.content.ContentResolver) {
+        // 1) 清理本应用写出的历史去重副本（XiTing-backup (N).json 等）
+        try {
             resolver.query(
-                findUri, arrayOf(MediaStore.Downloads._ID),
-                "${MediaStore.Downloads.DISPLAY_NAME}=?", arrayOf(FILE_NAME), null
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                arrayOf(MediaStore.Downloads._ID, MediaStore.Downloads.DISPLAY_NAME),
+                "${MediaStore.Downloads.DISPLAY_NAME} LIKE ?",
+                arrayOf("XiTing-backup%.json"), null
             )?.use { c ->
+                val idCol = c.getColumnIndexOrThrow(MediaStore.Downloads._ID)
+                val nameCol = c.getColumnIndexOrThrow(MediaStore.Downloads.DISPLAY_NAME)
                 while (c.moveToNext()) {
-                    resolver.delete(Uri.withAppendedPath(findUri, c.getLong(0).toString()), null, null)
+                    if (c.getString(nameCol) != FILE_NAME) {
+                        resolver.delete(
+                            Uri.withAppendedPath(MediaStore.Downloads.EXTERNAL_CONTENT_URI, c.getLong(idCol).toString()),
+                            null, null
+                        )
+                    }
                 }
             }
+        } catch (_: Exception) {
         }
-    }
-
-    /** 清理写入中断留下的孤儿行（media_type=0、无属主），只按 _data 精确匹配 */
-    private fun cleanupOrphanRows(resolver: android.content.ContentResolver) {
+        // 2) 尝试释放正名路径（孤儿行/旧行；无主行删不动时静默放弃）
         try {
             val filesUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
             val base = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 .absolutePath
-            val path = "$base/$REL_DIR/$FILE_NAME"
-            resolver.delete(filesUri, "_data=?", arrayOf(path))
+            val canonical = "$base/$REL_DIR/$FILE_NAME"
+            resolver.delete(filesUri, "_data=?", arrayOf(canonical))
         } catch (_: Exception) {
         }
     }

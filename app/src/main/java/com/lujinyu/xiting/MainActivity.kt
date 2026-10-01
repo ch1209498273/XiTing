@@ -861,6 +861,6 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val totalMin = ms / 60000
         val h = totalMin / 60
         val m = totalMin % 60
-        return if (h > 0) "${h}小时${m}分" else "${m}分钟"
+        return if (h > 0) "${h}时${m}分" else "${m}分钟"
     }
 }

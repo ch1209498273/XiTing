@@ -199,20 +199,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         super.onDraw(canvas)
         val now = System.currentTimeMillis()
         val t = (now - bornAt) / 1000f
-        val cx = width / 2f
-        val cy = height / 2f - 20f + (if (thumbMode) 20f else sin(t * 2.2f) * 8f)
-
-        // 半径按视图高度比例：形态越大身体越大（15% → 38%）
-        val h = height.toFloat()
-        val r = h * if (thumbMode) {
-            arrayOf(0.20f, 0.26f, 0.32f, 0.37f, 0.42f)[stage]
-        } else when (stage) {
-            STAGE_SPARK -> 0.15f
-            STAGE_BALL -> 0.21f
-            STAGE_CLOUD -> 0.27f
-            STAGE_STORM -> 0.33f
-            else -> 0.38f
-        }
+        val (cx, cy, r) = geometry()
 
         // 眨眼
         if (now > nextBlinkAt) {
@@ -251,18 +238,87 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             starPaint.alpha = 255
         }
 
-        // 放电动画
+        // 放电动画（每个形态互动不同）
         if (!thumbMode && now < dischargeUntil) {
             val k = (now % 500) / 500f
-            linePaint.color = if (stage >= STAGE_STORM) 0xFFB388FF.toInt() else 0xFFFFE082.toInt()
-            linePaint.strokeWidth = 5f
-            for (i in 0 until 8) {
-                val ang = (6.2831855f * i / 8) + k * 1.5f
-                val len = r * (0.5f + 0.4f * ((i % 3) + 1) * k)
-                canvas.drawLine(
-                    cx + cos(ang) * r * 0.95f, cy + sin(ang) * r * 0.95f,
-                    cx + cos(ang) * (r + len), cy + sin(ang) * (r + len), linePaint
-                )
+            when (stage) {
+                STAGE_SPARK -> {
+                    // 星芒爆闪：放射短刺延长+整体旋转
+                    linePaint.color = 0xFFFFE082.toInt()
+                    linePaint.strokeWidth = 5f
+                    for (i in 0 until 8) {
+                        val ang = (6.2831855f * i / 8) + k * 3.5f
+                        val len = r * (0.4f + 0.9f * k)
+                        canvas.drawLine(
+                            cx + cos(ang) * r * 1.1f, cy + sin(ang) * r * 1.1f,
+                            cx + cos(ang) * (r * 1.1f + len), cy + sin(ang) * (r * 1.1f + len), linePaint
+                        )
+                    }
+                }
+                STAGE_BALL -> {
+                    // 等离子爆裂：锯齿电弧四射
+                    linePaint.color = 0xFF00E5FF.toInt()
+                    linePaint.strokeWidth = 4f
+                    for (i in 0 until 6) {
+                        val ang = (6.2831855f * i / 6) + k * 2f
+                        val p = Path()
+                        p.moveTo(cx + cos(ang) * r * 1.0f, cy + sin(ang) * r * 1.0f)
+                        p.lineTo(cx + cos(ang + 0.2f) * r * (1.25f + 0.5f * k), cy + sin(ang + 0.2f) * r * (1.25f + 0.5f * k))
+                        p.lineTo(cx + cos(ang - 0.15f) * r * (1.5f + 0.7f * k), cy + sin(ang - 0.15f) * r * (1.5f + 0.7f * k))
+                        canvas.drawPath(p, linePaint)
+                    }
+                    // 扩散电环
+                    linePaint.color = 0xFF80DEEA.toInt()
+                    canvas.drawCircle(cx, cy, r * (1.1f + 0.9f * k), linePaint)
+                }
+                STAGE_CLOUD -> {
+                    // 雷阵雨：云下三重闪电快速闪 + 扩散圈
+                    boltPaint.color = 0xFF7FC4FF.toInt()
+                    val big = r * (0.5f + 0.5f * k)
+                    drawBolt(canvas, cx, cy + r * 0.5f, big)
+                    if ((now / 100) % 2 == 0L) {
+                        drawBolt(canvas, cx - r * 0.55f, cy + r * 0.55f, big * 0.7f)
+                    } else {
+                        drawBolt(canvas, cx + r * 0.55f, cy + r * 0.55f, big * 0.7f)
+                    }
+                    linePaint.color = 0x88A8C8FF.toInt()
+                    linePaint.strokeWidth = 4f
+                    canvas.drawCircle(cx, cy, r * (1.1f + 1.1f * k), linePaint)
+                }
+                STAGE_STORM -> {
+                    // 龙卷加速：螺旋速度线狂转 + 双闪电
+                    linePaint.color = 0xFFB0C4E8.toInt()
+                    linePaint.strokeWidth = 3.5f
+                    for (i in 0 until 4) {
+                        val pk = 0.15f + i * 0.2f
+                        val w = r * (1.3f - 0.95f * pk)
+                        val y = cy - r * 0.85f + pk * r * 1.6f
+                        canvas.drawArc(
+                            RectF(cx - w, y - r * 0.14f, cx + w, y + r * 0.14f),
+                            k * 720f, 110f, false, linePaint
+                        )
+                    }
+                    boltPaint.color = 0xFF8FD0FF.toInt()
+                    drawBolt(canvas, cx + r * 0.95f, cy - r * 0.1f, r * (0.3f + 0.3f * k))
+                    drawBolt(canvas, cx - r * 0.98f, cy + r * 0.25f, r * (0.25f + 0.25f * k))
+                }
+                else -> {
+                    // 王者之怒：12 道金闪电环射 + 双层金环扩散 + 翼展甩动
+                    linePaint.color = 0xFFFFC94D.toInt()
+                    linePaint.strokeWidth = 4.5f
+                    for (i in 0 until 12) {
+                        val ang = (6.2831855f * i / 12) + k * 1.2f
+                        val p = Path()
+                        p.moveTo(cx + cos(ang) * r * 0.9f, cy + sin(ang) * r * 0.9f)
+                        p.lineTo(cx + cos(ang + 0.12f) * r * (1.3f + 0.4f * k), cy + sin(ang + 0.12f) * r * (1.3f + 0.4f * k))
+                        p.lineTo(cx + cos(ang) * r * (1.7f + 0.8f * k), cy + sin(ang) * r * (1.7f + 0.8f * k))
+                        canvas.drawPath(p, linePaint)
+                    }
+                    linePaint.color = 0xAAFFC94D.toInt()
+                    canvas.drawCircle(cx, cy, r * (1.2f + 0.7f * k), linePaint)
+                    linePaint.color = 0x66B388FF.toInt()
+                    canvas.drawCircle(cx, cy, r * (1.5f + 1.0f * k), linePaint)
+                }
             }
         }
 
@@ -332,13 +388,18 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
                     )
                 }
             }
-            // 数值（条上方 ⚡N/200）
+            // 数值（条上方单行，统一字号两段色）
             popPaint.alpha = 255
-            popPaint.textSize = 26f
+            popPaint.textSize = 24f
+            val numStr = "$total"
+            val maxStr = "/200"
+            val w1 = popPaint.measureText(numStr)
+            val w2 = popPaint.measureText(maxStr)
+            val startX = bar.centerX() - (w1 + w2) / 2f
             popPaint.color = if (nearing > 0) 0xFFE64A19.toInt() else 0xFFB8860B.toInt()
-            canvas.drawText("⚡$total", bar.centerX(), bar.top - 22f, popPaint)
-            popPaint.textSize = 18f
-            canvas.drawText("/200", bar.centerX(), bar.top - 2f, popPaint)
+            canvas.drawText(numStr, startX + w1 / 2f, bar.top - 16f, popPaint)
+            popPaint.color = 0xFF9AA1AA.toInt()
+            canvas.drawText(maxStr, startX + w1 + w2 / 2f, bar.top - 16f, popPaint)
             popPaint.color = 0xFF1E8E5A.toInt()
             popPaint.textSize = 30f
             // ? 说明图标

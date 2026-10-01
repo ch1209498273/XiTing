@@ -96,7 +96,7 @@
                 android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -112,7 +112,7 @@
                     android:layout_marginTop="4dp"
                     android:text="0分钟"
                     android:textColor="#FF111418"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -135,7 +135,7 @@
                 android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -151,7 +151,7 @@
                     android:layout_marginTop="4dp"
                     android:text="0分钟"
                     android:textColor="#FF111418"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -173,7 +173,7 @@
                 android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -189,7 +189,7 @@
                     android:layout_marginTop="4dp"
                     android:text="0分钟"
                     android:textColor="#FF157A4C"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView

@@ -135,7 +135,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageHome.findViewById<View>(R.id.stats_card).setOnClickListener { switchTab(TAB_STATS) }
 
         rowOverlay.setOnClickListener {
-            if (!Settings.canDrawOverlays(this)) {
+            val permErr = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+                .getBoolean("bubble_perm_error", false)
+            if (!Settings.canDrawOverlays(this) || permErr) {
+                Toast.makeText(
+                    this,
+                    if (permErr) "请在系统页面中把「悬浮窗」开关关闭再重新打开，即可修复" else "请开启悬浮窗权限",
+                    Toast.LENGTH_LONG
+                ).show()
                 try {
                     startActivity(
                         Intent(
@@ -344,14 +351,28 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             if (running) "看剧时点悬浮球，黑屏听剧声音继续 · 点此停止助手"
             else "启动后，看剧时点悬浮球即可息屏听剧"
 
+        // 自愈：服务在跑但悬浮球丢失（ColorOS 偶发吞掉纯浮窗）→ 自动重建
+        OverlayService.instance?.let { svc ->
+            if (!svc.isBubbleVisible()) {
+                svc.rebuildBubble()
+            }
+        }
         val overlayOk = Settings.canDrawOverlays(this)
+        val permError = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+            .getBoolean("bubble_perm_error", false)
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         val batteryOk = pm.isIgnoringBatteryOptimizations(packageName)
         val notifyOk = if (Build.VERSION.SDK_INT >= 33) {
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         } else true
 
-        setPill(pageHome.findViewById(R.id.pill_overlay), overlayOk, "已开启", "去开启")
+        if (permError) {
+            // 权限表征与实际不一致（重装后 ColorOS）：引导关闭再重新开启悬浮窗
+            setPill(pageHome.findViewById(R.id.pill_overlay), false, "", "异常·点修复")
+            pageHome.findViewById<TextView>(R.id.pill_overlay).setTextColor(0xFFD84315.toInt())
+        } else {
+            setPill(pageHome.findViewById(R.id.pill_overlay), overlayOk, "已开启", "去开启")
+        }
         setPill(pageHome.findViewById(R.id.pill_battery), batteryOk, "已加白", "去加白")
         setPill(pageHome.findViewById(R.id.pill_notify), notifyOk, "已开启", "去开启")
 
@@ -470,8 +491,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val last = prefs.getString("last_share_date", "")
         if (last != today) {
             prefs.edit().putString("last_share_date", today).apply()
-            EnergyStore.add(this, SHARE_GP_PER_DAY) // 分享产生能量球，回统计页收集
-            Toast.makeText(this, "每日分享完成 · 获得 $SHARE_GP_PER_DAY 能量，回统计页收集 ⚡", Toast.LENGTH_LONG).show()
+            EnergyStore.add(this, SHARE_GP_PER_DAY) // 分享产生待收成长值
+            Toast.makeText(
+                this,
+                "分享完成 · +$SHARE_GP_PER_DAY 待收成长值（去统计页点左侧条收取）",
+                Toast.LENGTH_LONG
+            ).show()
         } else {
             Toast.makeText(this, "今日分享奖励已领取，明天再来（每天一次）", Toast.LENGTH_SHORT).show()
         }
@@ -499,25 +524,25 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 图鉴预览：选中非当前形态时主精灵切换为该形态
         pet.stage = if (previewStage >= 0) previewStage else stage
         pet.hideProgress = previewStage >= 0 && previewStage != stage
-        // 能量装载与收集回调（点击左侧能量条=收集全部；回调在飞入动画完成后触发）
+        // 成长值装载与收取回调（点击左侧条=收取全部；回调在飞入动画完成后触发）
         pet.pending = EnergyStore.pending(this)
         pet.onCollectAll = {
             val v = EnergyStore.collectAll(this)
             if (v > 0) {
-                Toast.makeText(this, "充能 +$v 成长值 ⚡", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "+$v 成长值已收取 ✓", Toast.LENGTH_SHORT).show()
             }
             renderStats()
         }
-        // ? 说明：能量机制细节
+        // ? 说明：成长值机制细节（统一口径：成长值 = 待收 + 已收）
         pet.onHelp = {
             android.app.AlertDialog.Builder(this)
-                .setTitle("能量说明")
+                .setTitle("成长值说明")
                 .setMessage(
-                    "· 听剧每满 1 分钟产生 1 点能量（跨会话累计）\n" +
-                        "· 每日首次分享产生 5 点能量\n" +
-                        "· 待收能量上限 200 点，满格后不再累积——记得先收再听\n" +
-                        "· 能量产生后 3 天内有效，快过期的部分在条上显示为红色\n" +
-                        "· 点击能量条即全部收集，收下的能量转为成长值"
+                    "· 听剧每满 1 分钟获得 1 点成长值（先进入待收）\n" +
+                        "· 每日首次分享获得 5 点成长值（先进入待收）\n" +
+                        "· 待收上限 200 点，满后不再累积——记得先收再听\n" +
+                        "· 待收成长值 3 天内有效，快过期的部分在条上显示为红色\n" +
+                        "· 点击左侧条即收取，收取后计入精灵等级"
                 )
                 .setPositiveButton("知道了", null)
                 .show()
@@ -534,6 +559,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         }
         if (seen != stage) prefs.edit().putInt("last_seen_stage", stage).apply()
 
+        // 设置页分享行状态：今天是否还能领
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            .format(java.util.Date(now))
+        pageSettings.findViewById<TextView>(R.id.share_sub).text =
+            if (prefs.getString("last_share_date", "") == todayStr) "今日已领取 ✓ · 明天再来"
+            else "今天可领 +$SHARE_GP_PER_DAY · 待收"
         // 文案
         pageStats.findViewById<TextView>(R.id.pet_caption).text =
             if (pet.sleepy) {

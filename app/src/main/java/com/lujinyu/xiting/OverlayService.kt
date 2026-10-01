@@ -276,12 +276,17 @@ class OverlayService : Service() {
         try {
             wm.addView(tv, lp)
             bubble = tv
-            Log.i(TAG, "bubble added at $lp.x,$lp.y")
+            prefs.edit().putBoolean("bubble_perm_error", false).apply()
+            Log.e(TAG, "bubble added at ${lp.x},${lp.y}")
         } catch (e: Exception) {
-            Log.i(TAG, "bubble add failed: $e")
-            // 无悬浮窗权限时会到这里；主界面有引导
+            Log.e(TAG, "bubble add failed: $e")
+            // 权限表征与内核态不一致（重装后 ColorOS 常见）：标记供主界面引导修复
+            prefs.edit().putBoolean("bubble_perm_error", true).apply()
         }
     }
+
+    /** 悬浮球是否存在（供自愈检测：服务在跑但球丢了就重建） */
+    fun isBubbleVisible(): Boolean = bubble != null
 
     /** 重建悬浮球（样式切换后立即生效） */
     fun rebuildBubble() {

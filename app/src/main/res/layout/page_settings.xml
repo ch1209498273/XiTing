@@ -222,9 +222,10 @@
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/share_sub"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="每天一次 +5 成长值"
+                    android:text="每天一次 · +5 待收成长值"
                     android:textColor="#FF8A9099"
                     android:textSize="13sp" />
             </LinearLayout>

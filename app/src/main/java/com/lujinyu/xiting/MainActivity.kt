@@ -39,6 +39,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         private const val RANGE_ALL = 2
         private const val SHOW_DAYS = 30L
         private const val SHARE_GP_PER_DAY = 5
+        private const val REQ_RESTORE = 2001
     }
 
     // 应用栏与导航
@@ -88,6 +89,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         bindStats()
         bindSettings()
         switchTab(TAB_HOME)
+        // 卸载重装恢复：启动后检查本机备份（设备ID匹配且本地为空）
+        window.decorView.postDelayed({ checkRestore() }, 600)
     }
 
     // ───────────────────────── 导航 ─────────────────────────
@@ -232,6 +235,78 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         refreshStates()
         refreshHomeStats()
         if (tab == TAB_STATS) renderStats()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // 静默备份到公共下载目录（卸载不删除；设备ID绑定，重装可恢复）
+        BackupManager.save(this)
+    }
+
+    /** 重装恢复引导：本地为空时提示可从下载目录恢复历史数据（SAF 文件选择器） */
+    private fun checkRestore() {
+        if (isFinishing) return
+        val localGp = EnergyStore.collectedTotal(this)
+        if (localGp > 0) return
+        android.app.AlertDialog.Builder(this)
+            .setTitle("恢复历史数据")
+            .setMessage(
+                "如果你之前使用过「息屏听剧」并卸载过：备份保存在下载目录的 XiTing 文件夹中（XiTing-backup.json），可在这里一键恢复成长值与统计。\n\n全新用户请点「不用了」。"
+            )
+            .setPositiveButton("选择备份文件") { _, _ -> openBackupPicker() }
+            .setNegativeButton("不用了", null)
+            .show()
+    }
+
+    /** 打开系统文件选择器（初始定位到下载目录/XiTing） */
+    private fun openBackupPicker() {
+        try {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(
+                    android.provider.DocumentsContract.EXTRA_INITIAL_URI,
+                    Uri.parse("content://com.android.externalstorage.documents/document/primary%3ADownload%2FXiTing")
+                )
+            }
+            startActivityForResult(intent, REQ_RESTORE)
+        } catch (e: Exception) {
+            Toast.makeText(this, "无法打开文件选择器", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQ_RESTORE && resultCode == RESULT_OK) {
+            val uri = data?.data ?: return
+            val obj = BackupManager.readFromUri(this, uri)
+            if (obj == null) {
+                Toast.makeText(this, "不是有效的备份文件", Toast.LENGTH_SHORT).show()
+                return
+            }
+            val gp = obj.optInt("gp", 0)
+            if (BackupManager.isSameDevice(this, obj)) {
+                doRestore(obj, gp)
+            } else {
+                android.app.AlertDialog.Builder(this)
+                    .setTitle("备份来自其他设备")
+                    .setMessage("该备份成长值 $gp，设备ID与本机不一致（换机场景）。确定恢复吗？")
+                    .setPositiveButton("恢复") { _, _ -> doRestore(obj, gp) }
+                    .setNegativeButton("取消", null)
+                    .show()
+            }
+        }
+    }
+
+    private fun doRestore(obj: org.json.JSONObject, gp: Int) {
+        if (BackupManager.restore(this, obj)) {
+            Toast.makeText(this, "数据已恢复 ✓（成长值 $gp）", Toast.LENGTH_LONG).show()
+            refreshStates(); refreshHomeStats()
+            if (tab == TAB_STATS) renderStats()
+        } else {
+            Toast.makeText(this, "恢复失败", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -464,7 +539,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             if (pet.sleepy) {
                 "${PetView.stageName(stage)} 打瞌睡了 · 听一集唤醒它"
             } else if (stage >= PetView.STAGE_KING) {
-                "${PetView.stageName(stage)} · 成长值 $gp · 已至巅峰"
+                "${PetView.stageName(stage)} · 已至巅峰 · 成长值 $gp 继续储备"
             } else {
                 "${PetView.stageName(stage)} · 成长值 $gp / ${PetView.THRESHOLDS[stage + 1]}"
             }

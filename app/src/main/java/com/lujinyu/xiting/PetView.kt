@@ -33,7 +33,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         const val STAGE_STORM = 3
         const val STAGE_KING = 4
 
-        val THRESHOLDS = longArrayOf(0, 30, 120, 360, 1200)
+        val THRESHOLDS = longArrayOf(0, 30, 300, 1500, 6000)
 
         fun stageOf(gp: Long): Int = when {
             gp >= THRESHOLDS[4] -> STAGE_KING

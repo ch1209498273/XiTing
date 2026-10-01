@@ -56,6 +56,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var lp: WindowManager.LayoutParams? = null
     private var unlockPill: TextView? = null
     private var mediaRow: LinearLayout? = null
+    private var playPauseBtn: android.widget.ImageView? = null
     private val am by lazy {
         context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
     }
@@ -157,7 +158,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         )
 
         // 媒体控制行（唤醒态显示）：黑幕下切集/暂停——通知栏被黑幕遮住，
-        // 这里是媒体键唯一可达的位置
+        // 这里是媒体键唯一可达的位置。默认关闭（防误触），可在设置中选择开启
+        val showMedia = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+            .getBoolean("black_media_controls", false)
         val media = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -184,16 +187,20 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             }
         }
         media.addView(mkBtn(R.drawable.ic_media_prev, KeyEvent.KEYCODE_MEDIA_PREVIOUS, "上一集"))
-        media.addView(mkBtn(R.drawable.ic_media_pause, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "播放/暂停"))
+        val ppBtn = mkBtn(R.drawable.ic_media_pause, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "播放/暂停")
+        playPauseBtn = ppBtn
+        media.addView(ppBtn)
         media.addView(mkBtn(R.drawable.ic_media_next, KeyEvent.KEYCODE_MEDIA_NEXT, "下一集"))
-        f.addView(
-            media,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-            ).apply { bottomMargin = (185 * density).toInt() }
-        )
+        if (showMedia) {
+            f.addView(
+                media,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
+                ).apply { bottomMargin = (185 * density).toInt() }
+            )
+        }
 
         // 未读通知角标（需用户授予「通知使用权」，未授权时不显示）
         val badge = TextView(context).apply {
@@ -380,6 +387,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         lp = null
         unlockPill = null
         mediaRow = null
+        playPauseBtn = null
         isShowing = false
     }
 
@@ -395,6 +403,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         unlockPill?.animate()?.alpha(1f)?.setDuration(200)?.start()
         mediaRow?.visibility = View.VISIBLE
         mediaRow?.animate()?.alpha(1f)?.setDuration(200)?.start()
+        updatePlayIcon()
         main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
         Log.i(TAG, "awake: 解除锁定，背光恢复")
     }
@@ -430,6 +439,15 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             main.removeCallbacks(relockRunnable)
             main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
         }
+        // 媒体键生效后刷新播放/暂停图标（音频状态更新有延迟）
+        main.postDelayed({ updatePlayIcon() }, 400)
+    }
+
+    /** 播放状态→显示暂停键；暂停状态→显示播放键 */
+    private fun updatePlayIcon() {
+        val btn = playPauseBtn ?: return
+        val playing = try { am.isMusicActive } catch (_: Exception) { false }
+        btn.setImageResource(if (playing) R.drawable.ic_media_pause else R.drawable.ic_media_play)
     }
 
     private fun unlockPillBg(context: Context) = android.graphics.drawable.GradientDrawable().apply {

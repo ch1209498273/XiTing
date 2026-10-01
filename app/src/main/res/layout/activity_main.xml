@@ -60,8 +60,8 @@
             android:visibility="gone" />
 
         <include
-            android:id="@+id/page_about"
-            layout="@layout/page_about"
+            android:id="@+id/page_settings"
+            layout="@layout/page_settings"
             android:visibility="gone" />
     </FrameLayout>
 
@@ -132,7 +132,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/nav_about"
+            android:id="@+id/nav_settings"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -143,18 +143,18 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/nav_icon_about"
+                android:id="@+id/nav_icon_settings"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_nav_about" />
+                android:src="@drawable/ic_nav_settings" />
 
             <TextView
-                android:id="@+id/nav_label_about"
+                android:id="@+id/nav_label_settings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="关于"
+                android:text="设置"
                 android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>

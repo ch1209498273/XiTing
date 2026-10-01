@@ -55,6 +55,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     var sleepy = false
     var totalMah = 0
     var progress = 0f      // 距下一形态进度 0..1（final 时无用）
+    var thumbMode = false  // 图鉴缩略模式：静态单帧、无粒子/进度条/光晕动画
 
     private var bornAt = System.currentTimeMillis()
     private var blinkUntil = 0L
@@ -97,7 +98,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        startAnimating()
+        if (!thumbMode) startAnimating()
     }
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
@@ -110,11 +111,13 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         val now = System.currentTimeMillis()
         val t = (now - bornAt) / 1000f
         val cx = width / 2f
-        val cy = height / 2f - 20f + sin(t * 2.2f) * 8f
+        val cy = height / 2f - 20f + (if (thumbMode) 20f else sin(t * 2.2f) * 8f)
 
         // 半径按视图高度比例：形态越大身体越大（15% → 38%）
         val h = height.toFloat()
-        val r = h * when (stage) {
+        val r = h * if (thumbMode) {
+            arrayOf(0.20f, 0.26f, 0.32f, 0.37f, 0.42f)[stage]
+        } else when (stage) {
             STAGE_SPARK -> 0.15f
             STAGE_BALL -> 0.21f
             STAGE_CLOUD -> 0.27f
@@ -142,10 +145,10 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             },
             Color.TRANSPARENT, Shader.TileMode.CLAMP
         )
-        canvas.drawCircle(cx, cy, glowR, glowPaint)
+        if (!thumbMode) canvas.drawCircle(cx, cy, glowR, glowPaint)
 
         // 环绕微粒（形态越高越多）
-        if (!sleepy && stage >= STAGE_BALL) {
+        if (!thumbMode && !sleepy && stage >= STAGE_BALL) {
             val n = 2 + stage   // 3~6 颗
             for (i in 0 until n) {
                 val ang = (6.2831855f * i / n) + t * 0.5f * (if (i % 2 == 0) 1f else -0.8f)
@@ -160,7 +163,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         }
 
         // 放电动画
-        if (now < dischargeUntil) {
+        if (!thumbMode && now < dischargeUntil) {
             val k = (now % 500) / 500f
             linePaint.color = if (stage >= STAGE_STORM) 0xFFB388FF.toInt() else 0xFFFFE082.toInt()
             linePaint.strokeWidth = 5f
@@ -212,7 +215,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         }
 
         // 成长进度条（底部，最终形态不显示）
-        if (stage < STAGE_KING) {
+        if (!thumbMode && stage < STAGE_KING) {
             val barW = width * 0.55f
             val barH = 12f
             val left = cx - barW / 2
@@ -230,7 +233,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             }
         }
 
-        postInvalidateDelayed(33)
+        if (!thumbMode) postInvalidateDelayed(33)
     }
 
     // ─────────────────── 形态一：电火花 ───────────────────
@@ -259,7 +262,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         )
         canvas.drawCircle(cx, cy, r, bodyPaint)
         bodyPaint.shader = null
-        drawFace(canvas, cx, cy, r * 0.24f, blinking, fierce = false)
+        drawFace(canvas, cx, cy, r * 0.17f, blinking, fierce = false)
     }
 
     // ─────────────────── 形态二：电球 ───────────────────
@@ -295,7 +298,18 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             RectF(cx - r * 0.95f, cy - r * 0.95f, cx + r * 0.95f, cy + r * 0.95f),
             205f, 70f, false, linePaint
         )
-        drawFace(canvas, cx, cy, r * 0.24f, blinking, fierce = false)
+        // 星芒（右上四点光，更闪耀）
+        linePaint.color = 0x99FFFFFF.toInt()
+        linePaint.strokeWidth = 3.5f
+        val sx = cx + r * 0.62f
+        val sy = cy - r * 0.62f
+        val sl = r * 0.22f
+        canvas.drawLine(sx - sl, sy, sx + sl, sy, linePaint)
+        canvas.drawLine(sx, sy - sl, sx, sy + sl, linePaint)
+        val sd = sl * 0.5f
+        canvas.drawLine(sx - sd, sy - sd, sx + sd, sy + sd, linePaint)
+        canvas.drawLine(sx - sd, sy + sd, sx + sd, sy - sd, linePaint)
+        drawFace(canvas, cx, cy, r * 0.17f, blinking, fierce = false)
     }
 
     // ─────────────────── 形态三/四/五：云系 ───────────────────
@@ -394,7 +408,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
 
         // 之王：金冠
         if (isKing && !sleepy) {
-            drawCrown(canvas, cx, cy - r * 0.72f, r * 0.5f)
+            drawCrown(canvas, cx, cy - r * 0.8f, r * 0.6f)
         } else if (isStorm && !sleepy) {
             // 风暴之灵：头顶火花冠
             linePaint.color = 0xFF8FD0FF.toInt()
@@ -408,7 +422,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         }
 
         // 脸（风暴起带眉毛=帅气）
-        drawFace(canvas, cx, cy - r * 0.12f, r * 0.2f, blinking, fierce = isStorm)
+        drawFace(canvas, cx, cy - r * 0.12f, r * 0.16f, blinking, fierce = isStorm)
     }
 
     // ─────────────────── 金冠 ───────────────────
@@ -453,11 +467,17 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             canvas.drawLine(cx - off - er * 0.55f, cy, cx - off + er * 0.55f, cy, linePaint)
             canvas.drawLine(cx + off - er * 0.55f, cy, cx + off + er * 0.55f, cy, linePaint)
         } else {
+            // 瞳孔：深色主体 + 底部反光 + 双高光（精致有神）
             canvas.drawCircle(cx - off, cy, er, eyePaint)
             canvas.drawCircle(cx + off, cy, er, eyePaint)
+            val glow = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x33FFFFFF }
+            canvas.drawCircle(cx - off + er * 0.25f, cy + er * 0.3f, er * 0.55f, glow)
+            canvas.drawCircle(cx + off + er * 0.25f, cy + er * 0.3f, er * 0.55f, glow)
             val hi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
-            canvas.drawCircle(cx - off - er * 0.3f, cy - er * 0.32f, er * 0.3f, hi)
-            canvas.drawCircle(cx + off - er * 0.3f, cy - er * 0.32f, er * 0.3f, hi)
+            canvas.drawCircle(cx - off - er * 0.34f, cy - er * 0.36f, er * 0.34f, hi)
+            canvas.drawCircle(cx + off - er * 0.34f, cy - er * 0.36f, er * 0.34f, hi)
+            canvas.drawCircle(cx - off + er * 0.3f, cy + er * 0.34f, er * 0.14f, hi)
+            canvas.drawCircle(cx + off + er * 0.3f, cy + er * 0.34f, er * 0.14f, hi)
         }
         // 微笑（睡觉时平滑）
         linePaint.color = 0xFF2E3B47.toInt()

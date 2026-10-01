@@ -31,14 +31,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     companion object {
         private const val TAB_HOME = 0
         private const val TAB_STATS = 1
-        private const val TAB_ABOUT = 2
+        private const val TAB_SETTINGS = 2
 
         private const val PAGE_SIZE = 10
         private const val RANGE_TODAY = 0
         private const val RANGE_WEEK = 1
         private const val RANGE_ALL = 2
         private const val SHOW_DAYS = 30L
-        private const val SHARE_GP_PER_DAY = 30
+        private const val SHARE_GP_PER_DAY = 5
     }
 
     // 应用栏与导航
@@ -46,10 +46,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     private lateinit var pillStatus: TextView
     private lateinit var pageHome: View
     private lateinit var pageStats: View
-    private lateinit var pageAbout: View
+    private lateinit var pageSettings: View
     private lateinit var navHome: LinearLayout
     private lateinit var navStats: LinearLayout
-    private lateinit var navAbout: LinearLayout
+    private lateinit var navSettings: LinearLayout
     private var tab = TAB_HOME
 
     // 首页控件
@@ -62,6 +62,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     // 统计页状态
     private var range = RANGE_ALL
     private var listPage = 0
+    private var galleryBuiltStage = -1
     private var todayMs = 0L
     private var weekMs = 0L
     private var allMs = 0L
@@ -74,17 +75,17 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pillStatus = findViewById(R.id.pill_status)
         pageHome = findViewById(R.id.page_home)
         pageStats = findViewById(R.id.page_stats)
-        pageAbout = findViewById(R.id.page_about)
+        pageSettings = findViewById(R.id.page_settings)
         navHome = findViewById(R.id.nav_home)
         navStats = findViewById(R.id.nav_stats)
-        navAbout = findViewById(R.id.nav_about)
+        navSettings = findViewById(R.id.nav_settings)
         navHome.setOnClickListener { switchTab(TAB_HOME) }
         navStats.setOnClickListener { switchTab(TAB_STATS) }
-        navAbout.setOnClickListener { switchTab(TAB_ABOUT) }
+        navSettings.setOnClickListener { switchTab(TAB_SETTINGS) }
 
         bindHome()
         bindStats()
-        bindAbout()
+        bindSettings()
         switchTab(TAB_HOME)
     }
 
@@ -94,17 +95,17 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         tab = target
         pageHome.visibility = if (target == TAB_HOME) View.VISIBLE else View.GONE
         pageStats.visibility = if (target == TAB_STATS) View.VISIBLE else View.GONE
-        pageAbout.visibility = if (target == TAB_ABOUT) View.VISIBLE else View.GONE
+        pageSettings.visibility = if (target == TAB_SETTINGS) View.VISIBLE else View.GONE
         appbarTitle.text = when (target) {
             TAB_HOME -> "息屏听剧"
             TAB_STATS -> "节能统计"
-            else -> "关于"
+            else -> "设置"
         }
         val sel = 0xFF1E8E5A.toInt()
         val unsel = 0xFF8A9099.toInt()
         tintNav(findViewById(R.id.nav_icon_home), findViewById(R.id.nav_label_home), target == TAB_HOME, sel, unsel)
         tintNav(findViewById(R.id.nav_icon_stats), findViewById(R.id.nav_label_stats), target == TAB_STATS, sel, unsel)
-        tintNav(findViewById(R.id.nav_icon_about), findViewById(R.id.nav_label_about), target == TAB_ABOUT, sel, unsel)
+        tintNav(findViewById(R.id.nav_icon_settings), findViewById(R.id.nav_label_settings), target == TAB_SETTINGS, sel, unsel)
         if (target == TAB_STATS) renderStats()
     }
 
@@ -216,28 +217,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 防杀保活指南
         pageHome.findViewById<View>(R.id.row_keepalive).setOnClickListener { showKeepAliveGuide() }
 
-        // 轻点直接解锁：跳过两段式确认（默认关，防误触优先）
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-        val switchDirect = pageHome.findViewById<android.widget.Switch>(R.id.switch_direct)
-        switchDirect.isChecked = prefs.getBoolean("direct_unlock", false)
-        switchDirect.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("direct_unlock", checked).apply()
-            Toast.makeText(
-                this,
-                if (checked) "已开启：黑幕下轻点屏幕直接解锁" else "已关闭：黑幕下轻点先唤醒，再点按钮退出",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        // 黑幕显示时间与电量（默认开；关闭后为纯黑）
-        val switchInfo = pageHome.findViewById<android.widget.Switch>(R.id.switch_info)
-        switchInfo.isChecked = prefs.getBoolean("black_info_show", false)
-        switchInfo.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("black_info_show", checked).apply()
-            OverlayService.instance?.reapplyBlack() // 黑幕显示中即时生效（无闪屏重挂）
-        }
-
-        // 页脚水印移至「关于」页签；主页不再放关于入口（与底部导航重复）
+        // 页脚水印移至「设置」页签；主页不再放关于入口（与底部导航重复）
     }
 
     override fun onResume() {
@@ -458,7 +438,37 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             if (sharedToday) "今日分享已完成 ✓ · 明天再来 ›"
             else "每日分享 · 精灵 +$SHARE_GP_PER_DAY 成长值 ›"
         pet.startAnimating()
+        buildGallery(stage)
     }
+
+    /** 形态图鉴：5 个缩略图，已解锁亮色 / 未解锁灰暗，点击查看信息 */
+    private fun buildGallery(currentStage: Int) {
+        if (galleryBuiltStage == currentStage) return
+        galleryBuiltStage = currentStage
+        val row = pageStats.findViewById<LinearLayout>(R.id.thumb_row)
+        row.removeAllViews()
+        val density = resources.displayMetrics.density
+        val size = (58 * density).toInt()
+        for (i in 0..4) {
+            val pv = PetView(this).apply {
+                stage = i
+                thumbMode = true
+                layoutParams = LinearLayout.LayoutParams(size, size).apply {
+                    marginStart = (6 * density).toInt()
+                    marginEnd = (6 * density).toInt()
+                }
+                if (i > currentStage) alpha = 0.25f
+                setOnClickListener {
+                    pageStats.findViewById<TextView>(R.id.gallery_info).text = when {
+                        i == currentStage -> "★ ${PetView.stageName(i)} · 当前形态（${PetView.THRESHOLDS[i]} 成长值）"
+                        i < currentStage -> "✓ ${PetView.stageName(i)} · 已解锁"
+                        else -> "🔒 ${PetView.stageName(i)} · 需 ${PetView.THRESHOLDS[i]} 成长值解锁"
+                    }
+                }
+            }
+            row.addView(pv)
+        }
+}
 
     private fun selectRange(r: Int) {
         range = r
@@ -600,11 +610,104 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         }
     }
 
-    // ───────────────────────── 关于页签 ─────────────────────────
+    // ───────────────────────── 设置页签 ─────────────────────────
 
-    private fun bindAbout() {
-        pageAbout.findViewById<TextView>(R.id.about_version).text =
-            "版本 ${BuildConfig.VERSION_NAME} · 构建ID ${BuildConfig.BUILD_ID}"
+    private fun bindSettings() {
+        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val page = pageSettings
+
+        // 黑幕轻点直接解锁（默认关，防误触优先）
+        val switchDirect = page.findViewById<android.widget.Switch>(R.id.switch_direct)
+        switchDirect.isChecked = prefs.getBoolean("direct_unlock", false)
+        switchDirect.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("direct_unlock", checked).apply()
+        }
+
+        // 黑幕显示时间与电量（默认关；开启后重锁保持暗态夜钟）
+        val switchInfo = page.findViewById<android.widget.Switch>(R.id.switch_info)
+        switchInfo.isChecked = prefs.getBoolean("black_info_show", false)
+        switchInfo.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("black_info_show", checked).apply()
+            OverlayService.instance?.reapplyBlack() // 黑幕显示中即时生效（无闪屏重挂）
+        }
+
+        // 黑幕播放控制（默认关：防误触）
+        val switchMedia = page.findViewById<android.widget.Switch>(R.id.switch_media)
+        switchMedia.isChecked = prefs.getBoolean("black_media_controls", false)
+        switchMedia.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("black_media_controls", checked).apply()
+            if (checked) {
+                Toast.makeText(this, "已开启：黑幕唤醒后显示 ⏮ ⏸ ⏭ 控制键", Toast.LENGTH_SHORT).show()
+            }
+            OverlayService.instance?.reapplyBlack()
+        }
+
+        // 悬浮球样式：默认「息屏」文字，可换为已解锁的精灵形态
+        page.findViewById<View>(R.id.row_bubble_style).setOnClickListener { showBubbleStyleDialog() }
+
+        // 检查更新：跳转 GitHub Release 页面（App 保持零网络权限，由浏览器打开）
+        page.findViewById<View>(R.id.row_update).setOnClickListener {
+            try {
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ch1209498273/XiTing/releases/latest"))
+                )
+            } catch (_: Exception) {
+                Toast.makeText(this, "无法打开浏览器", Toast.LENGTH_SHORT).show()
+            }
+        }
+        page.findViewById<TextView>(R.id.update_value).text = "当前 v${BuildConfig.VERSION_NAME}"
+
+        // 分享给朋友（计入每日分享任务）
+        page.findViewById<View>(R.id.row_share).setOnClickListener { sharePetStats() }
+
+        // 开源地址点击
+        page.findViewById<TextView>(R.id.about_repo).setOnClickListener {
+            try {
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ch1209498273/XiTing"))
+                )
+            } catch (_: Exception) {
+            }
+        }
+
+        refreshBubbleStyleValue()
+    }
+
+    /** 悬浮球样式选择：默认「息屏」文字 + 已解锁形态 */
+    private fun showBubbleStyleDialog() {
+        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val gp = allMs / 60000 + prefs.getInt("share_bonus_gp", 0)
+        val unlocked = PetView.stageOf(gp)
+        val labels = ArrayList<String>()
+        val values = ArrayList<String>()
+        labels.add("息屏（默认）")
+        values.add("text")
+        for (i in 0..unlocked) {
+            labels.add(PetView.stageName(i))
+            values.add("pet_$i")
+        }
+        val current = prefs.getString("bubble_style", "text") ?: "text"
+        val checked = values.indexOf(current)
+        android.app.AlertDialog.Builder(this)
+            .setTitle("悬浮球样式")
+            .setSingleChoiceItems(labels.toTypedArray(), checked) { d, which ->
+                prefs.edit().putString("bubble_style", values[which]).apply()
+                OverlayService.instance?.rebuildBubble()
+                refreshBubbleStyleValue()
+                Toast.makeText(this, "悬浮球已切换为「${labels[which]}」", Toast.LENGTH_SHORT).show()
+                d.dismiss()
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+
+    private fun refreshBubbleStyleValue() {
+        val style = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+            .getString("bubble_style", "text") ?: "text"
+        pageSettings.findViewById<TextView>(R.id.bubble_style_value).text =
+            if (style.startsWith("pet_")) {
+                PetView.stageName(style.removePrefix("pet_").toIntOrNull() ?: 0) + "头像"
+            } else "息屏"
     }
 
     // ───────────────────────── 通用 ─────────────────────────

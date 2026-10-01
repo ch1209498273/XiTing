@@ -28,11 +28,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="240dp" />
 
+            <!-- 形态图鉴：5 个缩略图（已解锁亮色/未解锁灰暗），点击查看信息 -->
+            <LinearLayout
+                android:id="@+id/thumb_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:orientation="horizontal" />
+
+            <TextView
+                android:id="@+id/gallery_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="点击图鉴查看各形态"
+                android:textColor="#FF8A9099"
+                android:textSize="11sp" />
+
             <TextView
                 android:id="@+id/pet_caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="6dp"
                 android:text="电能精灵 · 由你的真实听剧时长喂养"
                 android:textColor="#FF5F6570"
                 android:textSize="12sp" />

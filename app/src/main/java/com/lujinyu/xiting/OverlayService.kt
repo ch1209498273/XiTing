@@ -51,9 +51,6 @@ class OverlayService : Service() {
         const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         const val ACTION_SET_TIMER = "com.lujinyu.xiting.SET_TIMER"
         const val EXTRA_MINUTES = "minutes"
-        private const val ACTION_MEDIA_PREV = "com.lujinyu.xiting.MEDIA_PREV"
-        private const val ACTION_MEDIA_PLAYPAUSE = "com.lujinyu.xiting.MEDIA_PLAYPAUSE"
-        private const val ACTION_MEDIA_NEXT = "com.lujinyu.xiting.MEDIA_NEXT"
         private const val PREFS = "xiiting_prefs"
 
         var instance: OverlayService? = null
@@ -86,7 +83,7 @@ class OverlayService : Service() {
 
     /** 保活监控计数：YouTube等App会在片尾/中途把后台播放掐掉，息屏后3分钟内自动再救 */
 
-    private var bubble: TextView? = null
+    private var bubble: View? = null
     private var black: BlackOverlay? = null
 
     /** 黑幕是否在显示，供磁贴等外部判断 */
@@ -159,8 +156,6 @@ class OverlayService : Service() {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
             ACTION_SET_TIMER -> handleSetTimer(intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0)
-            ACTION_MEDIA_PREV, ACTION_MEDIA_PLAYPAUSE, ACTION_MEDIA_NEXT ->
-                intent?.action?.let { dispatchMediaKey(it) }
             ACTION_EXIT -> {
                 prefs.edit().putBoolean("assistant_wanted", false).apply()
                 hideAllBlack()
@@ -192,16 +187,26 @@ class OverlayService : Service() {
         val density = resources.displayMetrics.density
         val size = (48 * density).toInt()
 
-        val tv = TextView(this).apply {
-            text = "息屏"
-            textSize = 13f
-            setTextColor(Color.WHITE)
-            gravity = Gravity.CENTER
-            minWidth = size
-            minHeight = size
-            val bg = ShapeDrawable(OvalShape())
-            bg.paint.color = 0xB3000000.toInt()
-            background = bg
+        // 悬浮球样式：默认「息屏」文字；已解锁形态可切换为精灵头像
+        val style = prefs.getString("bubble_style", "text") ?: "text"
+        val tv: View = if (style.startsWith("pet_")) {
+            val st = style.removePrefix("pet_").toIntOrNull() ?: 1
+            BubblePetView(this).apply {
+                stage = st.coerceIn(0, 4)
+                layoutParams = android.view.ViewGroup.LayoutParams(size, size)
+            }
+        } else {
+            TextView(this).apply {
+                text = "息屏"
+                textSize = 13f
+                setTextColor(Color.WHITE)
+                gravity = Gravity.CENTER
+                minWidth = size
+                minHeight = size
+                val bg = ShapeDrawable(OvalShape())
+                bg.paint.color = 0xB3000000.toInt()
+                background = bg
+            }
         }
 
         val lp = WindowManager.LayoutParams(
@@ -278,6 +283,13 @@ class OverlayService : Service() {
         }
     }
 
+    /** 重建悬浮球（样式切换后立即生效） */
+    fun rebuildBubble() {
+        bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
+        bubble = null
+        showBubble()
+    }
+
     // ---------- 黑屏遮罩 ----------
 
     // 睡眠定时器：到期自动关闭黑幕（0=未设置）
@@ -337,19 +349,6 @@ class OverlayService : Service() {
         refreshNotification()
     }
 
-    private fun dispatchMediaKey(action: String) {
-        try {
-            val code = when (action) {
-                ACTION_MEDIA_PREV -> KeyEvent.KEYCODE_MEDIA_PREVIOUS
-                ACTION_MEDIA_NEXT -> KeyEvent.KEYCODE_MEDIA_NEXT
-                else -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
-            }
-            audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, code))
-            audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, code))
-        } catch (_: Exception) {
-        }
-    }
-
     // ---------- 通知 ----------
 
     private fun createChannel() {
@@ -368,12 +367,6 @@ class OverlayService : Service() {
             this, 1, Intent(this, OverlayService::class.java).setAction(ACTION_TOGGLE),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        val mediaPi: (String, Int) -> PendingIntent = { action, rc ->
-            PendingIntent.getService(
-                this, rc, Intent(this, OverlayService::class.java).setAction(action),
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        }
         val exitPi = PendingIntent.getService(
             this, 2, Intent(this, OverlayService::class.java).setAction(ACTION_EXIT),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
@@ -385,9 +378,6 @@ class OverlayService : Service() {
             .setContentTitle("息屏听剧助手运行中")
             .setContentText("点悬浮球黑屏听剧，声音继续$timerText")
             .setContentIntent(openPi)
-            .addAction(R.drawable.ic_media_prev, "上一集", mediaPi(ACTION_MEDIA_PREV, 10))
-            .addAction(R.drawable.ic_media_pause, "播放/暂停", mediaPi(ACTION_MEDIA_PLAYPAUSE, 11))
-            .addAction(R.drawable.ic_media_next, "下一集", mediaPi(ACTION_MEDIA_NEXT, 12))
             .addAction(0, if (isAnyBlackShowing()) "恢复画面" else "息屏听剧", togglePi)
             .addAction(0, "退出助手", exitPi)
             .setOngoing(true)

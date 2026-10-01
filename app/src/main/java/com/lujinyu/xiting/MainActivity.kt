@@ -733,7 +733,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     row.addView(
                         TextView(this@MainActivity).apply {
                             text = "息屏"
-                            textSize = 11f
+                            textSize = 13f
                             setTextColor(0xFFFFFFFF.toInt())
                             gravity = android.view.Gravity.CENTER
                             val bg = android.graphics.drawable.GradientDrawable().apply {
@@ -741,15 +741,15 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                                 setColor(0xB3000000.toInt())
                             }
                             background = bg
-                            layoutParams = LinearLayout.LayoutParams((44 * density).toInt(), (44 * density).toInt())
+                            layoutParams = LinearLayout.LayoutParams((56 * density).toInt(), (56 * density).toInt())
                         }
                     )
                 } else {
+                    // 全部形态显示真实彩色效果（未解锁用 🔒 标签区分，不灰化——要看就看真实样子）
                     row.addView(
                         BubblePetView(this@MainActivity).apply {
                             stage = position - 1
-                            if (position - 1 > unlocked) alpha = 0.3f  // 未解锁：灰暗预览
-                            layoutParams = LinearLayout.LayoutParams((44 * density).toInt(), (44 * density).toInt())
+                            layoutParams = LinearLayout.LayoutParams((56 * density).toInt(), (56 * density).toInt())
                         }
                     )
                 }
@@ -794,10 +794,37 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     private fun refreshBubbleStyleValue() {
         val style = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
             .getString("bubble_style", "text") ?: "text"
-        pageSettings.findViewById<TextView>(R.id.bubble_style_value).text =
-            if (style.startsWith("pet_")) {
-                PetView.stageName(style.removePrefix("pet_").toIntOrNull() ?: 0) + "头像"
-            } else "息屏"
+        // 行内直接显示当前悬浮球的真实样子 + 名称
+        val box = pageSettings.findViewById<LinearLayout>(R.id.bubble_style_preview)
+        box.removeAllViews()
+        val density = resources.displayMetrics.density
+        val size = (52 * density).toInt()
+        if (style.startsWith("pet_")) {
+            val st = (style.removePrefix("pet_").toIntOrNull() ?: 0).coerceIn(0, 4)
+            box.addView(
+                BubblePetView(this).apply {
+                    stage = st
+                    layoutParams = LinearLayout.LayoutParams(size, size)
+                }
+            )
+            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text = PetView.stageName(st)
+        } else {
+            box.addView(
+                TextView(this).apply {
+                    text = "息屏"
+                    textSize = 12f
+                    setTextColor(0xFFFFFFFF.toInt())
+                    gravity = android.view.Gravity.CENTER
+                    val bg = android.graphics.drawable.GradientDrawable().apply {
+                        shape = android.graphics.drawable.GradientDrawable.OVAL
+                        setColor(0xB3000000.toInt())
+                    }
+                    background = bg
+                    layoutParams = LinearLayout.LayoutParams(size, size)
+                }
+            )
+            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text = "默认"
+        }
     }
 
     // ───────────────────────── 通用 ─────────────────────────

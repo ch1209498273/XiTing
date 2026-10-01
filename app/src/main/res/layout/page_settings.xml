@@ -108,7 +108,8 @@
             <LinearLayout
                 android:id="@+id/row_bubble_style"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="wrap_content"
+                android:minHeight="76dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
@@ -125,10 +126,17 @@
                     android:id="@+id/bubble_style_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:text="息屏"
+                    android:layout_marginEnd="10dp"
+                    android:text="默认"
                     android:textColor="#FF8A9099"
                     android:textSize="13sp" />
+
+                <LinearLayout
+                    android:id="@+id/bubble_style_preview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="horizontal" />
 
                 <TextView
                     android:layout_width="wrap_content"

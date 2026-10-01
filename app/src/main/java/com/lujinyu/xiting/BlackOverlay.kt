@@ -14,6 +14,7 @@ import android.os.SystemClock
 import android.util.Log
 import android.view.Gravity
 import android.view.GestureDetector
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
@@ -54,6 +55,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var frame: FrameLayout? = null
     private var lp: WindowManager.LayoutParams? = null
     private var unlockPill: TextView? = null
+    private var mediaRow: LinearLayout? = null
+    private val am by lazy {
+        context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+    }
     private var badgeListener: ((Int) -> Unit)? = null
     private var onDismissCallback: (() -> Unit)? = null
     private var directUnlock = false          // 轻点直接解锁（跳过两段式）
@@ -149,6 +154,45 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
             ).apply { bottomMargin = (110 * density).toInt() }
+        )
+
+        // 媒体控制行（唤醒态显示）：黑幕下切集/暂停——通知栏被黑幕遮住，
+        // 这里是媒体键唯一可达的位置
+        val media = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            visibility = View.INVISIBLE
+            alpha = 0f
+        }
+        val mkBtn = { resId: Int, code: Int, desc: String ->
+            android.widget.ImageView(context).apply {
+                setImageResource(resId)
+                setColorFilter(Color.WHITE)
+                contentDescription = desc
+                val size = (52 * density).toInt()
+                val bg = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.OVAL
+                    setColor(0x66000000)
+                }
+                background = bg
+                setPadding((14 * density).toInt(), (14 * density).toInt(), (14 * density).toInt(), (14 * density).toInt())
+                layoutParams = LinearLayout.LayoutParams(size, size).apply {
+                    marginStart = (14 * density).toInt()
+                    marginEnd = (14 * density).toInt()
+                }
+                setOnClickListener { sendMediaKey(code) }
+            }
+        }
+        media.addView(mkBtn(R.drawable.ic_media_prev, KeyEvent.KEYCODE_MEDIA_PREVIOUS, "上一集"))
+        media.addView(mkBtn(R.drawable.ic_media_pause, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "播放/暂停"))
+        media.addView(mkBtn(R.drawable.ic_media_next, KeyEvent.KEYCODE_MEDIA_NEXT, "下一集"))
+        f.addView(
+            media,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
+            ).apply { bottomMargin = (185 * density).toInt() }
         )
 
         // 未读通知角标（需用户授予「通知使用权」，未授权时不显示）
@@ -272,6 +316,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             frame = f
             this.lp = lp
             unlockPill = pill
+            mediaRow = media
             isShowing = true
             sessionStart = System.currentTimeMillis()
             sessionStartElapsed = SystemClock.elapsedRealtime()
@@ -334,6 +379,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         frame = null
         lp = null
         unlockPill = null
+        mediaRow = null
         isShowing = false
     }
 
@@ -347,6 +393,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         try { wm.updateViewLayout(f, l) } catch (_: Exception) {}
         unlockPill?.visibility = View.VISIBLE
         unlockPill?.animate()?.alpha(1f)?.setDuration(200)?.start()
+        mediaRow?.visibility = View.VISIBLE
+        mediaRow?.animate()?.alpha(1f)?.setDuration(200)?.start()
         main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
         Log.i(TAG, "awake: 解除锁定，背光恢复")
     }
@@ -364,7 +412,24 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         try { wm.updateViewLayout(f, l) } catch (_: Exception) {}
         unlockPill?.animate()?.alpha(0f)?.setDuration(200)
             ?.withEndAction { unlockPill?.visibility = View.INVISIBLE }?.start()
+        mediaRow?.animate()?.alpha(0f)?.setDuration(200)
+            ?.withEndAction { mediaRow?.visibility = View.INVISIBLE }?.start()
         Log.i(TAG, "sleep: 重新锁定")
+    }
+
+    /** 黑幕内媒体键：注入后重置重锁计时（连续操作不被打断） */
+    private fun sendMediaKey(code: Int) {
+        try {
+            am.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, code))
+            am.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, code))
+            Log.i(TAG, "black overlay media key: $code")
+        } catch (e: Exception) {
+            Log.w(TAG, "media key failed: $e")
+        }
+        if (awake) {
+            main.removeCallbacks(relockRunnable)
+            main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
+        }
     }
 
     private fun unlockPillBg(context: Context) = android.graphics.drawable.GradientDrawable().apply {

@@ -38,6 +38,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         private const val RANGE_WEEK = 1
         private const val RANGE_ALL = 2
         private const val SHOW_DAYS = 30L
+        private const val SHARE_GP_PER_DAY = 30
     }
 
     // 应用栏与导航
@@ -380,7 +381,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageStats.findViewById<View>(R.id.pet_share).setOnClickListener { sharePetStats() }
     }
 
-    /** 分享战绩并推进分享任务（解锁精灵装扮：星光1次/彩虹3次/传奇5次） */
+    /** 每日分享任务：每天首次分享 +30 成长值（精灵成长值 = 听剧分钟 + 分享奖励） */
     private fun sharePetStats() {
         val sessions = SessionLog.sessions(this)
         val allMs = sessions.sumOf { it.durationMs }
@@ -399,32 +400,64 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 "分享到"
             )
         )
-        // 记一次分享（打开分享面板即计，行业通行做法），刷新装扮
+        // 每日任务结算：每天仅一次
         val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-        val n = prefs.getInt("share_count", 0) + 1
-        prefs.edit().putInt("share_count", n).apply()
-        refreshPetDecor()
-        val level = shareLevelOf(n)
-        if (level > 0) {
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        val last = prefs.getString("last_share_date", "")
+        if (last != today) {
+            val nb = prefs.getInt("share_bonus_gp", 0) + SHARE_GP_PER_DAY
+            prefs.edit().putInt("share_bonus_gp", nb).putString("last_share_date", today).apply()
+            Toast.makeText(this, "每日分享完成 · 精灵 +$SHARE_GP_PER_DAY 成长值 ⚡", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "今日分享奖励已领取，明天再来（每天一次）", Toast.LENGTH_SHORT).show()
+        }
+        renderStats()
+    }
+
+    /** 成长值体系：GP = 听剧分钟 + 每日分享奖励；展示进度与每日任务状态 */
+    private fun refreshPetPanel(allMs: Long, sessions: List<ListenSession>, now: Long) {
+        val pet = pageStats.findViewById<PetView>(R.id.pet_view)
+        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val gp = allMs / 60000 + prefs.getInt("share_bonus_gp", 0)
+        val stage = PetView.stageOf(gp)
+        pet.stage = stage
+        val lastSessionAt = sessions.maxOfOrNull { it.start } ?: 0L
+        pet.sleepy = lastSessionAt > 0 && (now - lastSessionAt) / (24L * 3600 * 1000) >= 3
+        pet.totalMah = Stats.estimatedMah(allMs)
+        pet.progress = if (stage < PetView.STAGE_KING) {
+            val lo = PetView.THRESHOLDS[stage]
+            val hi = PetView.THRESHOLDS[stage + 1]
+            ((gp - lo).toFloat() / (hi - lo)).coerceIn(0f, 1f)
+        } else 1f
+
+        // 进化提示（仅当上次记录的形态更低时弹一次）
+        val seen = prefs.getInt("last_seen_stage", -1)
+        if (seen in 0 until stage) {
             Toast.makeText(
                 this,
-                "分享任务 ${n} 次 · 精灵装扮：${PetView.shareLevelName(level)}",
-                Toast.LENGTH_SHORT
+                "🎉 进化！${PetView.stageName(seen)} → ${PetView.stageName(stage)}",
+                Toast.LENGTH_LONG
             ).show()
         }
-    }
+        if (seen != stage) prefs.edit().putInt("last_seen_stage", stage).apply()
 
-    private fun shareLevelOf(n: Int): Int = when {
-        n >= 5 -> 3
-        n >= 3 -> 2
-        n >= 1 -> 1
-        else -> 0
-    }
-
-    private fun refreshPetDecor() {
-        val pet = pageStats.findViewById<PetView>(R.id.pet_view)
-        val n = getSharedPreferences("xiiting_prefs", MODE_PRIVATE).getInt("share_count", 0)
-        pet.shareLevel = shareLevelOf(n)
+        // 文案
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            .format(java.util.Date(now))
+        val sharedToday = prefs.getString("last_share_date", "") == today
+        pageStats.findViewById<TextView>(R.id.pet_caption).text =
+            if (pet.sleepy) {
+                "${PetView.stageName(stage)} 打瞌睡了 · 听一集唤醒它"
+            } else if (stage >= PetView.STAGE_KING) {
+                "${PetView.stageName(stage)} · 成长值 $gp · 已至巅峰"
+            } else {
+                "${PetView.stageName(stage)} · 成长值 $gp / ${PetView.THRESHOLDS[stage + 1]}"
+            }
+        pageStats.findViewById<TextView>(R.id.pet_share).text =
+            if (sharedToday) "今日分享已完成 ✓ · 明天再来 ›"
+            else "每日分享 · 精灵 +$SHARE_GP_PER_DAY 成长值 ›"
+        pet.startAnimating()
     }
 
     private fun selectRange(r: Int) {
@@ -481,36 +514,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             "最长单次 ${fmtDur(sessions.maxOfOrNull { it.durationMs } ?: 0L)} · 共 $allCount 次息屏"
         updateMah()
 
-        // 电能精灵：进化阶段=累计听剧；状态=最近是否听过；能量=累计省电
-        val pet = pageStats.findViewById<PetView>(R.id.pet_view)
-        pet.stage = when {
-            allMs >= 10L * 3600 * 1000 -> PetView.STAGE_STORM
-            allMs >= 2L * 3600 * 1000 -> PetView.STAGE_CLOUD
-            allMs >= 30L * 60 * 1000 -> PetView.STAGE_BALL
-            else -> PetView.STAGE_SPARK
-        }
-        val lastSessionAt = sessions.maxOfOrNull { it.start } ?: 0L
-        val daysIdle = (now - lastSessionAt) / (24L * 3600 * 1000)
-        pet.sleepy = daysIdle >= 3
-        pet.totalMah = Stats.estimatedMah(allMs)
-        refreshPetDecor()
-        val shareN = getSharedPreferences("xiiting_prefs", MODE_PRIVATE).getInt("share_count", 0)
-        val decor = PetView.shareLevelName(pet.shareLevel).let {
-            if (it == "无装扮") "分享解锁装扮" else "装扮：$it"
-        }
-        pageStats.findViewById<TextView>(R.id.pet_caption).text =
-            if (pet.sleepy)
-                "${PetView.stageName(pet.stage)} 打瞌睡了 · 听一集唤醒它"
-            else
-                "${PetView.stageName(pet.stage)} · 已储存 ${pet.totalMah} mAh · $decor"
-        pageStats.findViewById<TextView>(R.id.pet_share).text =
-            when {
-                shareN >= 5 -> "分享战绩 · 装扮已集齐 ⭐🌈⚡ ›"
-                shareN >= 3 -> "分享战绩 · 再分享 2 次解锁「传奇」›"
-                shareN >= 1 -> "分享战绩 · 再分享 2 次解锁「彩虹」›" + if (shareN == 1) "" else ""
-                else -> "分享战绩 · 解锁精灵装扮 ›"
-            }
-        pet.startAnimating()
+        // 电能精灵：成长值驱动的五形态养成（听剧分钟 + 每日分享奖励）
+        refreshPetPanel(allMs, sessions, now)
 
         // 近7天柱状图（含今天，共7天）
         val dayLabels = ArrayList<Pair<String, Long>>()

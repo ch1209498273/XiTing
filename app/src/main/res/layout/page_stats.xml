@@ -11,6 +11,33 @@
         android:orientation="vertical"
         android:padding="20dp">
 
+        <!-- 电能精灵 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_card"
+            android:elevation="1dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="14dp">
+
+            <com.lujinyu.xiting.PetView
+                android:id="@+id/pet_view"
+                android:layout_width="match_parent"
+                android:layout_height="190dp" />
+
+            <TextView
+                android:id="@+id/pet_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="电能精灵 · 由你的真实听剧时长喂养"
+                android:textColor="#FF5F6570"
+                android:textSize="12sp" />
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

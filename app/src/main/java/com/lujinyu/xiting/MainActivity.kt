@@ -432,6 +432,25 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             "最长单次 ${fmtDur(sessions.maxOfOrNull { it.durationMs } ?: 0L)} · 共 $allCount 次息屏"
         updateMah()
 
+        // 电能精灵：进化阶段=累计听剧；状态=最近是否听过；能量=累计省电
+        val pet = pageStats.findViewById<PetView>(R.id.pet_view)
+        pet.stage = when {
+            allMs >= 10L * 3600 * 1000 -> PetView.STAGE_STORM
+            allMs >= 2L * 3600 * 1000 -> PetView.STAGE_CLOUD
+            allMs >= 30L * 60 * 1000 -> PetView.STAGE_BALL
+            else -> PetView.STAGE_SPARK
+        }
+        val lastSessionAt = sessions.maxOfOrNull { it.start } ?: 0L
+        val daysIdle = (now - lastSessionAt) / (24L * 3600 * 1000)
+        pet.sleepy = daysIdle >= 3
+        pet.totalMah = Stats.estimatedMah(allMs)
+        pageStats.findViewById<TextView>(R.id.pet_caption).text =
+            if (pet.sleepy)
+                "${PetView.stageName(pet.stage)} 打瞌睡了 · 听一集唤醒它"
+            else
+                "${PetView.stageName(pet.stage)} · 已储存 ${pet.totalMah} mAh · 点击放电"
+        pet.startAnimating()
+
         // 近7天柱状图（含今天，共7天）
         val dayLabels = ArrayList<Pair<String, Long>>()
         for (i in 6 downTo 0) {

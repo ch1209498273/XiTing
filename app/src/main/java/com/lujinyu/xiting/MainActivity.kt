@@ -241,6 +241,13 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         if (hasFocus) refreshStates()
     }
 
+    /** 会话在 [from, to) 区间内的实际时长（跨天会话按天拆分，归属不串） */
+    private fun overlapMs(s: ListenSession, from: Long, to: Long): Long {
+        val a = maxOf(s.start, from)
+        val b = minOf(s.end, to)
+        return (b - a).coerceAtLeast(0)
+    }
+
     private fun postRefresh() {
         Handler(Looper.getMainLooper()).postDelayed({ refreshStates(); refreshHomeStats() }, 400)
     }
@@ -332,10 +339,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         var todayMs = 0L
         var weekMs = 0L
         var allMs = 0L
+        val nowMs = System.currentTimeMillis()
         sessions.forEach { s ->
             allMs += s.durationMs
-            if (s.start >= todayStart) todayMs += s.durationMs
-            if (s.start >= weekStart) weekMs += s.durationMs
+            todayMs += overlapMs(s, todayStart, todayStart + 24L * 3600 * 1000)
+            weekMs += overlapMs(s, weekStart, nowMs)
         }
         homeToday.text = fmtDur(todayMs)
         homeWeek.text = fmtDur(weekMs)
@@ -569,8 +577,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         allMs = 0L
         sessions.forEach { s ->
             allMs += s.durationMs
-            if (s.start >= todayStart) { todayMs += s.durationMs; todayCount++ }
-            if (s.start >= weekStart) { weekMs += s.durationMs; weekCount++ }
+            val tv = overlapMs(s, todayStart, todayStart + 24L * 3600 * 1000)
+            if (tv > 0) { todayMs += tv; todayCount++ }
+            val wv = overlapMs(s, weekStart, now)
+            if (wv > 0) { weekMs += wv; weekCount++ }
         }
         val allCount = sessions.size
 
@@ -594,7 +604,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             val dayEnd = dayStart + 24L * 3600 * 1000
             var ms = 0L
             sessions.forEach { s ->
-                if (s.start >= dayStart && s.start < dayEnd) ms += s.durationMs
+                ms += overlapMs(s, dayStart, dayEnd)
             }
             dayLabels.add(Pair(dayLabel(i), ms))
         }

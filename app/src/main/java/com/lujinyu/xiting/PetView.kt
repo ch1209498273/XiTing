@@ -128,13 +128,13 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         val cy = height / 2f - 20f + (if (thumbMode) 20f else sin(t * 2.2f) * 8f)
         val h = height.toFloat()
         val r = h * if (thumbMode) {
-            arrayOf(0.20f, 0.26f, 0.32f, 0.37f, 0.42f)[stage]
+            arrayOf(0.19f, 0.24f, 0.29f, 0.33f, 0.37f)[stage]
         } else when (stage) {
-            STAGE_SPARK -> 0.15f
-            STAGE_BALL -> 0.21f
-            STAGE_CLOUD -> 0.27f
-            STAGE_STORM -> 0.33f
-            else -> 0.38f
+            STAGE_SPARK -> 0.11f
+            STAGE_BALL -> 0.15f
+            STAGE_CLOUD -> 0.19f
+            STAGE_STORM -> 0.22f
+            else -> 0.25f
         }
         return Triple(cx, cy, r)
     }

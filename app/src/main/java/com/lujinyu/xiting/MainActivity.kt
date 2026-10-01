@@ -376,6 +376,55 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             listPage++
             renderList()
         }
+        // 分享战绩：系统分享面板 + 分享任务（解锁精灵装扮）
+        pageStats.findViewById<View>(R.id.pet_share).setOnClickListener { sharePetStats() }
+    }
+
+    /** 分享战绩并推进分享任务（解锁精灵装扮：星光1次/彩虹3次/传奇5次） */
+    private fun sharePetStats() {
+        val sessions = SessionLog.sessions(this)
+        val allMs = sessions.sumOf { it.durationMs }
+        val mah = Stats.estimatedMah(allMs)
+        val pet = pageStats.findViewById<PetView>(R.id.pet_view)
+        val text = "⚡ 我用「息屏听剧」黑屏听了 ${fmtDur(allMs)}，估算省电 $mah mAh\n" +
+            "我的电能精灵已经进化到「${PetView.stageName(pet.stage)}」了\n" +
+            "完全免费无广告的息屏听剧神器（0.9MB 离线运行）\n" +
+            "https://github.com/ch1209498273/XiTing"
+        startActivity(
+            Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, text)
+                },
+                "分享到"
+            )
+        )
+        // 记一次分享（打开分享面板即计，行业通行做法），刷新装扮
+        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val n = prefs.getInt("share_count", 0) + 1
+        prefs.edit().putInt("share_count", n).apply()
+        refreshPetDecor()
+        val level = shareLevelOf(n)
+        if (level > 0) {
+            Toast.makeText(
+                this,
+                "分享任务 ${n} 次 · 精灵装扮：${PetView.shareLevelName(level)}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun shareLevelOf(n: Int): Int = when {
+        n >= 5 -> 3
+        n >= 3 -> 2
+        n >= 1 -> 1
+        else -> 0
+    }
+
+    private fun refreshPetDecor() {
+        val pet = pageStats.findViewById<PetView>(R.id.pet_view)
+        val n = getSharedPreferences("xiiting_prefs", MODE_PRIVATE).getInt("share_count", 0)
+        pet.shareLevel = shareLevelOf(n)
     }
 
     private fun selectRange(r: Int) {
@@ -444,11 +493,23 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val daysIdle = (now - lastSessionAt) / (24L * 3600 * 1000)
         pet.sleepy = daysIdle >= 3
         pet.totalMah = Stats.estimatedMah(allMs)
+        refreshPetDecor()
+        val shareN = getSharedPreferences("xiiting_prefs", MODE_PRIVATE).getInt("share_count", 0)
+        val decor = PetView.shareLevelName(pet.shareLevel).let {
+            if (it == "无装扮") "分享解锁装扮" else "装扮：$it"
+        }
         pageStats.findViewById<TextView>(R.id.pet_caption).text =
             if (pet.sleepy)
                 "${PetView.stageName(pet.stage)} 打瞌睡了 · 听一集唤醒它"
             else
-                "${PetView.stageName(pet.stage)} · 已储存 ${pet.totalMah} mAh · 点击放电"
+                "${PetView.stageName(pet.stage)} · 已储存 ${pet.totalMah} mAh · $decor"
+        pageStats.findViewById<TextView>(R.id.pet_share).text =
+            when {
+                shareN >= 5 -> "分享战绩 · 装扮已集齐 ⭐🌈⚡ ›"
+                shareN >= 3 -> "分享战绩 · 再分享 2 次解锁「传奇」›"
+                shareN >= 1 -> "分享战绩 · 再分享 2 次解锁「彩虹」›" + if (shareN == 1) "" else ""
+                else -> "分享战绩 · 解锁精灵装扮 ›"
+            }
         pet.startAnimating()
 
         // 近7天柱状图（含今天，共7天）

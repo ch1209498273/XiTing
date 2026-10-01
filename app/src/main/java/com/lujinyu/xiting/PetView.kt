@@ -35,11 +35,19 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             STAGE_CLOUD -> "雷云精灵"
             else -> "风暴之灵"
         }
+
+        fun shareLevelName(level: Int): String = when (level) {
+            1 -> "星光"
+            2 -> "彩虹"
+            3 -> "传奇"
+            else -> "无装扮"
+        }
     }
 
     var stage = STAGE_SPARK
     var sleepy = false
     var totalMah = 0
+    var shareLevel = 0   // 分享任务装扮：0=无 1=星光 2=彩虹 3=传奇
 
     private var bornAt = System.currentTimeMillis()
     private var blinkUntil = 0L            // 眨眼窗口
@@ -111,13 +119,50 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         }
         val blinking = now < blinkUntil
 
-        // 光晕
+        // 光晕（传奇装扮：脉冲呼吸光晕）
+        val legend = shareLevel >= 3 && !sleepy
+        val glowR = if (legend) r * (2.4f + 0.25f * sin(t * 3f)) else r * 2.4f
         glowPaint.shader = RadialGradient(
-            cx, cy, r * 2.4f,
-            if (sleepy) 0x14222930.toInt() else 0x2EFFE082.toInt(),
+            cx, cy, glowR,
+            if (sleepy) 0x14222930.toInt()
+            else if (legend) 0x44FFE082.toInt()
+            else 0x2EFFE082.toInt(),
             Color.TRANSPARENT, Shader.TileMode.CLAMP
         )
-        canvas.drawCircle(cx, cy, r * 2.4f, glowPaint)
+        canvas.drawCircle(cx, cy, glowR, glowPaint)
+
+        // 装扮·星光（≥1）：环绕小星星，缓慢旋转+闪烁
+        if (shareLevel >= 1 && !sleepy) {
+            val starPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFE082.toInt() }
+            for (i in 0 until 6) {
+                val ang = (6.2831855f * i / 6) + t * 0.35f
+                val rr = r * 1.65f
+                val sx = cx + cos(ang) * rr
+                val sy = cy + sin(ang) * rr
+                val tw = 0.5f + 0.5f * sin(t * 2.4f + i * 1.1f)  // 闪烁
+                starPaint.alpha = (170 * tw).toInt().coerceIn(30, 200)
+                drawStar(canvas, sx, sy, r * 0.16f * (0.8f + 0.3f * tw), starPaint)
+            }
+        }
+
+        // 装扮·彩虹（≥2）：本体外圈彩虹弧
+        if (shareLevel >= 2 && !sleepy) {
+            val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 6f
+                strokeCap = Paint.Cap.ROUND
+            }
+            val ring = RectF(cx - r * 1.4f, cy - r * 1.4f, cx + r * 1.4f, cy + r * 1.4f)
+            val colors = intArrayOf(
+                0xFFFF5252.toInt(), 0xFFFFB74D.toInt(), 0xFFFFF176.toInt(),
+                0xFF66BB6A.toInt(), 0xFF42A5F5.toInt(), 0xFFAB47BC.toInt()
+            )
+            for (i in 0 until 6) {
+                ringPaint.color = colors[i]
+                val start = (t * 60 + i * 60f) % 360f
+                canvas.drawArc(ring, start, 42f, false, ringPaint)
+            }
+        }
 
         // 放电动画：四周放射小闪电
         if (now < dischargeUntil) {
@@ -266,5 +311,17 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         p.lineTo(x + s * 0.06f, y + s * 0.72f)
         p.close()
         canvas.drawPath(p, boltPaint)
+    }
+
+    /** 四角星（星光装扮用） */
+    private fun drawStar(canvas: Canvas, x: Float, y: Float, s: Float, paint: Paint) {
+        val p = android.graphics.Path()
+        p.moveTo(x, y - s)
+        p.quadTo(x + s * 0.22f, y - s * 0.22f, x + s, y)
+        p.quadTo(x + s * 0.22f, y + s * 0.22f, x, y + s)
+        p.quadTo(x - s * 0.22f, y + s * 0.22f, x - s, y)
+        p.quadTo(x - s * 0.22f, y - s * 0.22f, x, y - s)
+        p.close()
+        canvas.drawPath(p, paint)
     }
 }

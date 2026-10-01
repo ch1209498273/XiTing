@@ -36,6 +36,20 @@
                 android:text="电能精灵 · 由你的真实听剧时长喂养"
                 android:textColor="#FF5F6570"
                 android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/pet_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingStart="12dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="6dp"
+                android:text="分享战绩 · 解锁精灵装扮 ›"
+                android:textColor="#FF1E8E5A"
+                android:textSize="13sp" />
         </LinearLayout>
 
         <TextView

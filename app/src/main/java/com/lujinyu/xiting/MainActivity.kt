@@ -417,10 +417,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 图鉴预览：选中非当前形态时主精灵切换为该形态
         pet.stage = if (previewStage >= 0) previewStage else stage
         pet.hideProgress = previewStage >= 0 && previewStage != stage
-        // 能量球装载与收集回调（回调在飞入动画完成后触发）
+        // 能量装载与收集回调（点击左侧能量条=收集全部；回调在飞入动画完成后触发）
         pet.pending = EnergyStore.pending(this)
-        pet.onCollect = { id ->
-            val v = EnergyStore.collect(this, id)
+        pet.onCollectAll = {
+            val v = EnergyStore.collectAll(this)
             if (v > 0) {
                 Toast.makeText(this, "充能 +$v 成长值 ⚡", Toast.LENGTH_SHORT).show()
             }
@@ -701,10 +701,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         refreshBubbleStyleValue()
     }
 
-    /** 悬浮球样式选择：默认「息屏」文字 + 已解锁形态 */
+    /** 悬浮球样式选择：带实时预览（每项直接显示该样式的实际长相） */
     private fun showBubbleStyleDialog() {
         val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-        val gp = allMs / 60000 + prefs.getInt("share_bonus_gp", 0)
+        val gp = EnergyStore.collectedTotal(this).toLong()
         val unlocked = PetView.stageOf(gp)
         val labels = ArrayList<String>()
         val values = ArrayList<String>()
@@ -715,14 +715,60 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             values.add("pet_$i")
         }
         val current = prefs.getString("bubble_style", "text") ?: "text"
-        val checked = values.indexOf(current)
+        val density = resources.displayMetrics.density
+        val adapter = object : android.widget.ArrayAdapter<String>(this, 0, labels) {
+            override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
+                val row = LinearLayout(this@MainActivity).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                    setPadding((16 * density).toInt(), (10 * density).toInt(), (16 * density).toInt(), (10 * density).toInt())
+                    if (values[position] == current) setBackgroundColor(0x1A1E8E5A)
+                }
+                if (position == 0) {
+                    // 「息屏」文字样式预览
+                    row.addView(
+                        TextView(this@MainActivity).apply {
+                            text = "息屏"
+                            textSize = 11f
+                            setTextColor(0xFFFFFFFF.toInt())
+                            gravity = android.view.Gravity.CENTER
+                            val bg = android.graphics.drawable.GradientDrawable().apply {
+                                shape = android.graphics.drawable.GradientDrawable.OVAL
+                                setColor(0xB3000000.toInt())
+                            }
+                            background = bg
+                            layoutParams = LinearLayout.LayoutParams((44 * density).toInt(), (44 * density).toInt())
+                        }
+                    )
+                } else {
+                    row.addView(
+                        BubblePetView(this@MainActivity).apply {
+                            stage = position - 1
+                            layoutParams = LinearLayout.LayoutParams((44 * density).toInt(), (44 * density).toInt())
+                        }
+                    )
+                }
+                row.addView(
+                    TextView(this@MainActivity).apply {
+                        text = labels[position]
+                        textSize = 15f
+                        setTextColor(0xFF111418.toInt())
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply { marginStart = (16 * density).toInt() }
+                    }
+                )
+                return row
+            }
+        }
         android.app.AlertDialog.Builder(this)
-            .setTitle("悬浮球样式")
-            .setSingleChoiceItems(labels.toTypedArray(), checked) { d, which ->
+            .setTitle("悬浮球样式（实时预览）")
+            .setAdapter(adapter) { d, which ->
                 prefs.edit().putString("bubble_style", values[which]).apply()
                 OverlayService.instance?.rebuildBubble()
                 refreshBubbleStyleValue()
-                Toast.makeText(this, "悬浮球已切换为「${labels[which]}」", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "悬浮球已切换为「${labels[which]}」，看右下角", Toast.LENGTH_SHORT).show()
                 d.dismiss()
             }
             .setNegativeButton("取消", null)

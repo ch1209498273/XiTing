@@ -59,7 +59,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     var thumbMode = false  // 图鉴缩略模式：静态单帧、无粒子/进度条/光晕动画
     var hideProgress = false               // 预览非当前形态时隐藏进度条
     var pending: List<PendingEnergy> = emptyList()   // 待收集能量球
-    var onCollect: ((Long) -> Unit)? = null          // 收集回调（延迟到飞入动画后）
+    var onCollectAll: (() -> Unit)? = null           // 收集全部回调（延迟到飞入动画后）
 
     // 收集动画内部状态
     private data class FlyBall(val value: Int, val sx: Float, val sy: Float, val startAt: Long)
@@ -138,16 +138,15 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         return Triple(cx, cy, r)
     }
 
-    /** 能量球位置：环绕精灵一圈（固定位置——移动的球难以点击） */
-    private fun ballLayout(cx: Float, cy: Float, r: Float, n: Int): List<Pair<Float, Float>> {
-        val out = ArrayList<Pair<Float, Float>>(n)
-        if (n == 0) return out
-        for (i in 0 until n) {
-            val ang = -1.5707964f + 6.2831855f * i / n
-            val rr = r * 1.5f + (if (i % 2 == 0) r * 0.12f else 0f)
-            out.add(Pair(cx + cos(ang) * rr, cy + sin(ang) * rr * 0.92f))
-        }
-        return out
+    /** 左侧固定能量条（待收集能量>0 时显示；点击即充能，不再超出界面） */
+    private fun energyBar(): RectF? {
+        if (pending.isEmpty() || thumbMode) return null
+        val h = height.toFloat()
+        val bw = (h * 0.055f).coerceAtLeast(20f)
+        val bh = h * 0.5f
+        val bx = width * 0.06f
+        val by = (h - bh) / 2f
+        return RectF(bx, by, bx + bw, by + bh)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -161,22 +160,18 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             MotionEvent.ACTION_UP -> {
                 val moved = Math.abs(event.x - downX) > 30 || Math.abs(event.y - downY) > 30
                 if (!moved) {
-                    val (cx, cy, r) = geometry()
-                    val balls = pending.take(8)
-                    val poss = ballLayout(cx, cy, r, balls.size)
-                    val br = (height * 0.085f).coerceAtLeast(14f)
-                    for (i in balls.indices) {
-                        val dx = event.x - poss[i].first
-                        val dy = event.y - poss[i].second
-                        if (dx * dx + dy * dy < (br * 2.8f) * (br * 2.8f)) {
-                            // 命中能量球：飞入动画 + 延迟回调
-                            val pe = balls[i]
-                            flyBalls.add(FlyBall(pe.value, poss[i].first, poss[i].second, System.currentTimeMillis()))
-                            postDelayed({ onCollect?.invoke(pe.id) }, 340)
-                            return true
-                        }
+                    // 命中左侧能量条（外扩点击区，好点）：点击即充能
+                    val bar = energyBar()
+                    if (bar != null &&
+                        event.x in (bar.left - 50f)..(bar.right + 70f) &&
+                        event.y in (bar.top - 80f)..(bar.bottom + 60f)
+                    ) {
+                        val total = pending.sumOf { it.value }
+                        flyBalls.add(FlyBall(total, bar.centerX(), bar.centerY(), System.currentTimeMillis()))
+                        postDelayed({ onCollectAll?.invoke() }, 340)
+                        return true
                     }
-                    performClick() // 未命中球：原有放电效果
+                    performClick() // 未命中能量条：原有放电效果
                 }
                 return true
             }
@@ -293,55 +288,48 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             popPaint.alpha = 255
         }
 
-        // ───────── 能量球系统（充能/收集） ─────────
+        // ───────── 能量系统：左侧固定能量条 + 充能动画 ─────────
         if (!thumbMode) {
-            val br = (height * 0.085f).coerceAtLeast(14f)
-            // 待收集能量球（环绕，缓慢旋转）
-            val balls = pending.take(8)
-            val poss = ballLayout(cx, cy, r, balls.size)
-            for (i in balls.indices) {
-                val (bx, by) = poss[i]
-                val pe = balls[i]
-                val nearing = pe.expireAt - now < EnergyStore.NEAR_EXPIRE_MS
-                // 临期（12小时内）橙红闪烁提醒过期
+            val bar = energyBar()
+            if (bar != null) {
+                val total = pending.sumOf { it.value }
+                val nearing = pending.any { it.expireAt - now < EnergyStore.NEAR_EXPIRE_MS }
                 val col = if (nearing) {
                     if ((now / 400) % 2 == 0L) 0xFFFF7043.toInt() else 0xFFFFAB91.toInt()
                 } else 0xFFFFC94D.toInt()
+                val rr = bar.width() / 2f
+                // 光晕
                 glowPaint.shader = RadialGradient(
-                    bx, by, br * 2.1f, (col and 0x00FFFFFF) or 0x44000000, Color.TRANSPARENT, Shader.TileMode.CLAMP
+                    bar.centerX(), bar.centerY(), bar.width() * 3f,
+                    (col and 0x00FFFFFF) or 0x33000000, Color.TRANSPARENT, Shader.TileMode.CLAMP
                 )
-                canvas.drawCircle(bx, by, br * 2.1f, glowPaint)
-                bodyPaint.color = col
-                canvas.drawCircle(bx, by, br, bodyPaint)
-                // 球面高光
-                val hi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x66FFFFFF }
-                canvas.drawCircle(bx - br * 0.3f, by - br * 0.35f, br * 0.32f, hi)
-                // 球上数字
+                canvas.drawCircle(bar.centerX(), bar.centerY(), bar.width() * 3f, glowPaint)
+                // 轨道 + 满填充（代表待收集）
+                barTrackPaint.color = 0xFFF0F2F5.toInt()
+                canvas.drawRoundRect(bar, rr, rr, barTrackPaint)
+                barFillPaint.color = col
+                canvas.drawRoundRect(bar, rr, rr, barFillPaint)
+                // 两端光点
+                val hi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x55FFFFFF }
+                canvas.drawCircle(bar.centerX(), bar.top + bar.width() * 0.5f, bar.width() * 0.22f, hi)
+                // 数值（条上方，横排）
                 popPaint.alpha = 255
-                popPaint.textSize = br * 0.85f
-                canvas.drawText("+${pe.value}", bx, by - br * 1.35f, popPaint)
                 popPaint.textSize = 30f
-            }
-            // 待收集提示
-            if (pending.size > 0) {
-                val tp = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = 0xFF8A9099.toInt()
-                    textSize = 26f
-                    textAlign = Paint.Align.CENTER
-                }
-                canvas.drawText("⚡ ${pending.size} 个能量待收集 · 点击收集（3天过期）", cx, 34f, tp)
+                popPaint.color = if (nearing) 0xFFE64A19.toInt() else 0xFFB8860B.toInt()
+                canvas.drawText("⚡$total", bar.centerX(), bar.top - 26f, popPaint)
+                popPaint.color = 0xFF1E8E5A.toInt()
             }
 
-            // 飞入动画：收集的球飞向精灵中心
+            // 飞入动画：从能量条飞向精灵中心
             flyBalls.removeAll { now - it.startAt > 320 }
             flyBalls.forEach { fb ->
                 val k = ((now - fb.startAt) / 300f).coerceIn(0f, 1f)
-                val ease = k * k * (3 - 2 * k)   // smoothstep
+                val ease = k * k * (3 - 2 * k)
                 val fx = fb.sx + (cx - fb.sx) * ease
                 val fy = fb.sy + (cy - fb.sy) * ease
-                val fr = br * (1f - 0.5f * ease)
+                val fr = (height * 0.09f) * (1f - 0.45f * ease)
                 ballPaint.color = 0xFFFFC94D.toInt()
-                ballPaint.alpha = (255 * (1f - 0.6f * ease)).toInt()
+                ballPaint.alpha = (255 * (1f - 0.55f * ease)).toInt()
                 canvas.drawCircle(fx, fy, fr, ballPaint)
                 ballPaint.alpha = 255
                 if (k >= 1f) {

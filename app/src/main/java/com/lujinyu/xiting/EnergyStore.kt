@@ -80,6 +80,13 @@ object EnergyStore {
         return item.value
     }
 
+    /** 收集全部待收能量，返回总量 */
+    fun collectAll(ctx: Context): Int {
+        var sum = 0
+        pending(ctx).forEach { sum += collect(ctx, it.id) }
+        return sum
+    }
+
     private fun writePending(ctx: Context, list: List<PendingEnergy>) {
         val arr = JSONArray()
         list.forEach {

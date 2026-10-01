@@ -213,8 +213,7 @@
             <Switch
                 android:id="@+id/switch_info"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <!-- 节能统计 -->

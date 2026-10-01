@@ -230,7 +230,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         // 黑幕显示时间与电量（默认开；关闭后为纯黑）
         val switchInfo = pageHome.findViewById<android.widget.Switch>(R.id.switch_info)
-        switchInfo.isChecked = prefs.getBoolean("black_info_show", true)
+        switchInfo.isChecked = prefs.getBoolean("black_info_show", false)
         switchInfo.setOnCheckedChangeListener { _, checked ->
             prefs.edit().putBoolean("black_info_show", checked).apply()
             OverlayService.instance?.reapplyBlack() // 黑幕显示中即时生效（无闪屏重挂）

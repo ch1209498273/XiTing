@@ -29,7 +29,7 @@ import android.widget.TextView
  * 交互（两段式解锁）：
  *   锁定态：全黑 + 背光物理关闭（screenBrightness=OFF）
  *   轻点屏幕 → 解除锁定：背光恢复到用户亮度，浮现「点击返回视频」按钮
- *   点按钮 → 返回视频；5秒无操作 → 自动重新锁定（背光再关）
+ *   点按钮 → 返回视频；5秒无操作 → 自动重新锁定（开时钟时压至最暗背光，暗态夜钟持续可见）
  *
  * 系统栏隐藏（实测重要）：insets隐藏只做一次、绝不周期性重复调用——
  * ColorOS 16上反复调用hide()反而会让系统栏重新显示（真机A/B实测结论）。
@@ -57,6 +57,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var badgeListener: ((Int) -> Unit)? = null
     private var onDismissCallback: (() -> Unit)? = null
     private var directUnlock = false          // 轻点直接解锁（跳过两段式）
+    private var showInfo = false              // 黑幕时钟/电量显示（默认关，首页可开）
     private var clockText: TextView? = null
     private var batteryText: TextView? = null
     private var awake = false
@@ -183,7 +184,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         NotificationBadge.register(badgeListener!!)
 
         val prefs = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-        val showInfo = prefs.getBoolean("black_info_show", true) // 时间/电量可关：纯黑偏好
+        showInfo = prefs.getBoolean("black_info_show", false) // 时钟/电量默认关：纯黑偏好
 
         // 黑幕信息：时间 + 电量（暗色显示，夜间看时间/电量不用亮屏）
         val infoCol = LinearLayout(context).apply {
@@ -350,14 +351,15 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         Log.i(TAG, "awake: 解除锁定，背光恢复")
     }
 
-    /** 重新锁定：背光再次关闭 */
+    /** 重新锁定：开时钟→背光压到最暗（暗态时钟持续可见）；未开→彻底关闭纯黑 */
     private fun sleep() {
         if (!awake) return
         awake = false
         main.removeCallbacks(relockRunnable)
         val f = frame ?: return
         val l = lp ?: return
-        l.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
+        l.screenBrightness =
+            if (showInfo) 0.01f else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
         l.buttonBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
         try { wm.updateViewLayout(f, l) } catch (_: Exception) {}
         unlockPill?.animate()?.alpha(0f)?.setDuration(200)

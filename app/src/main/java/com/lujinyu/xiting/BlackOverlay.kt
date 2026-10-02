@@ -318,6 +318,17 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
         lp.buttonBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
 
+        // 隐藏非系统悬浮窗（ColorOS 智能侧边栏小白条等 OEM 边缘组件是普通App uid 的
+        // 悬浮层，图层高于第三方窗口，黑幕盖不住）。该系统标志在黑幕显示期间会让
+        // WindowService 临时隐藏它们；API 为 @hide，反射注入，缺字段的老 ROM 静默跳过。
+        try {
+            val lpCls = WindowManager.LayoutParams::class.java
+            val pfField = lpCls.getField("privateFlags")
+            val hideFlag = lpCls.getField("SYSTEM_FLAG_HIDE_NON_SYSTEM_OVERLAY_WINDOWS").getInt(null)
+            pfField.setInt(lp, pfField.getInt(lp) or hideFlag)
+        } catch (_: Exception) {
+        }
+
         try {
             wm.addView(f, lp)
             frame = f

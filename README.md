@@ -53,6 +53,12 @@
 - 所有数据仅保存在本机
 - 📄 [隐私政策全文（PRIVACY.md）](PRIVACY.md)
 
+## 界面速览
+
+| 首页 | 电能精灵 | 看剧息屏 | 黑屏听剧 |
+|:---:|:---:|:---:|:---:|
+| <img src=".github/assets/shot-home.png" width="230"/> | <img src=".github/assets/shot-stats.png" width="230"/> | <img src=".github/assets/shot-video.png" width="230"/> | <img src=".github/assets/shot-black.png" width="230"/> |
+
 ## 使用
 
 1. 安装后打开App，完成三项授权（悬浮窗 / 电池加白 / 通知）

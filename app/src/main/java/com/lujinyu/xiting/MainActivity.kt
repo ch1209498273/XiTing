@@ -3,14 +3,20 @@ package com.lujinyu.xiting
 
 import android.Manifest
 import android.app.Activity
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaMetadata
+import android.media.session.MediaSessionManager
+import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.os.SystemClock
 import android.provider.Settings
 import android.view.View
 import android.widget.ImageView
@@ -40,6 +46,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         private const val SHOW_DAYS = 30L
         private const val SHARE_GP_PER_DAY = 5
         private const val REQ_RESTORE = 2001
+        private const val REQ_EXPORT = 2002
     }
 
     // 应用栏与导航
@@ -206,14 +213,18 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             postRefresh()
         }
 
-        // 定时关闭：15/30/60分钟，到点自动收黑幕
+        // 定时关闭：听完这集 / 15/30/60分钟，到点自动收黑幕
         pageHome.findViewById<View>(R.id.timer_chip).setOnClickListener {
-            val items = arrayOf("15分钟", "30分钟", "60分钟", "取消定时")
+            val items = arrayOf("🎧 听完这集", "15分钟", "30分钟", "60分钟", "取消定时")
             android.app.AlertDialog.Builder(this)
                 .setTitle("定时关闭")
                 .setItems(items) { _, which ->
+                    if (which == 0) {
+                        finishThisEpisode()
+                        return@setItems
+                    }
                     val minutes = when (which) {
-                        0 -> 15L; 1 -> 30L; 2 -> 60L; else -> 0L
+                        1 -> 15L; 2 -> 30L; 3 -> 60L; else -> 0L
                     }
                     startService(
                         Intent(this, OverlayService::class.java)
@@ -285,6 +296,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQ_EXPORT && resultCode == RESULT_OK) {
+            val uri = data?.data ?: return
+            val ok = BackupManager.exportToUri(this, uri)
+            Toast.makeText(this, if (ok) "已导出 ✓" else "导出失败", Toast.LENGTH_SHORT).show()
+            return
+        }
         if (requestCode == REQ_RESTORE && resultCode == RESULT_OK) {
             val uri = data?.data ?: return
             val obj = BackupManager.readFromUri(this, uri)
@@ -421,6 +438,164 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pill.text = if (on) onText else offText
         pill.setBackgroundResource(if (on) R.drawable.bg_pill_on else R.drawable.bg_pill_off)
         pill.setTextColor(if (on) 0xFF157A4C.toInt() else 0xFF5F6570.toInt())
+    }
+
+    /** 听完这集再关：读取正在播放会话的进度，定时到本集片尾（个性化·定时关闭选项） */
+    private fun finishThisEpisode() {
+        val mgr = getSystemService(Context.MEDIA_SESSION_SERVICE) as? MediaSessionManager
+        val comp = ComponentName(this, NotificationListener::class.java)
+        val sessions = try {
+            mgr?.getActiveSessions(comp)
+        } catch (e: SecurityException) {
+            null // 未授予通知使用权
+        }
+        if (sessions == null) {
+            android.app.AlertDialog.Builder(this)
+                .setTitle("需要「通知使用权」")
+                .setMessage("「听完这集」需要读取正在播放的剧集进度。\n请在系统设置中允许息屏听剧的「通知使用权」（仅用于读取播放进度，不做他用）。\n\n不想授权也可以用普通倒计时。")
+                .setPositiveButton("去授权") { _, _ ->
+                    try { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) } catch (_: Exception) {}
+                }
+                .setNegativeButton("用倒计时") { _, _ ->
+                    startService(
+                        Intent(this, OverlayService::class.java)
+                            .setAction(OverlayService.ACTION_SET_TIMER)
+                            .putExtra(OverlayService.EXTRA_MINUTES, 30L)
+                    )
+                }
+                .show()
+            return
+        }
+        var bestRemaining = -1L
+        for (c in sessions) {
+            val st = c.playbackState ?: continue
+            if (st.state != PlaybackState.STATE_PLAYING) continue
+            val dur = c.metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L
+            if (dur <= 0) continue
+            val speed = st.playbackSpeed
+            val pos = st.position + ((SystemClock.elapsedRealtime() - st.lastPositionUpdateTime) * speed).toLong()
+            val rem = dur - pos
+            if (rem > 0 && (bestRemaining < 0 || rem < bestRemaining)) bestRemaining = rem
+        }
+        if (bestRemaining <= 0) {
+            Toast.makeText(this, "没读到播放进度：先播放一集再选，或改用倒计时", Toast.LENGTH_LONG).show()
+            return
+        }
+        val endAt = System.currentTimeMillis() + bestRemaining + 4000 // 集尾缓冲4秒
+        startService(
+            Intent(this, OverlayService::class.java)
+                .setAction(OverlayService.ACTION_SET_TIMER)
+                .putExtra(OverlayService.EXTRA_END_AT, endAt)
+        )
+        val mins = bestRemaining / 60000
+        val secs = bestRemaining % 60000 / 1000
+        Toast.makeText(this, "本集结束后自动息屏（约 ${mins}分${secs}秒 后）", Toast.LENGTH_LONG).show()
+    }
+
+    /** 成就明细弹窗 */
+    private fun showAchievements() {
+        val unlocked = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+            .getStringSet("ach_unlocked", emptySet()) ?: emptySet()
+        val gotCount = unlocked.size
+        val msg = Achievements.ALL.joinToString("\n\n") { a ->
+            (if (a.id in unlocked) "✅ " else "🔒 ") + a.icon + " " + a.title + " · " + a.desc
+        }
+        android.app.AlertDialog.Builder(this)
+            .setTitle("精灵成就 $gotCount/${Achievements.ALL.size}")
+            .setMessage(msg)
+            .setPositiveButton("好的", null)
+            .show()
+    }
+
+    // ───────────────────────── 省电实测校准向导 ─────────────────────────
+
+    private val calibHandler = Handler(Looper.getMainLooper())
+
+    private fun onMahCardClick() {
+        val calib = PowerCalib.calibrated(this)
+        val ambient = PowerCalib.ambientStats(this)
+        val msg = StringBuilder().apply {
+            append(
+                if (calib != null) {
+                    val rate = (calib.first - calib.second) / 1000.0
+                    "已按本机实测校准（${SimpleDateFormat("M月d日", Locale.getDefault()).format(Date(calib.third))}）\n实测省电速率 ≈ %.0f mAh/小时".format(rate)
+                } else {
+                    "尚未实测校准（当前按 OLED 通用模型估算）"
+                }
+            )
+            ambient?.let { (ma, n) ->
+                append("\n\n黑屏听剧整机功耗实测 ≈ %.0f mA（%d 次采样）".format(ma, n))
+            }
+            append("\n\n校准流程（约 6 分钟）：\n① 亮屏播放任意视频 3 分钟\n② 应用自动进入黑屏 3 分钟\n\n请勿充电；电量保持 15%~95%。")
+        }
+        android.app.AlertDialog.Builder(this)
+            .setTitle("省电实测")
+            .setMessage(msg)
+            .setPositiveButton(if (calib != null) "重新校准" else "开始校准") { _, _ -> calibStep1() }
+            .setNegativeButton("关闭", null)
+            .show()
+    }
+
+    /** 步骤1：亮屏播放视频，采样 3 分钟 */
+    private fun calibStep1() {
+        val dlg = android.app.AlertDialog.Builder(this)
+            .setTitle("校准 1/2 · 亮屏播放")
+            .setMessage("请立即开始播放任意视频并保持亮屏…")
+            .setCancelable(false)
+            .create()
+        dlg.show()
+        var left = 180
+        var sum = 0L
+        var n = 0
+        val tick = object : Runnable {
+            override fun run() {
+                PowerCalib.sampleNow(this@MainActivity)?.let { sum += it; n++ }
+                left -= 30
+                if (left <= 0) {
+                    dlg.dismiss()
+                    if (n < 4) {
+                        Toast.makeText(this@MainActivity, "有效样本不足（是否在充电？），校准已取消", Toast.LENGTH_LONG).show()
+                        return
+                    }
+                    if (!OverlayService.isRunning) {
+                        Toast.makeText(this@MainActivity, "请先启动息屏听剧助手，再进行校准", Toast.LENGTH_LONG).show()
+                        return
+                    }
+                    startService(
+                        Intent(this@MainActivity, OverlayService::class.java)
+                            .setAction(OverlayService.ACTION_CALIB_START)
+                            .putExtra(OverlayService.EXTRA_CALIB_ON_UA, sum / n)
+                    )
+                    waitForCalibration()
+                } else {
+                    dlg.setMessage("请保持亮屏播放视频，不要操作手机\n剩余 ${left / 60}:${"%02d".format(left % 60)}（已采样 $n 次）")
+                    calibHandler.postDelayed(this, 30_000)
+                }
+            }
+        }
+        calibHandler.postDelayed(tick, 30_000)
+    }
+
+    /** 步骤2由服务完成（自动进黑屏采样后自动退出）；这里轮询结果 */
+    private fun waitForCalibration() {
+        val before = PowerCalib.calibrated(this)?.third ?: 0L
+        var waited = 0
+        val poll = object : Runnable {
+            override fun run() {
+                waited += 20
+                val c = PowerCalib.calibrated(this@MainActivity)
+                if (c != null && c.third != before) {
+                    val rate = (c.first - c.second) / 1000.0
+                    renderStats()
+                    Toast.makeText(this@MainActivity, "校准完成：本机实测省电 ≈ %.0f mAh/小时".format(rate), Toast.LENGTH_LONG).show()
+                } else if (waited < 330) {
+                    calibHandler.postDelayed(this, 20_000)
+                } else {
+                    Toast.makeText(this@MainActivity, "校准超时，请重试", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        calibHandler.postDelayed(poll, 20_000)
     }
 
     private fun refreshHomeStats() {
@@ -652,8 +827,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             RANGE_WEEK -> "近7天" to weekMs
             else -> "累计" to allMs
         }
+        val calib = PowerCalib.calibrated(this)
+        val mah = calib?.let { PowerCalib.calibratedSavingMah(this, ms) } ?: Stats.estimatedMah(ms)
+        val basis = if (calib != null) "按本机实测" else "按OLED屏幕功耗估算"
         pageStats.findViewById<TextView>(R.id.sum_mah).text =
-            "${label}估算省电 ≈ ${Stats.estimatedMah(ms)} mAh（按OLED屏幕功耗估算）"
+            "${label}省电 ≈ $mah mAh（$basis）"
     }
 
     private fun renderStats() {
@@ -687,6 +865,25 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageStats.findViewById<TextView>(R.id.sum_extra).text =
             "最长单次 ${fmtDur(sessions.maxOfOrNull { it.durationMs } ?: 0L)} · 共 $allCount 次息屏"
         updateMah()
+
+        // 精灵成就（精灵二期·一期）：依据统计评估解锁并渲染
+        val gpNow = EnergyStore.collectedTotal(this)
+        val stageNow = PetView.stageOf(gpNow.toLong())
+        val listenDays = sessions
+            .map { SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date(it.start)) }
+            .distinct().size
+        val freshAch = Achievements.evaluate(
+            this, allMs, sessions.size,
+            sessions.maxOfOrNull { it.durationMs } ?: 0L, listenDays, stageNow
+        )
+        freshAch.take(2).forEach {
+            Toast.makeText(this, "🏆 成就解锁：${it.icon} ${it.title}", Toast.LENGTH_LONG).show()
+        }
+        val (gotCount, achSub) = Achievements.summary(this)
+        pageStats.findViewById<TextView>(R.id.ach_title).text = "精灵成就 · $gotCount/${Achievements.ALL.size}"
+        pageStats.findViewById<TextView>(R.id.ach_sub).text = achSub
+        pageStats.findViewById<View>(R.id.card_ach).setOnClickListener { showAchievements() }
+        pageStats.findViewById<View>(R.id.card_mah).setOnClickListener { onMahCardClick() }
 
         // 电能精灵：成长值驱动的五形态养成（听剧分钟 + 每日分享奖励）
         refreshPetPanel(allMs, sessions, now)
@@ -808,6 +1005,32 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         // 悬浮球样式：默认「息屏」文字，可换为已解锁的精灵形态
         page.findViewById<View>(R.id.row_bubble_style).setOnClickListener { showBubbleStyleDialog() }
+
+        // 耳机拔出自动返回视频（默认开）
+        val switchHeadset = page.findViewById<android.widget.Switch>(R.id.switch_headset)
+        switchHeadset.isChecked = prefs.getBoolean("switch_headset", true)
+        switchHeadset.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("switch_headset", checked).apply()
+        }
+
+        // 导出数据备份（SAF 手动备份）
+        page.findViewById<View>(R.id.row_export).setOnClickListener {
+            val name = "XiTing-backup-${SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())}.json"
+            try {
+                startActivityForResult(
+                    Intent(Intent.ACTION_CREATE_DOCUMENT)
+                        .addCategory(Intent.CATEGORY_OPENABLE)
+                        .setType("application/json")
+                        .putExtra(Intent.EXTRA_TITLE, name),
+                    REQ_EXPORT
+                )
+            } catch (_: Exception) {
+                Toast.makeText(this, "无法打开文件选择器", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 从备份文件恢复（复用恢复弹窗与设备校验）
+        page.findViewById<View>(R.id.row_restore).setOnClickListener { openBackupPicker() }
 
         // 检查更新：跳转 GitHub Release 页面（App 保持零网络权限，由浏览器打开）
         page.findViewById<View>(R.id.row_update).setOnClickListener {

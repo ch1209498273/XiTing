@@ -27,27 +27,46 @@ object BackupManager {
     private fun androidId(ctx: Context): String =
         Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID) ?: "unknown"
 
+    /** 组装备份 JSON（自动备份与手动导出共用同一格式） */
+    fun buildBackupJson(ctx: Context): JSONObject {
+        val prefs = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+        val sessText = ctx.filesDir.resolve("sessions.json").takeIf { it.exists() }?.readText() ?: "[]"
+        return JSONObject()
+            .put("v", 1)
+            .put("device", androidId(ctx))
+            .put("gp", EnergyStore.collectedTotal(ctx))
+            .put("last_share_date", prefs.getString("last_share_date", "") ?: "")
+            .put("sessions", JSONArray(sessText))
+            .put("ts", System.currentTimeMillis())
+    }
+
+    /** 导出到用户所选位置（SAF 手动备份） */
+    fun exportToUri(ctx: Context, uri: Uri): Boolean {
+        return try {
+            ctx.contentResolver.openOutputStream(uri, "wt")?.use {
+                it.write(buildBackupJson(ctx).toString().toByteArray())
+            } ?: return false
+            Log.i(TAG, "备份已导出到所选位置")
+            true
+        } catch (e: Exception) {
+            Log.w(TAG, "导出失败: $e")
+            false
+        }
+    }
+
     /** 备份当前成长值/会话/分享状态（静默；Android 10+ 无需权限） */
     fun save(ctx: Context) {
         if (Build.VERSION.SDK_INT < 29) return // 9 及以下分区存储不稳定，跳过自动备份
         try {
             val prefs = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
             val gp = EnergyStore.collectedTotal(ctx)
-            val sessions = ctx.filesDir.resolve("sessions.json")
-            val sessText = if (sessions.exists()) sessions.readText() else "[]"
+            val sessText = ctx.filesDir.resolve("sessions.json").takeIf { it.exists() }?.readText() ?: "[]"
             // 防护：本地为空（重装后未恢复）时不覆盖既有备份，避免毁掉历史数据
             if (gp <= 0 && (sessText == "[]" || sessText.isBlank())) {
                 Log.i(TAG, "本地为空，跳过备份覆盖（保护历史备份）")
                 return
             }
-            val obj = JSONObject()
-                .put("v", 1)
-                .put("device", androidId(ctx))
-                .put("gp", gp)
-                .put("last_share_date", prefs.getString("last_share_date", "") ?: "")
-                .put("sessions", JSONArray(sessText))
-                .put("ts", System.currentTimeMillis())
-            val bytes = obj.toString().toByteArray()
+            val bytes = buildBackupJson(ctx).toString().toByteArray()
 
             val resolver = ctx.contentResolver
             // 先自愈命名：写入中断会留下孤儿行（media_type=0、无属主）占住正名路径，

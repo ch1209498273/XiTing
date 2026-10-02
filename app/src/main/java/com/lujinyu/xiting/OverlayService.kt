@@ -51,6 +51,11 @@ class OverlayService : Service() {
         const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         const val ACTION_SET_TIMER = "com.lujinyu.xiting.SET_TIMER"
         const val EXTRA_MINUTES = "minutes"
+        const val EXTRA_END_AT = "end_at"        // 听完这集：以绝对时刻（epoch ms）定时
+        const val ACTION_CALIB_START = "com.lujinyu.xiting.CALIB_START"
+        const val EXTRA_CALIB_ON_UA = "calib_on_ua"
+        private const val ACTION_TEST_TOGGLE = "com.lujinyu.xiting.TEST_TOGGLE"
+        private const val ACTION_TEST_RUN_MODE = "com.lujinyu.xiting.TEST_RUN_MODE"
         private const val PREFS = "xiiting_prefs"
 
         var instance: OverlayService? = null
@@ -92,6 +97,71 @@ class OverlayService : Service() {
     private fun hideAllBlack() {
         black?.hide()
         black = null
+        main.removeCallbacks(powerTick) // 停止会话功耗采样
+    }
+
+    // ---------- 会话功耗采样（省电实测） ----------
+
+    private val powerTick: Runnable = Runnable {
+        if (black?.isShowing == true) {
+            PowerCalib.sampleNow(this)?.let { PowerCalib.recordSample(this, it) }
+            main.postDelayed(powerTick, 60_000)
+        }
+    }
+
+    // ---------- 耳机拔出联动 ----------
+
+    /** 有线拔出/蓝牙断开时自动撤黑幕返回视频（个性化开关，默认开） */
+    private val headsetCb = object : android.media.AudioDeviceCallback() {
+        override fun onAudioDevicesRemoved(removedDevices: Array<out android.media.AudioDeviceInfo>) {
+            val headsetGone = removedDevices.any {
+                it.type == android.media.AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+                    it.type == android.media.AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
+                    it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
+                    it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+            }
+            if (headsetGone && prefs.getBoolean("switch_headset", true) && black?.isShowing == true) {
+                hideAllBlack()
+                refreshNotification()
+                Toast.makeText(this@OverlayService, "耳机已断开，已返回视频", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // ---------- 省电校准（5分钟向导·黑屏段） ----------
+
+    private var calibOnUa = 0L
+    private var calibSamples = mutableListOf<Long>()
+    private var calibTicks = 0
+
+    private fun startCalibrationBlack(onUa: Long) {
+        calibOnUa = onUa
+        if (black?.isShowing != true) {
+            black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+            black?.show { refreshNotification() }
+        }
+        calibSamples = mutableListOf()
+        calibTicks = 0
+        Toast.makeText(this, "校准步骤 2/2：保持黑屏 3 分钟，无需操作", Toast.LENGTH_LONG).show()
+        main.postDelayed(calibTick, 30_000)
+    }
+
+    private val calibTick: Runnable = Runnable {
+        calibTicks++
+        PowerCalib.sampleNow(this)?.let { calibSamples.add(it) }
+        if (calibTicks < 6) {
+            main.postDelayed(calibTick, 30_000)
+        } else {
+            hideAllBlack()
+            refreshNotification()
+            val avgOff = if (calibSamples.size >= 4) calibSamples.average().toLong() else 0L
+            if (avgOff > 0 && calibOnUa > avgOff) {
+                PowerCalib.storeCalibration(this, calibOnUa, avgOff)
+                Toast.makeText(this, "校准完成 ✓（有效样本 ${calibSamples.size}）", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "校准样本无效（是否在充电？），请重试", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     /**
@@ -103,6 +173,11 @@ class OverlayService : Service() {
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
+            ACTION_TEST_TOGGLE -> {
+                Log.i(TAG, "TEST_TOGGLE broadcast received")
+                toggleOverlay()
+            }
+
                 Intent.ACTION_SCREEN_OFF -> {
                     // 电源键/自动息屏时若黑幕还开着：撤掉遮罩，唤醒后直接回到视频画面
                     if (isAnyBlackShowing()) {
@@ -136,6 +211,7 @@ class OverlayService : Service() {
             audioManager.addOnModeChangedListener(main::post, modeListener)
             Log.i(TAG, "来电监听已注册")
         }
+        audioManager.registerAudioDeviceCallback(headsetCb, null)
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
         prefs.edit().putBoolean("assistant_wanted", true).apply()
         createChannel()
@@ -144,6 +220,8 @@ class OverlayService : Service() {
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Intent.ACTION_SCREEN_ON)
+            addAction(ACTION_TEST_TOGGLE) // UAT测试钩子：广播直接切换黑幕，绕开adb点击注入的不稳定
+            addAction(ACTION_TEST_RUN_MODE) // UAT测试钩子：广播执行所选模式
         }
         if (Build.VERSION.SDK_INT >= 33) {
             registerReceiver(screenOffReceiver, filter, Context.RECEIVER_EXPORTED)
@@ -155,7 +233,14 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
-            ACTION_SET_TIMER -> handleSetTimer(intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0)
+            ACTION_SET_TIMER -> handleSetTimer(
+                intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0,
+                intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0
+            )
+            ACTION_CALIB_START -> startCalibrationBlack(
+                intent?.getLongExtra(EXTRA_CALIB_ON_UA, 0) ?: 0
+            )
+            ACTION_TEST_TOGGLE -> toggleOverlay() // 测试广播
             ACTION_EXIT -> {
                 prefs.edit().putBoolean("assistant_wanted", false).apply()
                 hideAllBlack()
@@ -173,6 +258,7 @@ class OverlayService : Service() {
         if (Build.VERSION.SDK_INT >= 31) {
             try { audioManager.removeOnModeChangedListener(modeListener) } catch (_: Exception) {}
         }
+        try { audioManager.unregisterAudioDeviceCallback(headsetCb) } catch (_: Exception) {}
         main.removeCallbacksAndMessages(null)
         hideAllBlack()
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
@@ -321,12 +407,20 @@ class OverlayService : Service() {
         }
     }
 
-    private fun handleSetTimer(minutes: Long) {
-        timerEndAt = if (minutes <= 0) 0 else System.currentTimeMillis() + minutes * 60_000
+    private fun handleSetTimer(minutes: Long, endAtMs: Long = 0L) {
+        timerEndAt = when {
+            endAtMs > 0 -> endAtMs
+            minutes > 0 -> System.currentTimeMillis() + minutes * 60_000
+            else -> 0
+        }
         main.removeCallbacks(timerTick)
         if (timerEndAt > 0) {
-            main.postDelayed(timerTick, 30_000)
-            Toast.makeText(this, "定时关闭：${minutes}分钟后", Toast.LENGTH_SHORT).show()
+            main.postDelayed(timerTick, 15_000)
+            if (endAtMs > 0) {
+                Toast.makeText(this, "本集结束后将自动关闭", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "定时关闭：${minutes}分钟后", Toast.LENGTH_SHORT).show()
+            }
         } else {
             Toast.makeText(this, "定时关闭已取消", Toast.LENGTH_SHORT).show()
         }
@@ -345,11 +439,13 @@ class OverlayService : Service() {
     fun toggleOverlay() {
         Log.i(TAG, "toggleOverlay via app overlay")
         if (black?.isShowing == true) {
-            black?.hide()
-            black = null
+            hideAllBlack()
         } else {
             black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
             black?.show { refreshNotification() }
+            // 会话功耗采样：黑屏期间每 60 秒记录一次电池电流
+            main.removeCallbacks(powerTick)
+            main.postDelayed(powerTick, 60_000)
         }
         refreshNotification()
     }

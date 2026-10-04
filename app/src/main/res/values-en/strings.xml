@@ -78,6 +78,9 @@
     <string name="widget_idle">Idle</string>
     <string name="widget_today_fmt">Today %1$s</string>
     <string name="widget_pet_fmt">%1$s</string>
+    <string name="widget_growth_next">Growth %1$d · %2$d to next</string>
+    <string name="widget_growth_max">Growth %1$d · Maxed</string>
+    <string name="widget_total_fmt">Total %1$s</string>
 
     <!-- Black overlay -->
     <string name="black_hint">Screen-off listening · Tap to unlock</string>

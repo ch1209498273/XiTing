@@ -78,6 +78,9 @@
     <string name="widget_idle">未运行</string>
     <string name="widget_today_fmt">今日 %1$s</string>
     <string name="widget_pet_fmt">%1$s</string>
+    <string name="widget_growth_next">成长值 %1$d · 距下一形态 %2$d</string>
+    <string name="widget_growth_max">成长值 %1$d · 已至巅峰</string>
+    <string name="widget_total_fmt">累计 %1$s</string>
 
     <!-- 黑幕 -->
     <string name="black_hint">息屏听剧中 · 轻点屏幕解除锁定</string>

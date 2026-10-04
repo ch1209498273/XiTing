@@ -31,6 +31,7 @@ import android.view.ViewConfiguration
 import android.view.WindowManager
 import android.util.Log
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 
@@ -47,7 +48,8 @@ class OverlayService : Service() {
         private const val TAG = "XiTing"
         private const val CHANNEL_ID = "xiiting_service"
         private const val NOTIF_ID = 1
-        private const val ACTION_TOGGLE = "com.lujinyu.xiting.TOGGLE"
+        private const val NOTIF_EXIT_ID = 2
+        const val ACTION_TOGGLE = "com.lujinyu.xiting.TOGGLE"
         const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         const val ACTION_SET_TIMER = "com.lujinyu.xiting.SET_TIMER"
         const val EXTRA_MINUTES = "minutes"
@@ -229,6 +231,8 @@ class OverlayService : Service() {
         prefs.edit().putBoolean("assistant_wanted", true).apply()
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
+        // 上次退出时留的「撤销」通知：助手已重启，清掉
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancel(NOTIF_EXIT_ID)
         showBubble()
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
@@ -331,6 +335,15 @@ class OverlayService : Service() {
         var startY = 0
         var moved = false
         var downAt = 0L
+        var longPressFired = false
+
+        val longPressCheck = Runnable {
+            if (!moved) {
+                longPressFired = true
+                vibrateShort()
+                showExitConfirm()
+            }
+        }
 
         tv.setOnTouchListener { v, e ->
             when (e.actionMasked) {
@@ -340,13 +353,18 @@ class OverlayService : Service() {
                     startX = lp.x
                     startY = lp.y
                     moved = false
+                    longPressFired = false
                     downAt = SystemClock.elapsedRealtime()
+                    main.postDelayed(longPressCheck, 400)
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val dx = (e.rawX - downRawX).toInt()
                     val dy = (e.rawY - downRawY).toInt()
-                    if (!moved && (Math.abs(dx) > slop || Math.abs(dy) > slop)) moved = true
+                    if (!moved && (Math.abs(dx) > slop || Math.abs(dy) > slop)) {
+                        moved = true
+                        main.removeCallbacks(longPressCheck)
+                    }
                     if (moved) {
                         lp.x = startX + dx
                         lp.y = startY + dy
@@ -355,19 +373,22 @@ class OverlayService : Service() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
+                    main.removeCallbacks(longPressCheck)
                     // 短按（<250ms）即使有轻微位移也按点击处理：手持抖动超过
                     // 触摸容差很常见，不能让点击被当成拖动吞掉
                     val quickTap = SystemClock.elapsedRealtime() - downAt < 250
-                    Log.i(TAG, "bubble ACTION_UP, moved=$moved, quickTap=$quickTap")
-                    if (moved && !quickTap) {
-                        // 贴边吸附：吸到最近的左右边缘，避免悬浮球悬在半空挡内容
-                        val margin = (8 * density).toInt()
-                        val w = resources.displayMetrics.widthPixels
-                        lp.x = if (lp.x + lp.width / 2 < w / 2) margin else w - tv.width - margin
-                        wm.updateViewLayout(tv, lp)
-                        prefs.edit().putInt("bubble_x", lp.x).putInt("bubble_y", lp.y).apply()
-                    } else {
-                        toggleOverlay()
+                    Log.i(TAG, "bubble ACTION_UP, moved=$moved, quickTap=$quickTap, longPress=$longPressFired")
+                    when {
+                        longPressFired -> Unit                 // 退出确认条已弹出，UP 不再触发
+                        moved && !quickTap -> {
+                            // 贴边吸附：吸到最近的左右边缘，避免悬浮球悬在半空挡内容
+                            val margin = (8 * density).toInt()
+                            val w = resources.displayMetrics.widthPixels
+                            lp.x = if (lp.x + lp.width / 2 < w / 2) margin else w - tv.width - margin
+                            wm.updateViewLayout(tv, lp)
+                            prefs.edit().putInt("bubble_x", lp.x).putInt("bubble_y", lp.y).apply()
+                        }
+                        else -> toggleOverlay()
                     }
                     true
                 }
@@ -395,6 +416,121 @@ class OverlayService : Service() {
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
         bubble = null
         showBubble()
+    }
+
+    // ---------- 悬浮球长按退出 ----------
+
+    private var exitConfirm: View? = null
+
+    private fun vibrateShort() {
+        try {
+            if (Build.VERSION.SDK_INT >= 31) {
+                (getSystemService(VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager)
+                    .defaultVibrator.vibrate(40)
+            } else {
+                @Suppress("DEPRECATION")
+                (getSystemService(VIBRATOR_SERVICE) as android.os.Vibrator).vibrate(40)
+            }
+        } catch (_: Exception) {}
+    }
+
+    /** 球旁弹出退出确认条（4 秒无操作自动消失；点外部也消失） */
+    private fun showExitConfirm() {
+        if (exitConfirm != null) return
+        val d = resources.displayMetrics.density
+        val pill = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding((14 * d).toInt(), (10 * d).toInt(), (10 * d).toInt(), (10 * d).toInt())
+            setBackgroundColor(android.graphics.Color.argb(235, 16, 24, 40))
+        }
+        pill.addView(TextView(this).apply {
+            text = getString(R.string.exit_confirm_title)
+            setTextColor(android.graphics.Color.WHITE)
+            textSize = 13f
+            setPadding(0, 0, (14 * d).toInt(), 0)
+        })
+        pill.addView(TextView(this).apply {
+            text = getString(R.string.exit_confirm_yes)
+            setTextColor(android.graphics.Color.rgb(255, 120, 110))
+            textSize = 14f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            setPadding((12 * d).toInt(), (6 * d).toInt(), (12 * d).toInt(), (6 * d).toInt())
+            setOnClickListener { hideExitConfirm(); exitAssistant() }
+        })
+        pill.addView(TextView(this).apply {
+            text = getString(R.string.dlg_cancel)
+            setTextColor(android.graphics.Color.parseColor("#9FB0D0"))
+            textSize = 13f
+            setPadding((6 * d).toInt(), (6 * d).toInt(), (6 * d).toInt(), (6 * d).toInt())
+            setOnClickListener { hideExitConfirm() }
+        })
+        val lp = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+                or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            android.graphics.PixelFormat.TRANSLUCENT
+        )
+        lp.gravity = Gravity.TOP or Gravity.START
+        bubble?.let { b ->
+            lp.x = b.x.toInt().coerceIn(12, maxOf(12, resources.displayMetrics.widthPixels - 320))
+            lp.y = b.y.toInt() + b.height + 12
+            pill.post {
+                try {
+                    val lp2 = pill.layoutParams as WindowManager.LayoutParams
+                    lp2.x = (b.x.toInt() + b.width / 2 - pill.width / 2)
+                        .coerceIn(12, maxOf(12, resources.displayMetrics.widthPixels - pill.width - 12))
+                    wm.updateViewLayout(pill, lp2)
+                } catch (_: Exception) {}
+            }
+        } ?: run { lp.x = 200; lp.y = 600 }
+        try {
+            wm.addView(pill, lp)
+            exitConfirm = pill
+            pill.setOnTouchListener { _, e ->
+                if (e.actionMasked == MotionEvent.ACTION_OUTSIDE) { hideExitConfirm(); true } else false
+            }
+            main.postDelayed({ hideExitConfirm() }, 4000)
+        } catch (e: Exception) {
+            Log.w(TAG, "退出确认条显示失败: $e")
+        }
+    }
+
+    private fun hideExitConfirm() {
+        exitConfirm?.let { v -> try { wm.removeView(v) } catch (_: Exception) {} }
+        exitConfirm = null
+    }
+
+    /** 彻底退出助手（长按确认/通知/磁贴共用）：球与黑幕全撤，留一条可撤销通知 */
+    private fun exitAssistant() {
+        prefs.edit().putBoolean("assistant_wanted", false).apply()
+        hideAllBlack()
+        hideExitConfirm()
+        bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
+        bubble = null
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+        showUndoNotification()
+    }
+
+    private fun showUndoNotification() {
+        val undoPi = PendingIntent.getForegroundService(
+            this, 12, Intent(this, OverlayService::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val n = Notification.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notif)
+            .setContentTitle(getString(R.string.exit_notif_title))
+            .setContentText(getString(R.string.exit_notif_text))
+            .setContentIntent(undoPi)
+            .addAction(0, getString(R.string.exit_notif_undo), undoPi)
+            .setAutoCancel(true)
+            .build()
+        try {
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIF_EXIT_ID, n)
+        } catch (_: Exception) {}
     }
 
     // ---------- 黑屏遮罩 ----------
@@ -495,8 +631,8 @@ class OverlayService : Service() {
             .setContentTitle(getString(R.string.notif_title))
             .setContentText(getString(R.string.notif_text, timerText))
             .setContentIntent(openPi)
-            .addAction(0, if (isAnyBlackShowing()) "恢复画面" else "息屏听剧", togglePi)
-            .addAction(0, "退出助手", exitPi)
+            .addAction(0, getString(R.string.notif_action_stop), exitPi)
+            .addAction(0, getString(if (isAnyBlackShowing()) R.string.notif_action_restore else R.string.notif_action_listen), togglePi)
             .setOngoing(true)
             .build()
     }

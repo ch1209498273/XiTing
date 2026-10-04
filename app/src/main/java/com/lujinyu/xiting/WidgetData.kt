@@ -90,7 +90,7 @@ object WidgetData {
             // ---- 按钮 ----
             val piBlack = PendingIntent.getForegroundService(
                 context, 10,
-                Intent(context, OverlayService::class.java),
+                Intent(context, OverlayService::class.java).setAction(OverlayService.ACTION_TOGGLE),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             views.setOnClickPendingIntent(R.id.widget_btn_black, piBlack)

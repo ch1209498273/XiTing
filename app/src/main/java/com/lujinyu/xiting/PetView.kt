@@ -43,12 +43,12 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             else -> STAGE_SPARK
         }
 
-        fun stageName(stage: Int): String = when (stage) {
-            STAGE_SPARK -> "电火花"
-            STAGE_BALL -> "电球"
-            STAGE_CLOUD -> "雷云精灵"
-            STAGE_STORM -> "风暴之灵"
-            else -> "雷霆之王"
+        fun stageName(context: Context, stage: Int): String = when (stage) {
+            STAGE_SPARK -> context.getString(R.string.pet_spark)
+            STAGE_BALL -> context.getString(R.string.pet_ball)
+            STAGE_CLOUD -> context.getString(R.string.pet_cloud)
+            STAGE_STORM -> context.getString(R.string.pet_storm)
+            else -> context.getString(R.string.pet_king)
         }
     }
 

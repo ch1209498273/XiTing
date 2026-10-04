@@ -71,19 +71,28 @@ class OverlayService : Service() {
 
     /** 来电检测：响铃/通话时音频模式会切换（系统标准回调，无需权限）。
      *  黑幕期间来电 → 自动解除黑幕；通话期间 → 挂起所有自动注入动作。 */
-    private val modeListener = AudioManager.OnModeChangedListener { mode ->
-        Log.i(TAG, "audio mode -> $mode")
-        when (mode) {
-            AudioManager.MODE_RINGTONE, AudioManager.MODE_IN_CALL -> main.post {
-                Log.i(TAG, "来电/通话中：黑幕解除 + 挂起自动动作")
-                hideAllBlack()
-                main.removeCallbacksAndMessages(null)
-                refreshNotification()
-                try {
-                    Toast.makeText(this, "来电，黑幕已自动解除", Toast.LENGTH_LONG).show()
-                } catch (_: Exception) {}
+    // OnModeChangedListener 仅存在于 API 31+：字段若直接引用该类型，
+    // 低版本设备加载本类即 ClassNotFoundException（矩阵回归 api26/29 实测崩溃）。
+    // 改为 Any 持有 + 独立方法内创建，只在 31+ 分支调用时才解析类型。
+    private var modeListener: Any? = null
+
+    private fun registerModeListener() {
+        val l = AudioManager.OnModeChangedListener { mode ->
+            Log.i(TAG, "audio mode -> $mode")
+            when (mode) {
+                AudioManager.MODE_RINGTONE, AudioManager.MODE_IN_CALL -> main.post {
+                    Log.i(TAG, "来电/通话中：黑幕解除 + 挂起自动动作")
+                    hideAllBlack()
+                    main.removeCallbacksAndMessages(null)
+                    refreshNotification()
+                    try {
+                        Toast.makeText(this, "来电，黑幕已自动解除", Toast.LENGTH_LONG).show()
+                    } catch (_: Exception) {}
+                }
             }
         }
+        modeListener = l
+        audioManager.addOnModeChangedListener(main::post, l)
     }
 
     /** 保活监控计数：YouTube等App会在片尾/中途把后台播放掐掉，息屏后3分钟内自动再救 */
@@ -189,6 +198,10 @@ class OverlayService : Service() {
         }
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocales.wrap(newBase))
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
@@ -208,7 +221,7 @@ class OverlayService : Service() {
             null
         }
         if (Build.VERSION.SDK_INT >= 31) {
-            audioManager.addOnModeChangedListener(main::post, modeListener)
+            registerModeListener()
             Log.i(TAG, "来电监听已注册")
         }
         audioManager.registerAudioDeviceCallback(headsetCb, null)
@@ -256,7 +269,10 @@ class OverlayService : Service() {
         instance = null
         try { unregisterReceiver(screenOffReceiver) } catch (_: Exception) {}
         if (Build.VERSION.SDK_INT >= 31) {
-            try { audioManager.removeOnModeChangedListener(modeListener) } catch (_: Exception) {}
+            (modeListener as? AudioManager.OnModeChangedListener)?.let {
+                try { audioManager.removeOnModeChangedListener(it) } catch (_: Exception) {}
+            }
+            modeListener = null
         }
         try { audioManager.unregisterAudioDeviceCallback(headsetCb) } catch (_: Exception) {}
         main.removeCallbacksAndMessages(null)
@@ -455,7 +471,7 @@ class OverlayService : Service() {
     private fun createChannel() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, "息屏听剧助手", NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(CHANNEL_ID, getString(R.string.channel_name), NotificationManager.IMPORTANCE_LOW)
         )
     }
 
@@ -476,8 +492,8 @@ class OverlayService : Service() {
         val timerText = if (timerEndAt > 0) " · 定时${remainMin + 1}分钟后关闭" else ""
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
-            .setContentTitle("息屏听剧助手运行中")
-            .setContentText("点悬浮球黑屏听剧，声音继续$timerText")
+            .setContentTitle(getString(R.string.notif_title))
+            .setContentText(getString(R.string.notif_text, timerText))
             .setContentIntent(openPi)
             .addAction(0, if (isAnyBlackShowing()) "恢复画面" else "息屏听剧", togglePi)
             .addAction(0, "退出助手", exitPi)
@@ -486,6 +502,7 @@ class OverlayService : Service() {
     }
 
     private fun refreshNotification() {
+        XiTingWidget.refresh(this) // 小部件状态同步
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(NOTIF_ID, buildNotification())
     }

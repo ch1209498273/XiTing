@@ -39,7 +39,7 @@
                     android:id="@+id/hero_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="启动息屏听剧"
+                    android:text="@string/hero_title_start"
                     android:textColor="#FFFFFFFF"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -49,7 +49,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="启动后，看剧时点悬浮球即可息屏听剧"
+                    android:text="@string/hero_sub_start"
                     android:textColor="#B8FFFFFF"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -104,7 +104,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="定时关闭"
+                        android:text="@string/timer_title"
                         android:textColor="#FF111418"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -114,7 +114,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
-                        android:text="未设置"
+                        android:text="@string/timer_none"
                         android:textColor="#FF8A9099"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -152,7 +152,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="防杀保活"
+                        android:text="@string/keepalive_title"
                         android:textColor="#FF111418"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -162,7 +162,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
-                        android:text="设置指南"
+                        android:text="@string/keepalive_sub"
                         android:textColor="#FF8A9099"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -183,7 +183,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="节能统计"
+                android:text="@string/stats_section"
                 android:textColor="#FF111418"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -191,7 +191,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="查看明细 ›"
+                android:text="@string/view_details"
                 android:textColor="#FF1E8E5A"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -220,7 +220,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="今日"
+                    android:text="@string/label_today"
                     android:textColor="#FF8A9099"
                     android:textSize="11sp" />
 
@@ -250,7 +250,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="近7天"
+                    android:text="@string/label_week"
                     android:textColor="#FF8A9099"
                     android:textSize="11sp" />
 
@@ -280,7 +280,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="累计"
+                    android:text="@string/label_total"
                     android:textColor="#FF8A9099"
                     android:textSize="11sp" />
 
@@ -301,7 +301,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text="服务与权限"
+            android:text="@string/perm_section"
             android:textColor="#FF111418"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -340,7 +340,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="悬浮窗权限"
+                    android:text="@string/perm_overlay"
                     android:textColor="#FF111418"
                     android:textSize="14sp" />
 
@@ -353,7 +353,7 @@
                     android:paddingTop="3dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="3dp"
-                    android:text="去开启"
+                    android:text="@string/pill_off"
                     android:textColor="#FF5F6570"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -380,7 +380,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="电池后台加白"
+                    android:text="@string/perm_battery"
                     android:textColor="#FF111418"
                     android:textSize="14sp" />
 
@@ -393,7 +393,7 @@
                     android:paddingTop="3dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="3dp"
-                    android:text="去加白"
+                    android:text="@string/pill_battery_off"
                     android:textColor="#FF5F6570"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -420,7 +420,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="通知权限"
+                    android:text="@string/perm_notify"
                     android:textColor="#FF111418"
                     android:textSize="14sp" />
 
@@ -433,7 +433,7 @@
                     android:paddingTop="3dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="3dp"
-                    android:text="去开启"
+                    android:text="@string/pill_off"
                     android:textColor="#FF5F6570"
                     android:textSize="11sp" />
             </LinearLayout>

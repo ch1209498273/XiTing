@@ -34,6 +34,10 @@ import java.util.Locale
  */
 class MainActivity : Activity() { // MARKER_TEST_9271
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocales.wrap(newBase))
+    }
+
     companion object {
         private const val TAB_HOME = 0
         private const val TAB_STATS = 1
@@ -108,9 +112,9 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageStats.visibility = if (target == TAB_STATS) View.VISIBLE else View.GONE
         pageSettings.visibility = if (target == TAB_SETTINGS) View.VISIBLE else View.GONE
         appbarTitle.text = when (target) {
-            TAB_HOME -> "息屏听剧"
-            TAB_STATS -> "节能统计"
-            else -> "设置"
+            TAB_HOME -> getString(R.string.app_name)
+            TAB_STATS -> getString(R.string.title_stats)
+            else -> getString(R.string.title_settings)
         }
         val sel = 0xFF1E8E5A.toInt()
         val unsel = 0xFF8A9099.toInt()
@@ -352,21 +356,22 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     }
 
     private fun refreshStates() {
+        XiTingWidget.refresh(this) // 小部件状态同步
         val running = OverlayService.isRunning
         if (running) {
             pillStatus.setBackgroundResource(R.drawable.bg_pill_on)
             pillStatus.setTextColor(0xFF157A4C.toInt())
-            pillStatus.text = "运行中"
+            pillStatus.text = getString(R.string.status_running)
         } else {
             pillStatus.setBackgroundResource(R.drawable.bg_pill_off)
             pillStatus.setTextColor(0xFF5F6570.toInt())
-            pillStatus.text = "未运行"
+            pillStatus.text = getString(R.string.status_idle)
         }
         // 主按钮=助手控制：文案随运行状态变化
-        heroTitle.text = if (running) "息屏听剧运行中" else "启动息屏听剧"
+        heroTitle.text = if (running) getString(R.string.hero_title_stop) else getString(R.string.hero_title_start)
         pageHome.findViewById<TextView>(R.id.hero_sub).text =
-            if (running) "看剧时点悬浮球，黑屏听剧声音继续 · 点此停止助手"
-            else "启动后，看剧时点悬浮球即可息屏听剧"
+            if (running) getString(R.string.hero_sub_stop)
+            else getString(R.string.hero_sub_start)
 
         // 自愈：服务在跑但悬浮球丢失（ColorOS 偶发吞掉纯浮窗）→ 自动重建
         OverlayService.instance?.let { svc ->
@@ -385,13 +390,13 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         if (permError) {
             // 权限表征与实际不一致（重装后 ColorOS）：引导关闭再重新开启悬浮窗
-            setPill(pageHome.findViewById(R.id.pill_overlay), false, "", "异常·点修复")
+            setPill(pageHome.findViewById(R.id.pill_overlay), false, "", getString(R.string.pill_abnormal))
             pageHome.findViewById<TextView>(R.id.pill_overlay).setTextColor(0xFFD84315.toInt())
         } else {
-            setPill(pageHome.findViewById(R.id.pill_overlay), overlayOk, "已开启", "去开启")
+            setPill(pageHome.findViewById(R.id.pill_overlay), overlayOk, getString(R.string.pill_on), getString(R.string.pill_off))
         }
-        setPill(pageHome.findViewById(R.id.pill_battery), batteryOk, "已加白", "去加白")
-        setPill(pageHome.findViewById(R.id.pill_notify), notifyOk, "已开启", "去开启")
+        setPill(pageHome.findViewById(R.id.pill_battery), batteryOk, getString(R.string.pill_battery_on), getString(R.string.pill_battery_off))
+        setPill(pageHome.findViewById(R.id.pill_notify), notifyOk, getString(R.string.pill_on), getString(R.string.pill_off))
 
         val remain = OverlayService.instance?.timerRemainingMs() ?: 0
         pageHome.findViewById<TextView>(R.id.timer_state).text =
@@ -647,7 +652,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val mah = Stats.estimatedMah(allMs)
         val pet = pageStats.findViewById<PetView>(R.id.pet_view)
         val text = "⚡ 我用「息屏听剧」黑屏听了 ${fmtDur(allMs)}，估算省电 $mah mAh\n" +
-            "我的电能精灵已经进化到「${PetView.stageName(pet.stage)}」了\n" +
+            "我的电能精灵已经进化到「${PetView.stageName(this, pet.stage)}」了\n" +
             "完全免费无广告的息屏听剧神器（0.9MB 离线运行）\n" +
             "https://github.com/ch1209498273/XiTing"
         startActivity(
@@ -728,7 +733,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         if (seen in 0 until stage) {
             Toast.makeText(
                 this,
-                "🎉 进化！${PetView.stageName(seen)} → ${PetView.stageName(stage)}",
+                "🎉 进化！${PetView.stageName(this, seen)} → ${PetView.stageName(this, stage)}",
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -743,11 +748,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 文案
         pageStats.findViewById<TextView>(R.id.pet_caption).text =
             if (pet.sleepy) {
-                "${PetView.stageName(stage)} 打瞌睡了 · 听一集唤醒它"
+                "${PetView.stageName(this, stage)} 打瞌睡了 · 听一集唤醒它"
             } else if (stage >= PetView.STAGE_KING) {
-                "${PetView.stageName(stage)} · 已至巅峰 · 成长值 $gp 继续储备"
+                "${PetView.stageName(this, stage)} · 已至巅峰 · 成长值 $gp 继续储备"
             } else {
-                "${PetView.stageName(stage)} · 成长值 $gp / ${PetView.THRESHOLDS[stage + 1]}"
+                "${PetView.stageName(this, stage)} · 成长值 $gp / ${PetView.THRESHOLDS[stage + 1]}"
             }
         // 分享入口在「设置」页（统计页不再重复）
         pet.startAnimating()
@@ -1067,8 +1072,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 全部形态都列出（含未解锁：可预览外观，但不能选中）
         for (i in 0..4) {
             labels.add(
-                if (i <= unlocked) PetView.stageName(i)
-                else "${PetView.stageName(i)}（🔒需${PetView.THRESHOLDS[i]}成长值）"
+                if (i <= unlocked) PetView.stageName(this, i)
+                else "${PetView.stageName(this, i)}（🔒需${PetView.THRESHOLDS[i]}成长值）"
             )
             values.add("pet_$i")
         }
@@ -1129,7 +1134,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     // 未解锁：可预览外观但不能选中
                     Toast.makeText(
                         this,
-                        "「${PetView.stageName(stageOfItem)}」尚未解锁 · 需 ${PetView.THRESHOLDS[stageOfItem]} 成长值",
+                        "「${PetView.stageName(this, stageOfItem)}」尚未解锁 · 需 ${PetView.THRESHOLDS[stageOfItem]} 成长值",
                         Toast.LENGTH_LONG
                     ).show()
                     return@setAdapter
@@ -1137,7 +1142,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 prefs.edit().putString("bubble_style", values[which]).apply()
                 OverlayService.instance?.rebuildBubble()
                 refreshBubbleStyleValue()
-                val name = if (which == 0) "息屏" else PetView.stageName(stageOfItem)
+                val name = if (which == 0) "息屏" else PetView.stageName(this, stageOfItem)
                 Toast.makeText(this, "悬浮球已切换为「$name」，看右下角", Toast.LENGTH_SHORT).show()
                 d.dismiss()
             }
@@ -1161,7 +1166,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     layoutParams = LinearLayout.LayoutParams(size, size)
                 }
             )
-            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text = PetView.stageName(st)
+            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text = PetView.stageName(this, st)
         } else {
             box.addView(
                 TextView(this).apply {

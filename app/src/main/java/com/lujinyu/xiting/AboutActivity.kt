@@ -10,6 +10,10 @@ import android.widget.TextView
 /** 关于页（二级页面）：介绍 / 隐私 / 开源 / 许可 */
 class AboutActivity : Activity() {
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(AppLocales.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)

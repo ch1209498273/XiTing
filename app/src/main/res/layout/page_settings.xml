@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginBottom="8dp"
-            android:text="个性化"
+            android:text="@string/settings_personal"
             android:textColor="#FF8A9099"
             android:textSize="13sp" />
 
@@ -40,7 +40,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="黑幕轻点直接解锁"
+                    android:text="@string/switch_direct"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
@@ -65,7 +65,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="黑幕显示时间与电量"
+                    android:text="@string/switch_info"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
@@ -90,7 +90,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="黑幕播放控制"
+                    android:text="@string/switch_media"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
@@ -115,7 +115,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="耳机拔出自动返回视频"
+                    android:text="@string/switch_headset"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
@@ -143,7 +143,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="悬浮球样式"
+                    android:text="@string/bubble_style"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
@@ -179,7 +179,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="18dp"
             android:layout_marginBottom="8dp"
-            android:text="数据"
+            android:text="@string/settings_data"
             android:textColor="#FF8A9099"
             android:textSize="13sp" />
 
@@ -204,14 +204,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="导出数据备份"
+                    android:text="@string/row_export"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="存到任意位置"
+                    android:text="@string/row_export_sub"
                     android:textColor="#FF8A9099"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -233,14 +233,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="从备份文件恢复"
+                    android:text="@string/row_restore"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="成长值与统计"
+                    android:text="@string/row_restore_sub"
                     android:textColor="#FF8A9099"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -253,7 +253,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="18dp"
             android:layout_marginBottom="8dp"
-            android:text="关于"
+            android:text="@string/settings_about"
             android:textColor="#FF8A9099"
             android:textSize="13sp" />
 
@@ -278,7 +278,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="检查更新"
+                    android:text="@string/row_update"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
@@ -316,7 +316,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="分享给朋友"
+                    android:text="@string/row_share"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
@@ -324,7 +324,7 @@
                     android:id="@+id/share_sub"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="每天一次 · +5 待收成长值"
+                    android:text="@string/share_sub"
                     android:textColor="#FF8A9099"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -348,14 +348,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="关于息屏听剧"
+                android:text="@string/row_about"
                 android:textColor="#FF111418"
                 android:textSize="15sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="使用说明 / 隐私 / 开源"
+                android:text="@string/row_about_sub"
                 android:textColor="#FF8A9099"
                 android:textSize="13sp" />
 
@@ -373,7 +373,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="完全离线 · 不收集任何数据"
+            android:text="@string/footer_offline"
             android:textColor="#FFC3C8CF"
             android:textSize="10sp" />
     </LinearLayout>

@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="电能精灵 · 由你的真实听剧时长喂养"
+                android:text="@string/pet_subtitle"
                 android:textColor="#FF5F6570"
                 android:textSize="12sp" />
 
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="息屏听剧的时长与省电估算（保存在本机）"
+            android:text="@string/stats_hint"
             android:textColor="#FF5F6570"
             android:textSize="13sp" />
 
@@ -79,7 +79,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="今日"
+                    android:text="@string/label_today"
                     android:textColor="#FF8A9099"
                     android:textSize="12sp" />
 
@@ -118,7 +118,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="近7天"
+                    android:text="@string/label_week"
                     android:textColor="#FF8A9099"
                     android:textSize="12sp" />
 
@@ -156,7 +156,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="累计"
+                    android:text="@string/label_total"
                     android:textColor="#FF8A9099"
                     android:textSize="12sp" />
 
@@ -209,7 +209,7 @@
                     android:id="@+id/sum_mah"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="累计估算省电 ≈ 0 mAh"
+                    android:text="@string/sum_mah_default"
                     android:textColor="#FF111418"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -219,7 +219,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
-                    android:text="最长单次 — · 共 0 次息屏"
+                    android:text="@string/sum_extra_default"
                     android:textColor="#FF8A9099"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -254,7 +254,7 @@
                     android:id="@+id/ach_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="精灵成就 · 0/8"
+                    android:text="@string/ach_progress"
                     android:textColor="#FF111418"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -264,7 +264,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
-                    android:text="听剧积累，逐一点亮"
+                    android:text="@string/ach_sub_empty"
                     android:textColor="#FF8A9099"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -289,7 +289,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="近7天每日息屏时长"
+                android:text="@string/chart_title"
                 android:textColor="#FF111418"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -314,7 +314,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="最近会话记录 · 仅保留最近30天"
+                android:text="@string/recent_records"
                 android:textColor="#FF111418"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -341,7 +341,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:padding="10dp"
-                    android:text="‹ 上一页"
+                    android:text="@string/pager_prev"
                     android:textColor="#FF1E8E5A"
                     android:textSize="13sp" />
 
@@ -361,7 +361,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:padding="10dp"
-                    android:text="下一页 ›"
+                    android:text="@string/pager_next"
                     android:textColor="#FF1E8E5A"
                     android:textSize="13sp" />
             </LinearLayout>

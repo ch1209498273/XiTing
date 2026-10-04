@@ -117,7 +117,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         f.setBackgroundColor(Color.BLACK)
 
         val hint = TextView(context).apply {
-            text = "息屏听剧中 · 轻点屏幕解除锁定"
+            text = context.getString(R.string.black_hint)
             textSize = 15f
             setTextColor(0x66FFFFFF.toInt())
             gravity = Gravity.CENTER
@@ -132,7 +132,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         )
 
         val pill = TextView(context).apply {
-            text = "🔓 点击返回视频"
+            text = context.getString(R.string.black_return)
             textSize = 16f
             setTextColor(Color.WHITE)
             gravity = Gravity.CENTER

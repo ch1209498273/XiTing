@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="息屏听剧"
+            android:text="@string/app_name"
             android:textColor="#FF111418"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -33,7 +33,7 @@
             android:paddingTop="4dp"
             android:paddingEnd="10dp"
             android:paddingBottom="4dp"
-            android:text="未运行"
+            android:text="@string/status_idle"
             android:textColor="#FF5F6570"
             android:textSize="11sp" />
 
@@ -100,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="首页"
+                android:text="@string/nav_home"
                 android:textSize="10sp" />
         </LinearLayout>
 
@@ -127,7 +127,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="统计"
+                android:text="@string/nav_stats"
                 android:textSize="10sp" />
         </LinearLayout>
 
@@ -154,7 +154,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="设置"
+                android:text="@string/nav_settings"
                 android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>

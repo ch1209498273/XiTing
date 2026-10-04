@@ -502,7 +502,7 @@ class OverlayService : Service() {
     }
 
     private fun refreshNotification() {
-        XiTingWidget.refresh(this) // 小部件状态同步
+        WidgetData.refreshAll(this) // 小部件状态同步
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(NOTIF_ID, buildNotification())
     }

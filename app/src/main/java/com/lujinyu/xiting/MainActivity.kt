@@ -356,7 +356,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     }
 
     private fun refreshStates() {
-        XiTingWidget.refresh(this) // 小部件状态同步
+        WidgetData.refreshAll(this) // 小部件状态同步
         val running = OverlayService.isRunning
         if (running) {
             pillStatus.setBackgroundResource(R.drawable.bg_pill_on)

@@ -42,6 +42,7 @@
     <string name="chart_title">Daily screen-off time (7 days)</string>
     <string name="ach_title">Pet Achievements</string>
     <string name="ach_sub_empty">Keep listening to light them up</string>
+    <string name="ach_sub_latest">Latest: %1$s</string>
     <string name="ach_progress">Pet Achievements · 0/8</string>
     <string name="pet_subtitle">Energy Pet · fed by your real listening time</string>
     <string name="sum_mah_default">Total saved ≈ 0 mAh</string>
@@ -93,4 +94,144 @@
     <string name="pet_cloud">Storm Cloud</string>
     <string name="pet_storm">Tempest</string>
     <string name="pet_king">Thunder King</string>
+
+    <!-- Dynamic: assistant & permissions -->
+    <string name="perm_fix_hint">Turn the overlay switch OFF and back ON in system settings to fix it</string>
+    <string name="perm_need_overlay">Enable overlay permission</string>
+    <string name="toast_overlay_granted">Overlay permission granted</string>
+    <string name="toast_battery_ok">Already exempted from battery optimization</string>
+    <string name="toast_notify_granted">Notification permission granted</string>
+    <string name="toast_assistant_stopped">Assistant stopped</string>
+    <string name="toast_assistant_started">Assistant started — tap the bubble while watching</string>
+    <string name="toast_call">Incoming call — black screen removed</string>
+    <string name="toast_headset">Headphones disconnected — back to video</string>
+
+    <!-- Dynamic: timer -->
+    <string name="timer_item_episode">🎧 Finish this episode</string>
+    <string name="timer_15">15 min</string>
+    <string name="timer_30">30 min</string>
+    <string name="timer_60">60 min</string>
+    <string name="timer_cancel">Cancel timer</string>
+    <string name="toast_timer_set">Sleep timer: %1$d min</string>
+    <string name="toast_timer_episode">Will stop after this episode</string>
+    <string name="toast_timer_expired">Timer ended</string>
+    <string name="toast_timer_done">Timer ended — screen restored</string>
+    <string name="toast_timer_cancelled">Timer cancelled</string>
+    <string name="toast_episode_done">Screen off after this episode (~%1$dm %2$ds)</string>
+    <string name="timer_remain_fmt">%1$d min left</string>
+
+    <!-- Dynamic: backup & restore -->
+    <string name="restore_title">Restore history</string>
+    <string name="restore_msg">Used XiTing before and uninstalled it? Your backup lives in Download/XiTing (XiTing-backup.json) and can restore growth &amp; stats in one tap.\n\nNew here? Tap \"No thanks\".</string>
+    <string name="restore_pick">Choose backup file</string>
+    <string name="restore_no">No thanks</string>
+    <string name="toast_invalid_backup">Not a valid backup file</string>
+    <string name="restore_other_title">Backup from another device</string>
+    <string name="restore_other_msg">This backup holds %1$d growth but the device ID differs (new device, or migrated signature). Restore anyway?</string>
+    <string name="restore_ok_btn">Restore</string>
+    <string name="dlg_cancel">Cancel</string>
+    <string name="toast_restore_done">Restored ✓ (growth %1$d)</string>
+    <string name="toast_restore_fail">Restore failed</string>
+    <string name="toast_picker_fail">Cannot open the file picker</string>
+    <string name="toast_export_ok">Exported ✓</string>
+    <string name="toast_export_fail">Export failed</string>
+
+    <!-- Dynamic: keep-alive -->
+    <string name="keepalive_dlg_title">Keep-alive setup</string>
+    <string name="keepalive_msg">The system may kill background apps and remove the bubble. Three steps for long-term stability:\n\n1. Battery exemption (%1$s) — tap \"Battery settings\" below\n\n2. Auto-start: \"App info\" → Battery usage → allow auto-start &amp; background activity\n\n3. Lock the card: open recents, swipe down on XiTing, tap the lock icon</string>
+    <string name="state_done">Done ✓</string>
+    <string name="state_todo">Pending</string>
+    <string name="keepalive_btn_battery">Battery settings</string>
+    <string name="keepalive_btn_appinfo">App info</string>
+    <string name="keepalive_btn_ok">Got it</string>
+
+    <!-- Dynamic: finish this episode -->
+    <string name="locale_dlg_title">Notification access needed</string>
+    <string name="locale_dlg_msg">\"Finish this episode\" reads the current playback progress.\nAllow \"Notification access\" for XiTing in system settings (used only to read playback progress).\n\nOr just use the regular timer.</string>
+    <string name="locale_dlg_go">Grant</string>
+    <string name="locale_dlg_fallback">Use timer</string>
+    <string name="toast_no_progress">No playback progress found — play an episode first, or use the timer</string>
+
+    <!-- Dynamic: achievements & pet -->
+    <string name="ach_toast_fmt">🏆 Unlocked: %1$s %2$s</string>
+    <string name="ach_dlg_title_fmt">Pet Achievements %1$d/%2$d</string>
+    <string name="dlg_ok">OK</string>
+    <string name="toast_evolve">🎉 Evolved! %1$s → %2$s</string>
+    <string name="toast_charge">+%1$d growth collected ✓</string>
+    <string name="pet_caption_sleepy">%1$s is napping · play an episode to wake it</string>
+    <string name="pet_caption_max">%1$s · Maxed · growth %2$d banked</string>
+    <string name="pet_caption_progress">%1$s · Growth %2$d / %3$d</string>
+    <string name="ach_first_t">First Black-Out</string>
+    <string name="ach_first_d">Complete your first screen-off session</string>
+    <string name="ach_h1_t">One-Hour Club</string>
+    <string name="ach_h1_d">1 hour of total listening</string>
+    <string name="ach_h10_t">Ten-Hour Pact</string>
+    <string name="ach_h10_d">10 hours of total listening</string>
+    <string name="ach_h50_t">Fifty-Hour Dynasty</string>
+    <string name="ach_h50_d">50 hours of total listening</string>
+    <string name="ach_c100_t">Century Habit</string>
+    <string name="ach_c100_d">100 screen-off sessions</string>
+    <string name="ach_marathon_t">Marathon</string>
+    <string name="ach_marathon_d">One session of 1+ hour</string>
+    <string name="ach_week_t">Persistence</string>
+    <string name="ach_week_d">Sessions on 7 different days</string>
+    <string name="ach_king_t">Crowned</string>
+    <string name="ach_king_d">Evolve to Thunder King</string>
+
+    <!-- Dynamic: calibration -->
+    <string name="calib_title">Power measurement</string>
+    <string name="calib_msg_calibrated">Calibrated on %1$s\nMeasured rate ≈ %2$.0f mAh/h</string>
+    <string name="calib_msg_uncalibrated">Not calibrated yet (using the generic OLED model)</string>
+    <string name="calib_msg_ambient">\n\nMeasured black-screen draw ≈ %1$.0f mA (%2$d samples)</string>
+    <string name="calib_msg_flow">\n\nCalibration (~6 min):\n① Play any video with the screen on for 3 min\n② The app blacks the screen for 3 min\n\nDon\'t charge; keep battery between 15%–95%.</string>
+    <string name="calib_btn_restart">Recalibrate</string>
+    <string name="calib_btn_start">Start</string>
+    <string name="calib_btn_close">Close</string>
+    <string name="calib_step1_title">Calibration 1/2 · Screen on</string>
+    <string name="calib_step1_init">Start playing any video now and keep the screen on…</string>
+    <string name="calib_step1_wait">Keep playing with the screen on — don\'t touch the phone\n%1$s left (%2$d samples)</string>
+    <string name="toast_calib_too_few">Not enough valid samples (charging?) — calibration cancelled</string>
+    <string name="toast_calib_need_service">Start the assistant first, then calibrate</string>
+    <string name="toast_calib_step2">Calibration 2/2 · stay black for 3 min, hands off</string>
+    <string name="toast_calib_ok">Calibrated ✓ (%1$d valid samples)</string>
+    <string name="toast_calib_invalid">Invalid samples (charging?) — try again</string>
+    <string name="toast_calib_done">Calibrated: measured saving ≈ %1$.0f mAh/h</string>
+    <string name="toast_calib_timeout">Calibration timed out — try again</string>
+
+    <!-- Dynamic: stats & share -->
+    <string name="saved_basis_measured">measured on device</string>
+    <string name="saved_basis_model">generic OLED model</string>
+    <string name="sum_saved_fmt">Power saved (%1$s) ≈ %2$d mAh (%3$s)</string>
+    <string name="fmt_sessions">%1$d runs</string>
+    <string name="sum_extra_fmt">Longest %1$s · %2$d sessions total</string>
+    <string name="list_empty">No sessions yet — start one and details appear here</string>
+    <string name="pager_info_fmt">Page %1$d / %2$d · %3$d items</string>
+    <string name="day_today">Today</string>
+    <string name="day_yesterday">Yesterday</string>
+    <string name="share_chooser">Share via</string>
+    <string name="share_text">⚡ Screen-off listening with XiTing: %1$s, ~%2$d mAh saved\nMy energy pet evolved into %3$s\nFree, ad-free, fully offline (0.9MB)\nhttps://github.com/ch1209498273/XiTing</string>
+    <string name="toast_share_done">Shared · +%1$d pending growth (tap the bar on Stats to collect)</string>
+    <string name="toast_share_claimed">Today\'s reward claimed — come back tomorrow</string>
+    <string name="share_sub_claimed">Claimed today ✓ · back tomorrow</string>
+    <string name="share_sub_avail">+%1$d available today</string>
+    <string name="help_title">Growth points guide</string>
+    <string name="help_msg">· 1 growth point per minute of listening (goes to pending first)\n· +5 for the first share each day (pending first)\n· Pending caps at 200 — collect before it fills\n· Pending expires after 3 days; expiring part shows red on the bar\n· Tap the bar to collect into your pet\'s level</string>
+
+    <!-- Dynamic: settings -->
+    <string name="toast_media_on">Media controls (⏮ ⏸ ⏭) will show after wake</string>
+    <string name="toast_browser_fail">Cannot open the browser</string>
+    <string name="update_value_fmt">Now v%1$s</string>
+    <string name="bubble_default">Screen-off (default)</string>
+    <string name="bubble_label_off">Screen-off</string>
+    <string name="bubble_locked_fmt">%1$s (🔒 needs %2$d)</string>
+    <string name="bubble_dlg_title">Bubble style (live preview)</string>
+    <string name="toast_bubble_locked">%1$s locked · needs %2$d growth</string>
+    <string name="toast_bubble_set">Bubble set to %1$s — check the corner</string>
+    <string name="bubble_value_default">Default</string>
+
+    <!-- Duration units -->
+    <string name="unit_h">h</string>
+    <string name="unit_m">m</string>
+    <string name="unit_m_full">m</string>
+    <string name="unit_s">s</string>
 </resources>

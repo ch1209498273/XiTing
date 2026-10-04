@@ -86,7 +86,7 @@ class OverlayService : Service() {
                     main.removeCallbacksAndMessages(null)
                     refreshNotification()
                     try {
-                        Toast.makeText(this, "来电，黑幕已自动解除", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.toast_call), Toast.LENGTH_LONG).show()
                     } catch (_: Exception) {}
                 }
             }
@@ -132,7 +132,7 @@ class OverlayService : Service() {
             if (headsetGone && prefs.getBoolean("switch_headset", true) && black?.isShowing == true) {
                 hideAllBlack()
                 refreshNotification()
-                Toast.makeText(this@OverlayService, "耳机已断开，已返回视频", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@OverlayService, getString(R.string.toast_headset), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -151,7 +151,7 @@ class OverlayService : Service() {
         }
         calibSamples = mutableListOf()
         calibTicks = 0
-        Toast.makeText(this, "校准步骤 2/2：保持黑屏 3 分钟，无需操作", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.toast_calib_step2), Toast.LENGTH_LONG).show()
         main.postDelayed(calibTick, 30_000)
     }
 
@@ -166,9 +166,9 @@ class OverlayService : Service() {
             val avgOff = if (calibSamples.size >= 4) calibSamples.average().toLong() else 0L
             if (avgOff > 0 && calibOnUa > avgOff) {
                 PowerCalib.storeCalibration(this, calibOnUa, avgOff)
-                Toast.makeText(this, "校准完成 ✓（有效样本 ${calibSamples.size}）", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.toast_calib_ok, calibSamples.size), Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(this, "校准样本无效（是否在充电？），请重试", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.toast_calib_invalid), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -412,9 +412,9 @@ class OverlayService : Service() {
             timerEndAt = 0
             if (isAnyBlackShowing()) {
                 hideAllBlack()
-                Toast.makeText(this, "定时结束，黑幕已关闭", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.toast_timer_done), Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(this, "定时已到期", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_timer_expired), Toast.LENGTH_SHORT).show()
             }
             refreshNotification()
         } else {
@@ -433,12 +433,12 @@ class OverlayService : Service() {
         if (timerEndAt > 0) {
             main.postDelayed(timerTick, 15_000)
             if (endAtMs > 0) {
-                Toast.makeText(this, "本集结束后将自动关闭", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_timer_episode), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "定时关闭：${minutes}分钟后", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_timer_set, minutes), Toast.LENGTH_SHORT).show()
             }
         } else {
-            Toast.makeText(this, "定时关闭已取消", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_timer_cancelled), Toast.LENGTH_SHORT).show()
         }
         refreshNotification()
     }

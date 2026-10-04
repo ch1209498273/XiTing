@@ -6,21 +6,25 @@ import android.content.Context
 /**
  * 精灵成就系统（精灵二期·一期）：依据累计听剧数据评估解锁条件，
  * 解锁状态持久化在 prefs，评估幂等可随时重跑；新解锁由调用方负责提示。
+ * 文案走资源（titleRes/descRes），支持多语言。
  */
 object Achievements {
 
-    data class A(val id: String, val icon: String, val title: String, val desc: String)
+    data class A(val id: String, val icon: String, val titleRes: Int, val descRes: Int)
 
     val ALL = listOf(
-        A("first", "🌙", "初次息屏", "完成第一次息屏听剧"),
-        A("h1", "🎧", "一小时俱乐部", "累计听剧满 1 小时"),
-        A("h10", "🌙", "十小时之约", "累计听剧满 10 小时"),
-        A("h50", "👑", "五十小时王朝", "累计听剧满 50 小时"),
-        A("c100", "💯", "百次成习", "累计息屏 100 次"),
-        A("marathon", "🏃", "马拉松", "单次连续听剧满 1 小时"),
-        A("week", "📅", "持之以恒", "累计 7 个不同日期有息屏记录"),
-        A("king", "⚡", "雷霆加冕", "精灵进化至雷霆之王")
+        A("first", "🌙", R.string.ach_first_t, R.string.ach_first_d),
+        A("h1", "🎧", R.string.ach_h1_t, R.string.ach_h1_d),
+        A("h10", "🌙", R.string.ach_h10_t, R.string.ach_h10_d),
+        A("h50", "👑", R.string.ach_h50_t, R.string.ach_h50_d),
+        A("c100", "💯", R.string.ach_c100_t, R.string.ach_c100_d),
+        A("marathon", "🏃", R.string.ach_marathon_t, R.string.ach_marathon_d),
+        A("week", "📅", R.string.ach_week_t, R.string.ach_week_d),
+        A("king", "⚡", R.string.ach_king_t, R.string.ach_king_d)
     )
+
+    fun title(ctx: Context, a: A): String = ctx.getString(a.titleRes)
+    fun desc(ctx: Context, a: A): String = ctx.getString(a.descRes)
 
     private fun unlocked(ctx: Context): MutableSet<String> {
         val p = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
@@ -54,8 +58,8 @@ object Achievements {
         val got = unlocked(ctx)
         val latest = ALL.lastOrNull { it.id in got }
         val sub = when {
-            got.isEmpty() -> "听剧积累，逐一点亮"
-            else -> "最新解锁：${latest?.icon} ${latest?.title}"
+            got.isEmpty() -> ctx.getString(R.string.ach_sub_empty)
+            else -> ctx.getString(R.string.ach_sub_latest, title(ctx, latest!!))
         }
         return got.size to sub
     }

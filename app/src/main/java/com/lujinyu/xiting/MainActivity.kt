@@ -151,7 +151,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             if (!Settings.canDrawOverlays(this) || permErr) {
                 Toast.makeText(
                     this,
-                    if (permErr) "请在系统页面中把「悬浮窗」开关关闭再重新打开，即可修复" else "请开启悬浮窗权限",
+                    if (permErr) getString(R.string.perm_fix_hint) else getString(R.string.perm_need_overlay),
                     Toast.LENGTH_LONG
                 ).show()
                 try {
@@ -165,7 +165,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION))
                 }
             } else {
-                Toast.makeText(this, "悬浮窗权限已授予", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_overlay_granted), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -186,7 +186,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     }
                 }
             } else {
-                Toast.makeText(this, "已在电池优化白名单中", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_battery_ok), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -196,7 +196,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             ) {
                 requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
             } else {
-                Toast.makeText(this, "通知权限已授予", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_notify_granted), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -208,20 +208,20 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             if (OverlayService.isRunning) {
                 startService(Intent(this, OverlayService::class.java).setAction(OverlayService.ACTION_EXIT))
                 getSharedPreferences("xiiting_prefs", MODE_PRIVATE).edit().putBoolean("assistant_wanted", false).apply()
-                Toast.makeText(this, "助手已停止", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_assistant_stopped), Toast.LENGTH_SHORT).show()
             } else {
                 startForegroundService(Intent(this, OverlayService::class.java))
                 getSharedPreferences("xiiting_prefs", MODE_PRIVATE).edit().putBoolean("assistant_wanted", true).apply()
-                Toast.makeText(this, "助手已启动，看剧时点悬浮球即可", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_assistant_started), Toast.LENGTH_SHORT).show()
             }
             postRefresh()
         }
 
         // 定时关闭：听完这集 / 15/30/60分钟，到点自动收黑幕
         pageHome.findViewById<View>(R.id.timer_chip).setOnClickListener {
-            val items = arrayOf("🎧 听完这集", "15分钟", "30分钟", "60分钟", "取消定时")
+            val items = arrayOf(getString(R.string.timer_item_episode), getString(R.string.timer_15), getString(R.string.timer_30), getString(R.string.timer_60), getString(R.string.timer_cancel))
             android.app.AlertDialog.Builder(this)
-                .setTitle("定时关闭")
+                .setTitle(getString(R.string.timer_title))
                 .setItems(items) { _, which ->
                     if (which == 0) {
                         finishThisEpisode()
@@ -271,12 +271,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val localGp = EnergyStore.collectedTotal(this)
         if (localGp > 0) return
         android.app.AlertDialog.Builder(this)
-            .setTitle("恢复历史数据")
+            .setTitle(getString(R.string.restore_title))
             .setMessage(
-                "如果你之前使用过「息屏听剧」并卸载过：备份保存在下载目录的 XiTing 文件夹中（XiTing-backup.json），可在这里一键恢复成长值与统计。\n\n全新用户请点「不用了」。"
+                getString(R.string.restore_msg)
             )
-            .setPositiveButton("选择备份文件") { _, _ -> openBackupPicker() }
-            .setNegativeButton("不用了", null)
+            .setPositiveButton(getString(R.string.restore_pick)) { _, _ -> openBackupPicker() }
+            .setNegativeButton(getString(R.string.restore_no), null)
             .show()
     }
 
@@ -293,7 +293,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             }
             startActivityForResult(intent, REQ_RESTORE)
         } catch (e: Exception) {
-            Toast.makeText(this, "无法打开文件选择器", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_picker_fail), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -303,14 +303,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         if (requestCode == REQ_EXPORT && resultCode == RESULT_OK) {
             val uri = data?.data ?: return
             val ok = BackupManager.exportToUri(this, uri)
-            Toast.makeText(this, if (ok) "已导出 ✓" else "导出失败", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, if (ok) getString(R.string.toast_export_ok) else getString(R.string.toast_export_fail), Toast.LENGTH_SHORT).show()
             return
         }
         if (requestCode == REQ_RESTORE && resultCode == RESULT_OK) {
             val uri = data?.data ?: return
             val obj = BackupManager.readFromUri(this, uri)
             if (obj == null) {
-                Toast.makeText(this, "不是有效的备份文件", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_invalid_backup), Toast.LENGTH_SHORT).show()
                 return
             }
             val gp = obj.optInt("gp", 0)
@@ -318,10 +318,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 doRestore(obj, gp)
             } else {
                 android.app.AlertDialog.Builder(this)
-                    .setTitle("备份来自其他设备")
-                    .setMessage("该备份成长值 $gp，设备ID与本机不一致（换机，或从旧签名版本迁移）。确定恢复吗？")
-                    .setPositiveButton("恢复") { _, _ -> doRestore(obj, gp) }
-                    .setNegativeButton("取消", null)
+                    .setTitle(getString(R.string.restore_other_title))
+                    .setMessage(getString(R.string.restore_other_msg, gp))
+                    .setPositiveButton(getString(R.string.restore_ok_btn)) { _, _ -> doRestore(obj, gp) }
+                    .setNegativeButton(getString(R.string.dlg_cancel), null)
                     .show()
             }
         }
@@ -329,11 +329,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     private fun doRestore(obj: org.json.JSONObject, gp: Int) {
         if (BackupManager.restore(this, obj)) {
-            Toast.makeText(this, "数据已恢复 ✓（成长值 $gp）", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.toast_restore_done, gp), Toast.LENGTH_LONG).show()
             refreshStates(); refreshHomeStats()
             if (tab == TAB_STATS) renderStats()
         } else {
-            Toast.makeText(this, "恢复失败", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_restore_fail), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -400,7 +400,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         val remain = OverlayService.instance?.timerRemainingMs() ?: 0
         pageHome.findViewById<TextView>(R.id.timer_state).text =
-            if (remain > 0) "剩余 ${remain / 60000 + 1} 分钟" else "未设置"
+            if (remain > 0) getString(R.string.timer_remain_fmt, remain / 60000 + 1) else getString(R.string.timer_none)
     }
 
     /** 防杀保活指南：ColorOS后台限制的分步设置引导 */
@@ -408,14 +408,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         val batteryOk = pm.isIgnoringBatteryOptimizations(packageName)
         android.app.AlertDialog.Builder(this)
-            .setTitle("防杀保活设置")
+            .setTitle(getString(R.string.keepalive_dlg_title))
             .setMessage(
-                "系统会清理后台应用导致悬浮球消失，按以下三步设置后可长期稳定：\n\n" +
-                    "1. 电池白名单（${if (batteryOk) "已完成 ✓" else "未完成"}）——点下方「去电池设置」\n\n" +
-                    "2. 自启动：点「去应用详情」→ 耗电管理 → 允许自启动/完全后台行为\n\n" +
-                    "3. 最近任务加锁：下拉最近任务，在息屏听剧卡片上点锁图标"
+                getString(
+                    R.string.keepalive_msg,
+                    if (batteryOk) getString(R.string.state_done) else getString(R.string.state_todo)
+                )
             )
-            .setPositiveButton("去电池设置") { _, _ ->
+            .setPositiveButton(getString(R.string.keepalive_btn_battery)) { _, _ ->
                 try {
                     startActivity(
                         Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$packageName"))
@@ -456,12 +456,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         }
         if (sessions == null) {
             android.app.AlertDialog.Builder(this)
-                .setTitle("需要「通知使用权」")
-                .setMessage("「听完这集」需要读取正在播放的剧集进度。\n请在系统设置中允许息屏听剧的「通知使用权」（仅用于读取播放进度，不做他用）。\n\n不想授权也可以用普通倒计时。")
-                .setPositiveButton("去授权") { _, _ ->
+                .setTitle(getString(R.string.locale_dlg_title))
+                .setMessage(getString(R.string.locale_dlg_msg))
+                .setPositiveButton(getString(R.string.locale_dlg_go)) { _, _ ->
                     try { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) } catch (_: Exception) {}
                 }
-                .setNegativeButton("用倒计时") { _, _ ->
+                .setNegativeButton(getString(R.string.locale_dlg_fallback)) { _, _ ->
                     startService(
                         Intent(this, OverlayService::class.java)
                             .setAction(OverlayService.ACTION_SET_TIMER)
@@ -483,7 +483,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             if (rem > 0 && (bestRemaining < 0 || rem < bestRemaining)) bestRemaining = rem
         }
         if (bestRemaining <= 0) {
-            Toast.makeText(this, "没读到播放进度：先播放一集再选，或改用倒计时", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.toast_no_progress), Toast.LENGTH_LONG).show()
             return
         }
         val endAt = System.currentTimeMillis() + bestRemaining + 4000 // 集尾缓冲4秒
@@ -494,7 +494,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         )
         val mins = bestRemaining / 60000
         val secs = bestRemaining % 60000 / 1000
-        Toast.makeText(this, "本集结束后自动息屏（约 ${mins}分${secs}秒 后）", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.toast_episode_done, mins, secs), Toast.LENGTH_LONG).show()
     }
 
     /** 成就明细弹窗 */
@@ -503,12 +503,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             .getStringSet("ach_unlocked", emptySet()) ?: emptySet()
         val gotCount = unlocked.size
         val msg = Achievements.ALL.joinToString("\n\n") { a ->
-            (if (a.id in unlocked) "✅ " else "🔒 ") + a.icon + " " + a.title + " · " + a.desc
+            (if (a.id in unlocked) "✅ " else "🔒 ") + a.icon + " " + Achievements.title(this, a) + " · " + Achievements.desc(this, a)
         }
         android.app.AlertDialog.Builder(this)
-            .setTitle("精灵成就 $gotCount/${Achievements.ALL.size}")
+            .setTitle(getString(R.string.ach_dlg_title_fmt, gotCount, Achievements.ALL.size))
             .setMessage(msg)
-            .setPositiveButton("好的", null)
+            .setPositiveButton(getString(R.string.dlg_ok), null)
             .show()
     }
 
@@ -523,29 +523,31 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             append(
                 if (calib != null) {
                     val rate = (calib.first - calib.second) / 1000.0
-                    "已按本机实测校准（${SimpleDateFormat("M月d日", Locale.getDefault()).format(Date(calib.third))}）\n实测省电速率 ≈ %.0f mAh/小时".format(rate)
+                    getString(R.string.calib_msg_calibrated,
+                        SimpleDateFormat("M月d日", Locale.getDefault()).format(Date(calib.third)),
+                        rate.toFloat())
                 } else {
-                    "尚未实测校准（当前按 OLED 通用模型估算）"
+                    getString(R.string.calib_msg_uncalibrated)
                 }
             )
             ambient?.let { (ma, n) ->
-                append("\n\n黑屏听剧整机功耗实测 ≈ %.0f mA（%d 次采样）".format(ma, n))
+                append(getString(R.string.calib_msg_ambient, ma.toFloat(), n))
             }
-            append("\n\n校准流程（约 6 分钟）：\n① 亮屏播放任意视频 3 分钟\n② 应用自动进入黑屏 3 分钟\n\n请勿充电；电量保持 15%~95%。")
+            append(getString(R.string.calib_msg_flow))
         }
         android.app.AlertDialog.Builder(this)
-            .setTitle("省电实测")
+            .setTitle(getString(R.string.calib_title))
             .setMessage(msg)
-            .setPositiveButton(if (calib != null) "重新校准" else "开始校准") { _, _ -> calibStep1() }
-            .setNegativeButton("关闭", null)
+            .setPositiveButton(if (calib != null) getString(R.string.calib_btn_restart) else getString(R.string.calib_btn_start)) { _, _ -> calibStep1() }
+            .setNegativeButton(getString(R.string.calib_btn_close), null)
             .show()
     }
 
     /** 步骤1：亮屏播放视频，采样 3 分钟 */
     private fun calibStep1() {
         val dlg = android.app.AlertDialog.Builder(this)
-            .setTitle("校准 1/2 · 亮屏播放")
-            .setMessage("请立即开始播放任意视频并保持亮屏…")
+            .setTitle(getString(R.string.calib_step1_title))
+            .setMessage(getString(R.string.calib_step1_init))
             .setCancelable(false)
             .create()
         dlg.show()
@@ -559,11 +561,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 if (left <= 0) {
                     dlg.dismiss()
                     if (n < 4) {
-                        Toast.makeText(this@MainActivity, "有效样本不足（是否在充电？），校准已取消", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@MainActivity, getString(R.string.toast_calib_too_few), Toast.LENGTH_LONG).show()
                         return
                     }
                     if (!OverlayService.isRunning) {
-                        Toast.makeText(this@MainActivity, "请先启动息屏听剧助手，再进行校准", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@MainActivity, getString(R.string.toast_calib_need_service), Toast.LENGTH_LONG).show()
                         return
                     }
                     startService(
@@ -592,11 +594,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 if (c != null && c.third != before) {
                     val rate = (c.first - c.second) / 1000.0
                     renderStats()
-                    Toast.makeText(this@MainActivity, "校准完成：本机实测省电 ≈ %.0f mAh/小时".format(rate), Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@MainActivity, getString(R.string.toast_calib_done, rate.toFloat()), Toast.LENGTH_LONG).show()
                 } else if (waited < 330) {
                     calibHandler.postDelayed(this, 20_000)
                 } else {
-                    Toast.makeText(this@MainActivity, "校准超时，请重试", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, getString(R.string.toast_calib_timeout), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -651,17 +653,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val allMs = sessions.sumOf { it.durationMs }
         val mah = Stats.estimatedMah(allMs)
         val pet = pageStats.findViewById<PetView>(R.id.pet_view)
-        val text = "⚡ 我用「息屏听剧」黑屏听了 ${fmtDur(allMs)}，估算省电 $mah mAh\n" +
-            "我的电能精灵已经进化到「${PetView.stageName(this, pet.stage)}」了\n" +
-            "完全免费无广告的息屏听剧神器（0.9MB 离线运行）\n" +
-            "https://github.com/ch1209498273/XiTing"
+        val text = getString(R.string.share_text, fmtDur(allMs), mah, PetView.stageName(this, pet.stage))
         startActivity(
             Intent.createChooser(
                 Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
                     putExtra(Intent.EXTRA_TEXT, text)
                 },
-                "分享到"
+                getString(R.string.share_chooser)
             )
         )
         // 每日任务结算：每天仅一次
@@ -674,11 +673,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             EnergyStore.add(this, SHARE_GP_PER_DAY) // 分享产生待收成长值
             Toast.makeText(
                 this,
-                "分享完成 · +$SHARE_GP_PER_DAY 待收成长值（去统计页点左侧条收取）",
+                getString(R.string.toast_share_done, SHARE_GP_PER_DAY),
                 Toast.LENGTH_LONG
             ).show()
         } else {
-            Toast.makeText(this, "今日分享奖励已领取，明天再来（每天一次）", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_share_claimed), Toast.LENGTH_SHORT).show()
         }
         renderStats()
     }
@@ -709,22 +708,16 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pet.onCollectAll = {
             val v = EnergyStore.collectAll(this)
             if (v > 0) {
-                Toast.makeText(this, "+$v 成长值已收取 ✓", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_charge, v), Toast.LENGTH_SHORT).show()
             }
             renderStats()
         }
         // ? 说明：成长值机制细节（统一口径：成长值 = 待收 + 已收）
         pet.onHelp = {
             android.app.AlertDialog.Builder(this)
-                .setTitle("成长值说明")
-                .setMessage(
-                    "· 听剧每满 1 分钟获得 1 点成长值（先进入待收）\n" +
-                        "· 每日首次分享获得 5 点成长值（先进入待收）\n" +
-                        "· 待收上限 200 点，满后不再累积——记得先收再听\n" +
-                        "· 待收成长值 3 天内有效，快过期的部分在条上显示为红色\n" +
-                        "· 点击左侧条即收取，收取后计入精灵等级"
-                )
-                .setPositiveButton("知道了", null)
+                .setTitle(getString(R.string.help_title))
+                .setMessage(getString(R.string.help_msg))
+                .setPositiveButton(getString(R.string.keepalive_btn_ok), null)
                 .show()
         }
 
@@ -743,16 +736,16 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
             .format(java.util.Date(now))
         pageSettings.findViewById<TextView>(R.id.share_sub).text =
-            if (prefs.getString("last_share_date", "") == todayStr) "今日已领取 ✓ · 明天再来"
-            else "今天可领 +$SHARE_GP_PER_DAY · 待收"
+            if (prefs.getString("last_share_date", "") == todayStr) getString(R.string.share_sub_claimed)
+            else getString(R.string.share_sub_avail, SHARE_GP_PER_DAY)
         // 文案
         pageStats.findViewById<TextView>(R.id.pet_caption).text =
             if (pet.sleepy) {
-                "${PetView.stageName(this, stage)} 打瞌睡了 · 听一集唤醒它"
+                getString(R.string.pet_caption_sleepy, PetView.stageName(this, stage))
             } else if (stage >= PetView.STAGE_KING) {
-                "${PetView.stageName(this, stage)} · 已至巅峰 · 成长值 $gp 继续储备"
+                getString(R.string.pet_caption_max, PetView.stageName(this, stage), gp)
             } else {
-                "${PetView.stageName(this, stage)} · 成长值 $gp / ${PetView.THRESHOLDS[stage + 1]}"
+                getString(R.string.pet_caption_progress, PetView.stageName(this, stage), gp, PetView.THRESHOLDS[stage + 1])
             }
         // 分享入口在「设置」页（统计页不再重复）
         pet.startAnimating()
@@ -828,15 +821,15 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     private fun updateMah() {
         val (label, ms) = when (range) {
-            RANGE_TODAY -> "今日" to todayMs
-            RANGE_WEEK -> "近7天" to weekMs
-            else -> "累计" to allMs
+            RANGE_TODAY -> getString(R.string.label_today) to todayMs
+            RANGE_WEEK -> getString(R.string.label_week) to weekMs
+            else -> getString(R.string.label_total) to allMs
         }
         val calib = PowerCalib.calibrated(this)
         val mah = calib?.let { PowerCalib.calibratedSavingMah(this, ms) } ?: Stats.estimatedMah(ms)
-        val basis = if (calib != null) "按本机实测" else "按OLED屏幕功耗估算"
+        val basis = if (calib != null) getString(R.string.saved_basis_measured) else getString(R.string.saved_basis_model)
         pageStats.findViewById<TextView>(R.id.sum_mah).text =
-            "${label}省电 ≈ $mah mAh（$basis）"
+            getString(R.string.sum_saved_fmt, label, mah, basis)
     }
 
     private fun renderStats() {
@@ -862,13 +855,13 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val allCount = sessions.size
 
         pageStats.findViewById<TextView>(R.id.sum_today).text = fmtDur(todayMs)
-        pageStats.findViewById<TextView>(R.id.sum_today_count).text = "$todayCount 次"
+        pageStats.findViewById<TextView>(R.id.sum_today_count).text = getString(R.string.fmt_sessions, todayCount)
         pageStats.findViewById<TextView>(R.id.sum_week).text = fmtDur(weekMs)
-        pageStats.findViewById<TextView>(R.id.sum_week_count).text = "$weekCount 次"
+        pageStats.findViewById<TextView>(R.id.sum_week_count).text = getString(R.string.fmt_sessions, weekCount)
         pageStats.findViewById<TextView>(R.id.sum_all).text = fmtDur(allMs)
-        pageStats.findViewById<TextView>(R.id.sum_all_count).text = "$allCount 次"
+        pageStats.findViewById<TextView>(R.id.sum_all_count).text = getString(R.string.fmt_sessions, allCount)
         pageStats.findViewById<TextView>(R.id.sum_extra).text =
-            "最长单次 ${fmtDur(sessions.maxOfOrNull { it.durationMs } ?: 0L)} · 共 $allCount 次息屏"
+            getString(R.string.sum_extra_fmt, fmtDur(sessions.maxOfOrNull { it.durationMs } ?: 0L), allCount)
         updateMah()
 
         // 精灵成就（精灵二期·一期）：依据统计评估解锁并渲染
@@ -882,10 +875,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             sessions.maxOfOrNull { it.durationMs } ?: 0L, listenDays, stageNow
         )
         freshAch.take(2).forEach {
-            Toast.makeText(this, "🏆 成就解锁：${it.icon} ${it.title}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.ach_toast_fmt, it.icon, Achievements.title(this, it)), Toast.LENGTH_LONG).show()
         }
         val (gotCount, achSub) = Achievements.summary(this)
-        pageStats.findViewById<TextView>(R.id.ach_title).text = "精灵成就 · $gotCount/${Achievements.ALL.size}"
+        pageStats.findViewById<TextView>(R.id.ach_title).text = getString(R.string.ach_dlg_title_fmt, gotCount, Achievements.ALL.size)
         pageStats.findViewById<TextView>(R.id.ach_sub).text = achSub
         pageStats.findViewById<View>(R.id.card_ach).setOnClickListener { showAchievements() }
         pageStats.findViewById<View>(R.id.card_mah).setOnClickListener { onMahCardClick() }
@@ -923,7 +916,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         sessionList.removeAllViews()
         if (visible.isEmpty()) {
             val tv = TextView(this).apply {
-                text = "暂无记录——开启一次听剧后这里会出现明细"
+                text = getString(R.string.list_empty)
                 setTextColor(0xFF8A9099.toInt())
                 textSize = 13f
             }
@@ -961,14 +954,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         pageStats.findViewById<View>(R.id.pager_bar).visibility = View.VISIBLE
         pageStats.findViewById<TextView>(R.id.pager_label).text =
-            "第 ${listPage + 1} / $totalPages 页 · 共 ${visible.size} 条"
+            getString(R.string.pager_info_fmt, listPage + 1, totalPages, visible.size)
         pageStats.findViewById<TextView>(R.id.btn_prev).alpha = if (listPage == 0) 0.35f else 1f
         pageStats.findViewById<TextView>(R.id.btn_next).alpha = if (listPage >= totalPages - 1) 0.35f else 1f
     }
 
     private fun dayLabel(daysAgo: Int): String = when (daysAgo) {
-        0 -> "今天"
-        1 -> "昨天"
+        0 -> getString(R.string.day_today)
+        1 -> getString(R.string.day_yesterday)
         else -> {
             val c = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -daysAgo) }
             String.format(Locale.getDefault(), "%02d-%02d",
@@ -1003,7 +996,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         switchMedia.setOnCheckedChangeListener { _, checked ->
             prefs.edit().putBoolean("black_media_controls", checked).apply()
             if (checked) {
-                Toast.makeText(this, "已开启：黑幕唤醒后显示 ⏮ ⏸ ⏭ 控制键", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_media_on), Toast.LENGTH_SHORT).show()
             }
             OverlayService.instance?.reapplyBlack()
         }
@@ -1030,7 +1023,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     REQ_EXPORT
                 )
             } catch (_: Exception) {
-                Toast.makeText(this, "无法打开文件选择器", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_picker_fail), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -1044,10 +1037,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ch1209498273/XiTing/releases/latest"))
                 )
             } catch (_: Exception) {
-                Toast.makeText(this, "无法打开浏览器", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_browser_fail), Toast.LENGTH_SHORT).show()
             }
         }
-        page.findViewById<TextView>(R.id.update_value).text = "当前 v${BuildConfig.VERSION_NAME}"
+        page.findViewById<TextView>(R.id.update_value).text = getString(R.string.update_value_fmt, BuildConfig.VERSION_NAME)
 
         // 分享给朋友（计入每日分享任务）
         page.findViewById<View>(R.id.row_share).setOnClickListener { sharePetStats() }
@@ -1067,13 +1060,13 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val unlocked = PetView.stageOf(gp)
         val labels = ArrayList<String>()
         val values = ArrayList<String>()
-        labels.add("息屏（默认）")
+        labels.add(getString(R.string.bubble_default))
         values.add("text")
         // 全部形态都列出（含未解锁：可预览外观，但不能选中）
         for (i in 0..4) {
             labels.add(
                 if (i <= unlocked) PetView.stageName(this, i)
-                else "${PetView.stageName(this, i)}（🔒需${PetView.THRESHOLDS[i]}成长值）"
+                else getString(R.string.bubble_locked_fmt, PetView.stageName(this, i), PetView.THRESHOLDS[i])
             )
             values.add("pet_$i")
         }
@@ -1091,7 +1084,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     // 「息屏」文字样式预览
                     row.addView(
                         TextView(this@MainActivity).apply {
-                            text = "息屏"
+                            text = getString(R.string.bubble_label_off)
                             textSize = 13f
                             setTextColor(0xFFFFFFFF.toInt())
                             gravity = android.view.Gravity.CENTER
@@ -1127,14 +1120,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             }
         }
         android.app.AlertDialog.Builder(this)
-            .setTitle("悬浮球样式（实时预览）")
+            .setTitle(getString(R.string.bubble_dlg_title))
             .setAdapter(adapter) { d, which ->
                 val stageOfItem = which - 1
                 if (stageOfItem in 0..4 && stageOfItem > unlocked) {
                     // 未解锁：可预览外观但不能选中
                     Toast.makeText(
                         this,
-                        "「${PetView.stageName(this, stageOfItem)}」尚未解锁 · 需 ${PetView.THRESHOLDS[stageOfItem]} 成长值",
+                        getString(R.string.toast_bubble_locked, PetView.stageName(this, stageOfItem), PetView.THRESHOLDS[stageOfItem]),
                         Toast.LENGTH_LONG
                     ).show()
                     return@setAdapter
@@ -1142,11 +1135,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 prefs.edit().putString("bubble_style", values[which]).apply()
                 OverlayService.instance?.rebuildBubble()
                 refreshBubbleStyleValue()
-                val name = if (which == 0) "息屏" else PetView.stageName(this, stageOfItem)
-                Toast.makeText(this, "悬浮球已切换为「$name」，看右下角", Toast.LENGTH_SHORT).show()
+                val name = if (which == 0) getString(R.string.bubble_label_off) else PetView.stageName(this, stageOfItem)
+                Toast.makeText(this, getString(R.string.toast_bubble_set, name), Toast.LENGTH_SHORT).show()
                 d.dismiss()
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(getString(R.string.dlg_cancel), null)
             .show()
     }
 
@@ -1170,7 +1163,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         } else {
             box.addView(
                 TextView(this).apply {
-                    text = "息屏"
+                    text = getString(R.string.bubble_label_off)
                     textSize = 12f
                     setTextColor(0xFFFFFFFF.toInt())
                     gravity = android.view.Gravity.CENTER
@@ -1182,21 +1175,21 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     layoutParams = LinearLayout.LayoutParams(size, size)
                 }
             )
-            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text = "默认"
+            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text = getString(R.string.bubble_value_default)
         }
     }
 
     // ───────────────────────── 通用 ─────────────────────────
 
     private fun fmtDur(ms: Long): String {
-        if (ms < 60000) return "${ms / 1000}秒"
+        if (ms < 60000) return "${ms / 1000}${getString(R.string.unit_s)}"
         val totalMin = ms / 60000
         val h = totalMin / 60
         val m = totalMin % 60
         return when {
-            h >= 100 -> "${h}时"          // 超长丢分钟，保证三卡单行不换行
-            h > 0 -> "${h}时${m}分"
-            else -> "${m}分钟"
+            h >= 100 -> "$h${getString(R.string.unit_h)}"   // 超长丢分钟，保证三卡单行不换行
+            h > 0 -> "$h${getString(R.string.unit_h)}$m${getString(R.string.unit_m)}"
+            else -> "$m${getString(R.string.unit_m_full)}"
         }
     }
 }

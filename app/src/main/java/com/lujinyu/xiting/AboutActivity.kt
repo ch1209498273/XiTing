@@ -18,7 +18,7 @@ class AboutActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
         findViewById<TextView>(R.id.about_version).text =
-            "版本 ${BuildConfig.VERSION_NAME} · 构建ID ${BuildConfig.BUILD_ID}"
+            getString(R.string.about_version_fmt, BuildConfig.VERSION_NAME, BuildConfig.BUILD_ID)
         findViewById<TextView>(R.id.btn_back).setOnClickListener { finish() }
         findViewById<TextView>(R.id.about_repo).setOnClickListener {
             try {

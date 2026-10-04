@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="关于息屏听剧"
+                android:text="@string/about_title"
                 android:textColor="#FF111418"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -75,7 +75,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="关于这个App"
+                android:text="@string/about_section_app"
                 android:textColor="#FF111418"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="看剧时想闭眼听？点一下悬浮球，屏幕全黑：背光物理关闭、触摸屏蔽，声音照常播放——任意视频App可用。\n\n可选暗色夜钟与电量显示（重锁后保持最暗亮度持续可见），内容周期性微移保护OLED屏幕；来电自动退出黑幕，不会漏接电话；支持定时关闭，睡前听剧到点自动停。\n\n黑幕唤醒后可切集：上一集 / 播放暂停 / 下一集（可在设置中开启）。\n\n电能精灵：听剧积累成长值，养成五形态精灵（电火花 → 电球 → 雷云精灵 → 风暴之灵 → 雷霆之王），可作悬浮球头像，满级后继续储备；成就系统记录你的听剧里程碑。\n\nv3.1 新增：「听完这集再关」智能定时；耳机拔出自动返回视频；省电实测校准（5分钟向导，按本机真实功耗估算）；手动导出与恢复备份（设置-数据）。\n\n数据备份：自动备份至下载目录 XiTing 文件夹（仅本机），卸载重装后可一键恢复。所有数据仅保存在本机，无网络权限。"
+                android:text="@string/about_intro"
                 android:textColor="#FF444B54"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -102,7 +102,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="隐私与安全"
+                android:text="@string/about_section_privacy"
                 android:textColor="#FF111418"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -112,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="· 无 INTERNET 权限：物理上无法联网\n· 不读取任何屏幕内容\n· 所有数据仅保存在本机\n· 无广告、无追踪、无埋点"
+                android:text="@string/about_privacy"
                 android:textColor="#FF444B54"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -129,7 +129,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="开源与联系"
+                android:text="@string/about_section_open"
                 android:textColor="#FF111418"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -140,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="GitHub：github.com/ch1209498273/XiTing\n（点按打开项目主页）"
+                android:text="@string/about_github"
                 android:textColor="#FF157A4C"
                 android:textSize="13sp" />
 
@@ -149,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="问题反馈：1209498273@qq.com"
+                android:text="@string/about_feedback"
                 android:textColor="#FF5F6570"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -167,7 +167,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="许可"
+                android:text="@string/about_section_license"
                 android:textColor="#FF111418"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -177,7 +177,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="非商业许可（详见LICENSE）：个人学习交流可自由使用与分享（需保留署名）；任何商业用途均被禁止；禁止移除或篡改署名与溯源标识。\n\n本项目与 YouTube、Google 及任何视频平台无关联。仅供学习交流，请支持正版。"
+                android:text="@string/about_license"
                 android:textColor="#FF444B54"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -187,7 +187,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="完全离线 · 不收集任何数据"
+            android:text="@string/footer_offline"
             android:textColor="#FFC3C8CF"
             android:textSize="10sp" />
     </LinearLayout>

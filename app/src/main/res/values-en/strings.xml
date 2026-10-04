@@ -90,6 +90,14 @@
     <string name="channel_name">XiTing assistant</string>
     <string name="notif_title">XiTing assistant running</string>
     <string name="notif_text">Tap the bubble to black the screen — sound keeps playing%1$s</string>
+    <string name="notif_action_listen">Listen</string>
+    <string name="notif_action_restore">Restore</string>
+    <string name="notif_action_stop">Stop</string>
+    <string name="exit_confirm_title">Exit XiTing?</string>
+    <string name="exit_confirm_yes">Exit</string>
+    <string name="exit_notif_title">XiTing exited</string>
+    <string name="exit_notif_text">Tap \"Undo\" to restore the bubble &amp; screen-off</string>
+    <string name="exit_notif_undo">Undo</string>
 
     <!-- Pet stages -->
     <string name="pet_spark">Spark</string>
@@ -237,4 +245,17 @@
     <string name="unit_m">m</string>
     <string name="unit_m_full">m</string>
     <string name="unit_s">s</string>
+
+    <!-- About page -->
+    <string name="about_title">About XiTing</string>
+    <string name="about_section_app">About this app</string>
+    <string name="about_intro">Want to just listen while watching? Tap the bubble and the screen goes fully black: backlight physically off, touches blocked, sound keeps playing — works with any video app.\n\nOptional night clock &amp; battery display (stays visible at minimum brightness after re-lock, content micro-shifts to protect OLED); incoming calls exit the black screen so you never miss one; sleep timer and \"finish this episode\" smart timer; headphones unplug returns you to video.\n\nAfter wake you can skip tracks: previous / play-pause / next (enable in Settings).\n\nEnergy Pet: listening earns growth points to evolve a five-form pet (Spark → Orb → Storm Cloud → Tempest → Thunder King), usable as your bubble avatar; achievements track your listening milestones.\n\nHome-screen widgets: three sizes with your pet, listening stats and one-tap screen-off; long-press the bubble to exit quickly.\n\nData backup: auto-backed up to the XiTing folder in Downloads (on device only), restored in one tap after reinstall. Everything stays on this device — no network permission.</string>
+    <string name="about_section_privacy">Privacy &amp; Security</string>
+    <string name="about_privacy">· No INTERNET permission: physically cannot go online\n· Reads nothing on your screen\n· All data stays on this device\n· No ads, no tracking, no analytics</string>
+    <string name="about_section_open">Open Source &amp; Contact</string>
+    <string name="about_github">GitHub: github.com/ch1209498273/XiTing\n(Tap to open the project page)</string>
+    <string name="about_feedback">Feedback: 1209498273@qq.com</string>
+    <string name="about_section_license">License</string>
+    <string name="about_license">Non-commercial license (see LICENSE): free to use and share for personal learning with attribution; any commercial use prohibited; removing or altering attribution/tracing marks forbidden.\n\nThis project is not affiliated with YouTube, Google or any video platform. For study only — please support official releases.</string>
+    <string name="about_version_fmt">Version %1$s · Build %2$s</string>
 </resources>

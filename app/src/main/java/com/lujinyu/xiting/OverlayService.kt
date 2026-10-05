@@ -50,6 +50,7 @@ class OverlayService : Service() {
         private const val NOTIF_ID = 1
         private const val NOTIF_EXIT_ID = 2
         const val ACTION_TOGGLE = "com.lujinyu.xiting.TOGGLE"
+        const val ACTION_BUBBLE = "com.lujinyu.xiting.BUBBLE_TOGGLE"
         const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         const val ACTION_SET_TIMER = "com.lujinyu.xiting.SET_TIMER"
         const val EXTRA_MINUTES = "minutes"
@@ -250,6 +251,7 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
+            ACTION_BUBBLE -> setBubbleVisible(!prefs.getBoolean("bubble_hidden", false))
             ACTION_SET_TIMER -> handleSetTimer(
                 intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0,
                 intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0
@@ -290,6 +292,7 @@ class OverlayService : Service() {
 
     private fun showBubble() {
         if (bubble != null) return
+        if (prefs.getBoolean("bubble_hidden", false)) return // 用户已隐藏悬浮球：尊重设置
         val density = resources.displayMetrics.density
         val size = (48 * density).toInt()
 
@@ -327,6 +330,7 @@ class OverlayService : Service() {
         // 悬浮球位置记忆：恢复上次拖动后的位置
         lp.x = prefs.getInt("bubble_x", resources.displayMetrics.widthPixels - size - (8 * density).toInt())
         lp.y = prefs.getInt("bubble_y", (180 * density).toInt())
+        bubbleLp = lp   // 确认条定位用（球的窗口坐标在这里，View.getX 恒为 0）
 
         val slop = ViewConfiguration.get(this).scaledTouchSlop
         var downRawX = 0f
@@ -411,6 +415,16 @@ class OverlayService : Service() {
     /** 悬浮球是否存在（供自愈检测：服务在跑但球丢了就重建） */
     fun isBubbleVisible(): Boolean = bubble != null
 
+    /** 悬浮球显隐（通知按钮/设置开关/长按退出共用）：状态持久化，重启尊重 */
+    fun setBubbleVisible(visible: Boolean) {
+        prefs.edit().putBoolean("bubble_hidden", !visible).apply()
+        if (visible) showBubble() else {
+            bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
+            bubble = null
+        }
+        refreshNotification()
+    }
+
     /** 重建悬浮球（样式切换后立即生效） */
     fun rebuildBubble() {
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
@@ -421,6 +435,7 @@ class OverlayService : Service() {
     // ---------- 悬浮球长按退出 ----------
 
     private var exitConfirm: View? = null
+    private var bubbleLp: WindowManager.LayoutParams? = null
 
     private fun vibrateShort() {
         try {
@@ -441,8 +456,8 @@ class OverlayService : Service() {
         val pill = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
+            setBackgroundResource(R.drawable.exit_pill_bg)
             setPadding((14 * d).toInt(), (10 * d).toInt(), (10 * d).toInt(), (10 * d).toInt())
-            setBackgroundColor(android.graphics.Color.argb(235, 16, 24, 40))
         }
         pill.addView(TextView(this).apply {
             text = getString(R.string.exit_confirm_title)
@@ -474,17 +489,21 @@ class OverlayService : Service() {
             android.graphics.PixelFormat.TRANSLUCENT
         )
         lp.gravity = Gravity.TOP or Gravity.START
-        bubble?.let { b ->
-            lp.x = b.x.toInt().coerceIn(12, maxOf(12, resources.displayMetrics.widthPixels - 320))
-            lp.y = b.y.toInt() + b.height + 12
-            pill.post {
-                try {
-                    val lp2 = pill.layoutParams as WindowManager.LayoutParams
-                    lp2.x = (b.x.toInt() + b.width / 2 - pill.width / 2)
-                        .coerceIn(12, maxOf(12, resources.displayMetrics.widthPixels - pill.width - 12))
-                    wm.updateViewLayout(pill, lp2)
-                } catch (_: Exception) {}
-            }
+        // 定位到悬浮球旁：球的窗口坐标存在 bubbleLp（View.getX 在独立窗口里恒为 0，
+        // 之前误用它导致确认条总在固定位置）。球在上半屏弹下方，下半屏弹上方。
+        pill.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        val pillW = pill.measuredWidth
+        val pillH = pill.measuredHeight
+        val screenW = resources.displayMetrics.widthPixels
+        val screenH = resources.displayMetrics.heightPixels
+        bubbleLp?.let { blp ->
+            val bw = bubble?.width ?: 96
+            val bh = bubble?.height ?: 96
+            val bubbleCx = blp.x + bw / 2
+            val below = blp.y < screenH / 2
+            lp.x = (bubbleCx - pillW / 2).coerceIn(12, maxOf(12, screenW - pillW - 12))
+            lp.y = if (below) blp.y + bh + 14
+                   else (blp.y - pillH - 14).coerceAtLeast(12)
         } ?: run { lp.x = 200; lp.y = 600 }
         try {
             wm.addView(pill, lp)
@@ -624,6 +643,10 @@ class OverlayService : Service() {
             this, 2, Intent(this, OverlayService::class.java).setAction(ACTION_EXIT),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
+        val bubblePi = PendingIntent.getService(
+            this, 3, Intent(this, OverlayService::class.java).setAction(ACTION_BUBBLE),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
         val remainMin = timerRemainingMs() / 60000
         val timerText = if (timerEndAt > 0) " · 定时${remainMin + 1}分钟后关闭" else ""
         return Notification.Builder(this, CHANNEL_ID)
@@ -633,6 +656,7 @@ class OverlayService : Service() {
             .setContentIntent(openPi)
             .addAction(0, getString(R.string.notif_action_stop), exitPi)
             .addAction(0, getString(if (isAnyBlackShowing()) R.string.notif_action_restore else R.string.notif_action_listen), togglePi)
+            .addAction(0, getString(if (prefs.getBoolean("bubble_hidden", false)) R.string.notif_action_bubble_show else R.string.notif_action_bubble_hide), bubblePi)
             .setOngoing(true)
             .build()
     }

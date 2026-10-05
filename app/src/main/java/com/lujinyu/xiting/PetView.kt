@@ -2,6 +2,7 @@
 package com.lujinyu.xiting
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -195,8 +196,32 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         return super.onTouchEvent(event)
     }
 
+    /** 换肤：色相旋转角度（度），0=默认配色；由 PetSkins 按所穿皮肤设置 */
+    var skinHue = 0f
+
+    private var skinBmp: Bitmap? = null
+    private var skinCv: Canvas? = null
+    private val skinPaint = Paint()
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (skinHue != 0f && width > 0 && height > 0) {
+            // 换肤态：先画进离屏位图，再经色相矩阵滤镜合成（GPU 友好，全帧稳定）
+            if (skinBmp == null || skinBmp!!.width != width || skinBmp!!.height != height) {
+                skinBmp?.recycle()
+                skinBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                skinCv = Canvas(skinBmp!!)
+            }
+            skinCv!!.drawColor(android.graphics.Color.TRANSPARENT, android.graphics.PorterDuff.Mode.CLEAR)
+            drawBody(skinCv!!)
+            skinPaint.colorFilter = PetSkins.hueFilter(skinHue)
+            canvas.drawBitmap(skinBmp!!, 0f, 0f, skinPaint)
+        } else {
+            drawBody(canvas)
+        }
+    }
+
+    private fun drawBody(canvas: Canvas) {
         val now = System.currentTimeMillis()
         val t = (now - bornAt) / 1000f
         val (cx, cy, r) = geometry()

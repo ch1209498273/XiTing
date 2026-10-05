@@ -69,7 +69,11 @@ object WidgetData {
             }
 
             // ---- 通用绑定（三档布局共用同一组 id）----
-            views.setImageViewBitmap(R.id.widget_pet_img, renderPet(context, stage, pct))
+            val skin = PetSkins.active(context)
+            views.setImageViewBitmap(
+                R.id.widget_pet_img,
+                PetSkins.snapshot(context, stage, skin.hue, 160, withBar = true, pct = pct)
+            )
             views.setTextViewText(R.id.widget_pet, PetView.stageName(c, stage))
             views.setTextViewText(
                 R.id.widget_growth,
@@ -112,29 +116,6 @@ object WidgetData {
         }
     }
 
-    /** PetView 离屏渲染为位图（与统计页同源的精灵形象）+ 底部成长值进度条 */
-    private fun renderPet(context: Context, stage: Int, pct: Int): Bitmap {
-        val size = 160
-        val barH = 26
-        val bmp = Bitmap.createBitmap(size, size + barH, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bmp)
-        val pet = PetView(context)
-        pet.stage = stage
-        pet.hideProgress = true
-        val spec = View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
-        pet.measure(spec, spec)
-        pet.layout(0, 0, size, size)
-        pet.draw(canvas)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.color = android.graphics.Color.argb(70, 255, 255, 255)
-        canvas.drawRoundRect(14f, (size + 6).toFloat(), (size - 14).toFloat(), (size + 14).toFloat(),
-            5f, 5f, paint)
-        paint.color = android.graphics.Color.rgb(240, 200, 126)
-        val fillW = 14f + (size - 28) * pct / 100f
-        canvas.drawRoundRect(14f, (size + 6).toFloat(), fillW, (size + 14).toFloat(),
-            5f, 5f, paint)
-        return bmp
-    }
 
     /** 近7天迷你柱状图位图（大号小部件专用，今日金色） */
     private fun renderBars(sessions: List<ListenSession>, todayStart: Long): Bitmap {

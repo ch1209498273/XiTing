@@ -98,6 +98,9 @@
     <string name="exit_notif_title">息屏听剧已退出</string>
     <string name="exit_notif_text">点「撤销」恢复悬浮球与息屏功能</string>
     <string name="exit_notif_undo">撤销</string>
+    <string name="notif_action_bubble_hide">隐藏悬浮球</string>
+    <string name="notif_action_bubble_show">显示悬浮球</string>
+    <string name="switch_bubble">显示悬浮球</string>
 
     <!-- 精灵形态 -->
     <string name="pet_spark">电火花</string>
@@ -258,4 +261,27 @@
     <string name="about_section_license">许可</string>
     <string name="about_license">非商业许可（详见LICENSE）：个人学习交流可自由使用与分享（需保留署名）；任何商业用途均被禁止；禁止移除或篡改署名与溯源标识。\n\n本项目与 YouTube、Google 及任何视频平台无关联。仅供学习交流，请支持正版。</string>
     <string name="about_version_fmt">版本 %1$s · 构建ID %2$s</string>
+
+    <!-- v3.5 精灵图鉴与streak -->
+    <string name="gallery_btn">🎨 图鉴</string>
+    <string name="gallery_title">精灵图鉴</string>
+    <string name="streak_fmt">🔥 连续听剧 %1$d 天</string>
+    <string name="streak_best_fmt">最长 %1$d 天</string>
+    <string name="toast_rare_energy">⚡ 稀有雷暴能量 +%1$d！</string>
+    <string name="toast_skin_unlock">🎨 新皮肤解锁：%1$s</string>
+    <string name="toast_skin_worn">已换上「%1$s」</string>
+    <string name="gallery_wear">穿戴</string>
+    <string name="gallery_worn">使用中</string>
+    <string name="skin_default_n">经典配色</string>
+    <string name="skin_cond_default">默认形态</string>
+    <string name="skin_star_n">星夜之魂</string>
+    <string name="skin_cond_star">累计听剧 10 小时</string>
+    <string name="skin_aurora_n">极光之灵</string>
+    <string name="skin_cond_aurora">累计听剧 50 小时</string>
+    <string name="skin_sakura_n">樱雨精灵</string>
+    <string name="skin_cond_sakura">连续听剧 7 天</string>
+    <string name="skin_magma_n">熔岩暴君</string>
+    <string name="skin_cond_magma">累计省电 5000 mAh</string>
+    <string name="skin_jade_n">翡翠雷公</string>
+    <string name="skin_cond_jade">连续听剧 30 天</string>
 </resources>

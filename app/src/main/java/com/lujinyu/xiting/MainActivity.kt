@@ -373,9 +373,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             if (running) getString(R.string.hero_sub_stop)
             else getString(R.string.hero_sub_start)
 
-        // 自愈：服务在跑但悬浮球丢失（ColorOS 偶发吞掉纯浮窗）→ 自动重建
+        // 自愈：服务在跑、悬浮球未隐藏但球丢失（ColorOS 偶发吞掉纯浮窗）→ 自动重建
         OverlayService.instance?.let { svc ->
-            if (!svc.isBubbleVisible()) {
+            val bubbleHidden = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+                .getBoolean("bubble_hidden", false)
+            if (!svc.isBubbleVisible() && !bubbleHidden) {
                 svc.rebuildBubble()
             }
         }
@@ -515,6 +517,29 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     // ───────────────────────── 省电实测校准向导 ─────────────────────────
 
     private val calibHandler = Handler(Looper.getMainLooper())
+
+    /** 皮肤图鉴弹窗：6 款皮肤，已解锁可穿戴 */
+    private fun showSkinGallery() {
+        val totalMs = SessionLog.sessions(this).sumOf { it.durationMs }
+        val streakInfo = Streaks.compute(SessionLog.sessions(this))
+        val mah = Stats.estimatedMah(totalMs)
+        val active = PetSkins.active(this)
+        val msg = PetSkins.ALL.joinToString("\n\n") { s ->
+            val unlocked = PetSkins.isUnlocked(this, s, totalMs, streakInfo.current, mah)
+            val wearing = s.id == active.id
+            val prefix = when {
+                wearing -> "⭐ "
+                unlocked -> "✅ "
+                else -> "🔒 "
+            }
+            prefix + PetSkins.name(this, s) + " · " + PetSkins.cond(this, s)
+        }
+        android.app.AlertDialog.Builder(this)
+            .setTitle(getString(R.string.gallery_title))
+            .setMessage(msg)
+            .setPositiveButton(getString(R.string.dlg_ok), null)
+            .show()
+    }
 
     private fun onMahCardClick() {
         val calib = PowerCalib.calibrated(this)
@@ -880,8 +905,29 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val (gotCount, achSub) = Achievements.summary(this)
         pageStats.findViewById<TextView>(R.id.ach_title).text = getString(R.string.ach_dlg_title_fmt, gotCount, Achievements.ALL.size)
         pageStats.findViewById<TextView>(R.id.ach_sub).text = achSub
+        // streak（先于皮肤评估：皮肤条件依赖连续天数）
+        val streakInfo = Streaks.compute(sessions)
+
+        // 精灵皮肤：应用所穿皮肤的色相
+        val petView = pageStats.findViewById<PetView>(R.id.pet_view)
+        val activeSkin = PetSkins.active(this)
+        petView.skinHue = activeSkin.hue
+        val mahSaved = Stats.estimatedMah(allMs)
+        val freshSkins = PetSkins.evaluate(this, allMs, streakInfo.current, mahSaved)
+        freshSkins.take(2).forEach {
+            Toast.makeText(this, getString(R.string.toast_skin_unlock, PetSkins.name(this, it)), Toast.LENGTH_LONG).show()
+        }
         pageStats.findViewById<View>(R.id.card_ach).setOnClickListener { showAchievements() }
         pageStats.findViewById<View>(R.id.card_mah).setOnClickListener { onMahCardClick() }
+        pageStats.findViewById<View>(R.id.btn_gallery).setOnClickListener { showSkinGallery() }
+
+        // streak 展示
+        var streakText = getString(R.string.streak_fmt, streakInfo.current)
+        if (streakInfo.best > streakInfo.current) {
+            streakText += " · " + getString(R.string.streak_best_fmt, streakInfo.best)
+        }
+        pageStats.findViewById<TextView>(R.id.streak_chip).text = streakText
+        pageStats.findViewById<View>(R.id.btn_gallery).setOnClickListener { showSkinGallery() }
 
         // 电能精灵：成长值驱动的五形态养成（听剧分钟 + 每日分享奖励）
         refreshPetPanel(allMs, sessions, now)
@@ -1009,6 +1055,14 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         switchHeadset.isChecked = prefs.getBoolean("switch_headset", true)
         switchHeadset.setOnCheckedChangeListener { _, checked ->
             prefs.edit().putBoolean("switch_headset", checked).apply()
+        }
+
+        // 显示悬浮球（隐藏后助手照常运行，通知栏/此处均可恢复）
+        val switchBubble = page.findViewById<android.widget.Switch>(R.id.switch_bubble)
+        switchBubble.isChecked = !prefs.getBoolean("bubble_hidden", false)
+        switchBubble.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("bubble_hidden", !checked).apply()
+            OverlayService.instance?.setBubbleVisible(checked)
         }
 
         // 导出数据备份（SAF 手动备份）

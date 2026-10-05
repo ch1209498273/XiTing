@@ -381,6 +381,26 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             val dur = if (elapsed >= 0) elapsed else now - sessionStart
             Stats.addDelta(context, dur)
             SessionLog.add(context, ListenSession(sessionStart, now, dur, SessionLog.MODE_BLACK))
+            // 稀有能量掉落：≥5 分钟的会话 10% 概率刷出雷暴能量（每日一次），惊喜钩子
+            try {
+                if (dur >= 300_000) {
+                    val sp = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+                    val sdf = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault())
+                    val today = sdf.format(java.util.Date())
+                    if (sp.getString("last_rare_date", "") != today &&
+                        java.util.Random().nextFloat() < 0.10f
+                    ) {
+                        sp.edit().putString("last_rare_date", today).apply()
+                        val bonus = (dur / 60_000).toInt().coerceAtLeast(15)
+                        EnergyStore.add(context, bonus)
+                        android.widget.Toast.makeText(
+                            context,
+                            context.getString(R.string.toast_rare_energy, bonus),
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (_: Exception) {}
             // 听剧产生能量球：每满 1 分钟 1 点能量（含跨会话余数累积，不浪费零头）
             try {
                 val sp = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)

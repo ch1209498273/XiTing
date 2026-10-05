@@ -98,6 +98,9 @@
     <string name="exit_notif_title">XiTing exited</string>
     <string name="exit_notif_text">Tap \"Undo\" to restore the bubble &amp; screen-off</string>
     <string name="exit_notif_undo">Undo</string>
+    <string name="notif_action_bubble_hide">Hide bubble</string>
+    <string name="notif_action_bubble_show">Show bubble</string>
+    <string name="switch_bubble">Show floating bubble</string>
 
     <!-- Pet stages -->
     <string name="pet_spark">Spark</string>
@@ -258,4 +261,27 @@
     <string name="about_section_license">License</string>
     <string name="about_license">Non-commercial license (see LICENSE): free to use and share for personal learning with attribution; any commercial use prohibited; removing or altering attribution/tracing marks forbidden.\n\nThis project is not affiliated with YouTube, Google or any video platform. For study only — please support official releases.</string>
     <string name="about_version_fmt">Version %1$s · Build %2$s</string>
+
+    <!-- v3.5 skin gallery & streak -->
+    <string name="gallery_btn">🎨 Skins</string>
+    <string name="gallery_title">Skin Gallery</string>
+    <string name="streak_fmt">🔥 %1$d-day streak</string>
+    <string name="streak_best_fmt">best %1$d</string>
+    <string name="toast_rare_energy">⚡ Rare storm energy +%1$d!</string>
+    <string name="toast_skin_unlock">🎨 New skin unlocked: %1$s</string>
+    <string name="toast_skin_worn">Wearing %1$s</string>
+    <string name="gallery_wear">Wear</string>
+    <string name="gallery_worn">Worn</string>
+    <string name="skin_default_n">Classic</string>
+    <string name="skin_cond_default">Default look</string>
+    <string name="skin_star_n">Starlight</string>
+    <string name="skin_cond_star">10h total listening</string>
+    <string name="skin_aurora_n">Aurora</string>
+    <string name="skin_cond_aurora">50h total listening</string>
+    <string name="skin_sakura_n">Sakura</string>
+    <string name="skin_cond_sakura">7-day streak</string>
+    <string name="skin_magma_n">Magma</string>
+    <string name="skin_cond_magma">5000 mAh saved</string>
+    <string name="skin_jade_n">Jade</string>
+    <string name="skin_cond_jade">30-day streak</string>
 </resources>

@@ -165,6 +165,9 @@
     <!-- Dynamic: achievements & pet -->
     <string name="ach_toast_fmt">🏆 Unlocked: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">Pet Achievements %1$d/%2$d</string>
+<string name="ach_dlg_hint">Badges light up on the left of the pet, easiest at the bottom</string>
+<string name="ach_row_unlocked">Unlocked</string>
+<string name="ach_row_locked">Locked</string>
     <string name="dlg_ok">OK</string>
     <string name="toast_charge">+%1$d growth collected ✓</string>
     <string name="pet_caption_sleepy">%1$s is napping · play an episode to wake it</string>

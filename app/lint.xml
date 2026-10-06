@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  lint 配置。
+
+  PropertyEscape: 报的是 local.properties 里的 Windows 盘符没转义。
+  那份文件由 Android Studio / Gradle 自动生成、且已在 .gitignore 里，
+  根本不该由我们维护 —— 而它会占掉一条常驻 error，淹没真正的告警。
+  （本项目没有 .properties 源文件，屏蔽它没有任何副作用。）
+
+  其余误报就地用 @SuppressLint 注解，并在代码里写明理由 —— 比集中在这里屏蔽更好，
+  因为注解紧挨着代码，后人看得见「这里为什么被消音」。
+-->
+<lint>
+    <issue id="PropertyEscape" severity="ignore" />
+</lint>

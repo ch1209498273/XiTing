@@ -38,8 +38,11 @@
 | `a37569f` / `9d0be03` / `18369b6` | PetView 分配 / WidgetData 渲染门禁 / 移除只写不读的 xiiting_stats |
 | `46fb465` | 首次纳入版本控制 |
 
-**测试基建**：`app/src/test`，**52 个 JVM 单测**（JUnit4 + org.json），覆盖存档与能量的逐条容错、
-整数溢出饱和、成就残留 id 过滤、备份导入限量、徽章映射与徽章列布局、以及把 26 个持久化键名钉死。
+**测试基建**：`app/src/test`，**60 个 JVM 单测**（JUnit4 + org.json），覆盖存档与能量的逐条容错、
+整数溢出饱和、成就残留 id 过滤、备份导入限量、徽章映射与徽章列布局、换肤取色规则、
+光晕渐变不变量，以及把 26 个持久化键名钉死。
+
+**APK 体积 159 KB**（2026-10-07 从 660 KB 降下来）。
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
@@ -112,6 +115,50 @@ python tools\badge_preview.py          # 生成 .cowork-temp/badges_preview.svg
 3. 火焰未解锁态描边 0.12s 太细，缩到实际尺寸近乎消失 → 加粗到 0.15s。
 
 **教训：改任何手绘图形，都先跑一遍这个预览再装机。** 别拿用户手机当调试器。
+
+### 附录：本轮顺带做的优化
+
+| 项 | 前 | 后 |
+|---|---|---|
+| APK 体积 | 660 KB | **159 KB** |
+| lint error | 8 | **0** |
+| 单测 | 52 | **60** |
+| 精灵每帧对象分配 | ~15~20 | **~0**（路径/矩形/着色器全部复用或缓存） |
+
+**① APK 体积**：launcher 图标的 20 张密度桶 PNG 曾占整个 APK 的 **79%**（约 520 KB），
+dex 才 138 KB。`shrinkResources` 早已开启却删不掉——adaptive-icon 的
+foreground/monochrome 层确实引用了密度桶。
+
+- `minSdk 26` 意味着 `ic_launcher.png` / `ic_launcher_round.png` 各密度桶**永远不会被选中**
+  （`mipmap-anydpi-v26` 优先），本来就是死资源
+- foreground / monochrome 改用 **VectorDrawable**。不手绘，而是用
+  `tools/png2vector.py`（轮廓跟随 + 道格拉斯-普克简化）从原 PNG 的掩膜直接追踪，
+  **像素级一致**，不赌肉眼。矢量 2.9 KB / 2.9 KB，对应原 PNG 287 KB / 197 KB
+- 追踪前务必**渲染出来和原图并排比对**（同 `tools/badge_preview.py` 的做法）
+- ⚠️ `tools/analyze_icon.py` 里手写的 PNG 解码器：**滤波回溯的「左邻」步长是 bpp 而不是 4**。
+  RGBA（bpp=4）时硬编码 4 碰巧正确，RGB（bpp=3）就解出一张颜色全乱的图 —— 这种错极难发现
+
+**② 每帧分配**：统计页精灵 30fps、悬浮球 10fps 常驻，原先每帧 new 出十几个
+`RectF` / `Path` / `LinearGradient` / `RadialGradient`（每秒 400~600 个对象）。现在：
+
+- `energyBar()` 改为写入共享 `energyScratch`。⚠️ **它一帧内会被
+  `badgeColumn`/`helpCenter`/`drawBody`/`onTouchEvent` 多次调用**，
+  调用方不得跨调用持有返回值（`drawBody` 里 `helpCenter()` 那行已加注释标注这个顺序约束）
+- 着色器按 `(width, height)` 缓存，尺寸不变不重建；换肤时随调色板一起作废
+- 光晕改成「以本点为圆心建渐变 + `canvas.translate` 绘制」——这样渐变半径与
+  精灵的上下浮动解耦，才既可缓存又跟得动。
+  ⚠️ 副作用是**渐变半径必须 >= 光晕圆半径**，否则光晕被截成可见的圆盘；
+  这条不变量已写成 `GLOW_GRADIENT_RATIO` 常量并由 `PetGlowTest` 钉死
+- 两个绘制类（PetView / BubblePetView）各自维护一套复用对象，**没有抽公共基类**——
+  见第七节待办
+
+**③ lint**：原先 8 个 error **全是设计内误报**（MediaStore 29+、AudioManager 31+，
+调用点都有 `SDK_INT` 早退），但常驻 error 会让人对整个报告麻本。
+已就地 `@SuppressLint` 并写明理由 —— 集中屏蔽不如紧挨代码的注解可读。
+`local.properties` 的 `PropertyEscape` 走 `app/lint.xml`（它是自动生成且已 gitignore 的）。
+
+**④ 漏翻译**：新增的三个成就弹窗字符串当时只写了中文，lint 报 MissingTranslation。
+**改 `values/strings.xml` 记得同步 `values-en/`**。
 
 ### ⚠️ 两个只有真机才能发现的 bug（预览与单测全部漏掉）
 
@@ -261,7 +308,7 @@ Achievements.evaluate(this, sessions.size, maxMs, listenDays, stageNow)
 
 ---
 
-## 五、七个会绊倒人的坑
+## 五、十个会绊倒人的坑
 
 ### 1. `gradle test` 在这个路径下跑不了（必须用脚本）
 
@@ -335,6 +382,37 @@ powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1 *> out.txt
 
 ---
 
+### 8. 不要对资源目录做递归删除（2026-10-07 踩过）
+
+想删图标 PNG 时顺手清空密度桶目录，写成了：
+
+```powershell
+Get-ChildItem app\src\main\res -Directory | ForEach-Object { Remove-Item $_.FullName -Recurse -Force }
+```
+
+**结果是整个 `res/` 被删光**（drawable / layout / values / xml 全没了）——
+本意只是清掉空目录。
+
+本项目所有资源都已在 git 里，`git checkout -- app/src/main/res` 一键全恢复；
+但当时若有未提交的资源改动就直接没了。**正确做法**：
+
+- 只针对明确列出的文件删（`Get-ChildItem <dir> -File -Filter *.png`），不碰目录本身
+- 需要删空目录时，先把清单列出来看一眼再删
+- 删完立刻 `git status` 确认只动了预期内的文件
+
+### 9. Android string 里的撇号会被当转义符
+
+`values-en/strings.xml` 写 `the pet's left side`，aapt 直接报
+`Invalid unicode escape sequence in string`。需要写成 `pet\'s`，
+或者像我这次一样改成 `the left of the pet`。**改英文文案时避开撇号最省事。**
+
+### 10. 本项目没有 androidx，`@RequiresApi` 不可用
+
+`@RequiresApi` / `@ColorInt` / `@UiThread` 都在 **androidx.annotation**，
+而本项目零第三方依赖，编译直接报 `Unresolved reference`。
+框架只提供 `@SuppressLint` / `@TargetApi` / `@IntDef` 等少数几个。
+需要「声明版本要求 + 消 lint」时用 `@SuppressLint("NewApi")`。
+
 ## 六、已做过的真机验证结论（别重复劳动）
 
 OPPO PME110 / Android 16（API 36）实测确认：
@@ -350,13 +428,35 @@ OPPO PME110 / Android 16（API 36）实测确认：
 
 ---
 
-## 七、其它待办（优先级低）
+## 七、其它待办（按优先级）
 
-- `gradle test` 的根治（见坑 1）
-- 成就徽章：弹窗里点某个成就能不能也高亮精灵身上对应那一格（当前只展示，不联动）
+**高**
+
+- `PetView`(857行) 与 `BubblePetView`(321行) **各写一遍同一套 5 形态 + `drawFace`**。
+  改剪影就得手动同步两处——今晚已经吃过一次亏（图鉴大图不跟随选择、以及改形态要改两处）。
+  应抽出公共渲染器（形如 `PetRenderer.draw(canvas, stage, cx, cy, r, pal, t, …)`，
+  两个 View 只管尺寸与动画）。本轮的复用对象（shaderCache / scratchRect）也是各存一份。
+- 成就弹窗已改成徽章卡片，但**从未在真机上看过**（只改未验）。
+  弹窗里点某个成功能不能也高亮精灵身上对应那一格（当前只展示、不联动）。
+- 「持之以恒」口径：实现用的是**累计不同日期数 ≥ 7**，与设计表的「连续 7 天」
+  以及界面上的连续天数是两套口径。代码与文案自洽（非 bug），但待用户拍板。
+  ⚠️ `ach_unlocked` 是只增不减的持久化集合，改口径不会让已点亮的消失。
+
+**中**
+
+- `MainActivity` 1255 行 / 36 个函数，三个页面的 UI 挤在一个类里。
+  `showSkinGallery` 里还有三层嵌套局部函数（`rebuildRows` / `refreshPreview` …）。
+- `gradle test` 的根治：项目路径含中文，每次测试要镜像到 temp（30s+）。
+  把项目移到纯 ASCII 路径即可根治（用户尚未决定）。
+- `PetView` 各形态弧线处约 15 处每帧 `RectF` 分配（收益递减，未动）。
+
+**低**
+
 - VIBRATE 权限已加，但**触觉反馈是否真的被系统接受未在真机验证**
 - 剩余死代码清理（lint `UnusedResources` 仍有条目）
-- `PetView` 各形态弧线处约 15 处每帧 `RectF` 分配（收益递减，未动）
 - `BackupManager.findBackup` 已接通；`Stats.totals` / `xiiting_stats` 已随 `addDelta` 一并移除
 - 项目根目录有个遗留的目录联接 `D:\xt_projectsym`（指向本项目，诊断实验产物），
-  运行时拒绝删除，需手动 `rmdir D:\xt_projectsym`
+  需手动 `rmdir D:\xt_projectsym`（PowerShell 直接删会报错）
+- lint 剩下的 104 个 warning 里 `HardcodedText` 34 个、`PluralsCandidate` 13 个，
+  优先级低；`BatteryLife`(REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) 对 Play 政策有风险，
+  但当前渠道是酷安/应用宝/GitHub，不受影响

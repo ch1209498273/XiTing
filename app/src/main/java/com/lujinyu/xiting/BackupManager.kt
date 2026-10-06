@@ -1,6 +1,7 @@
 // XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/.trace
 package com.lujinyu.xiting
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
@@ -94,6 +95,17 @@ object BackupManager {
 
     /** 备份命名自愈：先清历史去重副本（自有行，可删），再尝试释放正名路径
      *  （卸载残留的无主行可能删不动——失败不影响后续写入，只是继续用去重名） */
+    /**
+     * 修补旧备份的文件名（改名为主备份 / 清理同前缀的历史件）。
+     *
+     * 唯一入口 [save] 已有 `SDK_INT < 29` 早退，这里消掉 NewApi 告警即可：
+     * 否则 lint 会在每一行报 error（MediaStore.Downloads 字段 29 才存在），
+     * 而这些常驻 error 会让人对整个 lint 报告麻本 —— 真正「新引入」的问题反而看不见了。
+     *
+     * 注：本项目零第三方依赖，没有 androidx，所以用框架自带的 @SuppressLint 而不是
+     * androidx 的 @RequiresApi。
+     */
+    @SuppressLint("NewApi")
     private fun healBackupNames(resolver: android.content.ContentResolver) {
         // 1) 清理本应用写出的历史去重副本（XiTing-backup (N).json 等）
         try {
@@ -127,6 +139,8 @@ object BackupManager {
         }
     }
 
+    /** 同 [healBackupNames]：只在 [save]（已守 SDK>=29）里被调用 */
+    @SuppressLint("NewApi")
     private fun insertAndWrite(resolver: android.content.ContentResolver, name: String, bytes: ByteArray) {
         val values = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, name)
@@ -140,6 +154,14 @@ object BackupManager {
     }
 
     /** 读取本机备份（若存在且为本设备创建）；返回 null 表示无可用备份 */
+    /**
+     * 读取本机备份（若存在且为本设备创建）；返回 null 表示无可用备份。
+     *
+     * **不能标 @RequiresApi(29)**：这个方法是自我守护的（内部 `SDK_INT < 29` 返回 null），
+     * 调用方在低版本上调用它完全合法，标了注解反而会把错误推到调用点。
+     * 所以这里只消告警并把理由写在原地，免得后人以为这 4 个 error 是待修的 bug。
+     */
+    @SuppressLint("NewApi")
     fun findBackup(ctx: Context): JSONObject? {
         if (Build.VERSION.SDK_INT < 29) return null
         return try {

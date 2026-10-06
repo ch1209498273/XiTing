@@ -69,10 +69,32 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
     private var paletteCache: PetPalette.Palette? = null
     private var paletteKey = Int.MIN_VALUE to (Float.NaN to Float.NaN)
 
+    // 与 PetView 同样的复用策略：悬浮球 10fps 常驻重绘，每帧新建 Path/RectF/Shader
+    // 就是每秒 200 个以上的对象。（黑幕盖住时 OverlayService 会 setAnimating(false) 停帧，
+    // 但用户不播放的绝大多数时间它都在跑。）
+    private val scratchRect = RectF()
+    private val pathA = Path()
+    private val pathB = Path()
+    private val pathC = Path()
+    private val shaderCache = HashMap<String, android.graphics.Shader>(8)
+    private var shaderKeyW = Int.MIN_VALUE
+    private var shaderKeyH = Int.MIN_VALUE
+
+    private fun shaderCacheCheck() {
+        if (shaderKeyW == width && shaderKeyH == height) return
+        shaderKeyW = width
+        shaderKeyH = height
+        shaderCache.clear()
+    }
+
+    private fun cachedShader(key: String, make: () -> android.graphics.Shader): android.graphics.Shader =
+        shaderCache.getOrPut(key) { make() }
+
     private fun palette(): PetPalette.Palette {
         val key = stage to (skinHue to skinSat)
         paletteCache?.let { if (key == paletteKey) return it }
         paletteKey = key
+        shaderCache.clear()
         return PetPalette.of(stage, skinHue, skinSat).also { paletteCache = it }
     }
 
@@ -141,6 +163,7 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         }
         val blinking = now < blinkUntil
         val pal = palette()
+        shaderCacheCheck()
 
         when (stage) {
             STAGE_SPARK -> drawSpark(canvas, cx, cy, s, t, blinking)
@@ -156,7 +179,8 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
     // 形态一：四角星
     private fun drawSpark(canvas: Canvas, cx: Float, cy: Float, s: Float, t: Float, blinking: Boolean) {
         val pal = palette()
-        val p = Path()
+        val p = pathA
+        p.reset()
         val spin = t * 0.5f
         for (i in 0 until 16) {
             val ang = (6.2831855f * i / 16) + spin
@@ -166,10 +190,12 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             if (i == 0) p.moveTo(x, y) else p.lineTo(x, y)
         }
         p.close()
-        bodyPaint.shader = android.graphics.LinearGradient(
-            cx - s, cy - s, cx + s, cy + s,
-            pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("spark") {
+            android.graphics.LinearGradient(
+                cx - s, cy - s, cx + s, cy + s,
+                pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawPath(p, bodyPaint)
         bodyPaint.shader = null
         drawMiniFace(canvas, cx, cy, s * 0.26f, blinking)
@@ -178,16 +204,19 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
     // 形态二：等离子球 + 旋转环
     private fun drawBall(canvas: Canvas, cx: Float, cy: Float, s: Float, t: Float, blinking: Boolean) {
         val pal = palette()
-        bodyPaint.shader = RadialGradient(
-            cx - s * 0.3f, cy - s * 0.3f, s * 1.5f,
-            pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("ball") {
+            RadialGradient(
+                cx - s * 0.3f, cy - s * 0.3f, s * 1.5f,
+                pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawCircle(cx, cy, s, bodyPaint)
         bodyPaint.shader = null
         // 内部电弧
         linePaint.color = pal.accentSoft
         linePaint.strokeWidth = s * 0.09f
-        val ap = Path()
+        val ap = pathA
+        ap.reset()
         for (k in 0 until 5) {
             val kk = k / 4f
             val ax = cx - s * 0.6f + s * 1.2f * kk
@@ -198,9 +227,9 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         // 旋转环（替换原来的青蓝环）
         linePaint.color = pal.accent
         linePaint.strokeWidth = s * 0.12f
-        val ring = RectF(cx - s * 1.35f, cy - s * 1.35f, cx + s * 1.35f, cy + s * 1.35f)
-        canvas.drawArc(ring, -t * 90, 100f, false, linePaint)
-        canvas.drawArc(ring, 180 - t * 90, 100f, false, linePaint)
+        scratchRect.set(cx - s * 1.35f, cy - s * 1.35f, cx + s * 1.35f, cy + s * 1.35f)
+        canvas.drawArc(scratchRect, -t * 90, 100f, false, linePaint)
+        canvas.drawArc(scratchRect, 180 - t * 90, 100f, false, linePaint)
         drawMiniFace(canvas, cx, cy, s * 0.24f, blinking)
     }
 
@@ -230,15 +259,18 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         val pal = palette()
         val topY = cy - s * 0.72f
         val h = s * 1.45f
-        val funnel = Path()
+        val funnel = pathA
+        funnel.reset()
         funnel.moveTo(cx - s * 0.26f, topY)
         funnel.cubicTo(cx - s * 0.34f, topY + h * 0.36f, cx - s * 0.68f, topY + h * 0.70f, cx - s * 0.95f, topY + h)
         funnel.lineTo(cx + s * 0.95f, topY + h)
         funnel.cubicTo(cx + s * 0.68f, topY + h * 0.70f, cx + s * 0.34f, topY + h * 0.36f, cx + s * 0.26f, topY)
         funnel.close()
-        bodyPaint.shader = android.graphics.LinearGradient(
-            cx, topY, cx, topY + h, pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("storm") {
+            android.graphics.LinearGradient(
+                cx, topY, cx, topY + h, pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
+            )
+        }
         bodyPaint.alpha = 95
         canvas.drawPath(funnel, bodyPaint)
         bodyPaint.shader = null
@@ -257,8 +289,9 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             linePaint.strokeWidth = s * 0.17f * (1f - 0.4f * tt)
             linePaint.color = if (i % 2 == 0) pal.accent else pal.accentSoft
             linePaint.alpha = (225 - tt * 70).toInt().coerceIn(0, 255)
-            canvas.drawArc(RectF(cx - w, y - ry, cx + w, y + ry), 28f, 124f, false, linePaint)
-            canvas.drawArc(RectF(cx - w, y - ry, cx + w, y + ry), 208f, 124f, false, linePaint)
+            scratchRect.set(cx - w, y - ry, cx + w, y + ry)
+            canvas.drawArc(scratchRect, 28f, 124f, false, linePaint)
+            canvas.drawArc(scratchRect, 208f, 124f, false, linePaint)
             canvas.restore()
         }
         linePaint.alpha = 255
@@ -281,13 +314,15 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             linePaint.strokeWidth = if (i == 0) s * 0.15f else s * 0.10f
             linePaint.color = if (i == 0) pal.accent else pal.accentSoft
             linePaint.alpha = if (i == 0) 225 else 150
-            canvas.drawArc(RectF(cx - rx, cy - ry, cx + rx, cy + ry), start, 180f, false, linePaint)
+            scratchRect.set(cx - rx, cy - ry, cx + rx, cy + ry)
+            canvas.drawArc(scratchRect, start, 180f, false, linePaint)
             canvas.restore()
         }
         ringHalf(0, 180f)
         ringHalf(1, 180f)
         // 六芒核心
-        val core = Path()
+        val core = pathA
+        core.reset()
         for (i in 0 until 12) {
             val ang = 6.2831855f * i / 12 - 1.5708f
             val rad = s * (if (i % 2 == 0) 1.05f else 0.45f)
@@ -296,9 +331,11 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             if (i == 0) core.moveTo(x, y) else core.lineTo(x, y)
         }
         core.close()
-        bodyPaint.shader = RadialGradient(
-            cx - s * 0.25f, cy - s * 0.3f, s * 1.7f, pal.highlight, pal.deep, Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("king") {
+            RadialGradient(
+                cx - s * 0.25f, cy - s * 0.3f, s * 1.7f, pal.highlight, pal.deep, Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawPath(core, bodyPaint)
         bodyPaint.shader = null
         // 下半环盖在核心之上
@@ -311,7 +348,8 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         val hh = s * 0.38f
         val ww = s * 0.08f
         boltPaint.color = pal.highlight
-        val sp = Path()
+        val sp = pathB
+        sp.reset()
         sp.moveTo(cx, sy - hh)
         sp.lineTo(cx + ww, sy - ww)
         sp.lineTo(cx + hh, sy)
@@ -350,14 +388,16 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         }
         linePaint.color = 0xFF2E3B47.toInt()
         linePaint.strokeWidth = er * 0.32f
-        val p = Path()
+        val p = pathC
+        p.reset()
         p.moveTo(cx - er * 0.8f, cy + er * 1.5f)
         p.quadTo(cx, cy + er * 2.3f, cx + er * 0.8f, cy + er * 1.5f)
         canvas.drawPath(p, linePaint)
     }
 
     private fun drawBolt(canvas: Canvas, x: Float, y: Float, sz: Float) {
-        val p = Path()
+        val p = pathC
+        p.reset()
         p.moveTo(x + sz * 0.25f, y)
         p.lineTo(x - sz * 0.35f, y + sz * 0.9f)
         p.lineTo(x + sz * 0.02f, y + sz * 0.9f)

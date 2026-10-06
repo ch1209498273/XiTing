@@ -39,6 +39,20 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         /** 新点亮徽章的脉冲高亮时长（ms） */
         private const val BADGE_GLOW_MS = 1400L
 
+        /**
+         * 光晕**渐变**的半径（= 视图高度 × 本系数），必须是渐变淡出到透明的半径。
+         *
+         * 而实际画出来的光晕圆半径是 `r × 1.8`（雷霆之王还会脉动到 `r × 1.85`），
+         * r 最大为 `0.25 × height` → 最远 `0.4625 × height`。
+         * 渐变半径一旦小于它，光晕就会被硬生生截断成一个可见的圆盘边界。
+         * [GLOW_CIRCLE_MAX_RATIO] 把这个不变量显式化（并有单测钉住），
+         * 以后改形态尺寸时就会立刻报错，而不是「看着有点怪但说不清」。
+         */
+        const val GLOW_GRADIENT_RATIO = 0.475f
+
+        /** 光晕圆半径相对视图高度的最大值（雷霆之王脉动峰值） */
+        const val GLOW_CIRCLE_MAX_RATIO = 0.25f * 1.85f
+
         fun stageOf(gp: Long): Int = when {
             gp >= THRESHOLDS[4] -> STAGE_KING
             gp >= THRESHOLDS[3] -> STAGE_STORM
@@ -142,9 +156,35 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private val faceHiPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
     private val scratchRect = RectF()
     private val scratchRect2 = RectF()
+    /** 能量条几何：energyBar() 以前每次调用都 new 一个 RectF，而一帧里要被调用 3~4 次 */
+    private val energyScratch = RectF()
     /** 螺旋飘带 / 星芒的复用 Path（每帧新建会持续给 GC 添压力，见上方注释） */
     private val ribbon = Path()
+    private val pathA = Path()
+    private val pathB = Path()
+    private val pathC = Path()
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+
+    /**
+     * 着色器缓存。
+     *
+     * 之前每帧 new 一个 LinearGradient / RadialGradient（精灵本体 6~7 个，悬浮球另有 4 个），
+     * 统计页 30fps 就是每秒 200 个以上的 native 对象。这些几何只随 **view 尺寸** 变化，
+     * 与动画无关，所以按 (width, height) 缓存即可。
+     *
+     * 底部进度条的渐变早就是这个做法，这里把它推广到其余全部。
+     */
+    private val shaderCache = HashMap<String, android.graphics.Shader>(8)
+    private var shaderKeyW = Int.MIN_VALUE
+    private var shaderKeyH = Int.MIN_VALUE
+
+    /** 尺寸变化时清空着色器缓存（尺寸不变就不清，否则动画中也会反复重建） */
+    private fun shaderCacheCheck() {
+        if (shaderKeyW == width && shaderKeyH == height) return
+        shaderKeyW = width
+        shaderKeyH = height
+        shaderCache.clear()
+    }
 
     /** 进度条渐变缓存：几何随 view 尺寸而定，尺寸不变就不必每帧重建 */
     private var barGradient: android.graphics.LinearGradient? = null
@@ -189,14 +229,21 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         return Triple(cx, cy, r)
     }
 
-    /** 左侧常驻能量条（电池：容量 200，点击即充能） */
+    /**
+     * 左侧常驻能量条（电池：容量 200，点击即充能）。
+     *
+     * 以前直接 return new RectF(...)，而它一帧里要被 energyBar/badgeColumn/helpCenter/
+     * onTouchEvent 调 3~4 次 —— 单这一项就是每帧 3~4 个对象。
+     * 现在写入共享的 [energyScratch]，**调用方不得跨调用持有返回值**。
+     */
     private fun energyBar(): RectF {
         val h = height.toFloat()
         val bw = (h * 0.055f).coerceAtLeast(20f)
         val bh = h * 0.5f
         val bx = width * 0.06f
         val by = (h - bh) / 2f
-        return RectF(bx, by, bx + bw, by + bh)
+        energyScratch.set(bx, by, bx + bw, by + bh)
+        return energyScratch
     }
 
     /** ? 问号说明图标中心（点击弹出能量机制说明） */
@@ -301,8 +348,13 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         val key = stage to (skinHue to skinSat)
         paletteCache?.let { if (key == paletteKey) return it }
         paletteKey = key
+        // 调色板变了，缓存的着色器（内含具体颜色）全部作废
+        shaderCache.clear()
         return PetPalette.of(stage, skinHue, skinSat).also { paletteCache = it }
     }
+
+    private fun cachedShader(key: String, make: () -> android.graphics.Shader): android.graphics.Shader =
+        shaderCache.getOrPut(key) { make() }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -333,6 +385,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         val t = (now - bornAt) / 1000f
         val (cx, cy, r) = geometry()
         val pal = palette()
+        shaderCacheCheck()
 
         // 眨眼
         if (now > nextBlinkAt) {
@@ -348,12 +401,21 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         // 换肤时又会被色相旋转搅乱，现在与主体同源。
         val glowColor = if (sleepy) 0x14222930.toInt()
         else (pal.glow and 0x00FFFFFF) or (0x50 shl 24)
-        glowPaint.shader = RadialGradient(
-            cx, cy, glowR,
-            glowColor,
-            Color.TRANSPARENT, Shader.TileMode.CLAMP
-        )
-        if (!thumbMode) canvas.drawCircle(cx, cy, glowR, glowPaint)
+        if (!thumbMode) {
+            // 渐变以本点为圆心建立，再靠 canvas 平移绘制。
+            // 这样它只随尺寸变化 → 可缓存；同时精灵的上下浮动仍能正确带动光晕
+            // （直接用带偏移的 cy 建渐变就既不能缓存、也跟着一起动不了）。
+            glowPaint.shader = cachedShader("glow$sleepy") {
+                RadialGradient(
+                    0f, 0f, height * GLOW_GRADIENT_RATIO,
+                    glowColor, Color.TRANSPARENT, Shader.TileMode.CLAMP
+                )
+            }
+            canvas.save()
+            canvas.translate(cx, cy)
+            canvas.drawCircle(0f, 0f, glowR, glowPaint)
+            canvas.restore()
+        }
 
         // 环绕微粒（形态越高越多）
         if (!thumbMode && !sleepy && stage >= STAGE_BALL) {
@@ -392,13 +454,14 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
                     // 等离子爆裂：锯齿电弧四射
                     linePaint.color = 0xFF00E5FF.toInt()
                     linePaint.strokeWidth = 4f
+                    val arcPath = pathA
                     for (i in 0 until 6) {
                         val ang = (6.2831855f * i / 6) + k * 2f
-                        val p = Path()
-                        p.moveTo(cx + cos(ang) * r * 1.0f, cy + sin(ang) * r * 1.0f)
-                        p.lineTo(cx + cos(ang + 0.2f) * r * (1.25f + 0.5f * k), cy + sin(ang + 0.2f) * r * (1.25f + 0.5f * k))
-                        p.lineTo(cx + cos(ang - 0.15f) * r * (1.5f + 0.7f * k), cy + sin(ang - 0.15f) * r * (1.5f + 0.7f * k))
-                        canvas.drawPath(p, linePaint)
+                        arcPath.reset()
+                        arcPath.moveTo(cx + cos(ang) * r * 1.0f, cy + sin(ang) * r * 1.0f)
+                        arcPath.lineTo(cx + cos(ang + 0.2f) * r * (1.25f + 0.5f * k), cy + sin(ang + 0.2f) * r * (1.25f + 0.5f * k))
+                        arcPath.lineTo(cx + cos(ang - 0.15f) * r * (1.5f + 0.7f * k), cy + sin(ang - 0.15f) * r * (1.5f + 0.7f * k))
+                        canvas.drawPath(arcPath, linePaint)
                     }
                     // 扩散电环
                     linePaint.color = 0xFF80DEEA.toInt()
@@ -426,10 +489,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
                         val pk = 0.15f + i * 0.2f
                         val w = r * (1.3f - 0.95f * pk)
                         val y = cy - r * 0.85f + pk * r * 1.6f
-                        canvas.drawArc(
-                            RectF(cx - w, y - r * 0.14f, cx + w, y + r * 0.14f),
-                            k * 720f, 110f, false, linePaint
-                        )
+                        scratchRect.set(cx - w, y - r * 0.14f, cx + w, y + r * 0.14f)
+                        canvas.drawArc(scratchRect, k * 720f, 110f, false, linePaint)
                     }
                     boltPaint.color = 0xFF8FD0FF.toInt()
                     drawBolt(canvas, cx + r * 0.95f, cy - r * 0.1f, r * (0.3f + 0.3f * k))
@@ -441,11 +502,12 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
                     linePaint.strokeWidth = 4.5f
                     for (i in 0 until 12) {
                         val ang = (6.2831855f * i / 12) + k * 1.2f
-                        val p = Path()
-                        p.moveTo(cx + cos(ang) * r * 0.9f, cy + sin(ang) * r * 0.9f)
-                        p.lineTo(cx + cos(ang + 0.12f) * r * (1.3f + 0.4f * k), cy + sin(ang + 0.12f) * r * (1.3f + 0.4f * k))
-                        p.lineTo(cx + cos(ang) * r * (1.7f + 0.8f * k), cy + sin(ang) * r * (1.7f + 0.8f * k))
-                        canvas.drawPath(p, linePaint)
+                        val ray = pathA
+                        ray.reset()
+                        ray.moveTo(cx + cos(ang) * r * 0.9f, cy + sin(ang) * r * 0.9f)
+                        ray.lineTo(cx + cos(ang + 0.12f) * r * (1.3f + 0.4f * k), cy + sin(ang + 0.12f) * r * (1.3f + 0.4f * k))
+                        ray.lineTo(cx + cos(ang) * r * (1.7f + 0.8f * k), cy + sin(ang) * r * (1.7f + 0.8f * k))
+                        canvas.drawPath(ray, linePaint)
                     }
                     linePaint.color = 0xAAFFC94D.toInt()
                     canvas.drawCircle(cx, cy, r * (1.2f + 0.7f * k), linePaint)
@@ -498,16 +560,14 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             val fillH = bar.height() * total / EnergyStore.MAX_PENDING.toFloat()
             if (fillH > 1f) {
                 barFillPaint.color = 0xFFFFC94D.toInt()
-                canvas.drawRoundRect(
-                    RectF(bar.left, bar.bottom - fillH, bar.right, bar.bottom), rr, rr, barFillPaint
-                )
+                scratchRect2.set(bar.left, bar.bottom - fillH, bar.right, bar.bottom)
+                canvas.drawRoundRect(scratchRect2, rr, rr, barFillPaint)
                 // 临期段（底部，最早产生的最先过期）：红色警示
                 val redH = bar.height() * nearing / EnergyStore.MAX_PENDING.toFloat()
                 if (redH > 1f) {
                     barFillPaint.color = 0xFFFF5252.toInt()
-                    canvas.drawRoundRect(
-                        RectF(bar.left, bar.bottom - redH, bar.right, bar.bottom), rr, rr, barFillPaint
-                    )
+                    scratchRect.set(bar.left, bar.bottom - redH, bar.right, bar.bottom)
+                    canvas.drawRoundRect(scratchRect, rr, rr, barFillPaint)
                 }
             }
             // 数值（条上方单行，统一字号两段色）
@@ -526,6 +586,10 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             popPaint.color = 0xFF1E8E5A.toInt()
             popPaint.textSize = 30f
             // ? 说明图标
+            // ⚠️ helpCenter() 内部会调 energyBar()，而 energyBar() 返回的是共享的
+            // energyScratch —— 调用它等于覆写 `bar`。此处是全函数最后一次用到 `bar`
+            // （上一次是上面 maxStr 那行 drawText），所以顺序安全。
+            // 以后若在下面新增用到 `bar` 的代码，必须先把它拷进另一个 RectF。
             val (hx, hy) = helpCenter()
             bodyPaint.color = 0xFFDDE1E6.toInt()
             canvas.drawCircle(hx, hy, 24f, bodyPaint)
@@ -611,7 +675,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         // 八角星轮廓：长尖+短凹交替（闪烁感），随时间轻微旋转呼吸
         val spin = t * 0.3f
         val breathe = 1f + 0.04f * sin(t * 3f)
-        val p = Path()
+        val p = pathA
+        p.reset()
         for (i in 0 until 16) {
             val ang = (6.2831855f * i / 16) + spin
             val rad = (if (i % 2 == 0) r * 1.15f else r * 0.5f) * breathe
@@ -620,12 +685,14 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             if (i == 0) p.moveTo(x, y) else p.lineTo(x, y)
         }
         p.close()
-        bodyPaint.shader = android.graphics.LinearGradient(
-            cx - r, cy - r, cx + r, cy + r,
-            if (sleepy) 0xFFCFD8DC.toInt() else pal.bodyLight,
-            if (sleepy) 0xFF90A4AE.toInt() else pal.shade,
-            Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("spark$sleepy") {
+            android.graphics.LinearGradient(
+                cx - r, cy - r, cx + r, cy + r,
+                if (sleepy) 0xFFCFD8DC.toInt() else pal.bodyLight,
+                if (sleepy) 0xFF90A4AE.toInt() else pal.shade,
+                Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawPath(p, bodyPaint)
         bodyPaint.shader = null
         // 外描边亮边
@@ -634,10 +701,12 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         canvas.drawPath(p, linePaint)
         // 中心亮核
         val core = if (sleepy) 0xFFCFD8DC.toInt() else pal.highlight
-        bodyPaint.shader = RadialGradient(
-            cx, cy, r * 0.75f,
-            core, core and 0x00FFFFFF, Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("sparkCore$sleepy") {
+            RadialGradient(
+                cx, cy, r * 0.75f,
+                core, core and 0x00FFFFFF, Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawCircle(cx, cy, r * 0.72f, bodyPaint)
         bodyPaint.shader = null
         drawFace(canvas, cx, cy, r * 0.16f, blinking, fierce = false)
@@ -647,20 +716,23 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private fun drawBall(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
         val pal = palette()
         // 深空球体：中心亮 → 边缘深
-        bodyPaint.shader = RadialGradient(
-            cx - r * 0.3f, cy - r * 0.32f, r * 1.55f,
-            if (sleepy) 0xFFCFD8DC.toInt() else pal.bodyLight,
-            if (sleepy) 0xFF78909C.toInt() else pal.deep,
-            Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("ball$sleepy") {
+            RadialGradient(
+                cx - r * 0.3f, cy - r * 0.32f, r * 1.55f,
+                if (sleepy) 0xFFCFD8DC.toInt() else pal.bodyLight,
+                if (sleepy) 0xFF78909C.toInt() else pal.deep,
+                Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawCircle(cx, cy, r, bodyPaint)
         bodyPaint.shader = null
         // 内部等离子电弧（两道锯齿电弧，随时间滑动）
         linePaint.color = if (sleepy) 0x66E0E0E0.toInt() else pal.accentSoft
         linePaint.strokeWidth = r * 0.09f
+        val ap = pathA
         for (arc in 0 until 2) {
             val phase = t * 1.6f + arc * 2.4f
-            val ap = Path()
+            ap.reset()
             var first = true
             for (k in 0 until 7) {
                 val kk = k / 6f
@@ -673,16 +745,14 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         // 外环绕电弧环（两段旋转）
         linePaint.color = if (sleepy) 0x5580DEEA.toInt() else pal.accent
         linePaint.strokeWidth = r * 0.11f
-        val ring = RectF(cx - r * 1.32f, cy - r * 1.32f, cx + r * 1.32f, cy + r * 1.32f)
-        canvas.drawArc(ring, -t * 80, 100f, false, linePaint)
-        canvas.drawArc(ring, 180 - t * 80, 100f, false, linePaint)
+        scratchRect.set(cx - r * 1.32f, cy - r * 1.32f, cx + r * 1.32f, cy + r * 1.32f)
+        canvas.drawArc(scratchRect, -t * 80, 100f, false, linePaint)
+        canvas.drawArc(scratchRect, 180 - t * 80, 100f, false, linePaint)
         // 左上高光
         linePaint.color = if (sleepy) 0x99FFFFFF.toInt() else pal.highlight
         linePaint.strokeWidth = r * 0.08f
-        canvas.drawArc(
-            RectF(cx - r * 0.92f, cy - r * 0.92f, cx + r * 0.92f, cy + r * 0.92f),
-            205f, 62f, false, linePaint
-        )
+        scratchRect2.set(cx - r * 0.92f, cy - r * 0.92f, cx + r * 0.92f, cy + r * 0.92f)
+        canvas.drawArc(scratchRect2, 205f, 62f, false, linePaint)
         drawFace(canvas, cx, cy, r * 0.17f, blinking, fierce = false)
     }
 
@@ -711,10 +781,12 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         if (sleepy) {
             bodyPaint.color = 0xFFCFD8DC.toInt()
         } else {
-            bodyPaint.shader = android.graphics.LinearGradient(
-                cx, baseY - r * 1.2f, cx, baseY + r * 0.2f,
-                pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
-            )
+            bodyPaint.shader = cachedShader("cloud") {
+                android.graphics.LinearGradient(
+                    cx, baseY - r * 1.2f, cx, baseY + r * 0.2f,
+                    pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
+                )
+            }
         }
         lobesAt(0f, bodyPaint)
         bodyPaint.shader = null
@@ -723,13 +795,11 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             linePaint.color = pal.highlight
             linePaint.strokeWidth = r * 0.07f
             for (l in lobes) {
-                canvas.drawArc(
-                    android.graphics.RectF(
-                        cx + l[0] * r - l[1] * r, baseY + l[2] * r - l[1] * r,
-                        cx + l[0] * r + l[1] * r, baseY + l[2] * r + l[1] * r
-                    ),
-                    196f, 148f, false, linePaint
+                scratchRect.set(
+                    cx + l[0] * r - l[1] * r, baseY + l[2] * r - l[1] * r,
+                    cx + l[0] * r + l[1] * r, baseY + l[2] * r + l[1] * r
                 )
+                canvas.drawArc(scratchRect, 196f, 148f, false, linePaint)
             }
             // 雨帘
             linePaint.color = pal.accentSoft
@@ -763,15 +833,18 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         val h = r * 1.80f
 
         // 极淡的漏斗体，只给体量感
-        val funnel = Path()
+        val funnel = pathA
+        funnel.reset()
         funnel.moveTo(cx - r * 0.26f, topY)
         funnel.cubicTo(cx - r * 0.34f, topY + h * 0.36f, cx - r * 0.68f, topY + h * 0.70f, cx - r * 1.00f, topY + h)
         funnel.lineTo(cx + r * 1.00f, topY + h)
         funnel.cubicTo(cx + r * 0.68f, topY + h * 0.70f, cx + r * 0.34f, topY + h * 0.36f, cx + r * 0.26f, topY)
         funnel.close()
-        bodyPaint.shader = android.graphics.LinearGradient(
-            cx, topY, cx, topY + h, pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("tornado${if (sleepy) 1 else 0}") {
+            android.graphics.LinearGradient(
+                cx, topY, cx, topY + h, pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
+            )
+        }
         bodyPaint.alpha = if (sleepy) 170 else 95
         canvas.drawPath(funnel, bodyPaint)
         bodyPaint.shader = null
@@ -852,7 +925,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         }
 
         // 六芒能量核心
-        val core = Path()
+        val core = pathA
+        core.reset()
         for (i in 0 until 12) {
             val ang = 6.2831855f * i / 12 - 1.5708f
             val rad = r * (if (i % 2 == 0) 1.02f else 0.44f)
@@ -865,10 +939,12 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             bodyPaint.color = 0xFFCFD8DC.toInt()
             canvas.drawPath(core, bodyPaint)
         } else {
-            bodyPaint.shader = RadialGradient(
-                cx - r * 0.25f, cy - r * 0.30f, r * 1.7f,
-                pal.highlight, pal.deep, Shader.TileMode.CLAMP
-            )
+            bodyPaint.shader = cachedShader("king$sleepy") {
+                RadialGradient(
+                    cx - r * 0.25f, cy - r * 0.30f, r * 1.7f,
+                    pal.highlight, pal.deep, Shader.TileMode.CLAMP
+                )
+            }
             canvas.drawPath(core, bodyPaint)
             bodyPaint.shader = null
         }
@@ -902,7 +978,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             val ww = r * 0.085f
             fillPaint.color = pal.highlight
             fillPaint.alpha = 235
-            val sp = Path()
+            val sp = pathB
+            sp.reset()
             sp.moveTo(cx, sy - hh)
             sp.lineTo(cx + ww, sy - ww)
             sp.lineTo(cx + hh, sy)
@@ -964,7 +1041,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         if (sleepy) {
             canvas.drawLine(cx, my, cx + er * 0.9f, my, linePaint)
         } else {
-            val p = Path()
+            val p = pathC
+            p.reset()
             p.moveTo(cx - er * 0.75f, my)
             p.quadTo(cx, my + er * 0.85f, cx + er * 0.75f, my)
             canvas.drawPath(p, linePaint)
@@ -972,7 +1050,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     }
 
     private fun drawBolt(canvas: Canvas, x: Float, y: Float, s: Float) {
-        val p = Path()
+        val p = pathC
+        p.reset()
         p.moveTo(x + s * 0.25f, y)
         p.lineTo(x - s * 0.35f, y + s * 0.9f)
         p.lineTo(x + s * 0.02f, y + s * 0.9f)

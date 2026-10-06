@@ -1,6 +1,7 @@
 // XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/.trace
 package com.lujinyu.xiting
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -80,6 +81,15 @@ class OverlayService : Service() {
     // 改为 Any 持有 + 独立方法内创建，只在 31+ 分支调用时才解析类型。
     private var modeListener: Any? = null
 
+    /**
+     * 注册音频模式监听（来电/通话检测）。
+     *
+     * 仅 31+ 调用（见下方两个 `SDK_INT >= 31` 分支）。消掉 NewApi 告警即可 ——
+     * 它们是**设计内的**：上方注释记着当初「矩阵回归 api26/29 实测崩溃」，
+     * 所以 `OnModeChangedListener` 这个类型必须隔离在方法体内，
+     * 只在 31+ 真正调用时才被解析。
+     */
+    @SuppressLint("NewApi")
     private fun registerModeListener() {
         val l = AudioManager.OnModeChangedListener { mode ->
             Log.i(TAG, "audio mode -> $mode")

@@ -30,3 +30,5 @@ uat/
 # 若确实想纳入版本控制，删掉下面两行，或对单个文件用 git add -f。
 物料/
 小红书/
+.cowork-temp/
+tools/__pycache__/

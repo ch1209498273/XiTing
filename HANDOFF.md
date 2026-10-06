@@ -97,8 +97,14 @@ powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
 
 做法：把 `Badges.kt` 里的路径控制点**原样**翻译成 SVG（Canvas 的 `moveTo/lineTo/cubicTo`
 与 SVG 的 `M/L/C` 语义一致），起个本地 HTTP 服务用浏览器截图，四个区块：
-放大看形状 / App 实际直径 45px / 未解锁 / 未解锁实际尺寸。脚本在
-`.cowork-temp/badge_preview.py`（临时目录，不入库）。
+放大看形状 / App 实际直径 45px / 未解锁 / 未解锁实际尺寸。
+
+```powershell
+python tools\badge_preview.py          # 生成 .cowork-temp/badges_preview.svg
+```
+
+> `file://` 协议被浏览器工具拦截，得起 HTTP 服务（`portal open` + `python -m http.server`）
+> 才能截图。改完图形务必重跑一次。
 
 **这步真的抓到了三个问题**，肉眼在代码里完全看不出来：
 1. 沙漏的玻璃用白色半透明描边，在金色底盘上几乎看不见 → 剩下一个橙色沙堆，读不出是沙漏 → 改深棕框 + 橙沙。
@@ -121,6 +127,9 @@ powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
 
 修法：徽章移到 `onDraw()` 中滤镜**之外**单独绘制（`drawBadgeColumn()`）。
 `能量条` 与 `? 图标` 仍留在滤镜内，与既有观感一致。
+
+> ⚠️ SVG 预览验不出这个 bug —— 预览里根本没有换肤滤镜。
+> **凡是涉及换肤的改动都必须在真机上看**，这是本项目第二条验证通道。
 
 **❗ 教训：任何承载「状态语义」的元素都不能参与换肤。**
 判断标准很简单——**它的颜色是否在传递信息**？传递信息的（成就徽章、临期红色警示）必须排除；

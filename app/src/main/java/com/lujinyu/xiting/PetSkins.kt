@@ -4,18 +4,17 @@ package com.lujinyu.xiting
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.view.View
 
 /**
- * 皮肤（图鉴收集）：同一套 Canvas 绘制按色相旋转换装。
+ * 皮肤（图鉴收集）：同一套 Canvas 绘制换个色相重画。
  *
- * 解锁维度与成就系统**刻意不重叠**：成就已占用「累计时长 1/10/50 小时、
- * 会话 100 次、单次 1 小时、连续 7 天、满级」，皮肤改用省电量、单次更长时长、
- * 更长连续天数、以及满级后继续储备的成长值。此前皮肤条件是
- * 10h / 50h / 7 天，与 h10 / h50 / week 三个成就同一时刻点亮 ——
- * 同一个里程碑拿两次奖励，用户没有任何额外获得感。
+ * 解锁维度与成就系统**刻意不重叠**：成就已占用「单次时长、会话 100 次、
+ * 连续 7 天、满级」，皮肤改用省电量、单次更长时长、更长连续天数、
+ * 以及满级后继续储备的成长值。此前皮肤条件是 10h / 50h / 7 天，
+ * 与 h10 / h50 / week 三个成就同一时刻点亮 —— 同一个里程碑拿两次奖励，
+ * 用户没有任何额外获得感。
  *
  * 全部离线，不涉及网络。
  */
@@ -35,20 +34,22 @@ object PetSkins {
     )
 
     /**
-     * 六款配色：色相均匀分布 60°，饱和度全部 >= 1.0 用来放大彼此差异。
+     * 六款配色：色相按**名字**定，不是按 60° 均分。
      *
-     * 两轮踩过的坑：
-     *  · 只靠色相：樱雨 190° 与 熔岩 200° 只差 10°，肉眼分不出 —— 现按 60° 均匀排开。
-     *  · 色相 + 降饱和：把某几款设成 0.7 想做「淡雅」，结果精灵主体本就浅，
-     *    降饱和直接洗成纯白（用户反馈「有的干脆全白了」）—— 故全部 >= 1.0。
+     * 均分色相（0/60/120/180/240/300）在旧的色相旋转方案下已经让四款皮肤名不副实：
+     * 「翡翠」渲染成洋红、「樱雨」是青、「熔岩」是蓝、「星夜」是黄。
+     * 旋转方案把这层混乱盖住了（旧版它们各自还保留了一部分原始底色），
+     * 但换成「色相直接决定颜色」之后就藏不住了 —— 所以这里按名字重新定色相。
+     *
+     * 饱和度全部 >= 1.0：只用来放大彩度，不用来淡化（<1 会把浅色主体洗成纯白）。
      */
     val ALL = listOf(
         Skin("default", 0f, 1.00f, R.string.skin_default_n, R.string.skin_cond_default),
-        Skin("star", 60f, 1.60f, R.string.skin_star_n, R.string.skin_cond_star),
-        Skin("aurora", 120f, 1.45f, R.string.skin_aurora_n, R.string.skin_cond_aurora),
-        Skin("sakura", 180f, 1.30f, R.string.skin_sakura_n, R.string.skin_cond_sakura),
-        Skin("magma", 240f, 1.50f, R.string.skin_magma_n, R.string.skin_cond_magma),
-        Skin("jade", 300f, 1.20f, R.string.skin_jade_n, R.string.skin_cond_jade)
+        Skin("star", 245f, 1.30f, R.string.skin_star_n, R.string.skin_cond_star),      // 星夜：深蓝紫
+        Skin("aurora", 160f, 1.35f, R.string.skin_aurora_n, R.string.skin_cond_aurora),  // 极光：青绿
+        Skin("sakura", 330f, 1.15f, R.string.skin_sakura_n, R.string.skin_cond_sakura),  // 樱雨：粉
+        Skin("magma", 15f, 1.45f, R.string.skin_magma_n, R.string.skin_cond_magma),      // 熔岩：橙红
+        Skin("jade", 105f, 1.20f, R.string.skin_jade_n, R.string.skin_cond_jade)         // 翡翠：翠绿
     )
 
     /**
@@ -133,39 +134,13 @@ object PetSkins {
     }
 
     /**
-     * 换肤滤镜：色相旋转 + 饱和度/明度调整。
+     * 换肤已于 2026-10 重构：不再是「画完对整张位图做色相旋转」的后处理滤镜，
+     * 而是**把色相变成绘制参数**（见 [PetPalette]）。旧的 `skinFilter()` 已删除。
      *
-     * 单纯色相旋转对这只精灵效果不好：主体接近白色，旋转后还是白色，
-     * 只有闪电、圆弧这些小面积强调色会变，于是六款配色看起来都差不多
-     * （用户反馈「樱雨和熔岩感觉一样的」）。色相差距拉到 55~65° 仍治标不治本。
-     *
-     * 所以再加一个饱和度系数：让配色从「同一只白精灵换个角度」变成
-     * 「白 / 金黄 / 墨绿」这种一眼可辨的差异。
+     * 原因：色相旋转会让青翼、紫影、金冠各自转到不同位置（撞色被完整保留，
+     * 等于每次换肤重新掷一次骰子），而且会把承载语义的灰白色元素染色。
+     * 改成按色相现算颜色后，一只精灵身上所有颜色都出自同一个 hue。
      */
-    fun skinFilter(deg: Float, saturation: Float): ColorMatrixColorFilter {
-        val rad = Math.toRadians(deg.toDouble())
-        val cos = kotlin.math.cos(rad).toFloat()
-        val sin = kotlin.math.sin(rad).toFloat()
-        val lr = 0.213f; val lg = 0.715f; val lb = 0.072f
-        val m = floatArrayOf(
-            lr + cos * (1 - lr) + sin * -lr, lg + cos * -lg + sin * -lg, lb + cos * -lb + sin * (1 - lb), 0f, 0f,
-            lr + cos * -lr + sin * 0.143f, lg + cos * (1 - lg) + sin * 0.140f, lb + cos * -lb + sin * -0.283f, 0f, 0f,
-            lr + cos * -lr + sin * -(1 - lr), lg + cos * -lg + sin * lg, lb + cos * lb + sin * lb, 0f, 0f,
-            0f, 0f, 0f, 1f, 0f
-        )
-        // 饱和度：先把 RGB 按亮度加权求灰度，再按 sat 拉回彩色
-        if (saturation != 1f) {
-            val sr = (1f - saturation) * lr
-            val sg = (1f - saturation) * lg
-            val sb = (1f - saturation) * lb
-            for (row in 0..2) {
-                m[row * 5] += sr
-                m[row * 5 + 1] += sg
-                m[row * 5 + 2] += sb
-            }
-        }
-        return ColorMatrixColorFilter(m)
-    }
 
     /** 离屏渲染指定形态 + 指定配色的精灵位图（图鉴缩略图 / 小组件共用） */
     fun snapshot(

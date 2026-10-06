@@ -110,7 +110,7 @@ object WidgetData {
             val skin = PetSkins.active(context)
             views.setImageViewBitmap(
                 R.id.widget_pet_img,
-                PetSkins.snapshot(context, showStage, skin.hue, 160, withBar = true, pct = pct)
+                PetSkins.snapshot(context, showStage, skin, 160, withBar = true, pct = pct)
             )
             views.setTextViewText(R.id.widget_pet, PetView.stageName(c, showStage))
             views.setTextViewText(

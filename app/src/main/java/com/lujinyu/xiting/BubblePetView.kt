@@ -49,12 +49,28 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
      */
     var skinHue = 0f
         set(value) {
-            if (field != value) {
-                field = value
-                hueLayerPaint.colorFilter = if (value == 0f) null else PetSkins.hueFilter(value)
-                invalidate()
-            }
+            if (field != value) { field = value; refreshSkinLayer(); invalidate() }
         }
+
+    /** 配色：饱和度系数，1.0=原样。与色相一起构成一套配色 */
+    var skinSat = 1f
+        set(value) {
+            if (field != value) { field = value; refreshSkinLayer(); invalidate() }
+        }
+
+    /**
+     * 一次性套用整套配色 —— 只设色相而漏掉饱和度是最难查的一类问题：
+     * 界面不崩，只是「这款皮肤看起来和别的没区别」。
+     */
+    fun applySkin(skin: PetSkins.Skin) {
+        skinHue = skin.hue
+        skinSat = skin.saturation
+    }
+
+    private fun refreshSkinLayer() {
+        hueLayerPaint.colorFilter =
+            if (skinHue == 0f && skinSat == 1f) null else PetSkins.skinFilter(skinHue, skinSat)
+    }
 
     /**
      * 套色相旋转用的图层画笔。
@@ -129,8 +145,8 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         }
         val blinking = now < blinkUntil
 
-        // 配色：整只精灵做色相旋转。默认配色(0)不走图层，省一次 saveLayer
-        val layer = if (skinHue != 0f) {
+        // 配色：整只精灵做色相旋转 + 饱和度调整。默认配色不走图层，省一次 saveLayer
+        val layer = if (skinHue != 0f || skinSat != 1f) {
             canvas.saveLayer(0f, 0f, width.toFloat(), height.toFloat(), hueLayerPaint)
         } else -1
 

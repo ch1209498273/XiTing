@@ -364,7 +364,7 @@ class OverlayService : Service() {
             val skin = PetSkins.active(this)
             BubblePetView(this).apply {
                 stage = st
-                skinHue = skin.hue
+                applySkin(skin)
                 layoutParams = android.view.ViewGroup.LayoutParams(size, size)
             }
         } else {

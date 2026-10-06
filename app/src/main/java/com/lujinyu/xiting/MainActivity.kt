@@ -516,14 +516,18 @@ private fun checkRestore() {
 
     /** 成就明细弹窗 */
     private fun showAchievements() {
-        val unlocked = prefs()
+        val raw = prefs()
             .getStringSet(Prefs.ACH_UNLOCKED, emptySet()) ?: emptySet()
-        val gotCount = unlocked.size
+        // 必须走 knownUnlocked 过滤，不能直接用 raw.size ——
+        // 老用户 prefs 里还留着已砍掉的 first/h1/h10/h50，直接取大小会显示「6/4」。
+        val known = knownUnlocked(raw)
+        val gotIds = known.map { it.id }.toSet()
         val msg = Achievements.ALL.joinToString("\n\n") { a ->
-            (if (a.id in unlocked) "✅ " else "🔒 ") + a.icon + " " + Achievements.title(this, a) + " · " + Achievements.desc(this, a)
+            (if (a.id in gotIds) "✅ " else "🔒 ") + a.icon + " " +
+                    Achievements.title(this, a) + " · " + Achievements.desc(this, a)
         }
         android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.ach_dlg_title_fmt, gotCount, Achievements.ALL.size))
+            .setTitle(getString(R.string.ach_dlg_title_fmt, known.size, Achievements.ALL.size))
             .setMessage(msg)
             .setPositiveButton(getString(R.string.dlg_ok), null)
             .show()
@@ -592,7 +596,7 @@ private fun showSkinGallery() {
 
         fun refreshPreview() {
             preview.setImageBitmap(
-                PetSkins.snapshot(this, curForm, curSkin.hue, (110 * d).toInt(), withBar = false, pct = 0)
+                PetSkins.snapshot(this, curForm, curSkin, (110 * d).toInt(), withBar = false, pct = 0)
             )
             previewLabel.text = "${PetView.stageName(this, curForm)} · ${PetSkins.name(this, curSkin)}"
             val maxed = curForm >= PetForm.unlockedStage(this)
@@ -615,7 +619,7 @@ private fun showSkinGallery() {
                 ).apply { marginEnd = (8 * d).toInt() }
             }
             box.addView(ImageView(this).apply {
-                setImageBitmap(PetSkins.snapshot(this@MainActivity, i, curSkin.hue, thumbPx, withBar = false, pct = 0))
+                setImageBitmap(PetSkins.snapshot(this@MainActivity, i, curSkin, thumbPx, withBar = false, pct = 0))
                 alpha = if (unlocked) 1f else 0.3f
             })
             box.addView(TextView(this).apply {
@@ -654,7 +658,7 @@ private fun showSkinGallery() {
                 ).apply { marginEnd = (8 * d).toInt() }
             }
             box.addView(ImageView(this).apply {
-                setImageBitmap(PetSkins.snapshot(this@MainActivity, curForm, skin.hue, thumbPx, withBar = false, pct = 0))
+                setImageBitmap(PetSkins.snapshot(this@MainActivity, curForm, skin, thumbPx, withBar = false, pct = 0))
                 alpha = if (unlocked) 1f else 0.3f
             })
             box.addView(TextView(this).apply {
@@ -875,20 +879,25 @@ private fun showSkinGallery() {
         // 因此这行必须保留——它不是死代码，是升级兼容点。
         EnergyStore.migrateIfNeeded(this, allMs / 60000, prefs.getInt(Prefs.SHARE_BONUS_GP_LEGACY, 0))
         val gp = EnergyStore.collectedTotal(this).toLong()
-        // 显示哪个形态由用户在图鉴里选（成长值只决定能选到哪一形态）
-        val stage = PetForm.selected(this)
-        pet.stage = stage
+        // 两个形态必须分清，混用会让「显示形态」污染「成长进度」：
+        //   showStage    —— 显示哪个，由用户在图鉴里选
+        //   growthStage  —— 成长值算到哪一形态，决定进度条 / 解锁锁 / 进化提示
+        // 曾经这里只有一个 stage（= selected），于是选了电球之后：
+        // 形态行把雷云以上全锁上、caption 变成「成长值 7296 / 300」。
+        val showStage = PetForm.selected(this)
+        val growthStage = PetView.stageOf(gp)
+        pet.stage = showStage
         val lastSessionAt = sessions.maxOfOrNull { it.start } ?: 0L
         pet.sleepy = lastSessionAt > 0 && (now - lastSessionAt) / (24L * 3600 * 1000) >= 3
         pet.totalMah = Stats.estimatedMah(allMs)
-        pet.progress = if (stage < PetView.STAGE_KING) {
-            val lo = PetView.THRESHOLDS[stage]
-            val hi = PetView.THRESHOLDS[stage + 1]
+        pet.progress = if (growthStage < PetView.STAGE_KING) {
+            val lo = PetView.THRESHOLDS[growthStage]
+            val hi = PetView.THRESHOLDS[growthStage + 1]
             ((gp - lo).toFloat() / (hi - lo)).coerceIn(0f, 1f)
         } else 1f
 
         // 显示哪个形态由 PetForm 统一决定（成长值只决定能选到哪一形态）
-        pet.stage = stage
+        pet.stage = showStage
         pet.hideProgress = false
         // 成长值装载与收取回调（点击左侧条=收取全部；回调在飞入动画完成后触发）
         pet.pending = EnergyStore.pending(this)
@@ -908,16 +917,16 @@ private fun showSkinGallery() {
                 .show()
         }
 
-        // 进化提示（仅当上次记录的形态更低时弹一次）
+        // 进化提示（仅当上次记录的形态更低时弹一次）——按成长值算，与显示哪个形态无关
         val seen = prefs.getInt(Prefs.LAST_SEEN_STAGE, -1)
-        if (seen in 0 until stage) {
+        if (seen in 0 until growthStage) {
             Toast.makeText(
                 this,
-                "🎉 进化！${PetView.stageName(this, seen)} → ${PetView.stageName(this, stage)}",
+                "🎉 进化！${PetView.stageName(this, seen)} → ${PetView.stageName(this, growthStage)}",
                 Toast.LENGTH_LONG
             ).show()
         }
-        if (seen != stage) prefs.edit().putInt(Prefs.LAST_SEEN_STAGE, stage).apply()
+        if (seen != growthStage) prefs.edit().putInt(Prefs.LAST_SEEN_STAGE, growthStage).apply()
 
         // 设置页分享行状态：今天是否还能领
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
@@ -925,24 +934,28 @@ private fun showSkinGallery() {
         pageSettings.findViewById<TextView>(R.id.share_sub).text =
             if (prefs.getString(Prefs.LAST_SHARE_DATE, "") == todayStr) getString(R.string.share_sub_claimed)
             else getString(R.string.share_sub_avail, SHARE_GP_PER_DAY)
-        // 文案
+        // 文案：描述的是「养成进度」，必须按成长值算，不能按当前显示的形态
         pageStats.findViewById<TextView>(R.id.pet_caption).text =
             if (pet.sleepy) {
-                getString(R.string.pet_caption_sleepy, PetView.stageName(this, stage))
-            } else if (stage >= PetView.STAGE_KING) {
-                getString(R.string.pet_caption_max, PetView.stageName(this, stage), gp)
+                getString(R.string.pet_caption_sleepy, PetView.stageName(this, showStage))
+            } else if (growthStage >= PetView.STAGE_KING) {
+                getString(R.string.pet_caption_max, PetView.stageName(this, growthStage), gp)
             } else {
-                getString(R.string.pet_caption_progress, PetView.stageName(this, stage), gp, PetView.THRESHOLDS[stage + 1])
+                getString(
+                    R.string.pet_caption_progress,
+                    PetView.stageName(this, growthStage), gp,
+                    PetView.THRESHOLDS[growthStage + 1]
+                )
             }
         // 分享入口在「设置」页（统计页不再重复）
         pet.startAnimating()
-        buildGallery(stage)
+        buildGallery(growthStage)
     }
 
-    /** 形态图鉴：点击缩略图切换当前展示形态（含未解锁的可预览，但不能选中） */
-    private fun buildGallery(currentStage: Int) {
-        if (galleryBuiltStage == currentStage && galleryBuiltSelected == PetForm.selected(this)) return
-        galleryBuiltStage = currentStage
+    /** 形态图鉴。传入的是**已解锁到**的形态（解锁锁与它有关），不是当前显示的形态。 */
+    private fun buildGallery(unlockedStage: Int) {
+        if (galleryBuiltStage == unlockedStage && galleryBuiltSelected == PetForm.selected(this)) return
+        galleryBuiltStage = unlockedStage
         galleryBuiltSelected = PetForm.selected(this)
         val selected = PetForm.selected(this)
         val row = pageStats.findViewById<LinearLayout>(R.id.thumb_row)
@@ -963,13 +976,13 @@ private fun showSkinGallery() {
             val pv = PetView(this).apply {
                 stage = i
                 thumbMode = true
-                skinHue = PetSkins.active(this@MainActivity).hue
+                applySkin(PetSkins.active(this@MainActivity))
                 layoutParams = android.widget.FrameLayout.LayoutParams(size, size)
                 setOnClickListener {
                     // 与「精灵图鉴」共用同一个选择入口。此前这里改的是 previewStage ——
                     // 一个只在本会话生效、不落盘的预览变量，于是统计页选了形态、
                     // 图鉴却毫无反应，两处各说各话。
-                    if (i > currentStage) {
+                    if (i > unlockedStage) {
                         Toast.makeText(this@MainActivity,
                             getString(R.string.gallery_form_locked_toast, PetForm.requiredFor(i)),
                             Toast.LENGTH_SHORT).show()
@@ -980,7 +993,7 @@ private fun showSkinGallery() {
                 }
             }
             frame.addView(pv)
-            if (i > currentStage) {
+            if (i > unlockedStage) {
                 // 小锁角标（右下角，不遮挡主体）
                 frame.addView(
                     TextView(this).apply {
@@ -1081,7 +1094,7 @@ private fun showSkinGallery() {
         // 精灵皮肤：应用所穿皮肤的色相
         val petView = pageStats.findViewById<PetView>(R.id.pet_view)
         val activeSkin = PetSkins.active(this)
-        petView.skinHue = activeSkin.hue
+        petView.applySkin(activeSkin)
         val mahSaved = Stats.estimatedMah(allMs)
         val skinProgress = PetSkins.SkinProgress(
             totalMs = allMs,
@@ -1323,7 +1336,7 @@ private fun showSkinGallery() {
             box.addView(
                 BubblePetView(this).apply {
                     this.stage = stage
-                    skinHue = skin.hue
+                    applySkin(skin)
                     layoutParams = LinearLayout.LayoutParams(size, size)
                 }
             )

@@ -21,7 +21,30 @@ import android.view.View
  */
 object PetSkins {
 
-    data class Skin(val id: String, val hue: Float, val nameRes: Int, val condRes: Int)
+    data class Skin(
+        val id: String,
+        val hue: Float,
+        /** 饱和度系数：1.0=原样，>1 更浓，<1 更淡。这是拉开六款差异的关键 —— 见 [skinFilter] */
+        val saturation: Float,
+        val nameRes: Int,
+        val condRes: Int
+    )
+
+    /**
+     * 换肤 = 整只精灵做色相旋转，所以配色之间必须拉开角度才分得清。
+     *
+     * 原先 sakura=190°、magma=200° 只差 10°，肉眼几乎一致 —— 但即使拉到 55~65°，
+     * 因为精灵主体接近白色，整体观感仍然差不多。所以在角度之外再加饱和度系数，
+     * 六款才真正一眼可辨（白 / 金黄 / 青 / 桃粉 / 绛紫 / 墨绿）。
+     */
+    val ALL = listOf(
+        Skin("default", 0f, 1.00f, R.string.skin_default_n, R.string.skin_cond_default),
+        Skin("star", 45f, 1.55f, R.string.skin_star_n, R.string.skin_cond_star),
+        Skin("aurora", 105f, 1.35f, R.string.skin_aurora_n, R.string.skin_cond_aurora),
+        Skin("sakura", 165f, 1.20f, R.string.skin_sakura_n, R.string.skin_cond_sakura),
+        Skin("magma", 225f, 0.70f, R.string.skin_magma_n, R.string.skin_cond_magma),
+        Skin("jade", 290f, 0.85f, R.string.skin_jade_n, R.string.skin_cond_jade)
+    )
 
     /**
      * 换肤解锁所需的统计快照。
@@ -42,23 +65,6 @@ object PetSkins {
 
     /** 满级后需额外储备的成长值（承接「已至巅峰·继续储备」设定） */
     private const val KING_RESERVE = 2000L
-
-    /**
-     * 换肤 = 整只精灵做色相旋转，所以配色之间必须拉开角度才分得清。
-     *
-     * 原先 sakura=190°、magma=200° 只差 10°，肉眼几乎一致——用户反馈
-     * 「樱雨精灵和熔岩暴君感觉一样的」就是这个。现按约 55~65° 均匀拉开，
-     * 保证六款一眼可辨。代价：名字里的「樱雨/熔岩/翡翠」不再对应某个固定色相，
-     * 因为旋转作用于整幅画（含高光与闪电），不是只换一个主色。
-     */
-    val ALL = listOf(
-        Skin("default", 0f, R.string.skin_default_n, R.string.skin_cond_default),
-        Skin("star", 45f, R.string.skin_star_n, R.string.skin_cond_star),
-        Skin("aurora", 105f, R.string.skin_aurora_n, R.string.skin_cond_aurora),
-        Skin("sakura", 165f, R.string.skin_sakura_n, R.string.skin_cond_sakura),
-        Skin("magma", 225f, R.string.skin_magma_n, R.string.skin_cond_magma),
-        Skin("jade", 290f, R.string.skin_jade_n, R.string.skin_cond_jade)
-    )
 
     fun name(ctx: Context, s: Skin): String = ctx.getString(s.nameRes)
     fun cond(ctx: Context, s: Skin): String = ctx.getString(s.condRes)
@@ -121,8 +127,17 @@ object PetSkins {
             .edit().putString(Prefs.PET_SKIN, s.id).apply()
     }
 
-    /** 色相旋转滤镜（度）。换肤的核心：绘制时对整只精灵做色相旋转，白底与高光不受影响 */
-    fun hueFilter(deg: Float): ColorMatrixColorFilter {
+    /**
+     * 换肤滤镜：色相旋转 + 饱和度/明度调整。
+     *
+     * 单纯色相旋转对这只精灵效果不好：主体接近白色，旋转后还是白色，
+     * 只有闪电、圆弧这些小面积强调色会变，于是六款配色看起来都差不多
+     * （用户反馈「樱雨和熔岩感觉一样的」）。色相差距拉到 55~65° 仍治标不治本。
+     *
+     * 所以再加一个饱和度系数：让配色从「同一只白精灵换个角度」变成
+     * 「白 / 金黄 / 墨绿」这种一眼可辨的差异。
+     */
+    fun skinFilter(deg: Float, saturation: Float): ColorMatrixColorFilter {
         val rad = Math.toRadians(deg.toDouble())
         val cos = kotlin.math.cos(rad).toFloat()
         val sin = kotlin.math.sin(rad).toFloat()
@@ -133,17 +148,40 @@ object PetSkins {
             lr + cos * -lr + sin * -(1 - lr), lg + cos * -lg + sin * lg, lb + cos * lb + sin * lb, 0f, 0f,
             0f, 0f, 0f, 1f, 0f
         )
+        // 饱和度：先把 RGB 按亮度加权求灰度，再按 sat 拉回彩色
+        if (saturation != 1f) {
+            val sr = (1f - saturation) * lr
+            val sg = (1f - saturation) * lg
+            val sb = (1f - saturation) * lb
+            for (row in 0..2) {
+                m[row * 5] += sr
+                m[row * 5 + 1] += sg
+                m[row * 5 + 2] += sb
+            }
+        }
         return ColorMatrixColorFilter(m)
     }
 
-    /** 离屏渲染指定形态+皮肤的精灵位图（小部件/图鉴共用） */
-    fun snapshot(context: Context, stage: Int, hue: Float, size: Int, withBar: Boolean, pct: Int): Bitmap {
+    /** 离屏渲染指定形态 + 指定配色的精灵位图（图鉴缩略图 / 小组件共用） */
+    fun snapshot(
+        context: Context,
+        stage: Int,
+        skin: Skin,
+        size: Int,
+        withBar: Boolean,
+        pct: Int
+    ): Bitmap {
         val barH = if (withBar) 26 else 0
         val bmp = Bitmap.createBitmap(size, size + barH, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bmp)
         val pet = PetView(context)
         pet.stage = stage
-        pet.skinHue = hue
+        pet.applySkin(skin)
+        // 必须置 thumbMode：否则 PetView 会把交互用的界面元素一并画进来 ——
+        // 左侧能量条、右下角「?」说明图标、以及 30fps 动画循环。
+        // 图鉴缩略图曾因此每张都糊着一条黄色能量条和一个问号，挤得看不清精灵本身。
+        // 小部件需要的进度条由本函数在下方单独绘制（withBar），不依赖 PetView 自己那条。
+        pet.thumbMode = true
         pet.hideProgress = true
         val spec = android.view.View.MeasureSpec.makeMeasureSpec(size, android.view.View.MeasureSpec.EXACTLY)
         pet.measure(spec, spec)

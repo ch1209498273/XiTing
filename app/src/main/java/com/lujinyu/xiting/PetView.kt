@@ -214,23 +214,47 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
 
     /** 换肤：色相旋转角度（度），0=默认配色；由 PetSkins 按所穿皮肤设置 */
     var skinHue = 0f
+        set(value) { if (field != value) { field = value; invalidate() } }
+
+    /** 换肤：饱和度系数，1.0=原样。与色相一起构成一套配色 —— 见 [PetSkins.skinFilter] */
+    var skinSat = 1f
+        set(value) { if (field != value) { field = value; invalidate() } }
+
+    /**
+     * 一次性套用整套配色。
+     *
+     * 让调用点只设 skinHue 而漏掉饱和度是迟早的事，而漏掉之后界面不会崩、
+     * 只会「这款皮肤看起来和别的没区别」——正是最难查的一类问题。
+     */
+    fun applySkin(skin: PetSkins.Skin) {
+        skinHue = skin.hue
+        skinSat = skin.saturation
+    }
 
     private var skinBmp: Bitmap? = null
     private var skinCv: Canvas? = null
     private val skinPaint = Paint()
+    private var skinFilterCache: android.graphics.ColorMatrixColorFilter? = null
+    private var skinFilterKey = Float.NaN to Float.NaN
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (skinHue != 0f && width > 0 && height > 0) {
-            // 换肤态：先画进离屏位图，再经色相矩阵滤镜合成（GPU 友好，全帧稳定）
+        if ((skinHue != 0f || skinSat != 1f) && width > 0 && height > 0) {
+            // 换肤态：先画进离屏位图，再经色相/饱和度矩阵滤镜合成（GPU 友好，全帧稳定）
             if (skinBmp == null || skinBmp!!.width != width || skinBmp!!.height != height) {
                 skinBmp?.recycle()
                 skinBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                 skinCv = Canvas(skinBmp!!)
+                skinFilterCache = null
+            }
+            val key = skinHue to skinSat
+            if (key != skinFilterKey) {
+                skinFilterKey = key
+                skinFilterCache = PetSkins.skinFilter(skinHue, skinSat)
             }
             skinCv!!.drawColor(android.graphics.Color.TRANSPARENT, android.graphics.PorterDuff.Mode.CLEAR)
             drawBody(skinCv!!)
-            skinPaint.colorFilter = PetSkins.hueFilter(skinHue)
+            skinPaint.colorFilter = skinFilterCache
             canvas.drawBitmap(skinBmp!!, 0f, 0f, skinPaint)
         } else {
             drawBody(canvas)

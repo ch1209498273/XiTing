@@ -24,26 +24,31 @@ object PetSkins {
     data class Skin(
         val id: String,
         val hue: Float,
-        /** 饱和度系数：1.0=原样，>1 更浓，<1 更淡。这是拉开六款差异的关键 —— 见 [skinFilter] */
+        /**
+         * 饱和度系数。**必须 >= 1.0**：精灵主体本就接近白色，
+         * 一旦降饱和（<1）就直接洗成纯白，轮廓和五官全看不见（用户实测反馈）。
+         * 所以这里只用来「放大」色相差异，不用来淡化。
+         */
         val saturation: Float,
         val nameRes: Int,
         val condRes: Int
     )
 
     /**
-     * 换肤 = 整只精灵做色相旋转，所以配色之间必须拉开角度才分得清。
+     * 六款配色：色相均匀分布 60°，饱和度全部 >= 1.0 用来放大彼此差异。
      *
-     * 原先 sakura=190°、magma=200° 只差 10°，肉眼几乎一致 —— 但即使拉到 55~65°，
-     * 因为精灵主体接近白色，整体观感仍然差不多。所以在角度之外再加饱和度系数，
-     * 六款才真正一眼可辨（白 / 金黄 / 青 / 桃粉 / 绛紫 / 墨绿）。
+     * 两轮踩过的坑：
+     *  · 只靠色相：樱雨 190° 与 熔岩 200° 只差 10°，肉眼分不出 —— 现按 60° 均匀排开。
+     *  · 色相 + 降饱和：把某几款设成 0.7 想做「淡雅」，结果精灵主体本就浅，
+     *    降饱和直接洗成纯白（用户反馈「有的干脆全白了」）—— 故全部 >= 1.0。
      */
     val ALL = listOf(
         Skin("default", 0f, 1.00f, R.string.skin_default_n, R.string.skin_cond_default),
-        Skin("star", 45f, 1.55f, R.string.skin_star_n, R.string.skin_cond_star),
-        Skin("aurora", 105f, 1.35f, R.string.skin_aurora_n, R.string.skin_cond_aurora),
-        Skin("sakura", 165f, 1.20f, R.string.skin_sakura_n, R.string.skin_cond_sakura),
-        Skin("magma", 225f, 0.70f, R.string.skin_magma_n, R.string.skin_cond_magma),
-        Skin("jade", 290f, 0.85f, R.string.skin_jade_n, R.string.skin_cond_jade)
+        Skin("star", 60f, 1.60f, R.string.skin_star_n, R.string.skin_cond_star),
+        Skin("aurora", 120f, 1.45f, R.string.skin_aurora_n, R.string.skin_cond_aurora),
+        Skin("sakura", 180f, 1.30f, R.string.skin_sakura_n, R.string.skin_cond_sakura),
+        Skin("magma", 240f, 1.50f, R.string.skin_magma_n, R.string.skin_cond_magma),
+        Skin("jade", 300f, 1.20f, R.string.skin_jade_n, R.string.skin_cond_jade)
     )
 
     /**

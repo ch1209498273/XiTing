@@ -579,19 +579,110 @@ private fun showSkinGallery() {
         // 当前选择：形态 + 配色
         var curForm = PetForm.selected(this)
         var curSkin = PetSkins.active(this)
-        val formBoxes = mutableListOf<View>()
-        val skinBoxes = mutableListOf<View>()
 
-        fun markSelected(box: View, selected: Boolean) {
-            box.background = android.graphics.drawable.GradientDrawable().apply {
-                cornerRadius = 12 * d
-                if (selected) {
-                    setColor(0x1420B26B)
-                    setStroke((1.5 * d).toInt().coerceAtLeast(1), 0xFF20B26B.toInt())
-                } else {
-                    setColor(0x0A000000)
-                }
+        // 选中态描边：重建时按当前选择直接画上去
+        fun selectedBg(selected: Boolean) = android.graphics.drawable.GradientDrawable().apply {
+            cornerRadius = 12 * d
+            if (selected) {
+                setColor(0x1420B26B)
+                setStroke((1.5 * d).toInt().coerceAtLeast(1), 0xFF20B26B.toInt())
+            } else {
+                setColor(0x0A000000)
             }
+        }
+
+        // 形态区的缩略图要随配色变、配色区的缩略图要随形态变，所以两行都必须能整体重建。
+        // 之前它们只在打开弹窗时渲染一次，于是「上面选了形态，下面配色还是旧形态」——
+        // 用户反馈的第二个问题。重建时保留当前滚动位置，免得跳回起点。
+        fun rebuildRows() {
+            val formScroll = formRow.parent as? android.widget.HorizontalScrollView
+            val skinScroll = skinRow.parent as? android.widget.HorizontalScrollView
+            val formX = formScroll?.scrollX ?: 0
+            val skinX = skinScroll?.scrollX ?: 0
+
+            formRow.removeAllViews()
+            skinRow.removeAllViews()
+
+            // ---- 形态区：成长值决定能选到哪一形态，选哪个由用户 ----
+            for (i in 0..PetView.STAGE_KING) {
+                val unlocked = PetForm.isUnlocked(this, i)
+                val box = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = android.view.Gravity.CENTER_HORIZONTAL
+                    val pad = (6 * d).toInt()
+                    setPadding(pad, pad, pad, pad)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { marginEnd = (8 * d).toInt() }
+                }
+                box.setBackground(selectedBg(i == curForm))
+                box.addView(ImageView(this).apply {
+                    // 形态缩略图用当前配色，一眼看出「这个形态穿上现在这身是什么样」
+                    setImageBitmap(PetSkins.snapshot(this@MainActivity, i, curSkin, thumbPx, withBar = false, pct = 0))
+                    alpha = if (unlocked) 1f else 0.3f
+                })
+                box.addView(TextView(this).apply {
+                    text = if (unlocked) PetView.stageName(this@MainActivity, i)
+                           else getString(R.string.gallery_locked_short, PetView.stageName(this@MainActivity, i))
+                    textSize = 11f
+                    setTextColor(0xFF6B7280.toInt())
+                })
+                box.setOnClickListener {
+                    if (!PetForm.select(this, i)) {
+                        Toast.makeText(this,
+                            getString(R.string.gallery_form_locked_toast, PetForm.requiredFor(i)),
+                            Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    curForm = i
+                    rebuildRows()
+                    applySkinEverywhere()
+                    Toast.makeText(this, getString(R.string.gallery_worn, PetView.stageName(this, i)),
+                        Toast.LENGTH_SHORT).show()
+                }
+                formRow.addView(box)
+            }
+
+            // ---- 配色区 ----
+            PetSkins.ALL.forEach { skin ->
+                val unlocked = skin.id in unlockedSkinIds
+                val box = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = android.view.Gravity.CENTER_HORIZONTAL
+                    val pad = (6 * d).toInt()
+                    setPadding(pad, pad, pad, pad)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { marginEnd = (8 * d).toInt() }
+                }
+                box.setBackground(selectedBg(skin.id == curSkin.id))
+                box.addView(ImageView(this).apply {
+                    // 配色缩略图用当前形态
+                    setImageBitmap(PetSkins.snapshot(this@MainActivity, curForm, skin, thumbPx, withBar = false, pct = 0))
+                    alpha = if (unlocked) 1f else 0.3f
+                })
+                box.addView(TextView(this).apply {
+                    text = if (unlocked) PetSkins.name(this@MainActivity, skin) else "🔒"
+                    textSize = 11f
+                    setTextColor(0xFF6B7280.toInt())
+                })
+                box.setOnClickListener {
+                    if (!unlocked) {
+                        Toast.makeText(this,
+                            getString(R.string.gallery_locked, PetSkins.name(this, skin), PetSkins.cond(this, skin)),
+                            Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    curSkin = skin
+                    PetSkins.wear(this, skin)
+                    rebuildRows()
+                    applySkinEverywhere()
+                }
+                skinRow.addView(box)
+            }
+
+            formScroll?.scrollTo(formX, 0)
+            skinScroll?.scrollTo(skinX, 0)
         }
 
         fun refreshPreview() {
@@ -602,85 +693,10 @@ private fun showSkinGallery() {
             val maxed = curForm >= PetForm.unlockedStage(this)
             growthHint.text = if (maxed) getString(R.string.gallery_form_maxed)
             else getString(R.string.gallery_form_next, PetForm.requiredFor(curForm + 1))
-            formBoxes.forEachIndexed { i, v -> markSelected(v, i == curForm) }
-            skinBoxes.forEachIndexed { i, v -> markSelected(v, PetSkins.ALL[i].id == curSkin.id) }
         }
 
-        // ---- 形态区：成长值决定能选到哪一形态，选哪个由用户 ----
-        for (i in 0..PetView.STAGE_KING) {
-            val unlocked = PetForm.isUnlocked(this, i)
-            val box = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                gravity = android.view.Gravity.CENTER_HORIZONTAL
-                val pad = (6 * d).toInt()
-                setPadding(pad, pad, pad, pad)
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { marginEnd = (8 * d).toInt() }
-            }
-            box.addView(ImageView(this).apply {
-                setImageBitmap(PetSkins.snapshot(this@MainActivity, i, curSkin, thumbPx, withBar = false, pct = 0))
-                alpha = if (unlocked) 1f else 0.3f
-            })
-            box.addView(TextView(this).apply {
-                text = if (unlocked) PetView.stageName(this@MainActivity, i)
-                       else getString(R.string.gallery_locked_short, PetView.stageName(this@MainActivity, i))
-                textSize = 11f
-                setTextColor(0xFF6B7280.toInt())
-            })
-            box.setOnClickListener {
-                if (!PetForm.select(this, i)) {
-                    Toast.makeText(this,
-                        getString(R.string.gallery_form_locked_toast, PetForm.requiredFor(i)),
-                        Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                curForm = i
-                refreshPreview()
-                applySkinEverywhere()
-                Toast.makeText(this, getString(R.string.gallery_worn, PetView.stageName(this, i)),
-                    Toast.LENGTH_SHORT).show()
-            }
-            formBoxes.add(box)
-            formRow.addView(box)
-        }
-
-        // ---- 配色区 ----
-        PetSkins.ALL.forEach { skin ->
-            val unlocked = skin.id in unlockedSkinIds
-            val box = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                gravity = android.view.Gravity.CENTER_HORIZONTAL
-                val pad = (6 * d).toInt()
-                setPadding(pad, pad, pad, pad)
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { marginEnd = (8 * d).toInt() }
-            }
-            box.addView(ImageView(this).apply {
-                setImageBitmap(PetSkins.snapshot(this@MainActivity, curForm, skin, thumbPx, withBar = false, pct = 0))
-                alpha = if (unlocked) 1f else 0.3f
-            })
-            box.addView(TextView(this).apply {
-                text = if (unlocked) PetSkins.name(this@MainActivity, skin) else "🔒"
-                textSize = 11f
-                setTextColor(0xFF6B7280.toInt())
-            })
-            box.setOnClickListener {
-                if (!unlocked) {
-                    Toast.makeText(this,
-                        getString(R.string.gallery_locked, PetSkins.name(this, skin), PetSkins.cond(this, skin)),
-                        Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                curSkin = skin
-                PetSkins.wear(this, skin)
-                refreshPreview()
-                applySkinEverywhere()
-            }
-            skinBoxes.add(box)
-            skinRow.addView(box)
-        }
+        rebuildRows()
+        refreshPreview()
 
         refreshPreview()
 

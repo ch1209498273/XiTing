@@ -636,6 +636,17 @@ private fun showSkinGallery() {
             }
         }
 
+        /** 顶部大图 + 形态/配色文案 + 成长提示。 */
+        fun refreshPreview() {
+            preview.setImageBitmap(
+                PetSkins.snapshot(this, curForm, curSkin, (110 * d).toInt(), withBar = false, pct = 0)
+            )
+            previewLabel.text = "${PetView.stageName(this, curForm)} · ${PetSkins.name(this, curSkin)}"
+            val maxed = curForm >= PetForm.unlockedStage(this)
+            growthHint.text = if (maxed) getString(R.string.gallery_form_maxed)
+            else getString(R.string.gallery_form_next, PetForm.requiredFor(curForm + 1))
+        }
+
         // 形态区的缩略图要随配色变、配色区的缩略图要随形态变，所以两行都必须能整体重建。
         // 之前它们只在打开弹窗时渲染一次，于是「上面选了形态，下面配色还是旧形态」——
         // 用户反馈的第二个问题。重建时保留当前滚动位置，免得跳回起点。
@@ -728,22 +739,14 @@ private fun showSkinGallery() {
 
             formScroll?.scrollTo(formX, 0)
             skinScroll?.scrollTo(skinX, 0)
-        }
-
-        fun refreshPreview() {
-            preview.setImageBitmap(
-                PetSkins.snapshot(this, curForm, curSkin, (110 * d).toInt(), withBar = false, pct = 0)
-            )
-            previewLabel.text = "${PetView.stageName(this, curForm)} · ${PetSkins.name(this, curSkin)}"
-            val maxed = curForm >= PetForm.unlockedStage(this)
-            growthHint.text = if (maxed) getString(R.string.gallery_form_maxed)
-            else getString(R.string.gallery_form_next, PetForm.requiredFor(curForm + 1))
+            // 顶部大图也在这里刷，不在各个点击回调里单独调。
+            // 上一版把 refreshPreview() 只放在打开弹窗时（而且一放就是两遍，明显是改了一半），
+            // 两个点击回调都忘了调 —— 于是「下面选了形态/配色，上面大图纹丝不动」。
+            // 收拢到重建函数末尾只有这一个调用点，以后新增交互不会再漏。
+            refreshPreview()
         }
 
         rebuildRows()
-        refreshPreview()
-
-        refreshPreview()
 
         dlg = android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.gallery_title))

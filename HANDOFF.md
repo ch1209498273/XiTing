@@ -158,7 +158,8 @@ Achievements.evaluate(this, sessions.size, maxMs, listenDays, stageNow)
 ### 相关代码位置
 
 - `Achievements.kt` —— `A` 加了 `badge: Badges.Kind`；新增 `badgeStates(ctx)` 与纯函数 `badgeList(got)`
-- `PetView.kt` —— `badges: List<Badges.Badge>` 属性 + `badgeColumn()` 几何 + `drawBody` 里的绘制
+- `PetView.kt` —— `badges: List<Badges.Badge>` 属性 + `badgeColumn()` 几何 + `drawBadgeColumn()`
+  （**必须挂在 `onDraw()` 的换肤滤镜之外**，见下面 ⚠️）
 - `MainActivity.kt` —— `refreshPetPanel()` 里赋值 `pet.badges`；`showAchievements()` 改成自定义布局
 
 ---
@@ -204,7 +205,7 @@ Achievements.evaluate(this, sessions.size, maxMs, listenDays, stageNow)
 
 ---
 
-## 五、五个会绊倒人的坑
+## 五、七个会绊倒人的坑
 
 ### 1. `gradle test` 在这个路径下跑不了（必须用脚本）
 
@@ -259,6 +260,22 @@ Achievements.evaluate(this, sessions.size, maxMs, listenDays, stageNow)
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1 *> out.txt
 ```
+
+### 7. 图鉴弹窗：顶部大图不跟随下方选择（已修）
+
+上一轮「缩略图不跟随选择」的修复只改了下面两行的 `rebuildRows()`，**顶部大图漏了**：
+`refreshPreview()` 只在打开弹窗时调用，两个点击回调里都没有。
+症状：下面选中了形态/配色，大图和文案纹丝不动。
+
+**现场特征**：打开弹窗时 `refreshPreview()` 后面跟着**两遍一模一样的调用** ——
+典型的「改了一半」痕迹。看到重复调用就该警觉：说明有人在这里修过但没修完，
+排查时优先怀疑同一函数里其它**没跟着走**的刷新点。
+
+修法不是给两个回调各补一次调用（上次就是这么漏的），而是把 `refreshPreview()`
+**收拢到 `rebuildRows()` 末尾**——只留一个调用点，以后新增交互不会再漏。
+
+**通用教训**：多个 UI 区域共享同一份选择状态时，刷新必须挂在**唯一的重建入口**上，
+绝不能散落在各个事件回调里各自调。散落式刷新漏掉一处，界面上就出现「两个区域显示不一致」。
 
 ---
 

@@ -309,6 +309,27 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         } else {
             drawBody(canvas)
         }
+        // 成就徽章列画在换肤滤镜**之外**：徽章的颜色是成就语义的载体（金=已解锁、
+        // 灰白轮廓=未解锁），一旦跟着色相旋转就全废了。实测中金色底盘被转成粉橙，
+        // 更糟的是未解锁的灰白轮廓——低饱和度颜色正是色相旋转伤害最大的，
+        // 会被转成橙红/绿色实心感，用户会误以为四条成就全部解锁。
+        // 能量条与 ? 图标则仍留在滤镜内，与既有观感保持一致。
+        if (!thumbMode) drawBadgeColumn(canvas)
+    }
+
+    /** 成就徽章列（自下而上）。几何与 [badgeColumn] 一致，颜色恒定不随换肤变化。 */
+    private fun drawBadgeColumn(canvas: Canvas) {
+        if (badges.isEmpty()) return
+        val (bx, by, br) = badgeColumn()
+        val ys = Badges.columnCenters(badges.size, by, br, height * Badges.GAP_RATIO)
+        val now = System.currentTimeMillis()
+        badges.forEachIndexed { i, b ->
+            val glow = if (i == badgeGlowIndex && badgeGlowAt > 0L) {
+                val dt = now - badgeGlowAt
+                if (dt in 0 until BADGE_GLOW_MS) 1f - dt / BADGE_GLOW_MS.toFloat() else 0f
+            } else 0f
+            Badges.draw(canvas, bx, ys[i], br, b.kind, b.unlocked, glow)
+        }
     }
 
     private fun drawBody(canvas: Canvas) {
@@ -527,21 +548,6 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             popPaint.isFakeBoldText = true
             canvas.drawText("?", hx, hy + 10f, popPaint)
             popPaint.color = 0xFF1E8E5A.toInt()
-
-            // 成就徽章列（能量条右侧，第 1 格最下）
-            if (badges.isNotEmpty()) {
-                val (bx, by, br) = badgeColumn()
-                val ys = Badges.columnCenters(
-                    badges.size, by, br, height * Badges.GAP_RATIO
-                )
-                badges.forEachIndexed { i, b ->
-                    val glow = if (i == badgeGlowIndex && badgeGlowAt > 0L) {
-                        val dt = now - badgeGlowAt
-                        if (dt in 0 until BADGE_GLOW_MS) 1f - dt / BADGE_GLOW_MS.toFloat() else 0f
-                    } else 0f
-                    Badges.draw(canvas, bx, ys[i], br, b.kind, b.unlocked, glow)
-                }
-            }
 
             // 飞入动画：从能量条飞向精灵中心
             flyBalls.removeAll { now - it.startAt > 320 }

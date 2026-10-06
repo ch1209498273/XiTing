@@ -75,7 +75,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     private var range = RANGE_ALL
     private var listPage = 0
     private var galleryBuiltStage = -1
-    private var previewStage = -1   // -1=显示当前形态；>=0=图鉴预览的形态
+    private var galleryBuiltSelected = -2
     private var todayMs = 0L
     private var weekMs = 0L
     private var allMs = 0L
@@ -146,8 +146,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageHome.findViewById<View>(R.id.stats_card).setOnClickListener { switchTab(TAB_STATS) }
 
         rowOverlay.setOnClickListener {
-            val permErr = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-                .getBoolean("bubble_perm_error", false)
+            val permErr = prefs()
+                .getBoolean(Prefs.BUBBLE_PERM_ERROR, false)
             if (!Settings.canDrawOverlays(this) || permErr) {
                 Toast.makeText(
                     this,
@@ -207,11 +207,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         cardBlack.setOnClickListener {
             if (OverlayService.isRunning) {
                 startService(Intent(this, OverlayService::class.java).setAction(OverlayService.ACTION_EXIT))
-                getSharedPreferences("xiiting_prefs", MODE_PRIVATE).edit().putBoolean("assistant_wanted", false).apply()
+                prefs().edit().putBoolean(Prefs.ASSISTANT_WANTED, false).apply()
                 Toast.makeText(this, getString(R.string.toast_assistant_stopped), Toast.LENGTH_SHORT).show()
             } else {
                 startForegroundService(Intent(this, OverlayService::class.java))
-                getSharedPreferences("xiiting_prefs", MODE_PRIVATE).edit().putBoolean("assistant_wanted", true).apply()
+                prefs().edit().putBoolean(Prefs.ASSISTANT_WANTED, true).apply()
                 Toast.makeText(this, getString(R.string.toast_assistant_started), Toast.LENGTH_SHORT).show()
             }
             postRefresh()
@@ -250,8 +250,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         super.onResume()
         // 助手被系统清理后（更新/后台清理），打开App时自动恢复；
         // 用户主动停止的（assistant_wanted=false）不复活
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-        if (!OverlayService.isRunning && prefs.getBoolean("assistant_wanted", false)) {
+        val prefs = prefs()
+        if (!OverlayService.isRunning && prefs.getBoolean(Prefs.ASSISTANT_WANTED, false)) {
             startForegroundService(Intent(this, OverlayService::class.java))
         }
         refreshStates()
@@ -261,15 +261,30 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     override fun onStop() {
         super.onStop()
-        // 静默备份到公共下载目录（卸载不删除；设备ID绑定，重装可恢复）
-        BackupManager.save(this)
+        // 静默备份到公共下载目录（卸载不删除；设备ID绑定，重装可恢复）。
+        // 挪到后台线程：save() 会读整个 sessions.json + 走 MediaStore
+        // query/delete/insert 再写文件，每次切后台都在主线程做一遍会掉帧，
+        // 甚至在低端机上触发 ANR。这里只发一次任务，不等待结果。
+        // 传 applicationContext 而非 Activity：save() 只用 prefs/filesDir/MediaStore，
+        // 都不需要 Activity，后台线程也不必持有正在销毁的 Activity。
+        Thread({ BackupManager.save(applicationContext) }, "XiTing-backup").start()
     }
 
-    /** 重装恢复引导：本地为空时提示可从下载目录恢复历史数据（SAF 文件选择器） */
-    private fun checkRestore() {
+    /**
+ * 重装恢复引导：**仅当本地无数据、且下载目录确有本机备份时**才提示。
+ *
+ * 原先只判 localGp==0 就弹窗，于是全新用户首次启动也会看到
+ * 「你以前用过息屏听剧吗」的恢复引导——而他根本没有备份可恢复。
+ * findBackup() 早就是为此写好的（查 Download/XiTing 并校验 ANDROID_ID），
+ * 但一直没被调用，这里接通。
+ *
+ * findBackup 已在内部按设备过滤：非本机备份返回 null，同样不弹。
+ * 它只在启动时跑一次（save() 是每次 onStop 都跑，所以那个才需要挪出主线程）。
+ */
+private fun checkRestore() {
         if (isFinishing) return
-        val localGp = EnergyStore.collectedTotal(this)
-        if (localGp > 0) return
+        if (EnergyStore.collectedTotal(this) > 0) return
+        if (BackupManager.findBackup(this) == null) return
         android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.restore_title))
             .setMessage(
@@ -375,15 +390,15 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         // 自愈：服务在跑、悬浮球未隐藏但球丢失（ColorOS 偶发吞掉纯浮窗）→ 自动重建
         OverlayService.instance?.let { svc ->
-            val bubbleHidden = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-                .getBoolean("bubble_hidden", false)
+            val bubbleHidden = prefs()
+                .getBoolean(Prefs.BUBBLE_HIDDEN, false)
             if (!svc.isBubbleVisible() && !bubbleHidden) {
                 svc.rebuildBubble()
             }
         }
         val overlayOk = Settings.canDrawOverlays(this)
-        val permError = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-            .getBoolean("bubble_perm_error", false)
+        val permError = prefs()
+            .getBoolean(Prefs.BUBBLE_PERM_ERROR, false)
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         val batteryOk = pm.isIgnoringBatteryOptimizations(packageName)
         val notifyOk = if (Build.VERSION.SDK_INT >= 33) {
@@ -499,17 +514,66 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         Toast.makeText(this, getString(R.string.toast_episode_done, mins, secs), Toast.LENGTH_LONG).show()
     }
 
-    /** 成就明细弹窗 */
+    /**
+     * 成就明细弹窗：每条一枚手绘徽章（已点亮金色实心 / 未解锁暗色轮廓）。
+     *
+     * 原来是纯文本的 ✅/🔒 列表，解锁之后什么都不给 —— 用户评价「没啥意思」。
+     * 现在徽章直接挂在精灵左侧身上，弹窗是它的明细视图。
+     */
     private fun showAchievements() {
-        val unlocked = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-            .getStringSet("ach_unlocked", emptySet()) ?: emptySet()
-        val gotCount = unlocked.size
-        val msg = Achievements.ALL.joinToString("\n\n") { a ->
-            (if (a.id in unlocked) "✅ " else "🔒 ") + a.icon + " " + Achievements.title(this, a) + " · " + Achievements.desc(this, a)
+        val raw = prefs()
+            .getStringSet(Prefs.ACH_UNLOCKED, emptySet()) ?: emptySet()
+        // 必须走 knownUnlocked 过滤，不能直接用 raw.size ——
+        // 老用户 prefs 里还留着已砍掉的 first/h1/h10/h50，直接取大小会显示「6/4」。
+        val known = knownUnlocked(raw)
+        val gotIds = known.map { it.id }.toSet()
+
+        val view = layoutInflater.inflate(R.layout.dialog_achievements, null)
+        view.findViewById<TextView>(R.id.ach_dlg_title).text =
+            getString(R.string.ach_dlg_title_fmt, known.size, Achievements.ALL.size)
+        val rows = view.findViewById<LinearLayout>(R.id.ach_rows)
+        val d = resources.displayMetrics.density
+
+        for (a in Achievements.ALL) {
+            val got = a.id in gotIds
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(0, (10 * d).toInt(), 0, (10 * d).toInt())
+            }
+            row.addView(BadgeView(this).apply {
+                val s = (40 * d).toInt()
+                layoutParams = LinearLayout.LayoutParams(s, s)
+                bind(a.badge, got)
+            })
+            val textCol = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    marginStart = (14 * d).toInt()
+                }
+            }
+            textCol.addView(TextView(this).apply {
+                text = Achievements.title(this@MainActivity, a)
+                setTextColor(if (got) 0xFF111418.toInt() else 0xFF8A9099.toInt())
+                textSize = 15f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            })
+            textCol.addView(TextView(this).apply {
+                text = Achievements.desc(this@MainActivity, a)
+                setTextColor(0xFF8A9099.toInt())
+                textSize = 12f
+            })
+            textCol.addView(TextView(this).apply {
+                text = getString(if (got) R.string.ach_row_unlocked else R.string.ach_row_locked)
+                setTextColor(if (got) 0xFF1E8E5A.toInt() else 0xFFB0B5BD.toInt())
+                textSize = 11f
+            })
+            row.addView(textCol)
+            rows.addView(row)
         }
+
         android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.ach_dlg_title_fmt, gotCount, Achievements.ALL.size))
-            .setMessage(msg)
+            .setView(view)
             .setPositiveButton(getString(R.string.dlg_ok), null)
             .show()
     }
@@ -518,27 +582,186 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     private val calibHandler = Handler(Looper.getMainLooper())
 
-    /** 皮肤图鉴弹窗：6 款皮肤，已解锁可穿戴 */
-    private fun showSkinGallery() {
-        val totalMs = SessionLog.sessions(this).sumOf { it.durationMs }
-        val streakInfo = Streaks.compute(SessionLog.sessions(this))
+    /** 换肤选择器弹窗：点选某款皮肤后需要主动关闭自己 */
+    private var dlg: android.app.AlertDialog? = null
+
+    /**
+ * 精灵图鉴：可视化换肤选择器。
+ *
+ * 此前这里是个纯文本 AlertDialog，只有「好的」一个按钮 —— 也就是**只能看不能换**，
+ * KDoc 写的「已解锁可穿戴」名不副实；PetSkins.wear() 的唯一调用点是调试广播，
+ * 正式版里根本走不到，pet_skin 键只写不进。
+ *
+ * 现在每行渲染真实精灵缩略图（PetSkins.snapshot，小部件已在用），
+ * 点击已解锁的即换上并同步刷新精灵 / 悬浮球 / 小组件；未解锁的置灰并提示条件。
+ */
+private fun showSkinGallery() {
+        val sessions = SessionLog.sessions(this)
+        val totalMs = sessions.sumOf { it.durationMs }
+        val maxSingleMs = sessions.maxOfOrNull { it.durationMs } ?: 0L
+        val streakDays = Streaks.compute(sessions).current
         val mah = Stats.estimatedMah(totalMs)
-        val active = PetSkins.active(this)
-        val msg = PetSkins.ALL.joinToString("\n\n") { s ->
-            val unlocked = PetSkins.isUnlocked(this, s, totalMs, streakInfo.current, mah)
-            val wearing = s.id == active.id
-            val prefix = when {
-                wearing -> "⭐ "
-                unlocked -> "✅ "
-                else -> "🔒 "
+        val gp = EnergyStore.collectedTotal(this).toLong()
+
+        // 先评估一次配色，保证刚达成的立刻出现在「已解锁」里
+        PetSkins.evaluate(this, PetSkins.SkinProgress(totalMs, maxSingleMs, streakDays, mah, gp))
+            .forEach {
+                Toast.makeText(this, getString(R.string.toast_skin_unlock, PetSkins.name(this, it)),
+                    Toast.LENGTH_SHORT).show()
             }
-            prefix + PetSkins.name(this, s) + " · " + PetSkins.cond(this, s)
+        val unlockedSkinIds = PetSkins.unlockedIds(this)
+
+        val view = layoutInflater.inflate(R.layout.dialog_skin_picker, null)
+        val preview = view.findViewById<ImageView>(R.id.preview)
+        val previewLabel = view.findViewById<TextView>(R.id.preview_label)
+        val growthHint = view.findViewById<TextView>(R.id.growth_hint)
+        val formRow = view.findViewById<LinearLayout>(R.id.form_row)
+        val skinRow = view.findViewById<LinearLayout>(R.id.skin_row)
+
+        val d = resources.displayMetrics.density
+        val thumbPx = (56 * d).toInt()
+
+        // 当前选择：形态 + 配色
+        var curForm = PetForm.selected(this)
+        var curSkin = PetSkins.active(this)
+
+        // 选中态描边：重建时按当前选择直接画上去
+        fun selectedBg(selected: Boolean) = android.graphics.drawable.GradientDrawable().apply {
+            cornerRadius = 12 * d
+            if (selected) {
+                setColor(0x1420B26B)
+                setStroke((1.5 * d).toInt().coerceAtLeast(1), 0xFF20B26B.toInt())
+            } else {
+                setColor(0x0A000000)
+            }
         }
-        android.app.AlertDialog.Builder(this)
+
+        /** 顶部大图 + 形态/配色文案 + 成长提示。 */
+        fun refreshPreview() {
+            preview.setImageBitmap(
+                PetSkins.snapshot(this, curForm, curSkin, (110 * d).toInt(), withBar = false, pct = 0)
+            )
+            previewLabel.text = "${PetView.stageName(this, curForm)} · ${PetSkins.name(this, curSkin)}"
+            val maxed = curForm >= PetForm.unlockedStage(this)
+            growthHint.text = if (maxed) getString(R.string.gallery_form_maxed)
+            else getString(R.string.gallery_form_next, PetForm.requiredFor(curForm + 1))
+        }
+
+        // 形态区的缩略图要随配色变、配色区的缩略图要随形态变，所以两行都必须能整体重建。
+        // 之前它们只在打开弹窗时渲染一次，于是「上面选了形态，下面配色还是旧形态」——
+        // 用户反馈的第二个问题。重建时保留当前滚动位置，免得跳回起点。
+        fun rebuildRows() {
+            val formScroll = formRow.parent as? android.widget.HorizontalScrollView
+            val skinScroll = skinRow.parent as? android.widget.HorizontalScrollView
+            val formX = formScroll?.scrollX ?: 0
+            val skinX = skinScroll?.scrollX ?: 0
+
+            formRow.removeAllViews()
+            skinRow.removeAllViews()
+
+            // ---- 形态区：成长值决定能选到哪一形态，选哪个由用户 ----
+            for (i in 0..PetView.STAGE_KING) {
+                val unlocked = PetForm.isUnlocked(this, i)
+                val box = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = android.view.Gravity.CENTER_HORIZONTAL
+                    val pad = (6 * d).toInt()
+                    setPadding(pad, pad, pad, pad)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { marginEnd = (8 * d).toInt() }
+                }
+                box.setBackground(selectedBg(i == curForm))
+                box.addView(ImageView(this).apply {
+                    // 形态缩略图用当前配色，一眼看出「这个形态穿上现在这身是什么样」
+                    setImageBitmap(PetSkins.snapshot(this@MainActivity, i, curSkin, thumbPx, withBar = false, pct = 0))
+                    alpha = if (unlocked) 1f else 0.3f
+                })
+                box.addView(TextView(this).apply {
+                    text = if (unlocked) PetView.stageName(this@MainActivity, i)
+                           else getString(R.string.gallery_locked_short, PetView.stageName(this@MainActivity, i))
+                    textSize = 11f
+                    setTextColor(0xFF6B7280.toInt())
+                })
+                box.setOnClickListener {
+                    if (!PetForm.select(this, i)) {
+                        Toast.makeText(this,
+                            getString(R.string.gallery_form_locked_toast, PetForm.requiredFor(i)),
+                            Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    curForm = i
+                    rebuildRows()
+                    applySkinEverywhere()
+                    Toast.makeText(this, getString(R.string.gallery_worn, PetView.stageName(this, i)),
+                        Toast.LENGTH_SHORT).show()
+                }
+                formRow.addView(box)
+            }
+
+            // ---- 配色区 ----
+            PetSkins.ALL.forEach { skin ->
+                val unlocked = skin.id in unlockedSkinIds
+                val box = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = android.view.Gravity.CENTER_HORIZONTAL
+                    val pad = (6 * d).toInt()
+                    setPadding(pad, pad, pad, pad)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { marginEnd = (8 * d).toInt() }
+                }
+                box.setBackground(selectedBg(skin.id == curSkin.id))
+                box.addView(ImageView(this).apply {
+                    // 配色缩略图用当前形态
+                    setImageBitmap(PetSkins.snapshot(this@MainActivity, curForm, skin, thumbPx, withBar = false, pct = 0))
+                    alpha = if (unlocked) 1f else 0.3f
+                })
+                box.addView(TextView(this).apply {
+                    text = if (unlocked) PetSkins.name(this@MainActivity, skin) else "🔒"
+                    textSize = 11f
+                    setTextColor(0xFF6B7280.toInt())
+                })
+                box.setOnClickListener {
+                    if (!unlocked) {
+                        Toast.makeText(this,
+                            getString(R.string.gallery_locked, PetSkins.name(this, skin), PetSkins.cond(this, skin)),
+                            Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    curSkin = skin
+                    PetSkins.wear(this, skin)
+                    rebuildRows()
+                    applySkinEverywhere()
+                }
+                skinRow.addView(box)
+            }
+
+            formScroll?.scrollTo(formX, 0)
+            skinScroll?.scrollTo(skinX, 0)
+            // 顶部大图也在这里刷，不在各个点击回调里单独调。
+            // 上一版把 refreshPreview() 只放在打开弹窗时（而且一放就是两遍，明显是改了一半），
+            // 两个点击回调都忘了调 —— 于是「下面选了形态/配色，上面大图纹丝不动」。
+            // 收拢到重建函数末尾只有这一个调用点，以后新增交互不会再漏。
+            refreshPreview()
+        }
+
+        rebuildRows()
+
+        dlg = android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.gallery_title))
-            .setMessage(msg)
+            .setView(view)
             .setPositiveButton(getString(R.string.dlg_ok), null)
-            .show()
+            .create()
+        dlg?.show()
+    }
+
+    /** 形态/配色变更后同步：主页精灵 / 悬浮球 / 三档小组件 */
+    private fun applySkinEverywhere() {
+        renderStats()
+        refreshHomeStats()
+        OverlayService.instance?.rebuildBubble()
+        WidgetData.refreshAll(this)
     }
 
     private fun onMahCardClick() {
@@ -659,6 +882,9 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageStats.findViewById<View>(R.id.card_today).setOnClickListener { selectRange(RANGE_TODAY) }
         pageStats.findViewById<View>(R.id.card_week).setOnClickListener { selectRange(RANGE_WEEK) }
         pageStats.findViewById<View>(R.id.card_all).setOnClickListener { selectRange(RANGE_ALL) }
+        pageStats.findViewById<View>(R.id.card_ach).setOnClickListener { showAchievements() }
+        pageStats.findViewById<View>(R.id.card_mah).setOnClickListener { onMahCardClick() }
+        pageStats.findViewById<View>(R.id.btn_gallery).setOnClickListener { showSkinGallery() }
         pageStats.findViewById<View>(R.id.btn_prev).setOnClickListener {
             if (listPage > 0) {
                 listPage--
@@ -689,12 +915,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             )
         )
         // 每日任务结算：每天仅一次
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val prefs = prefs()
         val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
             .format(java.util.Date())
-        val last = prefs.getString("last_share_date", "")
+        val last = prefs.getString(Prefs.LAST_SHARE_DATE, "")
         if (last != today) {
-            prefs.edit().putString("last_share_date", today).apply()
+            prefs.edit().putString(Prefs.LAST_SHARE_DATE, today).apply()
             EnergyStore.add(this, SHARE_GP_PER_DAY) // 分享产生待收成长值
             Toast.makeText(
                 this,
@@ -710,24 +936,35 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     /** 成长值体系：成长值=已收集能量；听剧/分享产生能量球待收集（3天过期） */
     private fun refreshPetPanel(allMs: Long, sessions: List<ListenSession>, now: Long) {
         val pet = pageStats.findViewById<PetView>(R.id.pet_view)
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-        // 旧版成长值（听剧分钟+分享奖励）一次性迁入已收集总量
-        EnergyStore.migrateIfNeeded(this, allMs / 60000, prefs.getInt("share_bonus_gp", 0))
+        val prefs = prefs()
+        // 旧版成长值（听剧分钟+分享奖励）一次性迁入已收集总量。
+        // share_bonus_gp 是「只读遗留键」：当前版本从不写入它，但早期版本写过，
+        // 仍在老用户的 prefs 里。不读取会让这些用户的迁移加成静默归零，
+        // 因此这行必须保留——它不是死代码，是升级兼容点。
+        EnergyStore.migrateIfNeeded(this, allMs / 60000, prefs.getInt(Prefs.SHARE_BONUS_GP_LEGACY, 0))
         val gp = EnergyStore.collectedTotal(this).toLong()
-        val stage = PetView.stageOf(gp)
-        pet.stage = stage
+        // 两个形态必须分清，混用会让「显示形态」污染「成长进度」：
+        //   showStage    —— 显示哪个，由用户在图鉴里选
+        //   growthStage  —— 成长值算到哪一形态，决定进度条 / 解锁锁 / 进化提示
+        // 曾经这里只有一个 stage（= selected），于是选了电球之后：
+        // 形态行把雷云以上全锁上、caption 变成「成长值 7296 / 300」。
+        val showStage = PetForm.selected(this)
+        val growthStage = PetView.stageOf(gp)
+        pet.stage = showStage
         val lastSessionAt = sessions.maxOfOrNull { it.start } ?: 0L
         pet.sleepy = lastSessionAt > 0 && (now - lastSessionAt) / (24L * 3600 * 1000) >= 3
         pet.totalMah = Stats.estimatedMah(allMs)
-        pet.progress = if (stage < PetView.STAGE_KING) {
-            val lo = PetView.THRESHOLDS[stage]
-            val hi = PetView.THRESHOLDS[stage + 1]
+        pet.progress = if (growthStage < PetView.STAGE_KING) {
+            val lo = PetView.THRESHOLDS[growthStage]
+            val hi = PetView.THRESHOLDS[growthStage + 1]
             ((gp - lo).toFloat() / (hi - lo)).coerceIn(0f, 1f)
         } else 1f
 
-        // 图鉴预览：选中非当前形态时主精灵切换为该形态
-        pet.stage = if (previewStage >= 0) previewStage else stage
-        pet.hideProgress = previewStage >= 0 && previewStage != stage
+        // 显示哪个形态由 PetForm 统一决定（成长值只决定能选到哪一形态）
+        pet.stage = showStage
+        pet.hideProgress = false
+        // 成就徽章列（自下而上，与能量条并列）
+        pet.badges = Achievements.badgeStates(this)
         // 成长值装载与收取回调（点击左侧条=收取全部；回调在飞入动画完成后触发）
         pet.pending = EnergyStore.pending(this)
         pet.onCollectAll = {
@@ -746,42 +983,47 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 .show()
         }
 
-        // 进化提示（仅当上次记录的形态更低时弹一次）
-        val seen = prefs.getInt("last_seen_stage", -1)
-        if (seen in 0 until stage) {
+        // 进化提示（仅当上次记录的形态更低时弹一次）——按成长值算，与显示哪个形态无关
+        val seen = prefs.getInt(Prefs.LAST_SEEN_STAGE, -1)
+        if (seen in 0 until growthStage) {
             Toast.makeText(
                 this,
-                "🎉 进化！${PetView.stageName(this, seen)} → ${PetView.stageName(this, stage)}",
+                "🎉 进化！${PetView.stageName(this, seen)} → ${PetView.stageName(this, growthStage)}",
                 Toast.LENGTH_LONG
             ).show()
         }
-        if (seen != stage) prefs.edit().putInt("last_seen_stage", stage).apply()
+        if (seen != growthStage) prefs.edit().putInt(Prefs.LAST_SEEN_STAGE, growthStage).apply()
 
         // 设置页分享行状态：今天是否还能领
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
             .format(java.util.Date(now))
         pageSettings.findViewById<TextView>(R.id.share_sub).text =
-            if (prefs.getString("last_share_date", "") == todayStr) getString(R.string.share_sub_claimed)
+            if (prefs.getString(Prefs.LAST_SHARE_DATE, "") == todayStr) getString(R.string.share_sub_claimed)
             else getString(R.string.share_sub_avail, SHARE_GP_PER_DAY)
-        // 文案
+        // 文案：描述的是「养成进度」，必须按成长值算，不能按当前显示的形态
         pageStats.findViewById<TextView>(R.id.pet_caption).text =
             if (pet.sleepy) {
-                getString(R.string.pet_caption_sleepy, PetView.stageName(this, stage))
-            } else if (stage >= PetView.STAGE_KING) {
-                getString(R.string.pet_caption_max, PetView.stageName(this, stage), gp)
+                getString(R.string.pet_caption_sleepy, PetView.stageName(this, showStage))
+            } else if (growthStage >= PetView.STAGE_KING) {
+                getString(R.string.pet_caption_max, PetView.stageName(this, growthStage), gp)
             } else {
-                getString(R.string.pet_caption_progress, PetView.stageName(this, stage), gp, PetView.THRESHOLDS[stage + 1])
+                getString(
+                    R.string.pet_caption_progress,
+                    PetView.stageName(this, growthStage), gp,
+                    PetView.THRESHOLDS[growthStage + 1]
+                )
             }
         // 分享入口在「设置」页（统计页不再重复）
         pet.startAnimating()
-        buildGallery(stage)
+        buildGallery(growthStage)
     }
 
-    /** 形态图鉴：点击缩略图预览该形态（含未解锁），再点一次恢复当前形态 */
-    private fun buildGallery(currentStage: Int) {
-        if (galleryBuiltStage == currentStage && galleryPreviewBuilt == previewStage) return
-        galleryBuiltStage = currentStage
-        galleryPreviewBuilt = previewStage
+    /** 形态图鉴。传入的是**已解锁到**的形态（解锁锁与它有关），不是当前显示的形态。 */
+    private fun buildGallery(unlockedStage: Int) {
+        if (galleryBuiltStage == unlockedStage && galleryBuiltSelected == PetForm.selected(this)) return
+        galleryBuiltStage = unlockedStage
+        galleryBuiltSelected = PetForm.selected(this)
+        val selected = PetForm.selected(this)
         val row = pageStats.findViewById<LinearLayout>(R.id.thumb_row)
         row.removeAllViews()
         val density = resources.displayMetrics.density
@@ -793,22 +1035,31 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     marginStart = (5 * density).toInt()
                     marginEnd = (5 * density).toInt()
                 }
-                if (i == previewStage || (previewStage < 0 && i == currentStage)) {
+                if (i == selected) {
                     setBackgroundResource(R.drawable.bg_thumb_selected)
                 }
             }
             val pv = PetView(this).apply {
                 stage = i
                 thumbMode = true
+                applySkin(PetSkins.active(this@MainActivity))
                 layoutParams = android.widget.FrameLayout.LayoutParams(size, size)
                 setOnClickListener {
-                    previewStage = if (i == currentStage) -1 else i
-                    galleryBuiltStage = -1 // 强制重建（刷新选中框）
-                    renderStats()
+                    // 与「精灵图鉴」共用同一个选择入口。此前这里改的是 previewStage ——
+                    // 一个只在本会话生效、不落盘的预览变量，于是统计页选了形态、
+                    // 图鉴却毫无反应，两处各说各话。
+                    if (i > unlockedStage) {
+                        Toast.makeText(this@MainActivity,
+                            getString(R.string.gallery_form_locked_toast, PetForm.requiredFor(i)),
+                            Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    PetForm.select(this@MainActivity, i)
+                    applySkinEverywhere()
                 }
             }
             frame.addView(pv)
-            if (i > currentStage) {
+            if (i > unlockedStage) {
                 // 小锁角标（右下角，不遮挡主体）
                 frame.addView(
                     TextView(this).apply {
@@ -827,8 +1078,6 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         }
         // 图鉴选中说明合并进主文案（上方 caption 已显示，不另占行）
     }
-
-    private var galleryPreviewBuilt = -2
 
     private fun selectRange(r: Int) {
         range = r
@@ -896,7 +1145,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             .map { SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date(it.start)) }
             .distinct().size
         val freshAch = Achievements.evaluate(
-            this, allMs, sessions.size,
+            this, sessions.size,
             sessions.maxOfOrNull { it.durationMs } ?: 0L, listenDays, stageNow
         )
         freshAch.take(2).forEach {
@@ -911,15 +1160,23 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 精灵皮肤：应用所穿皮肤的色相
         val petView = pageStats.findViewById<PetView>(R.id.pet_view)
         val activeSkin = PetSkins.active(this)
-        petView.skinHue = activeSkin.hue
+        petView.applySkin(activeSkin)
         val mahSaved = Stats.estimatedMah(allMs)
-        val freshSkins = PetSkins.evaluate(this, allMs, streakInfo.current, mahSaved)
+        val skinProgress = PetSkins.SkinProgress(
+            totalMs = allMs,
+            maxSingleMs = sessions.maxOfOrNull { it.durationMs } ?: 0L,
+            streakDays = streakInfo.current,
+            mah = mahSaved,
+            gp = gpNow.toLong()
+        )
+        val freshSkins = PetSkins.evaluate(this, skinProgress)
         freshSkins.take(2).forEach {
             Toast.makeText(this, getString(R.string.toast_skin_unlock, PetSkins.name(this, it)), Toast.LENGTH_LONG).show()
         }
-        pageStats.findViewById<View>(R.id.card_ach).setOnClickListener { showAchievements() }
-        pageStats.findViewById<View>(R.id.card_mah).setOnClickListener { onMahCardClick() }
-        pageStats.findViewById<View>(R.id.btn_gallery).setOnClickListener { showSkinGallery() }
+        // 注：card_ach / card_mah / btn_gallery 的点击监听统一在 bindStats() 注册一次，
+        // 不在这里重复绑定——renderStats() 会被切页、onResume、onCollectAll、恢复备份
+        // 以及校准轮询多次触发，每次都重新 setOnClickListener 是纯浪费
+        // （btn_gallery 此前甚至被绑了两遍，内容完全相同）。
 
         // streak 展示
         var streakText = getString(R.string.streak_fmt, streakInfo.current)
@@ -927,7 +1184,6 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             streakText += " · " + getString(R.string.streak_best_fmt, streakInfo.best)
         }
         pageStats.findViewById<TextView>(R.id.streak_chip).text = streakText
-        pageStats.findViewById<View>(R.id.btn_gallery).setOnClickListener { showSkinGallery() }
 
         // 电能精灵：成长值驱动的五形态养成（听剧分钟 + 每日分享奖励）
         refreshPetPanel(allMs, sessions, now)
@@ -1018,29 +1274,29 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     // ───────────────────────── 设置页签 ─────────────────────────
 
     private fun bindSettings() {
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val prefs = prefs()
         val page = pageSettings
 
         // 黑幕轻点直接解锁（默认关，防误触优先）
         val switchDirect = page.findViewById<android.widget.Switch>(R.id.switch_direct)
-        switchDirect.isChecked = prefs.getBoolean("direct_unlock", false)
+        switchDirect.isChecked = prefs.getBoolean(Prefs.DIRECT_UNLOCK, false)
         switchDirect.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("direct_unlock", checked).apply()
+            prefs.edit().putBoolean(Prefs.DIRECT_UNLOCK, checked).apply()
         }
 
         // 黑幕显示时间与电量（默认关；开启后重锁保持暗态夜钟）
         val switchInfo = page.findViewById<android.widget.Switch>(R.id.switch_info)
-        switchInfo.isChecked = prefs.getBoolean("black_info_show", false)
+        switchInfo.isChecked = prefs.getBoolean(Prefs.BLACK_INFO_SHOW, false)
         switchInfo.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("black_info_show", checked).apply()
+            prefs.edit().putBoolean(Prefs.BLACK_INFO_SHOW, checked).apply()
             OverlayService.instance?.reapplyBlack() // 黑幕显示中即时生效（无闪屏重挂）
         }
 
         // 黑幕播放控制（默认关：防误触）
         val switchMedia = page.findViewById<android.widget.Switch>(R.id.switch_media)
-        switchMedia.isChecked = prefs.getBoolean("black_media_controls", false)
+        switchMedia.isChecked = prefs.getBoolean(Prefs.BLACK_MEDIA_CONTROLS, false)
         switchMedia.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("black_media_controls", checked).apply()
+            prefs.edit().putBoolean(Prefs.BLACK_MEDIA_CONTROLS, checked).apply()
             if (checked) {
                 Toast.makeText(this, getString(R.string.toast_media_on), Toast.LENGTH_SHORT).show()
             }
@@ -1052,16 +1308,16 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         // 耳机拔出自动返回视频（默认开）
         val switchHeadset = page.findViewById<android.widget.Switch>(R.id.switch_headset)
-        switchHeadset.isChecked = prefs.getBoolean("switch_headset", true)
+        switchHeadset.isChecked = prefs.getBoolean(Prefs.SWITCH_HEADSET, true)
         switchHeadset.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("switch_headset", checked).apply()
+            prefs.edit().putBoolean(Prefs.SWITCH_HEADSET, checked).apply()
         }
 
         // 显示悬浮球（隐藏后助手照常运行，通知栏/此处均可恢复）
         val switchBubble = page.findViewById<android.widget.Switch>(R.id.switch_bubble)
-        switchBubble.isChecked = !prefs.getBoolean("bubble_hidden", false)
+        switchBubble.isChecked = !prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false)
         switchBubble.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("bubble_hidden", !checked).apply()
+            prefs.edit().putBoolean(Prefs.BUBBLE_HIDDEN, !checked).apply()
             OverlayService.instance?.setBubbleVisible(checked)
         }
 
@@ -1107,113 +1363,51 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         refreshBubbleStyleValue()
     }
 
-    /** 悬浮球样式选择：带实时预览（每项直接显示该样式的实际长相） */
+    /**
+     * 悬浮球样式：只决定「文字 / 精灵」。
+     *
+     * 形态与配色已归图鉴统一管（PetForm + PetSkins）。这里再放一份 pet_0..pet_4
+     * 就是两套状态各说各话 —— 早期正因如此：在设置里选了形态，主页精灵纹丝不动。
+     * 所以这里只留二选一，形态跟着图鉴走。
+     */
     private fun showBubbleStyleDialog() {
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-        val gp = EnergyStore.collectedTotal(this).toLong()
-        val unlocked = PetView.stageOf(gp)
-        val labels = ArrayList<String>()
-        val values = ArrayList<String>()
-        labels.add(getString(R.string.bubble_default))
-        values.add("text")
-        // 全部形态都列出（含未解锁：可预览外观，但不能选中）
-        for (i in 0..4) {
-            labels.add(
-                if (i <= unlocked) PetView.stageName(this, i)
-                else getString(R.string.bubble_locked_fmt, PetView.stageName(this, i), PetView.THRESHOLDS[i])
-            )
-            values.add("pet_$i")
-        }
-        val current = prefs.getString("bubble_style", "text") ?: "text"
-        val density = resources.displayMetrics.density
-        val adapter = object : android.widget.ArrayAdapter<String>(this, 0, labels) {
-            override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
-                val row = LinearLayout(this@MainActivity).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    gravity = android.view.Gravity.CENTER_VERTICAL
-                    setPadding((16 * density).toInt(), (10 * density).toInt(), (16 * density).toInt(), (10 * density).toInt())
-                    if (values[position] == current) setBackgroundColor(0x1A1E8E5A)
-                }
-                if (position == 0) {
-                    // 「息屏」文字样式预览
-                    row.addView(
-                        TextView(this@MainActivity).apply {
-                            text = getString(R.string.bubble_label_off)
-                            textSize = 13f
-                            setTextColor(0xFFFFFFFF.toInt())
-                            gravity = android.view.Gravity.CENTER
-                            val bg = android.graphics.drawable.GradientDrawable().apply {
-                                shape = android.graphics.drawable.GradientDrawable.OVAL
-                                setColor(0xB3000000.toInt())
-                            }
-                            background = bg
-                            layoutParams = LinearLayout.LayoutParams((56 * density).toInt(), (56 * density).toInt())
-                        }
-                    )
-                } else {
-                    // 全部形态显示真实彩色效果（未解锁用 🔒 标签区分，不灰化——要看就看真实样子）
-                    row.addView(
-                        BubblePetView(this@MainActivity).apply {
-                            stage = position - 1
-                            layoutParams = LinearLayout.LayoutParams((56 * density).toInt(), (56 * density).toInt())
-                        }
-                    )
-                }
-                row.addView(
-                    TextView(this@MainActivity).apply {
-                        text = labels[position]
-                        textSize = 15f
-                        setTextColor(0xFF111418.toInt())
-                        layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        ).apply { marginStart = (16 * density).toInt() }
-                    }
-                )
-                return row
-            }
-        }
+        val usesPet = PetForm.bubbleUsesPet(this)
+        val labels = arrayOf(
+            getString(R.string.bubble_default),
+            getString(R.string.gallery_form_label) + " · " + PetView.stageName(this, PetForm.selected(this))
+        )
         android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.bubble_dlg_title))
-            .setAdapter(adapter) { d, which ->
-                val stageOfItem = which - 1
-                if (stageOfItem in 0..4 && stageOfItem > unlocked) {
-                    // 未解锁：可预览外观但不能选中
-                    Toast.makeText(
-                        this,
-                        getString(R.string.toast_bubble_locked, PetView.stageName(this, stageOfItem), PetView.THRESHOLDS[stageOfItem]),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return@setAdapter
-                }
-                prefs.edit().putString("bubble_style", values[which]).apply()
+            .setTitle(getString(R.string.bubble_style_title))
+            .setSingleChoiceItems(labels, if (usesPet) 1 else 0) { d, which ->
+                PetForm.setBubbleUsesPet(this, which == 1)
                 OverlayService.instance?.rebuildBubble()
                 refreshBubbleStyleValue()
-                val name = if (which == 0) getString(R.string.bubble_label_off) else PetView.stageName(this, stageOfItem)
-                Toast.makeText(this, getString(R.string.toast_bubble_set, name), Toast.LENGTH_SHORT).show()
                 d.dismiss()
             }
             .setNegativeButton(getString(R.string.dlg_cancel), null)
             .show()
     }
 
+
     private fun refreshBubbleStyleValue() {
-        val style = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-            .getString("bubble_style", "text") ?: "text"
-        // 行内直接显示当前悬浮球的真实样子 + 名称
+        val usesPet = PetForm.bubbleUsesPet(this)
+        // 行内直接显示当前悬浮球的真实样子 + 名称（形态/配色跟随图鉴的选择）
         val box = pageSettings.findViewById<LinearLayout>(R.id.bubble_style_preview)
         box.removeAllViews()
         val density = resources.displayMetrics.density
         val size = (52 * density).toInt()
-        if (style.startsWith("pet_")) {
-            val st = (style.removePrefix("pet_").toIntOrNull() ?: 0).coerceIn(0, 4)
+        val stage = PetForm.selected(this)
+        val skin = PetSkins.active(this)
+        if (usesPet) {
             box.addView(
                 BubblePetView(this).apply {
-                    stage = st
+                    this.stage = stage
+                    applySkin(skin)
                     layoutParams = LinearLayout.LayoutParams(size, size)
                 }
             )
-            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text = PetView.stageName(this, st)
+            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text =
+                "${PetView.stageName(this, stage)} · ${PetSkins.name(this, skin)}"
         } else {
             box.addView(
                 TextView(this).apply {

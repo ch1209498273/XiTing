@@ -1,6 +1,7 @@
 // XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/.trace
 package com.lujinyu.xiting
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -59,7 +60,8 @@ class OverlayService : Service() {
         const val EXTRA_CALIB_ON_UA = "calib_on_ua"
         private const val ACTION_TEST_TOGGLE = "com.lujinyu.xiting.TEST_TOGGLE"
         private const val ACTION_TEST_RUN_MODE = "com.lujinyu.xiting.TEST_RUN_MODE"
-        private const val PREFS = "xiiting_prefs"
+        const val ACTION_TEST_UNLOCK_SKINS = "com.lujinyu.xiting.TEST_UNLOCK_SKINS"
+        const val ACTION_TEST_WEAR = "com.lujinyu.xiting.TEST_WEAR"
 
         var instance: OverlayService? = null
             private set
@@ -79,14 +81,32 @@ class OverlayService : Service() {
     // 改为 Any 持有 + 独立方法内创建，只在 31+ 分支调用时才解析类型。
     private var modeListener: Any? = null
 
+    /**
+     * 注册音频模式监听（来电/通话检测）。
+     *
+     * 仅 31+ 调用（见下方两个 `SDK_INT >= 31` 分支）。消掉 NewApi 告警即可 ——
+     * 它们是**设计内的**：上方注释记着当初「矩阵回归 api26/29 实测崩溃」，
+     * 所以 `OnModeChangedListener` 这个类型必须隔离在方法体内，
+     * 只在 31+ 真正调用时才被解析。
+     */
+    @SuppressLint("NewApi")
     private fun registerModeListener() {
         val l = AudioManager.OnModeChangedListener { mode ->
             Log.i(TAG, "audio mode -> $mode")
             when (mode) {
                 AudioManager.MODE_RINGTONE, AudioManager.MODE_IN_CALL -> main.post {
                     Log.i(TAG, "来电/通话中：黑幕解除 + 挂起自动动作")
-                    hideAllBlack()
-                    main.removeCallbacksAndMessages(null)
+                    hideAllBlack()   // 内部已停掉 powerTick（会话功耗采样）
+                    // 只停「会被通话状态打断」的两条链：
+                    //  · calibTick —— 校准向导需要重新采一段干净样本
+                    //  · 悬浮球长按 —— 松手时机被通话打断，不该再弹出退出确认条
+                    //
+                    // 绝不能改成 removeCallbacksAndMessages(null)：那会连带干掉
+                    // timerTick。timerTick 的职责是在未到期时把自己重新 post 一次，
+                    // 一旦被整体清空就没有任何人再挂它，睡眠定时器从此静默失效
+                    // （timerEndAt 仍留着值，看起来一切正常，实际永远不会触发）。
+                    main.removeCallbacks(calibTick)
+                    cancelLongPress()
                     refreshNotification()
                     try {
                         Toast.makeText(this, getString(R.string.toast_call), Toast.LENGTH_LONG).show()
@@ -103,6 +123,15 @@ class OverlayService : Service() {
     private var bubble: View? = null
     private var black: BlackOverlay? = null
 
+    /** 悬浮球 400ms 长按判定（提为字段，便于来电/重建时主动撤销） */
+    private var longPressCheck: Runnable? = null
+
+    /** 撤销待触发的长按判定：来电打断松手、或悬浮球重建时不应再弹退出确认条 */
+    private fun cancelLongPress() {
+        longPressCheck?.let { main.removeCallbacks(it) }
+        longPressCheck = null
+    }
+
     /** 黑幕是否在显示，供磁贴等外部判断 */
     fun isAnyBlackShowing(): Boolean = black?.isShowing == true
 
@@ -110,6 +139,16 @@ class OverlayService : Service() {
         black?.hide()
         black = null
         main.removeCallbacks(powerTick) // 停止会话功耗采样
+        setBubbleAnimating(true)
+    }
+
+    /**
+     * 黑幕是不透明全屏窗，把悬浮球整个盖住。此时精灵悬浮球若继续按帧重绘，
+     * 就是在完全看不见的地方空转——一次两小时听剧等于十几万帧无效渲染。
+     * 文字样式的悬浮球不是 BubblePetView，无需处理。
+     */
+    private fun setBubbleAnimating(on: Boolean) {
+        (bubble as? BubblePetView)?.setAnimating(on)
     }
 
     // ---------- 会话功耗采样（省电实测） ----------
@@ -132,7 +171,7 @@ class OverlayService : Service() {
                     it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
                     it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO
             }
-            if (headsetGone && prefs.getBoolean("switch_headset", true) && black?.isShowing == true) {
+            if (headsetGone && prefs.getBoolean(Prefs.SWITCH_HEADSET, true) && black?.isShowing == true) {
                 hideAllBlack()
                 refreshNotification()
                 Toast.makeText(this@OverlayService, getString(R.string.toast_headset), Toast.LENGTH_SHORT).show()
@@ -151,6 +190,7 @@ class OverlayService : Service() {
         if (black?.isShowing != true) {
             black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
             black?.show { refreshNotification() }
+            setBubbleAnimating(false)
         }
         calibSamples = mutableListOf()
         calibTicks = 0
@@ -228,8 +268,8 @@ class OverlayService : Service() {
             Log.i(TAG, "来电监听已注册")
         }
         audioManager.registerAudioDeviceCallback(headsetCb, null)
-        prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
-        prefs.edit().putBoolean("assistant_wanted", true).apply()
+        prefs = prefs()
+        prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, true).apply()
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
         // 上次退出时留的「撤销」通知：助手已重启，清掉
@@ -237,21 +277,30 @@ class OverlayService : Service() {
         showBubble()
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(ACTION_TEST_TOGGLE) // UAT测试钩子：广播直接切换黑幕，绕开adb点击注入的不稳定
-            addAction(ACTION_TEST_RUN_MODE) // UAT测试钩子：广播执行所选模式
+            // UAT 测试钩子只在 debug 包注册。release 包必须收不到：
+            // 否则同机任意 App 一条广播就能强制开关用户的黑幕
+            // （ACTION_SCREEN_ON / UNLOCK_SKINS / WEAR / RUN_MODE 这几条在
+            //   screenOffReceiver 里其实已无处理分支，属「真息屏续播」移除后的残留，
+            //   一并收进 debug 门禁，不改变任何对外行为）
+            if (BuildConfig.DEBUG) {
+                addAction(ACTION_TEST_TOGGLE)
+                addAction(ACTION_TEST_RUN_MODE)
+                addAction(ACTION_TEST_UNLOCK_SKINS)
+                addAction(ACTION_TEST_WEAR)
+            }
         }
-        if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(screenOffReceiver, filter, Context.RECEIVER_EXPORTED)
-        } else {
-            registerReceiver(screenOffReceiver, filter)
-        }
+        // RECEIVER_NOT_EXPORTED：只收本进程 + 系统广播。
+        // ACTION_SCREEN_OFF 是 protected 系统广播，非导出模式下依然收得到；
+        // 同机其他 App 的一律拦掉。
+        // Context.RECEIVER_NOT_EXPORTED 是编译期内联的 int，5 参 registerReceiver
+        // 自 API 26 起就存在，故 minSdk 26 无需按版本分支。
+        registerReceiver(screenOffReceiver, filter, null, null, Context.RECEIVER_NOT_EXPORTED)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
-            ACTION_BUBBLE -> setBubbleVisible(!prefs.getBoolean("bubble_hidden", false))
+            ACTION_BUBBLE -> setBubbleVisible(!prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false))
             ACTION_SET_TIMER -> handleSetTimer(
                 intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0,
                 intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0
@@ -260,8 +309,14 @@ class OverlayService : Service() {
                 intent?.getLongExtra(EXTRA_CALIB_ON_UA, 0) ?: 0
             )
             ACTION_TEST_TOGGLE -> toggleOverlay() // 测试广播
+            ACTION_TEST_UNLOCK_SKINS -> PetSkins.unlockAllForDebug(this)
+            ACTION_TEST_WEAR -> {
+                val skinId = intent?.getStringExtra("skin") ?: "star"
+                PetSkins.wear(this, PetSkins.ALL.first { it.id == skinId })
+                refreshNotification()
+            }
             ACTION_EXIT -> {
-                prefs.edit().putBoolean("assistant_wanted", false).apply()
+                prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, false).apply()
                 hideAllBlack()
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
@@ -285,23 +340,41 @@ class OverlayService : Service() {
         hideAllBlack()
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
         bubble = null
+        // 必须释放：PARTIAL_WAKE_LOCK 跨 onDestroy 存活会让 CPU 永不休眠。
+        // 本进程还挂着 NotificationListener + 3 个小组件，ColorOS 下进程不会立刻死，
+        // 漏释放等于「退出助手后仍在耗电」——对一款卖省电的 App 是最严重的反噬。
+        releaseWakeLock()
         super.onDestroy()
+    }
+
+    /** 释放唤醒锁；服务已持有时调用幂等 */
+    private fun releaseWakeLock() {
+        val wl = wakeLock ?: return
+        try {
+            if (wl.isHeld) wl.release()
+        } catch (e: Exception) {
+            Log.w(TAG, "唤醒锁释放失败: $e")
+        } finally {
+            wakeLock = null
+        }
     }
 
     // ---------- 悬浮球 ----------
 
     private fun showBubble() {
         if (bubble != null) return
-        if (prefs.getBoolean("bubble_hidden", false)) return // 用户已隐藏悬浮球：尊重设置
+        if (prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false)) return // 用户已隐藏悬浮球：尊重设置
         val density = resources.displayMetrics.density
         val size = (48 * density).toInt()
 
-        // 悬浮球样式：默认「息屏」文字；已解锁形态可切换为精灵头像
-        val style = prefs.getString("bubble_style", "text") ?: "text"
-        val tv: View = if (style.startsWith("pet_")) {
-            val st = style.removePrefix("pet_").toIntOrNull() ?: 1
+        // 悬浮球样式：默认「息屏」文字，可换成精灵形象（形态与配色跟随图鉴里的选择）
+        val usePet = PetForm.bubbleUsesPet(this)
+        val tv: View = if (usePet) {
+            val st = PetForm.selected(this)
+            val skin = PetSkins.active(this)
             BubblePetView(this).apply {
-                stage = st.coerceIn(0, 4)
+                stage = st
+                applySkin(skin)
                 layoutParams = android.view.ViewGroup.LayoutParams(size, size)
             }
         } else {
@@ -328,8 +401,8 @@ class OverlayService : Service() {
         )
         lp.gravity = Gravity.TOP or Gravity.START
         // 悬浮球位置记忆：恢复上次拖动后的位置
-        lp.x = prefs.getInt("bubble_x", resources.displayMetrics.widthPixels - size - (8 * density).toInt())
-        lp.y = prefs.getInt("bubble_y", (180 * density).toInt())
+        lp.x = prefs.getInt(Prefs.BUBBLE_X, resources.displayMetrics.widthPixels - size - (8 * density).toInt())
+        lp.y = prefs.getInt(Prefs.BUBBLE_Y, (180 * density).toInt())
         bubbleLp = lp   // 确认条定位用（球的窗口坐标在这里，View.getX 恒为 0）
 
         val slop = ViewConfiguration.get(this).scaledTouchSlop
@@ -341,7 +414,9 @@ class OverlayService : Service() {
         var downAt = 0L
         var longPressFired = false
 
-        val longPressCheck = Runnable {
+        cancelLongPress()
+        longPressCheck = Runnable {
+            longPressCheck = null
             if (!moved) {
                 longPressFired = true
                 vibrateShort()
@@ -359,7 +434,7 @@ class OverlayService : Service() {
                     moved = false
                     longPressFired = false
                     downAt = SystemClock.elapsedRealtime()
-                    main.postDelayed(longPressCheck, 400)
+                    longPressCheck?.let { main.postDelayed(it, 400) }
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -367,7 +442,7 @@ class OverlayService : Service() {
                     val dy = (e.rawY - downRawY).toInt()
                     if (!moved && (Math.abs(dx) > slop || Math.abs(dy) > slop)) {
                         moved = true
-                        main.removeCallbacks(longPressCheck)
+                        cancelLongPress()
                     }
                     if (moved) {
                         lp.x = startX + dx
@@ -377,7 +452,7 @@ class OverlayService : Service() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    main.removeCallbacks(longPressCheck)
+                    cancelLongPress()
                     // 短按（<250ms）即使有轻微位移也按点击处理：手持抖动超过
                     // 触摸容差很常见，不能让点击被当成拖动吞掉
                     val quickTap = SystemClock.elapsedRealtime() - downAt < 250
@@ -390,7 +465,7 @@ class OverlayService : Service() {
                             val w = resources.displayMetrics.widthPixels
                             lp.x = if (lp.x + lp.width / 2 < w / 2) margin else w - tv.width - margin
                             wm.updateViewLayout(tv, lp)
-                            prefs.edit().putInt("bubble_x", lp.x).putInt("bubble_y", lp.y).apply()
+                            prefs.edit().putInt(Prefs.BUBBLE_X, lp.x).putInt(Prefs.BUBBLE_Y, lp.y).apply()
                         }
                         else -> toggleOverlay()
                     }
@@ -403,12 +478,12 @@ class OverlayService : Service() {
         try {
             wm.addView(tv, lp)
             bubble = tv
-            prefs.edit().putBoolean("bubble_perm_error", false).apply()
+            prefs.edit().putBoolean(Prefs.BUBBLE_PERM_ERROR, false).apply()
             Log.e(TAG, "bubble added at ${lp.x},${lp.y}")
         } catch (e: Exception) {
             Log.e(TAG, "bubble add failed: $e")
             // 权限表征与内核态不一致（重装后 ColorOS 常见）：标记供主界面引导修复
-            prefs.edit().putBoolean("bubble_perm_error", true).apply()
+            prefs.edit().putBoolean(Prefs.BUBBLE_PERM_ERROR, true).apply()
         }
     }
 
@@ -417,7 +492,7 @@ class OverlayService : Service() {
 
     /** 悬浮球显隐（通知按钮/设置开关/长按退出共用）：状态持久化，重启尊重 */
     fun setBubbleVisible(visible: Boolean) {
-        prefs.edit().putBoolean("bubble_hidden", !visible).apply()
+        prefs.edit().putBoolean(Prefs.BUBBLE_HIDDEN, !visible).apply()
         if (visible) showBubble() else {
             bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
             bubble = null
@@ -524,7 +599,7 @@ class OverlayService : Service() {
 
     /** 彻底退出助手（长按确认/通知/磁贴共用）：球与黑幕全撤，留一条可撤销通知 */
     private fun exitAssistant() {
-        prefs.edit().putBoolean("assistant_wanted", false).apply()
+        prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, false).apply()
         hideAllBlack()
         hideExitConfirm()
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
@@ -604,6 +679,7 @@ class OverlayService : Service() {
         hideAllBlack()
         black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
         black?.show { refreshNotification() }
+        setBubbleAnimating(false)
     }
 
     /** 黑幕/恢复 切换（悬浮球、通知、快捷磁贴共用） */
@@ -614,6 +690,7 @@ class OverlayService : Service() {
         } else {
             black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
             black?.show { refreshNotification() }
+            setBubbleAnimating(false)
             // 会话功耗采样：黑屏期间每 60 秒记录一次电池电流
             main.removeCallbacks(powerTick)
             main.postDelayed(powerTick, 60_000)
@@ -656,7 +733,7 @@ class OverlayService : Service() {
             .setContentIntent(openPi)
             .addAction(0, getString(R.string.notif_action_stop), exitPi)
             .addAction(0, getString(if (isAnyBlackShowing()) R.string.notif_action_restore else R.string.notif_action_listen), togglePi)
-            .addAction(0, getString(if (prefs.getBoolean("bubble_hidden", false)) R.string.notif_action_bubble_show else R.string.notif_action_bubble_hide), bubblePi)
+            .addAction(0, getString(if (prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false)) R.string.notif_action_bubble_show else R.string.notif_action_bubble_hide), bubblePi)
             .setOngoing(true)
             .build()
     }

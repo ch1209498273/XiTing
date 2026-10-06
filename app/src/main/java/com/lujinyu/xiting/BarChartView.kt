@@ -73,6 +73,8 @@ class BarChartView(context: Context, attrs: AttributeSet?) : View(context, attrs
     private fun fmtDur(ms: Long): String = when {
         ms < 60_000L -> "${ms / 1000}秒"
         ms < 3_600_000L -> "${ms / 60_000}分钟"
-        else -> String.format("%.1f小时", ms / 3_600_000.0)
+        // 必须显式传 Locale：土耳其语区等会把 '.' 当成 '.'以外的东西，
+        // 产出「1,5小时」这类错位的数字（lint DefaultLocale）
+        else -> String.format(java.util.Locale.getDefault(), "%.1f小时", ms / 3_600_000.0)
     }
 }

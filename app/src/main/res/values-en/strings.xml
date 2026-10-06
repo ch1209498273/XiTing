@@ -40,10 +40,10 @@
     <!-- Stats -->
     <string name="stats_hint">Listening time &amp; power saved (stored on device)</string>
     <string name="chart_title">Daily screen-off time (7 days)</string>
-    <string name="ach_title">Pet Achievements</string>
     <string name="ach_sub_empty">Keep listening to light them up</string>
     <string name="ach_sub_latest">Latest: %1$s</string>
-    <string name="ach_progress">Pet Achievements · 0/8</string>
+    <!-- Design-time placeholder only; renderStats() overwrites it with ach_dlg_title_fmt at runtime -->
+    <string name="ach_progress">Pet Achievements</string>
     <string name="pet_subtitle">Energy Pet · fed by your real listening time</string>
     <string name="sum_mah_default">Total saved ≈ 0 mAh</string>
     <string name="sum_extra_default">Longest — · 0 sessions</string>
@@ -51,7 +51,6 @@
     <string name="recent_records">Recent sessions · last 30 days</string>
     <string name="pager_prev">‹ Prev</string>
     <string name="pager_next">Next ›</string>
-    <string name="pager_page">Page %1$d / %2$d</string>
 
     <!-- Settings -->
     <string name="settings_personal">Personalize</string>
@@ -77,10 +76,8 @@
     <string name="widget_active">Active</string>
     <string name="widget_idle">Idle</string>
     <string name="widget_today_fmt">Today %1$s</string>
-    <string name="widget_pet_fmt">%1$s</string>
     <string name="widget_growth_next">Growth %1$d · %2$d to next</string>
     <string name="widget_growth_max">Growth %1$d · Maxed</string>
-    <string name="widget_total_fmt">Total %1$s</string>
 
     <!-- Black overlay -->
     <string name="black_hint">Screen-off listening · Tap to unlock</string>
@@ -156,7 +153,6 @@
     <string name="state_done">Done ✓</string>
     <string name="state_todo">Pending</string>
     <string name="keepalive_btn_battery">Battery settings</string>
-    <string name="keepalive_btn_appinfo">App info</string>
     <string name="keepalive_btn_ok">Got it</string>
 
     <!-- Dynamic: finish this episode -->
@@ -169,20 +165,14 @@
     <!-- Dynamic: achievements & pet -->
     <string name="ach_toast_fmt">🏆 Unlocked: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">Pet Achievements %1$d/%2$d</string>
+<string name="ach_dlg_hint">Badges light up on the left of the pet, easiest at the bottom</string>
+<string name="ach_row_unlocked">Unlocked</string>
+<string name="ach_row_locked">Locked</string>
     <string name="dlg_ok">OK</string>
-    <string name="toast_evolve">🎉 Evolved! %1$s → %2$s</string>
     <string name="toast_charge">+%1$d growth collected ✓</string>
     <string name="pet_caption_sleepy">%1$s is napping · play an episode to wake it</string>
     <string name="pet_caption_max">%1$s · Maxed · growth %2$d banked</string>
     <string name="pet_caption_progress">%1$s · Growth %2$d / %3$d</string>
-    <string name="ach_first_t">First Black-Out</string>
-    <string name="ach_first_d">Complete your first screen-off session</string>
-    <string name="ach_h1_t">One-Hour Club</string>
-    <string name="ach_h1_d">1 hour of total listening</string>
-    <string name="ach_h10_t">Ten-Hour Pact</string>
-    <string name="ach_h10_d">10 hours of total listening</string>
-    <string name="ach_h50_t">Fifty-Hour Dynasty</string>
-    <string name="ach_h50_d">50 hours of total listening</string>
     <string name="ach_c100_t">Century Habit</string>
     <string name="ach_c100_d">100 screen-off sessions</string>
     <string name="ach_marathon_t">Marathon</string>
@@ -203,7 +193,6 @@
     <string name="calib_btn_close">Close</string>
     <string name="calib_step1_title">Calibration 1/2 · Screen on</string>
     <string name="calib_step1_init">Start playing any video now and keep the screen on…</string>
-    <string name="calib_step1_wait">Keep playing with the screen on — don\'t touch the phone\n%1$s left (%2$d samples)</string>
     <string name="toast_calib_too_few">Not enough valid samples (charging?) — calibration cancelled</string>
     <string name="toast_calib_need_service">Start the assistant first, then calibrate</string>
     <string name="toast_calib_step2">Calibration 2/2 · stay black for 3 min, hands off</string>
@@ -223,7 +212,7 @@
     <string name="day_today">Today</string>
     <string name="day_yesterday">Yesterday</string>
     <string name="share_chooser">Share via</string>
-    <string name="share_text">⚡ Screen-off listening with XiTing: %1$s, ~%2$d mAh saved\nMy energy pet evolved into %3$s\nFree, ad-free, fully offline (0.9MB)\nhttps://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">⚡ Screen-off listening with XiTing: %1$s, ~%2$d mAh saved\nMy energy pet evolved into %3$s\nFree, ad-free, fully offline (0.6MB)\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">Shared · +%1$d pending growth (tap the bar on Stats to collect)</string>
     <string name="toast_share_claimed">Today\'s reward claimed — come back tomorrow</string>
     <string name="share_sub_claimed">Claimed today ✓ · back tomorrow</string>
@@ -237,10 +226,8 @@
     <string name="update_value_fmt">Now v%1$s</string>
     <string name="bubble_default">Screen-off (default)</string>
     <string name="bubble_label_off">Screen-off</string>
-    <string name="bubble_locked_fmt">%1$s (🔒 needs %2$d)</string>
     <string name="bubble_dlg_title">Bubble style (live preview)</string>
     <string name="toast_bubble_locked">%1$s locked · needs %2$d growth</string>
-    <string name="toast_bubble_set">Bubble set to %1$s — check the corner</string>
     <string name="bubble_value_default">Default</string>
 
     <!-- Duration units -->
@@ -254,7 +241,7 @@
     <string name="about_section_app">About this app</string>
     <string name="about_intro">Want to just listen while watching? Tap the bubble and the screen goes fully black: backlight physically off, touches blocked, sound keeps playing — works with any video app.\n\nOptional night clock &amp; battery display (stays visible at minimum brightness after re-lock, content micro-shifts to protect OLED); incoming calls exit the black screen so you never miss one; sleep timer and \"finish this episode\" smart timer; headphones unplug returns you to video.\n\nAfter wake you can skip tracks: previous / play-pause / next (enable in Settings).\n\nEnergy Pet: listening earns growth points to evolve a five-form pet (Spark → Orb → Storm Cloud → Tempest → Thunder King), usable as your bubble avatar; achievements track your listening milestones.\n\nHome-screen widgets: three sizes with your pet, listening stats and one-tap screen-off; long-press the bubble to exit quickly.\n\nData backup: auto-backed up to the XiTing folder in Downloads (on device only), restored in one tap after reinstall. Everything stays on this device — no network permission.</string>
     <string name="about_section_privacy">Privacy &amp; Security</string>
-    <string name="about_privacy">· No INTERNET permission: physically cannot go online\n· Reads nothing on your screen\n· All data stays on this device\n· No ads, no tracking, no analytics</string>
+    <string name="about_privacy">· No INTERNET permission: physically cannot go online\n· Reads nothing on your screen\n· All data stays on this device (system cloud backup and device transfer are explicitly disabled)\n· A backup file is written only when you tap Export, into the Download/XiTing folder, and stays under your control\n· Notification counts are read only after you grant Notification Access, solely for the black-screen badge; notification titles and contents are never read, and the feature stays off entirely without your permission\n· The app embeds a build identifier (build ID and channel, used only to trace pirated copies; it contains no device information)\n· No ads, no tracking, no analytics</string>
     <string name="about_section_open">Open Source &amp; Contact</string>
     <string name="about_github">GitHub: github.com/ch1209498273/XiTing\n(Tap to open the project page)</string>
     <string name="about_feedback">Feedback: 1209498273@qq.com</string>
@@ -263,25 +250,30 @@
     <string name="about_version_fmt">Version %1$s · Build %2$s</string>
 
     <!-- v3.5 skin gallery & streak -->
-    <string name="gallery_btn">🎨 Skins</string>
     <string name="gallery_title">Skin Gallery</string>
     <string name="streak_fmt">🔥 %1$d-day streak</string>
     <string name="streak_best_fmt">best %1$d</string>
     <string name="toast_rare_energy">⚡ Rare storm energy +%1$d!</string>
     <string name="toast_skin_unlock">🎨 New skin unlocked: %1$s</string>
-    <string name="toast_skin_worn">Wearing %1$s</string>
-    <string name="gallery_wear">Wear</string>
-    <string name="gallery_worn">Worn</string>
     <string name="skin_default_n">Classic</string>
     <string name="skin_cond_default">Default look</string>
     <string name="skin_star_n">Starlight</string>
-    <string name="skin_cond_star">10h total listening</string>
+    <string name="skin_cond_star">1000 mAh saved</string>
     <string name="skin_aurora_n">Aurora</string>
-    <string name="skin_cond_aurora">50h total listening</string>
+    <string name="skin_cond_aurora">2h in one listening session</string>
     <string name="skin_sakura_n">Sakura</string>
-    <string name="skin_cond_sakura">7-day streak</string>
+    <string name="skin_cond_sakura">14-day streak</string>
     <string name="skin_magma_n">Magma</string>
-    <string name="skin_cond_magma">5000 mAh saved</string>
+    <string name="skin_cond_magma">Bank 2000 more growth after max stage</string>
     <string name="skin_jade_n">Jade</string>
-    <string name="skin_cond_jade">30-day streak</string>
+    <string name="skin_cond_jade">60-day streak</string>
+    <string name="gallery_locked">🔒 %1$s (%2$s)</string>
+    <string name="gallery_worn">Now wearing \"%1$s\"</string>
+    <string name="gallery_form_label">Form</string>
+    <string name="gallery_skin_label">Colour</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">Reach %1$d growth to unlock this form</string>
+    <string name="gallery_form_next">Bank %1$d more growth for the next form</string>
+    <string name="gallery_form_maxed">All forms unlocked</string>
+    <string name="bubble_style_title">Bubble style</string>
 </resources>

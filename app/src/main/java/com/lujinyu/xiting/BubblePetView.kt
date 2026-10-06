@@ -24,6 +24,14 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
     var stage = STAGE_BALL
 
     companion object {
+        /**
+         * 重绘间隔。
+         *
+         * 原为 50ms（20fps）。呼吸是 ±4% 慢摆、眨眼 140ms，对帧率不敏感，
+         * 100ms（10fps）肉眼无差别，日常待机开销直接减半。
+         */
+        private const val FRAME_MS = 100L
+
         const val STAGE_SPARK = 0
         const val STAGE_BALL = 1
         const val STAGE_CLOUD = 2
@@ -34,6 +42,77 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
     private val bornAt = System.currentTimeMillis()
     private var nextBlinkAt = System.currentTimeMillis() + 2500
     private var blinkUntil = 0L
+
+    /**
+     * 配色色相（度），0 = 经典配色。与主页精灵/小组件共用同一套皮肤值。
+     *
+     * 旧实现是「画完对整层做色相旋转」，现已改为**按色相现算颜色**（见 [PetPalette]），
+     * 下方不再需要 saveLayer + ColorMatrixColorFilter。
+     */
+    var skinHue = 0f
+        set(value) { if (field != value) { field = value; paletteCache = null; invalidate() } }
+
+    /** 配色：饱和度系数，1.0=原样。与色相一起构成一套配色 */
+    var skinSat = 1f
+        set(value) { if (field != value) { field = value; paletteCache = null; invalidate() } }
+
+    /**
+     * 一次性套用整套配色 —— 只设色相而漏掉饱和度是最难查的一类问题：
+     * 界面不崩，只是「这款皮肤看起来和别的没区别」。
+     */
+    fun applySkin(skin: PetSkins.Skin) {
+        skinHue = skin.hue
+        skinSat = skin.saturation
+    }
+
+    /** 缓存键含 stage：形态变了色相可能变，不能只按 skinHue 缓存 */
+    private var paletteCache: PetPalette.Palette? = null
+    private var paletteKey = Int.MIN_VALUE to (Float.NaN to Float.NaN)
+
+    // 与 PetView 同样的复用策略：悬浮球 10fps 常驻重绘，每帧新建 Path/RectF/Shader
+    // 就是每秒 200 个以上的对象。（黑幕盖住时 OverlayService 会 setAnimating(false) 停帧，
+    // 但用户不播放的绝大多数时间它都在跑。）
+    private val scratchRect = RectF()
+    private val pathA = Path()
+    private val pathB = Path()
+    private val pathC = Path()
+    private val shaderCache = HashMap<String, android.graphics.Shader>(8)
+    private var shaderKeyW = Int.MIN_VALUE
+    private var shaderKeyH = Int.MIN_VALUE
+
+    private fun shaderCacheCheck() {
+        if (shaderKeyW == width && shaderKeyH == height) return
+        shaderKeyW = width
+        shaderKeyH = height
+        shaderCache.clear()
+    }
+
+    private fun cachedShader(key: String, make: () -> android.graphics.Shader): android.graphics.Shader =
+        shaderCache.getOrPut(key) { make() }
+
+    private fun palette(): PetPalette.Palette {
+        val key = stage to (skinHue to skinSat)
+        paletteCache?.let { if (key == paletteKey) return it }
+        paletteKey = key
+        shaderCache.clear()
+        return PetPalette.of(stage, skinHue, skinSat).also { paletteCache = it }
+    }
+
+    /**
+     * 动画是否运行。
+     *
+     * 黑幕是一整块不透明全屏窗，把悬浮球完全盖住，此时它在背后继续 10fps 重绘
+     * 是纯粹的空转——一次两小时的听剧就是十几万帧看不见的开销。
+     * 黑幕显示时由 OverlayService 调 setAnimating(false) 停掉，收幕时恢复。
+     */
+    private var animating = true
+
+    fun setAnimating(on: Boolean) {
+        if (animating == on) return
+        animating = on
+        // 停帧之后 onDraw 不再续挂，这里必须补一次；启动时同理
+        if (on) postInvalidateDelayed(FRAME_MS)
+    }
 
     private val bodyPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -63,7 +142,7 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        postInvalidateDelayed(50)
+        if (animating) postInvalidateDelayed(FRAME_MS)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -83,6 +162,8 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             nextBlinkAt = now + 2600 + (abs(now % 1600)).toInt()
         }
         val blinking = now < blinkUntil
+        val pal = palette()
+        shaderCacheCheck()
 
         when (stage) {
             STAGE_SPARK -> drawSpark(canvas, cx, cy, s, t, blinking)
@@ -92,12 +173,14 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             else -> drawKing(canvas, cx, cy, s, t, blinking)
         }
 
-        postInvalidateDelayed(50)
+        if (animating) postInvalidateDelayed(FRAME_MS)
     }
 
     // 形态一：四角星
     private fun drawSpark(canvas: Canvas, cx: Float, cy: Float, s: Float, t: Float, blinking: Boolean) {
-        val p = Path()
+        val pal = palette()
+        val p = pathA
+        p.reset()
         val spin = t * 0.5f
         for (i in 0 until 16) {
             val ang = (6.2831855f * i / 16) + spin
@@ -107,27 +190,33 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             if (i == 0) p.moveTo(x, y) else p.lineTo(x, y)
         }
         p.close()
-        bodyPaint.shader = android.graphics.LinearGradient(
-            cx - s, cy - s, cx + s, cy + s,
-            0xFFFFF176.toInt(), 0xFFFFA000.toInt(), Shader.TileMode.CLAMP
-        )
+        bodyPaint.shader = cachedShader("spark") {
+            android.graphics.LinearGradient(
+                cx - s, cy - s, cx + s, cy + s,
+                pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawPath(p, bodyPaint)
         bodyPaint.shader = null
         drawMiniFace(canvas, cx, cy, s * 0.26f, blinking)
     }
 
-    // 形态二：紫色等离子球 + 青蓝环
+    // 形态二：等离子球 + 旋转环
     private fun drawBall(canvas: Canvas, cx: Float, cy: Float, s: Float, t: Float, blinking: Boolean) {
-        bodyPaint.shader = RadialGradient(
-            cx - s * 0.3f, cy - s * 0.3f, s * 1.5f,
-            0xFFB388FF.toInt(), 0xFF3F1D96.toInt(), Shader.TileMode.CLAMP
-        )
+        val pal = palette()
+        bodyPaint.shader = cachedShader("ball") {
+            RadialGradient(
+                cx - s * 0.3f, cy - s * 0.3f, s * 1.5f,
+                pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawCircle(cx, cy, s, bodyPaint)
         bodyPaint.shader = null
         // 内部电弧
-        linePaint.color = 0xCCB2EBF2.toInt()
-        linePaint.strokeWidth = 1.8f
-        val ap = Path()
+        linePaint.color = pal.accentSoft
+        linePaint.strokeWidth = s * 0.09f
+        val ap = pathA
+        ap.reset()
         for (k in 0 until 5) {
             val kk = k / 4f
             val ax = cx - s * 0.6f + s * 1.2f * kk
@@ -135,96 +224,145 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             if (k == 0) ap.moveTo(ax, ay) else ap.lineTo(ax, ay)
         }
         canvas.drawPath(ap, linePaint)
-        // 青蓝环（旋转）
-        linePaint.color = 0xCC00E5FF.toInt()
-        linePaint.strokeWidth = 2.5f
-        val ring = RectF(cx - s * 1.35f, cy - s * 1.35f, cx + s * 1.35f, cy + s * 1.35f)
-        canvas.drawArc(ring, -t * 90, 100f, false, linePaint)
-        canvas.drawArc(ring, 180 - t * 90, 100f, false, linePaint)
+        // 旋转环（替换原来的青蓝环）
+        linePaint.color = pal.accent
+        linePaint.strokeWidth = s * 0.12f
+        scratchRect.set(cx - s * 1.35f, cy - s * 1.35f, cx + s * 1.35f, cy + s * 1.35f)
+        canvas.drawArc(scratchRect, -t * 90, 100f, false, linePaint)
+        canvas.drawArc(scratchRect, 180 - t * 90, 100f, false, linePaint)
         drawMiniFace(canvas, cx, cy, s * 0.24f, blinking)
     }
 
-    // 形态三：白云 + 闪电
+    // 形态三：底部平坦的积云（与主页同剪影）
     private fun drawCloud(canvas: Canvas, cx: Float, cy: Float, s: Float, t: Float, blinking: Boolean) {
-        val puffs = arrayOf(
-            floatArrayOf(-0.55f, 0.1f, 0.42f), floatArrayOf(0f, -0.25f, 0.55f), floatArrayOf(0.55f, 0.1f, 0.42f)
+        val pal = palette()
+        val baseY = cy + s * 0.35f
+        val lobes = arrayOf(
+            floatArrayOf(-0.55f, 0.40f, -0.28f),
+            floatArrayOf(-0.12f, 0.52f, -0.52f),
+            floatArrayOf(0.36f, 0.44f, -0.40f),
+            floatArrayOf(0.70f, 0.30f, -0.18f)
         )
-        bodyPaint.color = 0xFFEAF4FF.toInt()
-        for (p in puffs) canvas.drawCircle(cx + p[0] * s, cy + p[1] * s, p[2] * s, bodyPaint)
-        canvas.drawRoundRect(RectF(cx - s * 0.8f, cy - s * 0.05f, cx + s * 0.8f, cy + s * 0.5f), s * 0.25f, s * 0.25f, bodyPaint)
-        boltPaint.color = 0xFF7FC4FF.toInt()
-        drawBolt(canvas, cx, cy + s * 0.55f, s * 0.4f)
-        drawMiniFace(canvas, cx, cy - s * 0.1f, s * 0.22f, blinking)
+        for (l in lobes) canvas.drawCircle(cx + l[0] * s, baseY + l[2] * s, l[1] * s, bodyPaint.apply {
+            color = pal.body
+        })
+        canvas.drawRect(cx - s * 0.80f, baseY - s * 0.32f, cx + s * 0.80f, baseY, bodyPaint.apply {
+            color = pal.body
+        })
+        boltPaint.color = pal.accent
+        drawBolt(canvas, cx, baseY - s * 0.02f, s * 0.38f)
+        drawMiniFace(canvas, cx, cy - s * 0.06f, s * 0.22f, blinking)
     }
 
-    // 形态四：小龙卷风
+    // 形态四：小龙卷风（与主页同做法：淡漏斗 + 错位旋转弧）
     private fun drawStorm(canvas: Canvas, cx: Float, cy: Float, s: Float, t: Float, blinking: Boolean) {
-        val layers = 5
-        for (i in 0 until layers) {
-            val k = i / (layers - 1f)
-            val w = s * (1.05f - 0.75f * k)
-            val y = cy - s * 0.7f + k * s * 1.4f
-            val hh = s * 0.26f * (1f - 0.4f * k)
-            bodyPaint.color = if (i < 3) 0xFFDCEAFF.toInt() else 0xFF9FB6E8.toInt()
-            canvas.drawOval(RectF(cx - w, y - hh / 2, cx + w, y + hh / 2), bodyPaint)
+        val pal = palette()
+        val topY = cy - s * 0.72f
+        val h = s * 1.45f
+        val funnel = pathA
+        funnel.reset()
+        funnel.moveTo(cx - s * 0.26f, topY)
+        funnel.cubicTo(cx - s * 0.34f, topY + h * 0.36f, cx - s * 0.68f, topY + h * 0.70f, cx - s * 0.95f, topY + h)
+        funnel.lineTo(cx + s * 0.95f, topY + h)
+        funnel.cubicTo(cx + s * 0.68f, topY + h * 0.70f, cx + s * 0.34f, topY + h * 0.36f, cx + s * 0.26f, topY)
+        funnel.close()
+        bodyPaint.shader = cachedShader("storm") {
+            android.graphics.LinearGradient(
+                cx, topY, cx, topY + h, pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
+            )
         }
-        boltPaint.color = 0xFF8FD0FF.toInt()
-        drawBolt(canvas, cx + s * 0.85f, cy, s * 0.32f)
-        drawMiniFace(canvas, cx, cy - s * 0.28f, s * 0.2f, blinking, fierce = true)
+        bodyPaint.alpha = 95
+        canvas.drawPath(funnel, bodyPaint)
+        bodyPaint.shader = null
+        bodyPaint.alpha = 255
+        bodyPaint.color = pal.highlight
+        canvas.drawCircle(cx, topY + s * 0.16f, r0(s), bodyPaint)
+        // 四层错位旋转弧
+        linePaint.strokeCap = android.graphics.Paint.Cap.ROUND
+        for (i in 0 until 4) {
+            val tt = i / 3f
+            val w = s * (0.30f + 0.68f * tt)
+            val y = topY + s * 0.18f + tt * (h - s * 0.18f)
+            val ry = s * 0.16f * (0.75f + 0.45f * tt)
+            canvas.save()
+            canvas.rotate(t * 26f + tt * 52f, cx, y)
+            linePaint.strokeWidth = s * 0.17f * (1f - 0.4f * tt)
+            linePaint.color = if (i % 2 == 0) pal.accent else pal.accentSoft
+            linePaint.alpha = (225 - tt * 70).toInt().coerceIn(0, 255)
+            scratchRect.set(cx - w, y - ry, cx + w, y + ry)
+            canvas.drawArc(scratchRect, 28f, 124f, false, linePaint)
+            canvas.drawArc(scratchRect, 208f, 124f, false, linePaint)
+            canvas.restore()
+        }
+        linePaint.alpha = 255
+        drawMiniFace(canvas, cx, topY + s * 0.58f, s * 0.20f, blinking, fierce = true)
     }
 
-    // 形态五：紫云 + 金冠 + 雷电双翼
+    private fun r0(s: Float) = s * 0.19f
+
+    // 形态五：六芒能量核心 + 土星环（与主页同剪影；翅膀与皇冠已去掉）
     private fun drawKing(canvas: Canvas, cx: Float, cy: Float, s: Float, t: Float, blinking: Boolean) {
-        // 双翼（3根锯齿，翼尖微扇动）
-        val flap = 0.06f * sin(t * 3f)
-        val wingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFC94D.toInt() }
-        for (side in intArrayOf(-1, 1)) {
-            for (f in 0 until 3) {
-                val fp = Path()
-                val baseX = cx + side * s * 0.8f
-                val baseY = cy - s * 0.15f + f * s * 0.28f
-                val tipX = cx + side * s * (1.35f + f * 0.1f + flap)
-                val tipY = baseY - s * 0.5f + f * s * 0.15f
-                val midX = (baseX + tipX) / 2 + side * s * 0.12f
-                val midY = (baseY + tipY) / 2
-                fp.moveTo(baseX, baseY)
-                fp.lineTo(midX, midY - s * 0.12f)
-                fp.lineTo(midX + side * s * 0.08f, midY)
-                fp.lineTo(tipX, tipY)
-                fp.lineTo(midX, midY + s * 0.14f)
-                fp.lineTo(baseX, baseY + s * 0.18f)
-                fp.close()
-                canvas.drawPath(fp, wingPaint)
-            }
+        val pal = palette()
+        // 上半环在核心之前、下半环在核心之后，与主页一致
+        fun ringHalf(i: Int, start: Float) {
+            val rot = if (i == 0) -16f + sin(t * 0.5f) * 2.5f else 14f
+            val rx = if (i == 0) s * 1.66f else s * 1.32f
+            val ry = if (i == 0) s * 0.32f else s * 0.23f
+            canvas.save()
+            canvas.rotate(rot, cx, cy)
+            linePaint.strokeCap = android.graphics.Paint.Cap.BUTT
+            linePaint.strokeWidth = if (i == 0) s * 0.15f else s * 0.10f
+            linePaint.color = if (i == 0) pal.accent else pal.accentSoft
+            linePaint.alpha = if (i == 0) 225 else 150
+            scratchRect.set(cx - rx, cy - ry, cx + rx, cy + ry)
+            canvas.drawArc(scratchRect, start, 180f, false, linePaint)
+            canvas.restore()
         }
-        // 紫云
-        val puffs = arrayOf(
-            floatArrayOf(-0.5f, 0.1f, 0.4f), floatArrayOf(0f, -0.28f, 0.52f), floatArrayOf(0.5f, 0.1f, 0.4f)
-        )
-        bodyPaint.color = 0xFFF2ECFF.toInt()
-        for (p in puffs) canvas.drawCircle(cx + p[0] * s, cy + p[1] * s, p[2] * s, bodyPaint)
-        canvas.drawRoundRect(RectF(cx - s * 0.75f, cy - s * 0.05f, cx + s * 0.75f, cy + s * 0.48f), s * 0.24f, s * 0.24f, bodyPaint)
-        // 中央金闪电
-        boltPaint.color = 0xFFFFC94D.toInt()
-        drawBolt(canvas, cx, cy + s * 0.52f, s * 0.45f)
-        // 金冠
-        val cw = s * 0.85f
-        val topY = cy - s * 1.0f
-        val ch = cw * 0.66f
-        val p = Path()
-        p.moveTo(cx - cw / 2, topY + ch)
-        p.lineTo(cx - cw / 2, topY + ch * 0.35f)
-        p.lineTo(cx - cw * 0.26f, topY + ch * 0.64f)
-        p.lineTo(cx - cw * 0.14f, topY)
-        p.lineTo(cx, topY + ch * 0.44f)
-        p.lineTo(cx + cw * 0.14f, topY)
-        p.lineTo(cx + cw * 0.26f, topY + ch * 0.64f)
-        p.lineTo(cx + cw / 2, topY + ch * 0.35f)
-        p.lineTo(cx + cw / 2, topY + ch)
-        p.close()
-        boltPaint.color = 0xFFFFC94D.toInt()
-        canvas.drawPath(p, boltPaint)
-        drawMiniFace(canvas, cx, cy - s * 0.08f, s * 0.2f, blinking, fierce = true)
+        ringHalf(0, 180f)
+        ringHalf(1, 180f)
+        // 六芒核心
+        val core = pathA
+        core.reset()
+        for (i in 0 until 12) {
+            val ang = 6.2831855f * i / 12 - 1.5708f
+            val rad = s * (if (i % 2 == 0) 1.05f else 0.45f)
+            val x = cx + cos(ang) * rad
+            val y = cy + sin(ang) * rad * 0.94f
+            if (i == 0) core.moveTo(x, y) else core.lineTo(x, y)
+        }
+        core.close()
+        bodyPaint.shader = cachedShader("king") {
+            RadialGradient(
+                cx - s * 0.25f, cy - s * 0.3f, s * 1.7f, pal.highlight, pal.deep, Shader.TileMode.CLAMP
+            )
+        }
+        canvas.drawPath(core, bodyPaint)
+        bodyPaint.shader = null
+        // 下半环盖在核心之上
+        ringHalf(0, 0f)
+        ringHalf(1, 0f)
+        linePaint.strokeCap = android.graphics.Paint.Cap.ROUND
+        linePaint.alpha = 255
+        // 头顶星芒（四尖，ww 必须远小于 hh）
+        val sy = cy - s * 1.08f
+        val hh = s * 0.38f
+        val ww = s * 0.08f
+        boltPaint.color = pal.highlight
+        val sp = pathB
+        sp.reset()
+        sp.moveTo(cx, sy - hh)
+        sp.lineTo(cx + ww, sy - ww)
+        sp.lineTo(cx + hh, sy)
+        sp.lineTo(cx + ww, sy + ww)
+        sp.lineTo(cx, sy + hh)
+        sp.lineTo(cx - ww, sy + ww)
+        sp.lineTo(cx - hh, sy)
+        sp.lineTo(cx - ww, sy - ww)
+        sp.close()
+        canvas.drawPath(sp, boltPaint)
+        boltPaint.color = pal.accent
+        drawBolt(canvas, cx, cy + s * 0.44f, s * 0.42f)
+        drawMiniFace(canvas, cx, cy - s * 0.04f, s * 0.20f, blinking, fierce = true)
     }
 
     private fun drawMiniFace(
@@ -250,14 +388,16 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         }
         linePaint.color = 0xFF2E3B47.toInt()
         linePaint.strokeWidth = er * 0.32f
-        val p = Path()
+        val p = pathC
+        p.reset()
         p.moveTo(cx - er * 0.8f, cy + er * 1.5f)
         p.quadTo(cx, cy + er * 2.3f, cx + er * 0.8f, cy + er * 1.5f)
         canvas.drawPath(p, linePaint)
     }
 
     private fun drawBolt(canvas: Canvas, x: Float, y: Float, sz: Float) {
-        val p = Path()
+        val p = pathC
+        p.reset()
         p.moveTo(x + sz * 0.25f, y)
         p.lineTo(x - sz * 0.35f, y + sz * 0.9f)
         p.lineTo(x + sz * 0.02f, y + sz * 0.9f)

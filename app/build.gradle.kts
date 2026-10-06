@@ -100,6 +100,15 @@ android {
         abortOnError = false
     }
 
+    testOptions {
+        unitTests {
+            // android.util.Log 在 JVM 单测里是「未实现」的 stub，不设此项会抛
+            // RuntimeException: Method w in android.util.Log not mocked。
+            // 本项目的解析路径只拿 Log 记日志，返回默认值即可。
+            isReturnDefaultValues = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -110,4 +119,24 @@ kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
+}
+
+dependencies {
+    testImplementation("junit:junit:4.13.2")
+    // 单测跑在 JVM 上：android.jar 里的 org.json 是「调用即抛异常」的 stub，
+    // 引入真实实现才能测存档/能量的解析容错路径。
+    // main 源码集仍编译进 APK 的 org.json，两者不冲突（单测 classpath 里本实现优先）。
+    testImplementation("org.json:json:20231013")
+}
+
+tasks.withType<Test>().configureEach {
+    jvmArgs("-Dfile.encoding=UTF-8", "-Dsun.jnu.encoding=UTF-8")
+    // AGP 只把 javac 的输出目录挂上单测运行时 classpath。本模块的测试全是纯 Kotlin，
+    // javac 什么都不产出，于是 tmp/kotlin-classes/<variant>UnitTest 里的测试类
+    // 不在 classpath 上 —— Gradle 能扫到类名（它自己在 daemon 里读目录），
+    // worker 却 Class.forName 失败，于是每个测试类都报
+    // 「java.lang.ClassNotFoundException: com.lujinyu.xiting.XxxTest」。
+    // 这里按变体名补回 Kotlin 编译输出。task 名形如 testDebugUnitTest → debugUnitTest。
+    val variantDir = name.removePrefix("test").replaceFirstChar { it.lowercase() }
+    classpath += files(layout.buildDirectory.dir("tmp/kotlin-classes/$variantDir"))
 }

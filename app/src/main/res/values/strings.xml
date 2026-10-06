@@ -40,10 +40,10 @@
     <!-- 统计页 -->
     <string name="stats_hint">息屏听剧的时长与省电估算（保存在本机）</string>
     <string name="chart_title">近7天每日息屏时长</string>
-    <string name="ach_title">精灵成就</string>
     <string name="ach_sub_empty">听剧积累，逐一点亮</string>
     <string name="ach_sub_latest">最新解锁：%1$s</string>
-    <string name="ach_progress">精灵成就 · 0/8</string>
+    <!-- 仅作设计期占位：运行时由 renderStats() 用 ach_dlg_title_fmt 覆盖成「精灵成就 N/4」 -->
+    <string name="ach_progress">精灵成就</string>
     <string name="pet_subtitle">电能精灵 · 由你的真实听剧时长喂养</string>
     <string name="sum_mah_default">累计估算省电 ≈ 0 mAh</string>
     <string name="sum_extra_default">最长单次 — · 共 0 次息屏</string>
@@ -51,7 +51,6 @@
     <string name="recent_records">最近会话记录 · 仅保留最近30天</string>
     <string name="pager_prev">‹ 上一页</string>
     <string name="pager_next">下一页 ›</string>
-    <string name="pager_page">第 %1$d / %2$d 页</string>
 
     <!-- 设置页 -->
     <string name="settings_personal">个性化</string>
@@ -77,10 +76,8 @@
     <string name="widget_active">运行中</string>
     <string name="widget_idle">未运行</string>
     <string name="widget_today_fmt">今日 %1$s</string>
-    <string name="widget_pet_fmt">%1$s</string>
     <string name="widget_growth_next">成长值 %1$d · 距下一形态 %2$d</string>
     <string name="widget_growth_max">成长值 %1$d · 已至巅峰</string>
-    <string name="widget_total_fmt">累计 %1$s</string>
 
     <!-- 黑幕 -->
     <string name="black_hint">息屏听剧中 · 轻点屏幕解除锁定</string>
@@ -156,7 +153,6 @@
     <string name="state_done">已完成 ✓</string>
     <string name="state_todo">未完成</string>
     <string name="keepalive_btn_battery">去电池设置</string>
-    <string name="keepalive_btn_appinfo">去应用详情</string>
     <string name="keepalive_btn_ok">知道了</string>
 
     <!-- 动态文案：听完这集 -->
@@ -169,20 +165,15 @@
     <!-- 动态文案：成就与精灵 -->
     <string name="ach_toast_fmt">🏆 成就解锁：%1$s %2$s</string>
     <string name="ach_dlg_title_fmt">精灵成就 %1$d/%2$d</string>
+    <!-- 徽章化后成就弹窗的说明：徽章会点亮在精灵身上 -->
+    <string name="ach_dlg_hint">徽章会点亮在精灵左侧，自下而上按难度递进</string>
+    <string name="ach_row_unlocked">已点亮</string>
+    <string name="ach_row_locked">未解锁</string>
     <string name="dlg_ok">好的</string>
-    <string name="toast_evolve">🎉 进化！%1$s → %2$s</string>
     <string name="toast_charge">+%1$d 成长值已收取 ✓</string>
     <string name="pet_caption_sleepy">%1$s 打瞌睡了 · 听一集唤醒它</string>
     <string name="pet_caption_max">%1$s · 已至巅峰 · 成长值 %2$d 继续储备</string>
     <string name="pet_caption_progress">%1$s · 成长值 %2$d / %3$d</string>
-    <string name="ach_first_t">初次息屏</string>
-    <string name="ach_first_d">完成第一次息屏听剧</string>
-    <string name="ach_h1_t">一小时俱乐部</string>
-    <string name="ach_h1_d">累计听剧满 1 小时</string>
-    <string name="ach_h10_t">十小时之约</string>
-    <string name="ach_h10_d">累计听剧满 10 小时</string>
-    <string name="ach_h50_t">五十小时王朝</string>
-    <string name="ach_h50_d">累计听剧满 50 小时</string>
     <string name="ach_c100_t">百次成习</string>
     <string name="ach_c100_d">累计息屏 100 次</string>
     <string name="ach_marathon_t">马拉松</string>
@@ -203,7 +194,6 @@
     <string name="calib_btn_close">关闭</string>
     <string name="calib_step1_title">校准 1/2 · 亮屏播放</string>
     <string name="calib_step1_init">请立即开始播放任意视频并保持亮屏…</string>
-    <string name="calib_step1_wait">请保持亮屏播放视频，不要操作手机\n剩余 %1$s（已采样 %2$d 次）</string>
     <string name="toast_calib_too_few">有效样本不足（是否在充电？），校准已取消</string>
     <string name="toast_calib_need_service">请先启动息屏听剧助手，再进行校准</string>
     <string name="toast_calib_step2">校准步骤 2/2：保持黑屏 3 分钟，无需操作</string>
@@ -223,7 +213,7 @@
     <string name="day_today">今天</string>
     <string name="day_yesterday">昨天</string>
     <string name="share_chooser">分享到</string>
-    <string name="share_text">⚡ 我用「息屏听剧」黑屏听了 %1$s，估算省电 %2$d mAh\n我的电能精灵已经进化到「%3$s」了\n完全免费无广告的息屏听剧神器（0.9MB 离线运行）\nhttps://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">⚡ 我用「息屏听剧」黑屏听了 %1$s，估算省电 %2$d mAh\n我的电能精灵已经进化到「%3$s」了\n完全免费无广告的息屏听剧神器（0.6MB 离线运行）\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">分享完成 · +%1$d 待收成长值（去统计页点左侧条收取）</string>
     <string name="toast_share_claimed">今日分享奖励已领取，明天再来（每天一次）</string>
     <string name="share_sub_claimed">今日已领取 ✓ · 明天再来</string>
@@ -237,10 +227,8 @@
     <string name="update_value_fmt">当前 v%1$s</string>
     <string name="bubble_default">息屏（默认）</string>
     <string name="bubble_label_off">息屏</string>
-    <string name="bubble_locked_fmt">%1$s（🔒需%2$d成长值）</string>
     <string name="bubble_dlg_title">悬浮球样式（实时预览）</string>
     <string name="toast_bubble_locked">「%1$s」尚未解锁 · 需 %2$d 成长值</string>
-    <string name="toast_bubble_set">悬浮球已切换为「%1$s」，看右下角</string>
     <string name="bubble_value_default">默认</string>
 
     <!-- 时长单位 -->
@@ -254,7 +242,7 @@
     <string name="about_section_app">关于这个App</string>
     <string name="about_intro">看剧时想闭眼听？点一下悬浮球，屏幕全黑：背光物理关闭、触摸屏蔽，声音照常播放——任意视频App可用。\n\n可选暗色夜钟与电量显示（重锁后保持最暗亮度持续可见），内容周期性微移保护OLED屏幕；来电自动退出黑幕，不会漏接电话；支持定时关闭与「听完这集」智能定时；耳机拔出自动返回视频。\n\n黑幕唤醒后可切集：上一集 / 播放暂停 / 下一集（可在设置中开启）。\n\n电能精灵：听剧积累成长值，养成五形态精灵（电火花 → 电球 → 雷云精灵 → 风暴之灵 → 雷霆之王），可作悬浮球头像，满级后继续储备；成就系统记录你的听剧里程碑。\n\n桌面小部件：三档尺寸，精灵形象、听剧数据与一键息屏随身可见；悬浮球支持长按快速退出。\n\n数据备份：自动备份至下载目录 XiTing 文件夹（仅本机），卸载重装后可一键恢复。所有数据仅保存在本机，无网络权限。</string>
     <string name="about_section_privacy">隐私与安全</string>
-    <string name="about_privacy">· 无 INTERNET 权限：物理上无法联网\n· 不读取任何屏幕内容\n· 所有数据仅保存在本机\n· 无广告、无追踪、无埋点</string>
+    <string name="about_privacy">· 无 INTERNET 权限：物理上无法联网\n· 不读取任何屏幕内容\n· 所有数据仅保存在本机（已显式关闭系统云备份与换机自动迁移）\n· 备份仅在你主动点击导出时写入「下载/XiTing」目录，由你自己保管\n· 仅当你主动授予「通知使用权」后，才统计通知条数用于黑幕角标；不读取通知标题与内容，未授权则完全不启用\n· 应用内含构建标识（构建ID与渠道，仅用于盗版溯源，不含任何设备信息）\n· 无广告、无追踪、无埋点</string>
     <string name="about_section_open">开源与联系</string>
     <string name="about_github">GitHub：github.com/ch1209498273/XiTing\n（点按打开项目主页）</string>
     <string name="about_feedback">问题反馈：1209498273@qq.com</string>
@@ -263,25 +251,30 @@
     <string name="about_version_fmt">版本 %1$s · 构建ID %2$s</string>
 
     <!-- v3.5 精灵图鉴与streak -->
-    <string name="gallery_btn">🎨 图鉴</string>
     <string name="gallery_title">精灵图鉴</string>
     <string name="streak_fmt">🔥 连续听剧 %1$d 天</string>
     <string name="streak_best_fmt">最长 %1$d 天</string>
     <string name="toast_rare_energy">⚡ 稀有雷暴能量 +%1$d！</string>
     <string name="toast_skin_unlock">🎨 新皮肤解锁：%1$s</string>
-    <string name="toast_skin_worn">已换上「%1$s」</string>
-    <string name="gallery_wear">穿戴</string>
-    <string name="gallery_worn">使用中</string>
     <string name="skin_default_n">经典配色</string>
     <string name="skin_cond_default">默认形态</string>
     <string name="skin_star_n">星夜之魂</string>
-    <string name="skin_cond_star">累计听剧 10 小时</string>
+    <string name="skin_cond_star">累计省电 1000 mAh</string>
     <string name="skin_aurora_n">极光之灵</string>
-    <string name="skin_cond_aurora">累计听剧 50 小时</string>
+    <string name="skin_cond_aurora">单次连续听剧 2 小时</string>
     <string name="skin_sakura_n">樱雨精灵</string>
-    <string name="skin_cond_sakura">连续听剧 7 天</string>
+    <string name="skin_cond_sakura">连续听剧 14 天</string>
     <string name="skin_magma_n">熔岩暴君</string>
-    <string name="skin_cond_magma">累计省电 5000 mAh</string>
+    <string name="skin_cond_magma">满级后再积累 2000 成长值</string>
     <string name="skin_jade_n">翡翠雷公</string>
-    <string name="skin_cond_jade">连续听剧 30 天</string>
+    <string name="skin_cond_jade">连续听剧 60 天</string>
+    <string name="gallery_locked">🔒 %1$s（%2$s）</string>
+    <string name="gallery_worn">已换上「%1$s」</string>
+    <string name="gallery_form_label">形态</string>
+    <string name="gallery_skin_label">配色</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">成长值达到 %1$d 才能解锁该形态</string>
+    <string name="gallery_form_next">再积累 %1$d 成长值解锁下一形态</string>
+    <string name="gallery_form_maxed">已解锁全部形态</string>
+    <string name="bubble_style_title">悬浮球样式</string>
 </resources>

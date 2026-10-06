@@ -28,9 +28,44 @@ object WidgetData {
         Triple(WidgetData::refresh, XiTingWidgetLarge::class.java, Style.LARGE)
     )
 
-    /** 全部小部件统一刷新（OverlayService/MainActivity 状态变化时调用） */
+    /**
+     * 桌面上确实存在实例的档位。
+     *
+     * refresh() 每档都要 PetSkins.snapshot 画一张精灵位图（大号还要再画
+     * 560×150 柱状图并新建 3 个 PendingIntent），而 refreshAll 此前无条件
+     * 渲染三档。onWindowFocusChanged 每次获得焦点都会走到 refreshStates →
+     * refreshAll：关掉任意弹窗、切一次应用、拉一次输入法都白渲染一遍，
+     * 一个小组件都没装也照画。
+     */
+    private fun activeStyles(context: Context): List<Style> {
+        val awm = try {
+            AppWidgetManager.getInstance(context)
+        } catch (_: Exception) {
+            null
+        } ?: return emptyList()
+        val out = ArrayList<Style>(PROVIDERS.size)
+        for ((_, cls, style) in PROVIDERS) {
+            try {
+                if (awm.getAppWidgetIds(ComponentName(context, cls)).isNotEmpty()) out.add(style)
+            } catch (_: Exception) {
+            }
+        }
+        return out
+    }
+
+    /**
+     * 全部小部件统一刷新（OverlayService/MainActivity 状态变化时调用）。
+     *
+     * 只刷新桌面真有实例的档位；一个都没装就直接返回。
+     * 注意：小组件刚被添加时由各 provider 的 onUpdate 直接调 refresh()，
+     * 不经过这里，因此新添加的实例一定能被画出来。
+     */
     fun refreshAll(context: Context) {
-        for ((fn, _, style) in PROVIDERS) fn(context, style)
+        val styles = activeStyles(context)
+        if (styles.isEmpty()) return
+        for ((fn, _, style) in PROVIDERS) {
+            if (style in styles) fn(context, style)
+        }
     }
 
     fun refresh(context: Context, style: Style) {
@@ -46,11 +81,14 @@ object WidgetData {
 
             // ---- 数据 ----
             val gp = EnergyStore.collectedTotal(context).toLong()
-            val stage = PetView.stageOf(gp)
+            // 成长进度按「已达到的形态」算，与当前显示哪个形态无关 ——
+            // 用户可以切回低形态看长相，但进度文案必须如实反映养成进度
+            val growthStage = PetView.stageOf(gp)
+            val showStage = PetForm.selected(context)
             val th = PetView.THRESHOLDS
             var pct = 100
-            if (stage < PetView.STAGE_KING) {
-                pct = (((gp - th[stage]) * 100) / (th[stage + 1] - th[stage])).toInt().coerceIn(0, 100)
+            if (growthStage < PetView.STAGE_KING) {
+                pct = (((gp - th[growthStage]) * 100) / (th[growthStage + 1] - th[growthStage])).toInt().coerceIn(0, 100)
             }
             val sessions = SessionLog.sessions(context)
             val cal = Calendar.getInstance().apply {
@@ -72,13 +110,13 @@ object WidgetData {
             val skin = PetSkins.active(context)
             views.setImageViewBitmap(
                 R.id.widget_pet_img,
-                PetSkins.snapshot(context, stage, skin.hue, 160, withBar = true, pct = pct)
+                PetSkins.snapshot(context, showStage, skin, 160, withBar = true, pct = pct)
             )
-            views.setTextViewText(R.id.widget_pet, PetView.stageName(c, stage))
+            views.setTextViewText(R.id.widget_pet, PetView.stageName(c, showStage))
             views.setTextViewText(
                 R.id.widget_growth,
-                if (stage >= PetView.STAGE_KING) c.getString(R.string.widget_growth_max, gp)
-                else c.getString(R.string.widget_growth_next, gp, th[stage + 1] - gp)
+                if (growthStage >= PetView.STAGE_KING) c.getString(R.string.widget_growth_max, gp)
+                else c.getString(R.string.widget_growth_next, gp, th[growthStage + 1] - gp)
             )
             views.setTextViewText(R.id.widget_today, c.getString(R.string.widget_today_fmt, fmtMin(todayMs)))
             views.setTextViewText(

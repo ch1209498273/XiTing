@@ -159,8 +159,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
 
         // 媒体控制行（唤醒态显示）：黑幕下切集/暂停——通知栏被黑幕遮住，
         // 这里是媒体键唯一可达的位置。默认关闭（防误触），可在设置中选择开启
-        val showMedia = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-            .getBoolean("black_media_controls", false)
+        val showMedia = context.prefs()
+            .getBoolean(Prefs.BLACK_MEDIA_CONTROLS, false)
         val media = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -234,8 +234,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         NotificationBadge.register(badgeListener!!)
 
-        val prefs = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-        showInfo = prefs.getBoolean("black_info_show", false) // 时钟/电量默认关：纯黑偏好
+        val prefs = context.prefs()
+        showInfo = prefs.getBoolean(Prefs.BLACK_INFO_SHOW, false) // 时钟/电量默认关：纯黑偏好
 
         // 黑幕信息：时间 + 电量（暗色显示，夜间看时间/电量不用亮屏）
         val infoCol = LinearLayout(context).apply {
@@ -280,7 +280,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
 
         // 解锁方式：轻点直接解锁（跳过两段式确认）默认关
-        directUnlock = prefs.getBoolean("direct_unlock", false)
+        directUnlock = prefs.getBoolean(Prefs.DIRECT_UNLOCK, false)
         onDismissCallback = onDismiss
 
         val gd = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -384,13 +384,13 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             // 稀有能量掉落：≥5 分钟的会话 10% 概率刷出雷暴能量（每日一次），惊喜钩子
             try {
                 if (dur >= 300_000) {
-                    val sp = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+                    val sp = context.prefs()
                     val sdf = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault())
                     val today = sdf.format(java.util.Date())
-                    if (sp.getString("last_rare_date", "") != today &&
+                    if (sp.getString(Prefs.LAST_RARE_DATE, "") != today &&
                         java.util.Random().nextFloat() < 0.10f
                     ) {
-                        sp.edit().putString("last_rare_date", today).apply()
+                        sp.edit().putString(Prefs.LAST_RARE_DATE, today).apply()
                         val bonus = (dur / 60_000).toInt().coerceAtLeast(15)
                         EnergyStore.add(context, bonus)
                         android.widget.Toast.makeText(
@@ -403,10 +403,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             } catch (_: Exception) {}
             // 听剧产生能量球：每满 1 分钟 1 点能量（含跨会话余数累积，不浪费零头）
             try {
-                val sp = context.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-                val carry = sp.getLong("energy_carry_ms", 0) + dur
+                val sp = context.prefs()
+                val carry = sp.getLong(Prefs.ENERGY_CARRY_MS, 0) + dur
                 val energy = (carry / 60000).toInt()
-                sp.edit().putLong("energy_carry_ms", carry % 60000).apply()
+                sp.edit().putLong(Prefs.ENERGY_CARRY_MS, carry % 60000).apply()
                 if (energy > 0) EnergyStore.add(context, energy)
             } catch (_: Exception) {
             }

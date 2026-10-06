@@ -9,6 +9,41 @@ import org.json.JSONObject
 data class PendingEnergy(val id: Long, val value: Int, val expireAt: Long)
 
 /**
+ * 解析待收能量 JSON（纯函数，可单测）。
+ *
+ * 逐条 try/catch 跳过损坏记录。这里曾用 map()，一条脏记录就让整份待收能量
+ * 变成 emptyList()——所有能量球静默消失。
+ * 文本整体语法非法时抛给调用方。
+ */
+internal fun parsePending(raw: String): ParseResult<PendingEnergy> {
+    val arr = JSONArray(raw)
+    var skipped = 0
+    val items = (0 until arr.length()).mapNotNull { i ->
+        try {
+            val o = arr.getJSONObject(i)
+            PendingEnergy(o.getLong("id"), o.getInt("v"), o.getLong("e"))
+        } catch (e: Exception) {
+            skipped++
+            null
+        }
+    }
+    return ParseResult(items, skipped)
+}
+
+/**
+ * 还能再塞多少能量（纯函数，可单测）。
+ * 用 Long 累加：existing 来自持久化 prefs，单条 value 若是脏数据里的 Int.MAX，
+ * Int 累加会溢出成负数，让 room 反而变成正数而突破上限。
+ */
+internal fun roomFor(existing: List<PendingEnergy>, max: Int): Int =
+    (max - existing.sumOf { it.value.toLong() })
+        .coerceIn(0L, Int.MAX_VALUE.toLong()).toInt()
+
+/** 成长值累加，饱和不溢出（纯函数，可单测） */
+internal fun saturatingAdd(current: Int, delta: Long): Int =
+    (current.toLong() + delta).coerceIn(0L, Int.MAX_VALUE.toLong()).toInt()
+
+/**
  * 能量收集机制（蚂蚁森林式）：
  * 听剧/每日分享产生能量球 → 用户在统计页主动点击收集 → 汇入成长值。
  * 能量球 3 天内未收集会过期消失（损失厌恶促回访）。
@@ -25,7 +60,7 @@ object EnergyStore {
     const val MAX_PENDING = 200                   // 待收能量上限（满格后不再累积）
 
     private fun sp(ctx: Context) =
-        ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+        ctx.prefs()
 
     /** 旧版成长值一次性迁入（听剧分钟 + 分享奖励），避免老用户进度清零 */
     fun migrateIfNeeded(ctx: Context, listenMinutes: Long, legacyBonus: Int) {
@@ -47,17 +82,7 @@ object EnergyStore {
         val now = System.currentTimeMillis()
         val raw = p.getString(KEY_PENDING, "[]") ?: "[]"
         val list = try {
-            val arr = JSONArray(raw)
-            // 与 SessionLog 同一类问题：原来用 map()，一条脏记录就让整份待收能量
-            // 变成 emptyList()（全部能量球静默消失）。这里逐条跳过坏记录。
-            (0 until arr.length()).mapNotNull { i ->
-                try {
-                    val o = arr.getJSONObject(i)
-                    PendingEnergy(o.getLong("id"), o.getInt("v"), o.getLong("e"))
-                } catch (_: Exception) {
-                    null
-                }
-            }
+            parsePending(raw).items
         } catch (_: Exception) {
             emptyList()
         }
@@ -70,10 +95,7 @@ object EnergyStore {
     fun add(ctx: Context, value: Int) {
         if (value <= 0) return
         val exist = pending(ctx)
-        // 用 Long 累加：exist 来自持久化 prefs，单条 value 若是脏数据里的 Int.MAX，
-        // Int 累加会溢出成负数，让 room 变成正数而突破上限
-        val room = (MAX_PENDING - exist.sumOf { it.value.toLong() })
-            .coerceIn(0L, Int.MAX_VALUE.toLong()).toInt()
+        val room = roomFor(exist, MAX_PENDING)
         if (room <= 0) return
         val v = value.coerceAtMost(room)
         val now = System.currentTimeMillis()
@@ -113,9 +135,8 @@ object EnergyStore {
     /** 成长值累加（饱和，不允许溢出成负数） */
     private fun credit(ctx: Context, delta: Long) {
         val p = sp(ctx)
-        val next = p.getInt(KEY_COLLECTED, 0).toLong() + delta
         p.edit()
-            .putInt(KEY_COLLECTED, next.coerceIn(0L, Int.MAX_VALUE.toLong()).toInt())
+            .putInt(KEY_COLLECTED, saturatingAdd(p.getInt(KEY_COLLECTED, 0), delta))
             .apply()
     }
 

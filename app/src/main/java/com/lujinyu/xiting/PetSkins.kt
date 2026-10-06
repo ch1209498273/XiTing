@@ -29,8 +29,8 @@ object PetSkins {
     fun cond(ctx: Context, s: Skin): String = ctx.getString(s.condRes)
 
     private fun unlocked(ctx: Context): MutableSet<String> {
-        val p = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-        return (p.getStringSet("skins_unlocked", setOf("default")) ?: setOf("default")).toMutableSet()
+        val p = ctx.prefs()
+        return (p.getStringSet(Prefs.SKINS_UNLOCKED, setOf("default")) ?: setOf("default")).toMutableSet()
     }
 
     fun isUnlocked(ctx: Context, s: Skin, totalMs: Long, streakDays: Int, mah: Int): Boolean = when (s.id) {
@@ -47,8 +47,8 @@ object PetSkins {
     fun unlockAllForDebug(ctx: Context) {
         val got = unlocked(ctx)
         ALL.forEach { got.add(it.id) }
-        ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-            .edit().putStringSet("skins_unlocked", got).apply()
+        ctx.prefs()
+            .edit().putStringSet(Prefs.SKINS_UNLOCKED, got).apply()
     }
 
     /** 条件评估并持久化，返回本次新解锁（可能为空） */
@@ -57,22 +57,22 @@ object PetSkins {
         val fresh = ALL.filter { it.id !in got && isUnlocked(ctx, it, totalMs, streakDays, mah) }
         if (fresh.isNotEmpty()) {
             got.addAll(fresh.map { it.id })
-            ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-                .edit().putStringSet("skins_unlocked", got).apply()
+            ctx.prefs()
+                .edit().putStringSet(Prefs.SKINS_UNLOCKED, got).apply()
         }
         return fresh
     }
 
     /** 当前穿戴的皮肤（默认=经典） */
     fun active(ctx: Context): Skin {
-        val id = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-            .getString("pet_skin", "default") ?: "default"
+        val id = ctx.prefs()
+            .getString(Prefs.PET_SKIN, "default") ?: "default"
         return ALL.firstOrNull { it.id == id } ?: ALL[0]
     }
 
     fun wear(ctx: Context, s: Skin) {
-        ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-            .edit().putString("pet_skin", s.id).apply()
+        ctx.prefs()
+            .edit().putString(Prefs.PET_SKIN, s.id).apply()
     }
 
     /** 色相旋转滤镜（度）。换肤的核心：绘制时对整只精灵做色相旋转，白底与高光不受影响 */

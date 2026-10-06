@@ -61,7 +61,6 @@ class OverlayService : Service() {
         private const val ACTION_TEST_RUN_MODE = "com.lujinyu.xiting.TEST_RUN_MODE"
         const val ACTION_TEST_UNLOCK_SKINS = "com.lujinyu.xiting.TEST_UNLOCK_SKINS"
         const val ACTION_TEST_WEAR = "com.lujinyu.xiting.TEST_WEAR"
-        private const val PREFS = "xiiting_prefs"
 
         var instance: OverlayService? = null
             private set
@@ -162,7 +161,7 @@ class OverlayService : Service() {
                     it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
                     it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO
             }
-            if (headsetGone && prefs.getBoolean("switch_headset", true) && black?.isShowing == true) {
+            if (headsetGone && prefs.getBoolean(Prefs.SWITCH_HEADSET, true) && black?.isShowing == true) {
                 hideAllBlack()
                 refreshNotification()
                 Toast.makeText(this@OverlayService, getString(R.string.toast_headset), Toast.LENGTH_SHORT).show()
@@ -259,8 +258,8 @@ class OverlayService : Service() {
             Log.i(TAG, "来电监听已注册")
         }
         audioManager.registerAudioDeviceCallback(headsetCb, null)
-        prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
-        prefs.edit().putBoolean("assistant_wanted", true).apply()
+        prefs = prefs()
+        prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, true).apply()
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
         // 上次退出时留的「撤销」通知：助手已重启，清掉
@@ -291,7 +290,7 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
-            ACTION_BUBBLE -> setBubbleVisible(!prefs.getBoolean("bubble_hidden", false))
+            ACTION_BUBBLE -> setBubbleVisible(!prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false))
             ACTION_SET_TIMER -> handleSetTimer(
                 intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0,
                 intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0
@@ -307,7 +306,7 @@ class OverlayService : Service() {
                 refreshNotification()
             }
             ACTION_EXIT -> {
-                prefs.edit().putBoolean("assistant_wanted", false).apply()
+                prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, false).apply()
                 hideAllBlack()
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
@@ -354,12 +353,12 @@ class OverlayService : Service() {
 
     private fun showBubble() {
         if (bubble != null) return
-        if (prefs.getBoolean("bubble_hidden", false)) return // 用户已隐藏悬浮球：尊重设置
+        if (prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false)) return // 用户已隐藏悬浮球：尊重设置
         val density = resources.displayMetrics.density
         val size = (48 * density).toInt()
 
         // 悬浮球样式：默认「息屏」文字；已解锁形态可切换为精灵头像
-        val style = prefs.getString("bubble_style", "text") ?: "text"
+        val style = prefs.getString(Prefs.BUBBLE_STYLE, "text") ?: "text"
         val tv: View = if (style.startsWith("pet_")) {
             val st = style.removePrefix("pet_").toIntOrNull() ?: 1
             BubblePetView(this).apply {
@@ -390,8 +389,8 @@ class OverlayService : Service() {
         )
         lp.gravity = Gravity.TOP or Gravity.START
         // 悬浮球位置记忆：恢复上次拖动后的位置
-        lp.x = prefs.getInt("bubble_x", resources.displayMetrics.widthPixels - size - (8 * density).toInt())
-        lp.y = prefs.getInt("bubble_y", (180 * density).toInt())
+        lp.x = prefs.getInt(Prefs.BUBBLE_X, resources.displayMetrics.widthPixels - size - (8 * density).toInt())
+        lp.y = prefs.getInt(Prefs.BUBBLE_Y, (180 * density).toInt())
         bubbleLp = lp   // 确认条定位用（球的窗口坐标在这里，View.getX 恒为 0）
 
         val slop = ViewConfiguration.get(this).scaledTouchSlop
@@ -454,7 +453,7 @@ class OverlayService : Service() {
                             val w = resources.displayMetrics.widthPixels
                             lp.x = if (lp.x + lp.width / 2 < w / 2) margin else w - tv.width - margin
                             wm.updateViewLayout(tv, lp)
-                            prefs.edit().putInt("bubble_x", lp.x).putInt("bubble_y", lp.y).apply()
+                            prefs.edit().putInt(Prefs.BUBBLE_X, lp.x).putInt(Prefs.BUBBLE_Y, lp.y).apply()
                         }
                         else -> toggleOverlay()
                     }
@@ -467,12 +466,12 @@ class OverlayService : Service() {
         try {
             wm.addView(tv, lp)
             bubble = tv
-            prefs.edit().putBoolean("bubble_perm_error", false).apply()
+            prefs.edit().putBoolean(Prefs.BUBBLE_PERM_ERROR, false).apply()
             Log.e(TAG, "bubble added at ${lp.x},${lp.y}")
         } catch (e: Exception) {
             Log.e(TAG, "bubble add failed: $e")
             // 权限表征与内核态不一致（重装后 ColorOS 常见）：标记供主界面引导修复
-            prefs.edit().putBoolean("bubble_perm_error", true).apply()
+            prefs.edit().putBoolean(Prefs.BUBBLE_PERM_ERROR, true).apply()
         }
     }
 
@@ -481,7 +480,7 @@ class OverlayService : Service() {
 
     /** 悬浮球显隐（通知按钮/设置开关/长按退出共用）：状态持久化，重启尊重 */
     fun setBubbleVisible(visible: Boolean) {
-        prefs.edit().putBoolean("bubble_hidden", !visible).apply()
+        prefs.edit().putBoolean(Prefs.BUBBLE_HIDDEN, !visible).apply()
         if (visible) showBubble() else {
             bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
             bubble = null
@@ -588,7 +587,7 @@ class OverlayService : Service() {
 
     /** 彻底退出助手（长按确认/通知/磁贴共用）：球与黑幕全撤，留一条可撤销通知 */
     private fun exitAssistant() {
-        prefs.edit().putBoolean("assistant_wanted", false).apply()
+        prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, false).apply()
         hideAllBlack()
         hideExitConfirm()
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
@@ -722,7 +721,7 @@ class OverlayService : Service() {
             .setContentIntent(openPi)
             .addAction(0, getString(R.string.notif_action_stop), exitPi)
             .addAction(0, getString(if (isAnyBlackShowing()) R.string.notif_action_restore else R.string.notif_action_listen), togglePi)
-            .addAction(0, getString(if (prefs.getBoolean("bubble_hidden", false)) R.string.notif_action_bubble_show else R.string.notif_action_bubble_hide), bubblePi)
+            .addAction(0, getString(if (prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false)) R.string.notif_action_bubble_show else R.string.notif_action_bubble_hide), bubblePi)
             .setOngoing(true)
             .build()
     }

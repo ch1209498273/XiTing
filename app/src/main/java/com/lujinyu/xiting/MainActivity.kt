@@ -146,8 +146,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         pageHome.findViewById<View>(R.id.stats_card).setOnClickListener { switchTab(TAB_STATS) }
 
         rowOverlay.setOnClickListener {
-            val permErr = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-                .getBoolean("bubble_perm_error", false)
+            val permErr = prefs()
+                .getBoolean(Prefs.BUBBLE_PERM_ERROR, false)
             if (!Settings.canDrawOverlays(this) || permErr) {
                 Toast.makeText(
                     this,
@@ -207,11 +207,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         cardBlack.setOnClickListener {
             if (OverlayService.isRunning) {
                 startService(Intent(this, OverlayService::class.java).setAction(OverlayService.ACTION_EXIT))
-                getSharedPreferences("xiiting_prefs", MODE_PRIVATE).edit().putBoolean("assistant_wanted", false).apply()
+                prefs().edit().putBoolean(Prefs.ASSISTANT_WANTED, false).apply()
                 Toast.makeText(this, getString(R.string.toast_assistant_stopped), Toast.LENGTH_SHORT).show()
             } else {
                 startForegroundService(Intent(this, OverlayService::class.java))
-                getSharedPreferences("xiiting_prefs", MODE_PRIVATE).edit().putBoolean("assistant_wanted", true).apply()
+                prefs().edit().putBoolean(Prefs.ASSISTANT_WANTED, true).apply()
                 Toast.makeText(this, getString(R.string.toast_assistant_started), Toast.LENGTH_SHORT).show()
             }
             postRefresh()
@@ -250,8 +250,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         super.onResume()
         // 助手被系统清理后（更新/后台清理），打开App时自动恢复；
         // 用户主动停止的（assistant_wanted=false）不复活
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-        if (!OverlayService.isRunning && prefs.getBoolean("assistant_wanted", false)) {
+        val prefs = prefs()
+        if (!OverlayService.isRunning && prefs.getBoolean(Prefs.ASSISTANT_WANTED, false)) {
             startForegroundService(Intent(this, OverlayService::class.java))
         }
         refreshStates()
@@ -380,15 +380,15 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         // 自愈：服务在跑、悬浮球未隐藏但球丢失（ColorOS 偶发吞掉纯浮窗）→ 自动重建
         OverlayService.instance?.let { svc ->
-            val bubbleHidden = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-                .getBoolean("bubble_hidden", false)
+            val bubbleHidden = prefs()
+                .getBoolean(Prefs.BUBBLE_HIDDEN, false)
             if (!svc.isBubbleVisible() && !bubbleHidden) {
                 svc.rebuildBubble()
             }
         }
         val overlayOk = Settings.canDrawOverlays(this)
-        val permError = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-            .getBoolean("bubble_perm_error", false)
+        val permError = prefs()
+            .getBoolean(Prefs.BUBBLE_PERM_ERROR, false)
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         val batteryOk = pm.isIgnoringBatteryOptimizations(packageName)
         val notifyOk = if (Build.VERSION.SDK_INT >= 33) {
@@ -506,8 +506,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     /** 成就明细弹窗 */
     private fun showAchievements() {
-        val unlocked = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-            .getStringSet("ach_unlocked", emptySet()) ?: emptySet()
+        val unlocked = prefs()
+            .getStringSet(Prefs.ACH_UNLOCKED, emptySet()) ?: emptySet()
         val gotCount = unlocked.size
         val msg = Achievements.ALL.joinToString("\n\n") { a ->
             (if (a.id in unlocked) "✅ " else "🔒 ") + a.icon + " " + Achievements.title(this, a) + " · " + Achievements.desc(this, a)
@@ -697,12 +697,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             )
         )
         // 每日任务结算：每天仅一次
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val prefs = prefs()
         val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
             .format(java.util.Date())
-        val last = prefs.getString("last_share_date", "")
+        val last = prefs.getString(Prefs.LAST_SHARE_DATE, "")
         if (last != today) {
-            prefs.edit().putString("last_share_date", today).apply()
+            prefs.edit().putString(Prefs.LAST_SHARE_DATE, today).apply()
             EnergyStore.add(this, SHARE_GP_PER_DAY) // 分享产生待收成长值
             Toast.makeText(
                 this,
@@ -718,12 +718,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     /** 成长值体系：成长值=已收集能量；听剧/分享产生能量球待收集（3天过期） */
     private fun refreshPetPanel(allMs: Long, sessions: List<ListenSession>, now: Long) {
         val pet = pageStats.findViewById<PetView>(R.id.pet_view)
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val prefs = prefs()
         // 旧版成长值（听剧分钟+分享奖励）一次性迁入已收集总量。
         // share_bonus_gp 是「只读遗留键」：当前版本从不写入它，但早期版本写过，
         // 仍在老用户的 prefs 里。不读取会让这些用户的迁移加成静默归零，
         // 因此这行必须保留——它不是死代码，是升级兼容点。
-        EnergyStore.migrateIfNeeded(this, allMs / 60000, prefs.getInt("share_bonus_gp", 0))
+        EnergyStore.migrateIfNeeded(this, allMs / 60000, prefs.getInt(Prefs.SHARE_BONUS_GP_LEGACY, 0))
         val gp = EnergyStore.collectedTotal(this).toLong()
         val stage = PetView.stageOf(gp)
         pet.stage = stage
@@ -758,7 +758,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         }
 
         // 进化提示（仅当上次记录的形态更低时弹一次）
-        val seen = prefs.getInt("last_seen_stage", -1)
+        val seen = prefs.getInt(Prefs.LAST_SEEN_STAGE, -1)
         if (seen in 0 until stage) {
             Toast.makeText(
                 this,
@@ -766,13 +766,13 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 Toast.LENGTH_LONG
             ).show()
         }
-        if (seen != stage) prefs.edit().putInt("last_seen_stage", stage).apply()
+        if (seen != stage) prefs.edit().putInt(Prefs.LAST_SEEN_STAGE, stage).apply()
 
         // 设置页分享行状态：今天是否还能领
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
             .format(java.util.Date(now))
         pageSettings.findViewById<TextView>(R.id.share_sub).text =
-            if (prefs.getString("last_share_date", "") == todayStr) getString(R.string.share_sub_claimed)
+            if (prefs.getString(Prefs.LAST_SHARE_DATE, "") == todayStr) getString(R.string.share_sub_claimed)
             else getString(R.string.share_sub_avail, SHARE_GP_PER_DAY)
         // 文案
         pageStats.findViewById<TextView>(R.id.pet_caption).text =
@@ -1029,29 +1029,29 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     // ───────────────────────── 设置页签 ─────────────────────────
 
     private fun bindSettings() {
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val prefs = prefs()
         val page = pageSettings
 
         // 黑幕轻点直接解锁（默认关，防误触优先）
         val switchDirect = page.findViewById<android.widget.Switch>(R.id.switch_direct)
-        switchDirect.isChecked = prefs.getBoolean("direct_unlock", false)
+        switchDirect.isChecked = prefs.getBoolean(Prefs.DIRECT_UNLOCK, false)
         switchDirect.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("direct_unlock", checked).apply()
+            prefs.edit().putBoolean(Prefs.DIRECT_UNLOCK, checked).apply()
         }
 
         // 黑幕显示时间与电量（默认关；开启后重锁保持暗态夜钟）
         val switchInfo = page.findViewById<android.widget.Switch>(R.id.switch_info)
-        switchInfo.isChecked = prefs.getBoolean("black_info_show", false)
+        switchInfo.isChecked = prefs.getBoolean(Prefs.BLACK_INFO_SHOW, false)
         switchInfo.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("black_info_show", checked).apply()
+            prefs.edit().putBoolean(Prefs.BLACK_INFO_SHOW, checked).apply()
             OverlayService.instance?.reapplyBlack() // 黑幕显示中即时生效（无闪屏重挂）
         }
 
         // 黑幕播放控制（默认关：防误触）
         val switchMedia = page.findViewById<android.widget.Switch>(R.id.switch_media)
-        switchMedia.isChecked = prefs.getBoolean("black_media_controls", false)
+        switchMedia.isChecked = prefs.getBoolean(Prefs.BLACK_MEDIA_CONTROLS, false)
         switchMedia.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("black_media_controls", checked).apply()
+            prefs.edit().putBoolean(Prefs.BLACK_MEDIA_CONTROLS, checked).apply()
             if (checked) {
                 Toast.makeText(this, getString(R.string.toast_media_on), Toast.LENGTH_SHORT).show()
             }
@@ -1063,16 +1063,16 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         // 耳机拔出自动返回视频（默认开）
         val switchHeadset = page.findViewById<android.widget.Switch>(R.id.switch_headset)
-        switchHeadset.isChecked = prefs.getBoolean("switch_headset", true)
+        switchHeadset.isChecked = prefs.getBoolean(Prefs.SWITCH_HEADSET, true)
         switchHeadset.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("switch_headset", checked).apply()
+            prefs.edit().putBoolean(Prefs.SWITCH_HEADSET, checked).apply()
         }
 
         // 显示悬浮球（隐藏后助手照常运行，通知栏/此处均可恢复）
         val switchBubble = page.findViewById<android.widget.Switch>(R.id.switch_bubble)
-        switchBubble.isChecked = !prefs.getBoolean("bubble_hidden", false)
+        switchBubble.isChecked = !prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false)
         switchBubble.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean("bubble_hidden", !checked).apply()
+            prefs.edit().putBoolean(Prefs.BUBBLE_HIDDEN, !checked).apply()
             OverlayService.instance?.setBubbleVisible(checked)
         }
 
@@ -1120,7 +1120,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     /** 悬浮球样式选择：带实时预览（每项直接显示该样式的实际长相） */
     private fun showBubbleStyleDialog() {
-        val prefs = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
+        val prefs = prefs()
         val gp = EnergyStore.collectedTotal(this).toLong()
         val unlocked = PetView.stageOf(gp)
         val labels = ArrayList<String>()
@@ -1135,7 +1135,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             )
             values.add("pet_$i")
         }
-        val current = prefs.getString("bubble_style", "text") ?: "text"
+        val current = prefs.getString(Prefs.BUBBLE_STYLE, "text") ?: "text"
         val density = resources.displayMetrics.density
         val adapter = object : android.widget.ArrayAdapter<String>(this, 0, labels) {
             override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
@@ -1197,7 +1197,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                     ).show()
                     return@setAdapter
                 }
-                prefs.edit().putString("bubble_style", values[which]).apply()
+                prefs.edit().putString(Prefs.BUBBLE_STYLE, values[which]).apply()
                 OverlayService.instance?.rebuildBubble()
                 refreshBubbleStyleValue()
                 val name = if (which == 0) getString(R.string.bubble_label_off) else PetView.stageName(this, stageOfItem)
@@ -1209,8 +1209,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     }
 
     private fun refreshBubbleStyleValue() {
-        val style = getSharedPreferences("xiiting_prefs", MODE_PRIVATE)
-            .getString("bubble_style", "text") ?: "text"
+        val style = prefs()
+            .getString(Prefs.BUBBLE_STYLE, "text") ?: "text"
         // 行内直接显示当前悬浮球的真实样子 + 名称
         val box = pageSettings.findViewById<LinearLayout>(R.id.bubble_style_preview)
         box.removeAllViews()

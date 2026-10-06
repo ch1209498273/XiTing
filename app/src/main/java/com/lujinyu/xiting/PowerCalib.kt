@@ -46,7 +46,7 @@ object PowerCalib {
     /** 会话期间采样入库 */
     fun recordSample(ctx: Context, ua: Long) {
         try {
-            val p = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+            val p = ctx.prefs()
             p.edit()
                 .putLong(K_SUM, p.getLong(K_SUM, 0L) + ua)
                 .putInt(K_CNT, p.getInt(K_CNT, 0) + 1)
@@ -57,7 +57,7 @@ object PowerCalib {
 
     /** 实测黑屏听剧整机均值（mA）与采样次数；样本不足返回 null */
     fun ambientStats(ctx: Context): Pair<Double, Int>? {
-        val p = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+        val p = ctx.prefs()
         val n = p.getInt(K_CNT, 0)
         if (n < MIN_SAMPLES) return null
         val avgUa = p.getLong(K_SUM, 0L).toDouble() / n
@@ -66,7 +66,7 @@ object PowerCalib {
 
     /** 校准结果（亮屏µA, 黑屏µA, 完成时间）或 null */
     fun calibrated(ctx: Context): Triple<Long, Long, Long>? {
-        val p = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+        val p = ctx.prefs()
         val on = p.getLong(K_ON, 0L)
         val off = p.getLong(K_OFF, 0L)
         val ts = p.getLong(K_TS, 0L)
@@ -76,7 +76,7 @@ object PowerCalib {
 
     /** 保存校准结果 */
     fun storeCalibration(ctx: Context, onUa: Long, offUa: Long) {
-        ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE).edit()
+        ctx.prefs().edit()
             .putLong(K_ON, onUa).putLong(K_OFF, offUa)
             .putLong(K_TS, System.currentTimeMillis())
             .apply()

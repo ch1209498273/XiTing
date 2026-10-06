@@ -27,8 +27,8 @@ object Achievements {
     fun desc(ctx: Context, a: A): String = ctx.getString(a.descRes)
 
     private fun unlocked(ctx: Context): MutableSet<String> {
-        val p = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-        return (p.getStringSet("ach_unlocked", emptySet()) ?: emptySet()).toMutableSet()
+        val p = ctx.prefs()
+        return (p.getStringSet(Prefs.ACH_UNLOCKED, emptySet()) ?: emptySet()).toMutableSet()
     }
 
     /** 依据统计评估并持久化，返回本次新解锁的成就（可能为空） */
@@ -47,19 +47,15 @@ object Achievements {
         val fresh = ALL.filter { it.id !in got && cond[it.id] == true }
         if (fresh.isNotEmpty()) {
             got.addAll(fresh.map { it.id })
-            ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
-                .edit().putStringSet("ach_unlocked", got).apply()
+            ctx.prefs()
+                .edit().putStringSet(Prefs.ACH_UNLOCKED, got).apply()
         }
         return fresh
     }
 
     /** 成就卡摘要：(已解锁数, 最新一条描述) */
     fun summary(ctx: Context): Pair<Int, String> {
-        // 只统计 ALL 中存在的 id。ach_unlocked 是持久化的字符串集合，早期版本
-        // 改过成就 id、或文件被外部改写，都可能留下 ALL 里已不存在的残留项。
-        // 原实现直接 ALL.lastOrNull { it.id in got } 再 latest!! —— 集合非空但
-        // 全部是残留 id 时 latest 为 null，当场 NPE 崩在统计页。
-        val known = ALL.filter { it.id in unlocked(ctx) }
+        val known = knownUnlocked(unlocked(ctx))
         val sub = if (known.isEmpty()) {
             ctx.getString(R.string.ach_sub_empty)
         } else {
@@ -68,3 +64,14 @@ object Achievements {
         return known.size to sub
     }
 }
+
+/**
+ * 已知成就与已解锁集合的交集（纯函数，可单测）。
+ *
+ * 只认 ALL 里存在的 id：ach_unlocked 是持久化字符串集合，早期版本改过成就 id、
+ * 或文件被外部改写，都可能留下 ALL 里已不存在的残留项。原实现直接
+ * ALL.lastOrNull { it.id in got } 后 latest!!，集合非空但全是残留 id 时
+ * latest 为 null，统计页当场 NPE。
+ */
+internal fun knownUnlocked(got: Set<String>): List<Achievements.A> =
+    Achievements.ALL.filter { it.id in got }

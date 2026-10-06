@@ -32,13 +32,15 @@ object BackupManager {
 
     /** 组装备份 JSON（自动备份与手动导出共用同一格式） */
     fun buildBackupJson(ctx: Context): JSONObject {
-        val prefs = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+        val prefs = ctx.prefs()
         val sessText = ctx.filesDir.resolve("sessions.json").takeIf { it.exists() }?.readText() ?: "[]"
         return JSONObject()
+            // 注意：下面是备份文件的 JSON 键，属于对外数据格式，改名会让旧备份失效。
+            // 它们与 prefs 键「碰巧同名字符串」不是一回事，勿与 Prefs 常量混用。
             .put("v", 1)
             .put("device", androidId(ctx))
             .put("gp", EnergyStore.collectedTotal(ctx))
-            .put("last_share_date", prefs.getString("last_share_date", "") ?: "")
+            .put("last_share_date", prefs.getString(Prefs.LAST_SHARE_DATE, "") ?: "")
             .put("sessions", JSONArray(sessText))
             .put("ts", System.currentTimeMillis())
     }
@@ -61,7 +63,7 @@ object BackupManager {
     fun save(ctx: Context) {
         if (Build.VERSION.SDK_INT < 29) return // 9 及以下分区存储不稳定，跳过自动备份
         try {
-            val prefs = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+            val prefs = ctx.prefs()
             val gp = EnergyStore.collectedTotal(ctx)
             val sessText = ctx.filesDir.resolve("sessions.json").takeIf { it.exists() }?.readText() ?: "[]"
             // 防护：本地为空（重装后未恢复）时不覆盖既有备份，避免毁掉历史数据
@@ -193,27 +195,22 @@ object BackupManager {
             // gp 来自外部文件，不能直接写进 prefs：负数会让精灵进度异常，
             // 极大值在后续累加时溢出成负
             val gp = obj.optInt("gp", 0).coerceIn(0, Int.MAX_VALUE)
-            val prefs = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
+            val prefs = ctx.prefs()
             // 迁移标记置位，避免旧值再迁移覆盖
             prefs.edit()
-                .putInt("energy_collected_total", gp)
-                .putBoolean("energy_migrated_v1", true)
-                .putString("last_share_date", obj.optString("last_share_date", ""))
+                .putInt(Prefs.ENERGY_COLLECTED, gp)
+                .putBoolean(Prefs.ENERGY_MIGRATED, true)
+                .putString(Prefs.LAST_SHARE_DATE, obj.optString("last_share_date", ""))
                 .apply()
             obj.optJSONArray("sessions")?.let { arr ->
                 // 导入数据不可信：原来整段 arr.toString() 原样落盘，
                 // 一个超大或畸形的数组会在之后的 SessionLog.sessions() 里
                 // 被主线程全量解析，轻则 ANR 重则 OOM。
-                // 这里限量 + 逐条查形状，只放行结构完整的记录。
-                val kept = ArrayList<JSONObject>(minOf(arr.length(), MAX_IMPORT_SESSIONS))
-                for (i in 0 until minOf(arr.length(), MAX_IMPORT_SESSIONS)) {
-                    val o = arr.optJSONObject(i) ?: continue
-                    if (o.has("s") && o.has("e") && o.has("d") && o.has("m")) kept.add(o)
+                val kept = filterImportSessions(arr, MAX_IMPORT_SESSIONS)
+                if (kept.length() > 0) {
+                    ctx.filesDir.resolve("sessions.json").writeText(kept.toString())
                 }
-                if (kept.isNotEmpty()) {
-                    ctx.filesDir.resolve("sessions.json").writeText(JSONArray(kept).toString())
-                }
-                Log.i(TAG, "导入会话 ${kept.size} 条（原文件 ${arr.length()} 条，超限或结构不合法者已丢弃）")
+                Log.i(TAG, "导入会话 ${kept.length()} 条（原文件 ${arr.length()} 条，超限或结构不合法者已丢弃）")
             }
             Log.i(TAG, "备份已恢复（gp=$gp）")
             true
@@ -222,4 +219,21 @@ object BackupManager {
             false
         }
     }
+}
+
+/**
+ * 从备份里筛出结构完整的会话记录，最多 max 条（纯函数，可单测）。
+ *
+ * 导入数据不可信：非对象元素、缺字段的记录都要挡掉，否则它们会在之后的
+ * SessionLog 解析路径里被逐条跳过，白白占用配额；超大数组则直接导致
+ * 主线程全量解析时 ANR/OOM。
+ */
+internal fun filterImportSessions(arr: JSONArray, max: Int): JSONArray {
+    val kept = JSONArray()
+    val limit = minOf(arr.length(), max)
+    for (i in 0 until limit) {
+        val o = arr.optJSONObject(i) ?: continue
+        if (o.has("s") && o.has("e") && o.has("d") && o.has("m")) kept.put(o)
+    }
+    return kept
 }

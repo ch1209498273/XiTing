@@ -38,6 +38,7 @@
 | `SYSTEM_ALERT_WINDOW`（悬浮窗） | 显示悬浮球与全屏黑幕遮罩——本应用的核心功能 | **必须** |
 | `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_SPECIAL_USE` | 悬浮球常驻时保持一个低优先级前台服务，使黑屏监听与定时器在后台持续可用 | **必须** |
 | `WAKE_LOCK` | 黑幕会话期间保持 CPU 唤醒，保证定时器与功耗采样准确；服务退出时立即释放 | **必须** |
+| `VIBRATE` | 长按悬浮球退出时的一次触觉反馈（震动 40ms）。普通权限，系统授权时自动授予，不弹窗、不涉及任何数据 | 可选 |
 | `POST_NOTIFICATIONS` | 显示常驻通知（黑屏/恢复、悬浮球显隐、退出助手、定时剩余时间） | **必须**（Android 13+ 不授权则通知不可见） |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | 由你主动点击按钮时，引导系统忽略电池优化，避免 ColorOS 冻结后台服务 | 可选 |
 | `RECEIVE_BOOT_COMPLETED` | 若你开启了「开机自启」，重启后恢复悬浮球 | 可选 |

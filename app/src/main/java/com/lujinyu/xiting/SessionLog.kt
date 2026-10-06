@@ -17,6 +17,37 @@ data class ListenSession(
     val mode: Int         // 0=黑幕模式 1=真息屏模式
 )
 
+/** 解析结果：合法条目 + 被跳过的损坏条目数 */
+data class ParseResult<T>(val items: List<T>, val skipped: Int)
+
+/**
+ * 解析存档文本（纯函数，可单测）。
+ *
+ * 逐条 try/catch 跳过损坏记录，而不是整份文件一起放弃——这里曾用 map()，
+ * 一条脏记录就让整个 map 抛出、外层 catch 返回 emptyList()，随后 add()
+ * 拿着这个空列表做读-改-写，把全部历史覆盖成仅剩的一条。
+ * 单条损坏只丢那一条，其余 499 条必须照常读出。
+ *
+ * 整个文本语法级非法时抛给调用方处理（那是另一个层面的问题，走留底策略）。
+ */
+internal fun parseSessions(text: String): ParseResult<ListenSession> {
+    val arr = JSONArray(text)
+    var skipped = 0
+    val items = (0 until arr.length()).mapNotNull { i ->
+        try {
+            val o = arr.getJSONObject(i)
+            ListenSession(
+                o.getLong("s"), o.getLong("e"),
+                o.getLong("d"), o.getInt("m")
+            )
+        } catch (e: Exception) {
+            skipped++
+            null
+        }
+    }
+    return ParseResult(items, skipped)
+}
+
 object SessionLog {
 
     private const val FILE = "sessions.json"
@@ -45,42 +76,26 @@ object SessionLog {
     fun sessions(context: Context): List<ListenSession> = synchronized(lock) { read(context) }
 
     /**
-     * 解析存档。
-     *
-     * 逐条 try/catch 跳过损坏记录，而不是整份文件一起放弃——这里曾用 map()，
-     * 一条脏记录就让整个 map 抛出、外层 catch 返回 emptyList()，随后 add()
-     * 拿着这个空列表做读-改-写，把全部历史覆盖成仅剩的一条。
-     * 单条损坏只丢那一条，其余 499 条必须照常读出。
+     * 解析存档文件。语法级损坏（整个 JSON 非法）走留底；元素级损坏逐条跳过。
      */
     private fun read(context: Context): List<ListenSession> {
         val f = File(context.filesDir, FILE)
         if (!f.exists()) return emptyList()
-        val arr = try {
-            JSONArray(f.readText())
+        val parsed = try {
+            parseSessions(f.readText())
         } catch (e: Exception) {
-            // 整体解析不了：先把原件留底再当空存档处理。
+            // 整体语法解析不了：先把原件留底再当空存档处理。
             // 不留底的话，下一次 add() 会拿着空列表把文件覆盖掉，原始数据彻底消失。
             preserveCorrupt(f)
             return emptyList()
         }
-        var skipped = 0
-        val all = (0 until arr.length()).mapNotNull { i ->
-            try {
-                val o = arr.getJSONObject(i)
-                ListenSession(
-                    o.getLong("s"), o.getLong("e"),
-                    o.getLong("d"), o.getInt("m")
-                )
-            } catch (e: Exception) {
-                skipped++
-                null
-            }
+        if (parsed.skipped > 0) {
+            Log.w(TAG, "跳过 ${parsed.skipped} 条损坏记录，其余 ${parsed.items.size} 条照常读取")
         }
-        if (skipped > 0) Log.w(TAG, "跳过 $skipped 条损坏记录，其余 ${all.size} 条照常读取")
-        val valid = all.filter { it.durationMs >= 60_000 && it.durationMs <= LEGACY_MAX_MS }
-        if (valid.size != all.size) {
+        val valid = parsed.items.filter { it.durationMs >= 60_000 && it.durationMs <= LEGACY_MAX_MS }
+        if (valid.size != parsed.items.size) {
             write(context, valid)
-            Log.w(TAG, "统计迁移：剔除${all.size - valid.size}条旧版失真记录")
+            Log.w(TAG, "统计迁移：剔除${parsed.items.size - valid.size}条旧版失真记录")
         }
         return valid.sortedByDescending { it.start }
     }

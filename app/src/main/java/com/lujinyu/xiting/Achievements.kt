@@ -55,12 +55,16 @@ object Achievements {
 
     /** 成就卡摘要：(已解锁数, 最新一条描述) */
     fun summary(ctx: Context): Pair<Int, String> {
-        val got = unlocked(ctx)
-        val latest = ALL.lastOrNull { it.id in got }
-        val sub = when {
-            got.isEmpty() -> ctx.getString(R.string.ach_sub_empty)
-            else -> ctx.getString(R.string.ach_sub_latest, title(ctx, latest!!))
+        // 只统计 ALL 中存在的 id。ach_unlocked 是持久化的字符串集合，早期版本
+        // 改过成就 id、或文件被外部改写，都可能留下 ALL 里已不存在的残留项。
+        // 原实现直接 ALL.lastOrNull { it.id in got } 再 latest!! —— 集合非空但
+        // 全部是残留 id 时 latest 为 null，当场 NPE 崩在统计页。
+        val known = ALL.filter { it.id in unlocked(ctx) }
+        val sub = if (known.isEmpty()) {
+            ctx.getString(R.string.ach_sub_empty)
+        } else {
+            ctx.getString(R.string.ach_sub_latest, title(ctx, known.last()))
         }
-        return got.size to sub
+        return known.size to sub
     }
 }

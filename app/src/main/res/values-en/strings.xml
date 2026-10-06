@@ -40,7 +40,6 @@
     <!-- Stats -->
     <string name="stats_hint">Listening time &amp; power saved (stored on device)</string>
     <string name="chart_title">Daily screen-off time (7 days)</string>
-    <string name="ach_title">Pet Achievements</string>
     <string name="ach_sub_empty">Keep listening to light them up</string>
     <string name="ach_sub_latest">Latest: %1$s</string>
     <string name="ach_progress">Pet Achievements · 0/8</string>
@@ -51,7 +50,6 @@
     <string name="recent_records">Recent sessions · last 30 days</string>
     <string name="pager_prev">‹ Prev</string>
     <string name="pager_next">Next ›</string>
-    <string name="pager_page">Page %1$d / %2$d</string>
 
     <!-- Settings -->
     <string name="settings_personal">Personalize</string>
@@ -77,10 +75,8 @@
     <string name="widget_active">Active</string>
     <string name="widget_idle">Idle</string>
     <string name="widget_today_fmt">Today %1$s</string>
-    <string name="widget_pet_fmt">%1$s</string>
     <string name="widget_growth_next">Growth %1$d · %2$d to next</string>
     <string name="widget_growth_max">Growth %1$d · Maxed</string>
-    <string name="widget_total_fmt">Total %1$s</string>
 
     <!-- Black overlay -->
     <string name="black_hint">Screen-off listening · Tap to unlock</string>
@@ -156,7 +152,6 @@
     <string name="state_done">Done ✓</string>
     <string name="state_todo">Pending</string>
     <string name="keepalive_btn_battery">Battery settings</string>
-    <string name="keepalive_btn_appinfo">App info</string>
     <string name="keepalive_btn_ok">Got it</string>
 
     <!-- Dynamic: finish this episode -->
@@ -170,7 +165,6 @@
     <string name="ach_toast_fmt">🏆 Unlocked: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">Pet Achievements %1$d/%2$d</string>
     <string name="dlg_ok">OK</string>
-    <string name="toast_evolve">🎉 Evolved! %1$s → %2$s</string>
     <string name="toast_charge">+%1$d growth collected ✓</string>
     <string name="pet_caption_sleepy">%1$s is napping · play an episode to wake it</string>
     <string name="pet_caption_max">%1$s · Maxed · growth %2$d banked</string>
@@ -203,7 +197,6 @@
     <string name="calib_btn_close">Close</string>
     <string name="calib_step1_title">Calibration 1/2 · Screen on</string>
     <string name="calib_step1_init">Start playing any video now and keep the screen on…</string>
-    <string name="calib_step1_wait">Keep playing with the screen on — don\'t touch the phone\n%1$s left (%2$d samples)</string>
     <string name="toast_calib_too_few">Not enough valid samples (charging?) — calibration cancelled</string>
     <string name="toast_calib_need_service">Start the assistant first, then calibrate</string>
     <string name="toast_calib_step2">Calibration 2/2 · stay black for 3 min, hands off</string>
@@ -263,15 +256,11 @@
     <string name="about_version_fmt">Version %1$s · Build %2$s</string>
 
     <!-- v3.5 skin gallery & streak -->
-    <string name="gallery_btn">🎨 Skins</string>
     <string name="gallery_title">Skin Gallery</string>
     <string name="streak_fmt">🔥 %1$d-day streak</string>
     <string name="streak_best_fmt">best %1$d</string>
     <string name="toast_rare_energy">⚡ Rare storm energy +%1$d!</string>
     <string name="toast_skin_unlock">🎨 New skin unlocked: %1$s</string>
-    <string name="toast_skin_worn">Wearing %1$s</string>
-    <string name="gallery_wear">Wear</string>
-    <string name="gallery_worn">Worn</string>
     <string name="skin_default_n">Classic</string>
     <string name="skin_cond_default">Default look</string>
     <string name="skin_star_n">Starlight</string>

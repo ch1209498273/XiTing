@@ -48,9 +48,15 @@ object EnergyStore {
         val raw = p.getString(KEY_PENDING, "[]") ?: "[]"
         val list = try {
             val arr = JSONArray(raw)
+            // 与 SessionLog 同一类问题：原来用 map()，一条脏记录就让整份待收能量
+            // 变成 emptyList()（全部能量球静默消失）。这里逐条跳过坏记录。
             (0 until arr.length()).mapNotNull { i ->
-                val o = arr.getJSONObject(i)
-                PendingEnergy(o.getLong("id"), o.getInt("v"), o.getLong("e"))
+                try {
+                    val o = arr.getJSONObject(i)
+                    PendingEnergy(o.getLong("id"), o.getInt("v"), o.getLong("e"))
+                } catch (_: Exception) {
+                    null
+                }
             }
         } catch (_: Exception) {
             emptyList()
@@ -64,7 +70,10 @@ object EnergyStore {
     fun add(ctx: Context, value: Int) {
         if (value <= 0) return
         val exist = pending(ctx)
-        val room = MAX_PENDING - exist.sumOf { it.value }
+        // 用 Long 累加：exist 来自持久化 prefs，单条 value 若是脏数据里的 Int.MAX，
+        // Int 累加会溢出成负数，让 room 变成正数而突破上限
+        val room = (MAX_PENDING - exist.sumOf { it.value.toLong() })
+            .coerceIn(0L, Int.MAX_VALUE.toLong()).toInt()
         if (room <= 0) return
         val v = value.coerceAtMost(room)
         val now = System.currentTimeMillis()
@@ -79,16 +88,35 @@ object EnergyStore {
         val item = list.find { it.id == id } ?: return 0
         list.remove(item)
         writePending(ctx, list)
-        val p = sp(ctx)
-        p.edit().putInt(KEY_COLLECTED, p.getInt(KEY_COLLECTED, 0) + item.value).apply()
+        credit(ctx, item.value.toLong())
         return item.value
     }
 
-    /** 收集全部待收能量，返回总量 */
+    /**
+     * 收集全部待收能量，返回总量。
+     *
+     * 原实现是 sum += collect(id) 逐枚调用，而每枚 collect() 都会
+     * 重新 pending()（读 prefs + 解析 JSON + 过期过滤）再 writePending()（全量回写），
+     * 于是 n 枚球产生 O(n²) 次序列化。n 上限 200 时，一次点击能量条
+     * 最多触发 400 次全量 SharedPreferences 写——低端机上肉眼可见的卡顿。
+     * 这里改成「读一次、算总和、清一次」，O(1) 次写。
+     */
     fun collectAll(ctx: Context): Int {
-        var sum = 0
-        pending(ctx).forEach { sum += collect(ctx, it.id) }
+        val list = pending(ctx)
+        if (list.isEmpty()) return 0
+        val sum = list.sumOf { it.value }
+        writePending(ctx, emptyList())
+        credit(ctx, sum.toLong())
         return sum
+    }
+
+    /** 成长值累加（饱和，不允许溢出成负数） */
+    private fun credit(ctx: Context, delta: Long) {
+        val p = sp(ctx)
+        val next = p.getInt(KEY_COLLECTED, 0).toLong() + delta
+        p.edit()
+            .putInt(KEY_COLLECTED, next.coerceIn(0L, Int.MAX_VALUE.toLong()).toInt())
+            .apply()
     }
 
     private fun writePending(ctx: Context, list: List<PendingEnergy>) {

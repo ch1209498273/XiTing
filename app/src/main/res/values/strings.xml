@@ -40,7 +40,6 @@
     <!-- 统计页 -->
     <string name="stats_hint">息屏听剧的时长与省电估算（保存在本机）</string>
     <string name="chart_title">近7天每日息屏时长</string>
-    <string name="ach_title">精灵成就</string>
     <string name="ach_sub_empty">听剧积累，逐一点亮</string>
     <string name="ach_sub_latest">最新解锁：%1$s</string>
     <string name="ach_progress">精灵成就 · 0/8</string>
@@ -51,7 +50,6 @@
     <string name="recent_records">最近会话记录 · 仅保留最近30天</string>
     <string name="pager_prev">‹ 上一页</string>
     <string name="pager_next">下一页 ›</string>
-    <string name="pager_page">第 %1$d / %2$d 页</string>
 
     <!-- 设置页 -->
     <string name="settings_personal">个性化</string>
@@ -77,10 +75,8 @@
     <string name="widget_active">运行中</string>
     <string name="widget_idle">未运行</string>
     <string name="widget_today_fmt">今日 %1$s</string>
-    <string name="widget_pet_fmt">%1$s</string>
     <string name="widget_growth_next">成长值 %1$d · 距下一形态 %2$d</string>
     <string name="widget_growth_max">成长值 %1$d · 已至巅峰</string>
-    <string name="widget_total_fmt">累计 %1$s</string>
 
     <!-- 黑幕 -->
     <string name="black_hint">息屏听剧中 · 轻点屏幕解除锁定</string>
@@ -156,7 +152,6 @@
     <string name="state_done">已完成 ✓</string>
     <string name="state_todo">未完成</string>
     <string name="keepalive_btn_battery">去电池设置</string>
-    <string name="keepalive_btn_appinfo">去应用详情</string>
     <string name="keepalive_btn_ok">知道了</string>
 
     <!-- 动态文案：听完这集 -->
@@ -170,7 +165,6 @@
     <string name="ach_toast_fmt">🏆 成就解锁：%1$s %2$s</string>
     <string name="ach_dlg_title_fmt">精灵成就 %1$d/%2$d</string>
     <string name="dlg_ok">好的</string>
-    <string name="toast_evolve">🎉 进化！%1$s → %2$s</string>
     <string name="toast_charge">+%1$d 成长值已收取 ✓</string>
     <string name="pet_caption_sleepy">%1$s 打瞌睡了 · 听一集唤醒它</string>
     <string name="pet_caption_max">%1$s · 已至巅峰 · 成长值 %2$d 继续储备</string>
@@ -203,7 +197,6 @@
     <string name="calib_btn_close">关闭</string>
     <string name="calib_step1_title">校准 1/2 · 亮屏播放</string>
     <string name="calib_step1_init">请立即开始播放任意视频并保持亮屏…</string>
-    <string name="calib_step1_wait">请保持亮屏播放视频，不要操作手机\n剩余 %1$s（已采样 %2$d 次）</string>
     <string name="toast_calib_too_few">有效样本不足（是否在充电？），校准已取消</string>
     <string name="toast_calib_need_service">请先启动息屏听剧助手，再进行校准</string>
     <string name="toast_calib_step2">校准步骤 2/2：保持黑屏 3 分钟，无需操作</string>
@@ -263,15 +256,11 @@
     <string name="about_version_fmt">版本 %1$s · 构建ID %2$s</string>
 
     <!-- v3.5 精灵图鉴与streak -->
-    <string name="gallery_btn">🎨 图鉴</string>
     <string name="gallery_title">精灵图鉴</string>
     <string name="streak_fmt">🔥 连续听剧 %1$d 天</string>
     <string name="streak_best_fmt">最长 %1$d 天</string>
     <string name="toast_rare_energy">⚡ 稀有雷暴能量 +%1$d！</string>
     <string name="toast_skin_unlock">🎨 新皮肤解锁：%1$s</string>
-    <string name="toast_skin_worn">已换上「%1$s」</string>
-    <string name="gallery_wear">穿戴</string>
-    <string name="gallery_worn">使用中</string>
     <string name="skin_default_n">经典配色</string>
     <string name="skin_cond_default">默认形态</string>
     <string name="skin_star_n">星夜之魂</string>

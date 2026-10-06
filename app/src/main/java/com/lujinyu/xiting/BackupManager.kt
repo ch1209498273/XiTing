@@ -22,6 +22,9 @@ object BackupManager {
 
     private const val TAG = "XiTing"
     private const val FILE_NAME = "XiTing-backup.json"
+
+    /** 导入会话条数上限，与 SessionLog.MAX 对齐：超出的部分不恢复 */
+    private const val MAX_IMPORT_SESSIONS = 500
     private val REL_DIR = Environment.DIRECTORY_DOWNLOADS + "/XiTing"
 
     private fun androidId(ctx: Context): String =
@@ -187,7 +190,9 @@ object BackupManager {
     /** 把备份数据恢复到本地（成长值/会话/分享状态） */
     fun restore(ctx: Context, obj: JSONObject): Boolean {
         return try {
-            val gp = obj.optInt("gp", 0)
+            // gp 来自外部文件，不能直接写进 prefs：负数会让精灵进度异常，
+            // 极大值在后续累加时溢出成负
+            val gp = obj.optInt("gp", 0).coerceIn(0, Int.MAX_VALUE)
             val prefs = ctx.getSharedPreferences("xiiting_prefs", Context.MODE_PRIVATE)
             // 迁移标记置位，避免旧值再迁移覆盖
             prefs.edit()
@@ -196,7 +201,19 @@ object BackupManager {
                 .putString("last_share_date", obj.optString("last_share_date", ""))
                 .apply()
             obj.optJSONArray("sessions")?.let { arr ->
-                ctx.filesDir.resolve("sessions.json").writeText(arr.toString())
+                // 导入数据不可信：原来整段 arr.toString() 原样落盘，
+                // 一个超大或畸形的数组会在之后的 SessionLog.sessions() 里
+                // 被主线程全量解析，轻则 ANR 重则 OOM。
+                // 这里限量 + 逐条查形状，只放行结构完整的记录。
+                val kept = ArrayList<JSONObject>(minOf(arr.length(), MAX_IMPORT_SESSIONS))
+                for (i in 0 until minOf(arr.length(), MAX_IMPORT_SESSIONS)) {
+                    val o = arr.optJSONObject(i) ?: continue
+                    if (o.has("s") && o.has("e") && o.has("d") && o.has("m")) kept.add(o)
+                }
+                if (kept.isNotEmpty()) {
+                    ctx.filesDir.resolve("sessions.json").writeText(JSONArray(kept).toString())
+                }
+                Log.i(TAG, "导入会话 ${kept.size} 条（原文件 ${arr.length()} 条，超限或结构不合法者已丢弃）")
             }
             Log.i(TAG, "备份已恢复（gp=$gp）")
             true

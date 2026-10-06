@@ -43,12 +43,20 @@ object PetSkins {
     /** 满级后需额外储备的成长值（承接「已至巅峰·继续储备」设定） */
     private const val KING_RESERVE = 2000L
 
+    /**
+     * 换肤 = 整只精灵做色相旋转，所以配色之间必须拉开角度才分得清。
+     *
+     * 原先 sakura=190°、magma=200° 只差 10°，肉眼几乎一致——用户反馈
+     * 「樱雨精灵和熔岩暴君感觉一样的」就是这个。现按约 55~65° 均匀拉开，
+     * 保证六款一眼可辨。代价：名字里的「樱雨/熔岩/翡翠」不再对应某个固定色相，
+     * 因为旋转作用于整幅画（含高光与闪电），不是只换一个主色。
+     */
     val ALL = listOf(
         Skin("default", 0f, R.string.skin_default_n, R.string.skin_cond_default),
-        Skin("star", 40f, R.string.skin_star_n, R.string.skin_cond_star),
-        Skin("aurora", 110f, R.string.skin_aurora_n, R.string.skin_cond_aurora),
-        Skin("sakura", 190f, R.string.skin_sakura_n, R.string.skin_cond_sakura),
-        Skin("magma", 200f, R.string.skin_magma_n, R.string.skin_cond_magma),
+        Skin("star", 45f, R.string.skin_star_n, R.string.skin_cond_star),
+        Skin("aurora", 105f, R.string.skin_aurora_n, R.string.skin_cond_aurora),
+        Skin("sakura", 165f, R.string.skin_sakura_n, R.string.skin_cond_sakura),
+        Skin("magma", 225f, R.string.skin_magma_n, R.string.skin_cond_magma),
         Skin("jade", 290f, R.string.skin_jade_n, R.string.skin_cond_jade)
     )
 

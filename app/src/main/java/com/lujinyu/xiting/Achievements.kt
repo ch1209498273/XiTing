@@ -4,22 +4,24 @@ package com.lujinyu.xiting
 import android.content.Context
 
 /**
- * 精灵成就系统（精灵二期·一期）：依据累计听剧数据评估解锁条件，
- * 解锁状态持久化在 prefs，评估幂等可随时重跑；新解锁由调用方负责提示。
- * 文案走资源（titleRes/descRes），支持多语言。
+ * 精灵成就。
+ *
+ * 从 8 条砍到 4 条：原先 first / h1 / h10 / h50 四条里，三条是同一根「累计时长」
+ * 轴上的刻度（1 / 10 / 50 小时），还有 first 是打开 App 就自动亮的 —— 挂着没意义。
+ * 保留的四条各自代表一种不同维度，互不重复：
+ *   单次时长 / 连续性 / 频次 / 阶段
+ *
+ * 已解锁集合 ach_unlocked 是持久化的，砍掉的 id 会被 [knownUnlocked] 直接忽略，
+ * 不会在成就弹窗里变成「永远打不开的锁」。
  */
 object Achievements {
 
     data class A(val id: String, val icon: String, val titleRes: Int, val descRes: Int)
 
     val ALL = listOf(
-        A("first", "🌙", R.string.ach_first_t, R.string.ach_first_d),
-        A("h1", "🎧", R.string.ach_h1_t, R.string.ach_h1_d),
-        A("h10", "🌙", R.string.ach_h10_t, R.string.ach_h10_d),
-        A("h50", "👑", R.string.ach_h50_t, R.string.ach_h50_d),
-        A("c100", "💯", R.string.ach_c100_t, R.string.ach_c100_d),
         A("marathon", "🏃", R.string.ach_marathon_t, R.string.ach_marathon_d),
         A("week", "📅", R.string.ach_week_t, R.string.ach_week_d),
+        A("c100", "🎧", R.string.ach_c100_t, R.string.ach_c100_d),
         A("king", "⚡", R.string.ach_king_t, R.string.ach_king_d)
     )
 
@@ -32,15 +34,11 @@ object Achievements {
     }
 
     /** 依据统计评估并持久化，返回本次新解锁的成就（可能为空） */
-    fun evaluate(ctx: Context, allMs: Long, count: Int, maxMs: Long, days: Int, stage: Int): List<A> {
+    fun evaluate(ctx: Context, count: Int, maxMs: Long, days: Int, stage: Int): List<A> {
         val cond = mapOf(
-            "first" to (allMs > 0),
-            "h1" to (allMs >= 3_600_000L),
-            "h10" to (allMs >= 36_000_000L),
-            "h50" to (allMs >= 180_000_000L),
-            "c100" to (count >= 100),
             "marathon" to (maxMs >= 3_600_000L),
             "week" to (days >= 7),
+            "c100" to (count >= 100),
             "king" to (stage >= 4)
         )
         val got = unlocked(ctx)

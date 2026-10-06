@@ -42,7 +42,8 @@
     <string name="chart_title">Daily screen-off time (7 days)</string>
     <string name="ach_sub_empty">Keep listening to light them up</string>
     <string name="ach_sub_latest">Latest: %1$s</string>
-    <string name="ach_progress">Pet Achievements · 0/8</string>
+    <!-- Design-time placeholder only; renderStats() overwrites it with ach_dlg_title_fmt at runtime -->
+    <string name="ach_progress">Pet Achievements</string>
     <string name="pet_subtitle">Energy Pet · fed by your real listening time</string>
     <string name="sum_mah_default">Total saved ≈ 0 mAh</string>
     <string name="sum_extra_default">Longest — · 0 sessions</string>
@@ -169,14 +170,6 @@
     <string name="pet_caption_sleepy">%1$s is napping · play an episode to wake it</string>
     <string name="pet_caption_max">%1$s · Maxed · growth %2$d banked</string>
     <string name="pet_caption_progress">%1$s · Growth %2$d / %3$d</string>
-    <string name="ach_first_t">First Black-Out</string>
-    <string name="ach_first_d">Complete your first screen-off session</string>
-    <string name="ach_h1_t">One-Hour Club</string>
-    <string name="ach_h1_d">1 hour of total listening</string>
-    <string name="ach_h10_t">Ten-Hour Pact</string>
-    <string name="ach_h10_d">10 hours of total listening</string>
-    <string name="ach_h50_t">Fifty-Hour Dynasty</string>
-    <string name="ach_h50_d">50 hours of total listening</string>
     <string name="ach_c100_t">Century Habit</string>
     <string name="ach_c100_d">100 screen-off sessions</string>
     <string name="ach_marathon_t">Marathon</string>

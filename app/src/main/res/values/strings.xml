@@ -42,7 +42,8 @@
     <string name="chart_title">近7天每日息屏时长</string>
     <string name="ach_sub_empty">听剧积累，逐一点亮</string>
     <string name="ach_sub_latest">最新解锁：%1$s</string>
-    <string name="ach_progress">精灵成就 · 0/8</string>
+    <!-- 仅作设计期占位：运行时由 renderStats() 用 ach_dlg_title_fmt 覆盖成「精灵成就 N/4」 -->
+    <string name="ach_progress">精灵成就</string>
     <string name="pet_subtitle">电能精灵 · 由你的真实听剧时长喂养</string>
     <string name="sum_mah_default">累计估算省电 ≈ 0 mAh</string>
     <string name="sum_extra_default">最长单次 — · 共 0 次息屏</string>
@@ -169,14 +170,6 @@
     <string name="pet_caption_sleepy">%1$s 打瞌睡了 · 听一集唤醒它</string>
     <string name="pet_caption_max">%1$s · 已至巅峰 · 成长值 %2$d 继续储备</string>
     <string name="pet_caption_progress">%1$s · 成长值 %2$d / %3$d</string>
-    <string name="ach_first_t">初次息屏</string>
-    <string name="ach_first_d">完成第一次息屏听剧</string>
-    <string name="ach_h1_t">一小时俱乐部</string>
-    <string name="ach_h1_d">累计听剧满 1 小时</string>
-    <string name="ach_h10_t">十小时之约</string>
-    <string name="ach_h10_d">累计听剧满 10 小时</string>
-    <string name="ach_h50_t">五十小时王朝</string>
-    <string name="ach_h50_d">累计听剧满 50 小时</string>
     <string name="ach_c100_t">百次成习</string>
     <string name="ach_c100_d">累计息屏 100 次</string>
     <string name="ach_marathon_t">马拉松</string>

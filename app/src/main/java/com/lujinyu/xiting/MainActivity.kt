@@ -75,7 +75,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     private var range = RANGE_ALL
     private var listPage = 0
     private var galleryBuiltStage = -1
-    private var previewStage = -1   // -1=显示当前形态；>=0=图鉴预览的形态
+    private var galleryBuiltSelected = -2
     private var todayMs = 0L
     private var weekMs = 0L
     private var allMs = 0L
@@ -887,9 +887,9 @@ private fun showSkinGallery() {
             ((gp - lo).toFloat() / (hi - lo)).coerceIn(0f, 1f)
         } else 1f
 
-        // 图鉴预览：选中非当前形态时主精灵切换为该形态
-        pet.stage = if (previewStage >= 0) previewStage else stage
-        pet.hideProgress = previewStage >= 0 && previewStage != stage
+        // 显示哪个形态由 PetForm 统一决定（成长值只决定能选到哪一形态）
+        pet.stage = stage
+        pet.hideProgress = false
         // 成长值装载与收取回调（点击左侧条=收取全部；回调在飞入动画完成后触发）
         pet.pending = EnergyStore.pending(this)
         pet.onCollectAll = {
@@ -939,11 +939,12 @@ private fun showSkinGallery() {
         buildGallery(stage)
     }
 
-    /** 形态图鉴：点击缩略图预览该形态（含未解锁），再点一次恢复当前形态 */
+    /** 形态图鉴：点击缩略图切换当前展示形态（含未解锁的可预览，但不能选中） */
     private fun buildGallery(currentStage: Int) {
-        if (galleryBuiltStage == currentStage && galleryPreviewBuilt == previewStage) return
+        if (galleryBuiltStage == currentStage && galleryBuiltSelected == PetForm.selected(this)) return
         galleryBuiltStage = currentStage
-        galleryPreviewBuilt = previewStage
+        galleryBuiltSelected = PetForm.selected(this)
+        val selected = PetForm.selected(this)
         val row = pageStats.findViewById<LinearLayout>(R.id.thumb_row)
         row.removeAllViews()
         val density = resources.displayMetrics.density
@@ -955,18 +956,27 @@ private fun showSkinGallery() {
                     marginStart = (5 * density).toInt()
                     marginEnd = (5 * density).toInt()
                 }
-                if (i == previewStage || (previewStage < 0 && i == currentStage)) {
+                if (i == selected) {
                     setBackgroundResource(R.drawable.bg_thumb_selected)
                 }
             }
             val pv = PetView(this).apply {
                 stage = i
                 thumbMode = true
+                skinHue = PetSkins.active(this@MainActivity).hue
                 layoutParams = android.widget.FrameLayout.LayoutParams(size, size)
                 setOnClickListener {
-                    previewStage = if (i == currentStage) -1 else i
-                    galleryBuiltStage = -1 // 强制重建（刷新选中框）
-                    renderStats()
+                    // 与「精灵图鉴」共用同一个选择入口。此前这里改的是 previewStage ——
+                    // 一个只在本会话生效、不落盘的预览变量，于是统计页选了形态、
+                    // 图鉴却毫无反应，两处各说各话。
+                    if (i > currentStage) {
+                        Toast.makeText(this@MainActivity,
+                            getString(R.string.gallery_form_locked_toast, PetForm.requiredFor(i)),
+                            Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    PetForm.select(this@MainActivity, i)
+                    applySkinEverywhere()
                 }
             }
             frame.addView(pv)
@@ -989,8 +999,6 @@ private fun showSkinGallery() {
         }
         // 图鉴选中说明合并进主文案（上方 caption 已显示，不另占行）
     }
-
-    private var galleryPreviewBuilt = -2
 
     private fun selectRange(r: Int) {
         range = r
@@ -1058,7 +1066,7 @@ private fun showSkinGallery() {
             .map { SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date(it.start)) }
             .distinct().size
         val freshAch = Achievements.evaluate(
-            this, allMs, sessions.size,
+            this, sessions.size,
             sessions.maxOfOrNull { it.durationMs } ?: 0L, listenDays, stageNow
         )
         freshAch.take(2).forEach {

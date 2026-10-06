@@ -128,6 +128,28 @@ gradle assembleRelease -Pdist=wechat-张三
 
 ---
 
+### 运行单元测试
+
+```bash
+powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
+```
+
+脚本会把源码镜像到临时 ASCII 路径再跑，跑完汇总结果并清理现场。
+
+**为什么要绕这一圈**：本项目路径含中文，Gradle 执行单测时 fork 的测试进程
+通过 `@argfile` 接收 classpath，而 JVM 解析 `@argfile` 发生在
+`-Dfile.encoding` 等参数生效之前，中文路径被解错，于是**所有测试类都报
+ClassNotFoundException**。已用对照实验确认：同一份代码复制到纯 ASCII 路径后
+42 个测试全绿。`assembleDebug` / `assembleRelease` 不受影响，只有单测任务受影响。
+
+覆盖范围：存档与能量的逐条容错、成长值溢出饱和、成就残留 id、备份导入限量，
+以及把 26 个持久化键名钉死（`PrefsKeysTest`）——改键名等于全体用户丢失该设置，
+必须有人会注意到。
+
+参数：`-Variant release` 跑 release 变体，`-KeepMirror` 保留镜像目录便于排查。
+
+---
+
 ## 安装到手机
 
 **方式一（推荐，需 USB 调试）**：手机开「开发者选项 → USB调试」，连电脑后

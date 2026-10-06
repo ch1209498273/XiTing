@@ -82,7 +82,7 @@ object SessionLog {
             write(context, valid)
             Log.w(TAG, "统计迁移：剔除${all.size - valid.size}条旧版失真记录")
         }
-        valid.sortedByDescending { it.start }
+        return valid.sortedByDescending { it.start }
     }
 
     fun add(context: Context, session: ListenSession) {

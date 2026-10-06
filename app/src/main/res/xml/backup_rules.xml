@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 11及以下（API 23~30）备份规则。
+
+  android:dataExtractionRules 自 API 31 起才生效，低版本走本文件
+  （android:fullBackupContent）。
+
+  API 26~30 没有「云备份」与「换机迁移」的分段能力，只能一刀切。这里选择
+  **完全排除**：隐私承诺（数据不出设备）优先于换机便利——这一档换机请用应用内
+  的「导出/导入备份」（写到 下载/XiTing/，用户自己保管）。
+
+  Android 12+ 才有分段能力，换机直达迁移已在那里恢复，见 data_extraction_rules.xml。
+-->
+<full-backup-content>
+    <exclude domain="root" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="external" path="." />
+    <exclude domain="device_root" path="." />
+    <exclude domain="device_file" path="." />
+    <exclude domain="device_database" path="." />
+    <exclude domain="device_sharedpref" path="." />
+</full-backup-content>

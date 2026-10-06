@@ -1,0 +1,32 @@
+# ---- 构建产物 ----
+.gradle/
+.kotlin/
+build/
+app/build/
+devtools/**/build/
+
+# ---- 本机配置与密钥（绝不入库）----
+local.properties
+*.apk
+*.aab
+keystore.properties
+keystore/
+*.jks
+
+# ---- 发布暂存目录 ----
+# .release/XiTing 是推 GitHub Releases 前的工作副本（含 local.properties），
+# 不是源码，重复一份反而容易误改。
+.release/
+
+# ---- UAT 过程产物 ----
+# .uat/ 是 Play 商店页面抓取的中间文件（单目录就 70MB，绝大部分是抓取垃圾）；
+# uat/ 是回归截图证据，可随时重跑生成，不进源码仓库。
+.uat/
+uat/
+
+# ---- 营销物料 ----
+# 截图、小红书卡片、mapping 反混淆表等分发用素材，约 40MB，
+# 属于发布产物而非应用源码，随 GitHub Releases 一起分发即可。
+# 若确实想纳入版本控制，删掉下面两行，或对单个文件用 git add -f。
+物料/
+小红书/

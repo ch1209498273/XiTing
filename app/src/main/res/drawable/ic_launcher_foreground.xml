@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 月亮 -->
+    <path
+        android:pathData="M63,30 a13,13 0 1 0 10,21 a11,11 0 0 1 -10,-21 z"
+        android:fillColor="#FFF5D76E" />
+    <!-- 耳机头带 -->
+    <path
+        android:pathData="M34,64 a20,20 0 0 1 40,0"
+        android:strokeColor="#FF7EC8A9"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- 左耳罩 -->
+    <path
+        android:pathData="M30,62 h9 a2,2 0 0 1 2,2 v12 a2,2 0 0 1 -2,2 h-9 a2,2 0 0 1 -2,-2 v-12 a2,2 0 0 1 2,-2 z"
+        android:fillColor="#FF7EC8A9" />
+    <!-- 右耳罩 -->
+    <path
+        android:pathData="M69,62 h9 a2,2 0 0 1 2,2 v12 a2,2 0 0 1 -2,2 h-9 a2,2 0 0 1 -2,-2 v-12 a2,2 0 0 1 2,-2 z"
+        android:fillColor="#FF7EC8A9" />
+</vector>

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用 -->
+    <string name="app_name">息屏听剧</string>
+    <string name="tile_label">息屏听剧</string>
+    <string name="nav_home">首页</string>
+    <string name="nav_stats">统计</string>
+    <string name="nav_settings">设置</string>
+    <string name="footer_offline">完全离线 · 不收集任何数据</string>
+    <string name="title_stats">节能统计</string>
+    <string name="title_settings">设置</string>
+
+    <!-- 状态胶囊 -->
+    <string name="status_running">运行中</string>
+    <string name="status_idle">未运行</string>
+    <string name="pill_on">已开启</string>
+    <string name="pill_off">去开启</string>
+    <string name="pill_battery_on">已加白</string>
+    <string name="pill_battery_off">去加白</string>
+    <string name="pill_abnormal">异常 · 点修复</string>
+
+    <!-- 首页 -->
+    <string name="hero_title_start">启动息屏听剧</string>
+    <string name="hero_title_stop">息屏听剧运行中</string>
+    <string name="hero_sub_start">启动后，看剧时点悬浮球即可息屏听剧</string>
+    <string name="hero_sub_stop">看剧时点悬浮球，黑屏听剧声音继续 · 点此停止助手</string>
+    <string name="timer_title">定时关闭</string>
+    <string name="keepalive_title">防杀保活</string>
+    <string name="keepalive_sub">设置指南</string>
+    <string name="stats_section">节能统计</string>
+    <string name="view_details">查看明细 ›</string>
+    <string name="label_today">今日</string>
+    <string name="label_week">近7天</string>
+    <string name="label_total">累计</string>
+    <string name="perm_section">服务与权限</string>
+    <string name="perm_overlay">悬浮窗权限</string>
+    <string name="perm_battery">电池后台加白</string>
+    <string name="perm_notify">通知权限</string>
+
+    <!-- 统计页 -->
+    <string name="stats_hint">息屏听剧的时长与省电估算（保存在本机）</string>
+    <string name="chart_title">近7天每日息屏时长</string>
+    <string name="ach_title">精灵成就</string>
+    <string name="ach_sub_empty">听剧积累，逐一点亮</string>
+    <string name="ach_sub_latest">最新解锁：%1$s</string>
+    <string name="ach_progress">精灵成就 · 0/8</string>
+    <string name="pet_subtitle">电能精灵 · 由你的真实听剧时长喂养</string>
+    <string name="sum_mah_default">累计估算省电 ≈ 0 mAh</string>
+    <string name="sum_extra_default">最长单次 — · 共 0 次息屏</string>
+    <string name="timer_none">未设置</string>
+    <string name="recent_records">最近会话记录 · 仅保留最近30天</string>
+    <string name="pager_prev">‹ 上一页</string>
+    <string name="pager_next">下一页 ›</string>
+    <string name="pager_page">第 %1$d / %2$d 页</string>
+
+    <!-- 设置页 -->
+    <string name="settings_personal">个性化</string>
+    <string name="switch_direct">黑幕轻点直接解锁</string>
+    <string name="switch_info">黑幕显示时间与电量</string>
+    <string name="switch_media">黑幕播放控制</string>
+    <string name="switch_headset">耳机拔出自动返回视频</string>
+    <string name="bubble_style">悬浮球样式</string>
+    <string name="settings_data">数据</string>
+    <string name="row_export">导出数据备份</string>
+    <string name="row_export_sub">存到任意位置</string>
+    <string name="row_restore">从备份文件恢复</string>
+    <string name="row_restore_sub">成长值与统计</string>
+    <string name="settings_about">关于</string>
+    <string name="row_update">检查更新</string>
+    <string name="row_share">分享给朋友</string>
+    <string name="share_sub">每天一次 · +5 待收成长值</string>
+    <string name="row_about">关于息屏听剧</string>
+    <string name="row_about_sub">使用说明 / 隐私 / 开源</string>
+
+    <!-- 小部件 -->
+    <string name="widget_black">息屏</string>
+    <string name="widget_active">运行中</string>
+    <string name="widget_idle">未运行</string>
+    <string name="widget_today_fmt">今日 %1$s</string>
+    <string name="widget_pet_fmt">%1$s</string>
+    <string name="widget_growth_next">成长值 %1$d · 距下一形态 %2$d</string>
+    <string name="widget_growth_max">成长值 %1$d · 已至巅峰</string>
+    <string name="widget_total_fmt">累计 %1$s</string>
+
+    <!-- 黑幕 -->
+    <string name="black_hint">息屏听剧中 · 轻点屏幕解除锁定</string>
+    <string name="black_return">🔒 点击返回视频</string>
+
+    <!-- 通知 -->
+    <string name="channel_name">息屏听剧助手</string>
+    <string name="notif_title">息屏听剧助手运行中</string>
+    <string name="notif_text">点悬浮球黑屏听剧，声音继续%1$s</string>
+    <string name="notif_action_listen">息屏听剧</string>
+    <string name="notif_action_restore">恢复画面</string>
+    <string name="notif_action_stop">退出助手</string>
+    <string name="exit_confirm_title">退出息屏听剧？</string>
+    <string name="exit_confirm_yes">退出</string>
+    <string name="exit_notif_title">息屏听剧已退出</string>
+    <string name="exit_notif_text">点「撤销」恢复悬浮球与息屏功能</string>
+    <string name="exit_notif_undo">撤销</string>
+    <string name="notif_action_bubble_hide">隐藏悬浮球</string>
+    <string name="notif_action_bubble_show">显示悬浮球</string>
+    <string name="switch_bubble">显示悬浮球</string>
+
+    <!-- 精灵形态 -->
+    <string name="pet_spark">电火花</string>
+    <string name="pet_ball">电球</string>
+    <string name="pet_cloud">雷云精灵</string>
+    <string name="pet_storm">风暴之灵</string>
+    <string name="pet_king">雷霆之王</string>
+
+    <!-- 动态文案：助手与权限 -->
+    <string name="perm_fix_hint">请在系统页面中把「悬浮窗」开关关闭再重新打开，即可修复</string>
+    <string name="perm_need_overlay">请开启悬浮窗权限</string>
+    <string name="toast_overlay_granted">悬浮窗权限已授予</string>
+    <string name="toast_battery_ok">已在电池优化白名单中</string>
+    <string name="toast_notify_granted">通知权限已授予</string>
+    <string name="toast_assistant_stopped">助手已停止</string>
+    <string name="toast_assistant_started">助手已启动，看剧时点悬浮球即可</string>
+    <string name="toast_call">来电，黑幕已自动解除</string>
+    <string name="toast_headset">耳机已断开，已返回视频</string>
+
+    <!-- 动态文案：定时 -->
+    <string name="timer_item_episode">🎧 听完这集</string>
+    <string name="timer_15">15分钟</string>
+    <string name="timer_30">30分钟</string>
+    <string name="timer_60">60分钟</string>
+    <string name="timer_cancel">取消定时</string>
+    <string name="toast_timer_set">定时关闭：%1$d分钟后</string>
+    <string name="toast_timer_episode">本集结束后将自动关闭</string>
+    <string name="toast_timer_expired">定时已到期</string>
+    <string name="toast_timer_done">定时结束，黑幕已关闭</string>
+    <string name="toast_timer_cancelled">定时关闭已取消</string>
+    <string name="toast_episode_done">本集结束后自动息屏（约 %1$d分%2$d秒 后）</string>
+    <string name="timer_remain_fmt">剩余 %1$d 分钟</string>
+
+    <!-- 动态文案：备份恢复 -->
+    <string name="restore_title">恢复历史数据</string>
+    <string name="restore_msg">如果你之前使用过「息屏听剧」并卸载过：备份保存在下载目录的 XiTing 文件夹中（XiTing-backup.json），可在这里一键恢复成长值与统计。\n\n全新用户请点「不用了」。</string>
+    <string name="restore_pick">选择备份文件</string>
+    <string name="restore_no">不用了</string>
+    <string name="toast_invalid_backup">不是有效的备份文件</string>
+    <string name="restore_other_title">备份来自其他设备</string>
+    <string name="restore_other_msg">该备份成长值 %1$d，设备ID与本机不一致（换机，或从旧签名版本迁移）。确定恢复吗？</string>
+    <string name="restore_ok_btn">恢复</string>
+    <string name="dlg_cancel">取消</string>
+    <string name="toast_restore_done">数据已恢复 ✓（成长值 %1$d）</string>
+    <string name="toast_restore_fail">恢复失败</string>
+    <string name="toast_picker_fail">无法打开文件选择器</string>
+    <string name="toast_export_ok">已导出 ✓</string>
+    <string name="toast_export_fail">导出失败</string>
+
+    <!-- 动态文案：保活 -->
+    <string name="keepalive_dlg_title">防杀保活设置</string>
+    <string name="keepalive_msg">系统会清理后台应用导致悬浮球消失，按以下三步设置后可长期稳定：\n\n1. 电池白名单（%1$s）——点下方「去电池设置」\n\n2. 自启动：点「去应用详情」→ 耗电管理 → 允许自启动/完全后台行为\n\n3. 最近任务加锁：下拉最近任务，在息屏听剧卡片上点锁图标</string>
+    <string name="state_done">已完成 ✓</string>
+    <string name="state_todo">未完成</string>
+    <string name="keepalive_btn_battery">去电池设置</string>
+    <string name="keepalive_btn_appinfo">去应用详情</string>
+    <string name="keepalive_btn_ok">知道了</string>
+
+    <!-- 动态文案：听完这集 -->
+    <string name="locale_dlg_title">需要「通知使用权」</string>
+    <string name="locale_dlg_msg">「听完这集」需要读取正在播放的剧集进度。\n请在系统设置中允许息屏听剧的「通知使用权」（仅用于读取播放进度，不做他用）。\n\n不想授权也可以用普通倒计时。</string>
+    <string name="locale_dlg_go">去授权</string>
+    <string name="locale_dlg_fallback">用倒计时</string>
+    <string name="toast_no_progress">没读到播放进度：先播放一集再选，或改用倒计时</string>
+
+    <!-- 动态文案：成就与精灵 -->
+    <string name="ach_toast_fmt">🏆 成就解锁：%1$s %2$s</string>
+    <string name="ach_dlg_title_fmt">精灵成就 %1$d/%2$d</string>
+    <string name="dlg_ok">好的</string>
+    <string name="toast_evolve">🎉 进化！%1$s → %2$s</string>
+    <string name="toast_charge">+%1$d 成长值已收取 ✓</string>
+    <string name="pet_caption_sleepy">%1$s 打瞌睡了 · 听一集唤醒它</string>
+    <string name="pet_caption_max">%1$s · 已至巅峰 · 成长值 %2$d 继续储备</string>
+    <string name="pet_caption_progress">%1$s · 成长值 %2$d / %3$d</string>
+    <string name="ach_first_t">初次息屏</string>
+    <string name="ach_first_d">完成第一次息屏听剧</string>
+    <string name="ach_h1_t">一小时俱乐部</string>
+    <string name="ach_h1_d">累计听剧满 1 小时</string>
+    <string name="ach_h10_t">十小时之约</string>
+    <string name="ach_h10_d">累计听剧满 10 小时</string>
+    <string name="ach_h50_t">五十小时王朝</string>
+    <string name="ach_h50_d">累计听剧满 50 小时</string>
+    <string name="ach_c100_t">百次成习</string>
+    <string name="ach_c100_d">累计息屏 100 次</string>
+    <string name="ach_marathon_t">马拉松</string>
+    <string name="ach_marathon_d">单次连续听剧满 1 小时</string>
+    <string name="ach_week_t">持之以恒</string>
+    <string name="ach_week_d">累计 7 个不同日期有息屏记录</string>
+    <string name="ach_king_t">雷霆加冕</string>
+    <string name="ach_king_d">精灵进化至雷霆之王</string>
+
+    <!-- 动态文案：校准 -->
+    <string name="calib_title">省电实测</string>
+    <string name="calib_msg_calibrated">已按本机实测校准（%1$s）\n实测省电速率 ≈ %2$.0f mAh/小时</string>
+    <string name="calib_msg_uncalibrated">尚未实测校准（当前按 OLED 通用模型估算）</string>
+    <string name="calib_msg_ambient">\n\n黑屏听剧整机功耗实测 ≈ %1$.0f mA（%2$d 次采样）</string>
+    <string name="calib_msg_flow">\n\n校准流程（约 6 分钟）：\n① 亮屏播放任意视频 3 分钟\n② 应用自动进入黑屏 3 分钟\n\n请勿充电；电量保持 15%~95%。</string>
+    <string name="calib_btn_restart">重新校准</string>
+    <string name="calib_btn_start">开始校准</string>
+    <string name="calib_btn_close">关闭</string>
+    <string name="calib_step1_title">校准 1/2 · 亮屏播放</string>
+    <string name="calib_step1_init">请立即开始播放任意视频并保持亮屏…</string>
+    <string name="calib_step1_wait">请保持亮屏播放视频，不要操作手机\n剩余 %1$s（已采样 %2$d 次）</string>
+    <string name="toast_calib_too_few">有效样本不足（是否在充电？），校准已取消</string>
+    <string name="toast_calib_need_service">请先启动息屏听剧助手，再进行校准</string>
+    <string name="toast_calib_step2">校准步骤 2/2：保持黑屏 3 分钟，无需操作</string>
+    <string name="toast_calib_ok">校准完成 ✓（有效样本 %1$d）</string>
+    <string name="toast_calib_invalid">校准样本无效（是否在充电？），请重试</string>
+    <string name="toast_calib_done">校准完成：本机实测省电 ≈ %1$.0f mAh/小时</string>
+    <string name="toast_calib_timeout">校准超时，请重试</string>
+
+    <!-- 动态文案：统计与分享 -->
+    <string name="saved_basis_measured">按本机实测</string>
+    <string name="saved_basis_model">按OLED屏幕功耗估算</string>
+    <string name="sum_saved_fmt">%1$s省电 ≈ %2$d mAh（%3$s）</string>
+    <string name="fmt_sessions">%1$d 次</string>
+    <string name="sum_extra_fmt">最长单次 %1$s · 共 %2$d 次息屏</string>
+    <string name="list_empty">暂无记录——开启一次听剧后这里会出现明细</string>
+    <string name="pager_info_fmt">第 %1$d / %2$d 页 · 共 %3$d 条</string>
+    <string name="day_today">今天</string>
+    <string name="day_yesterday">昨天</string>
+    <string name="share_chooser">分享到</string>
+    <string name="share_text">⚡ 我用「息屏听剧」黑屏听了 %1$s，估算省电 %2$d mAh\n我的电能精灵已经进化到「%3$s」了\n完全免费无广告的息屏听剧神器（0.6MB 离线运行）\nhttps://github.com/ch1209498273/XiTing</string>
+    <string name="toast_share_done">分享完成 · +%1$d 待收成长值（去统计页点左侧条收取）</string>
+    <string name="toast_share_claimed">今日分享奖励已领取，明天再来（每天一次）</string>
+    <string name="share_sub_claimed">今日已领取 ✓ · 明天再来</string>
+    <string name="share_sub_avail">今天可领 +%1$d · 待收</string>
+    <string name="help_title">成长值说明</string>
+    <string name="help_msg">· 听剧每满 1 分钟获得 1 点成长值（先进入待收）\n· 每日首次分享获得 5 点成长值（先进入待收）\n· 待收上限 200 点，满后不再累积——记得先收再听\n· 待收成长值 3 天内有效，快过期的部分在条上显示为红色\n· 点击左侧条即收取，收取后计入精灵等级</string>
+
+    <!-- 动态文案：设置页 -->
+    <string name="toast_media_on">已开启：黑幕唤醒后显示 ⏮ ⏸ ⏭ 控制键</string>
+    <string name="toast_browser_fail">无法打开浏览器</string>
+    <string name="update_value_fmt">当前 v%1$s</string>
+    <string name="bubble_default">息屏（默认）</string>
+    <string name="bubble_label_off">息屏</string>
+    <string name="bubble_locked_fmt">%1$s（🔒需%2$d成长值）</string>
+    <string name="bubble_dlg_title">悬浮球样式（实时预览）</string>
+    <string name="toast_bubble_locked">「%1$s」尚未解锁 · 需 %2$d 成长值</string>
+    <string name="toast_bubble_set">悬浮球已切换为「%1$s」，看右下角</string>
+    <string name="bubble_value_default">默认</string>
+
+    <!-- 时长单位 -->
+    <string name="unit_h">时</string>
+    <string name="unit_m">分</string>
+    <string name="unit_m_full">分钟</string>
+    <string name="unit_s">秒</string>
+
+    <!-- 关于页 -->
+    <string name="about_title">关于息屏听剧</string>
+    <string name="about_section_app">关于这个App</string>
+    <string name="about_intro">看剧时想闭眼听？点一下悬浮球，屏幕全黑：背光物理关闭、触摸屏蔽，声音照常播放——任意视频App可用。\n\n可选暗色夜钟与电量显示（重锁后保持最暗亮度持续可见），内容周期性微移保护OLED屏幕；来电自动退出黑幕，不会漏接电话；支持定时关闭与「听完这集」智能定时；耳机拔出自动返回视频。\n\n黑幕唤醒后可切集：上一集 / 播放暂停 / 下一集（可在设置中开启）。\n\n电能精灵：听剧积累成长值，养成五形态精灵（电火花 → 电球 → 雷云精灵 → 风暴之灵 → 雷霆之王），可作悬浮球头像，满级后继续储备；成就系统记录你的听剧里程碑。\n\n桌面小部件：三档尺寸，精灵形象、听剧数据与一键息屏随身可见；悬浮球支持长按快速退出。\n\n数据备份：自动备份至下载目录 XiTing 文件夹（仅本机），卸载重装后可一键恢复。所有数据仅保存在本机，无网络权限。</string>
+    <string name="about_section_privacy">隐私与安全</string>
+    <string name="about_privacy">· 无 INTERNET 权限：物理上无法联网\n· 不读取任何屏幕内容\n· 所有数据仅保存在本机（已显式关闭系统云备份与换机自动迁移）\n· 备份仅在你主动点击导出时写入「下载/XiTing」目录，由你自己保管\n· 仅当你主动授予「通知使用权」后，才统计通知条数用于黑幕角标；不读取通知标题与内容，未授权则完全不启用\n· 应用内含构建标识（构建ID与渠道，仅用于盗版溯源，不含任何设备信息）\n· 无广告、无追踪、无埋点</string>
+    <string name="about_section_open">开源与联系</string>
+    <string name="about_github">GitHub：github.com/ch1209498273/XiTing\n（点按打开项目主页）</string>
+    <string name="about_feedback">问题反馈：1209498273@qq.com</string>
+    <string name="about_section_license">许可</string>
+    <string name="about_license">非商业许可（详见LICENSE）：个人学习交流可自由使用与分享（需保留署名）；任何商业用途均被禁止；禁止移除或篡改署名与溯源标识。\n\n本项目与 YouTube、Google 及任何视频平台无关联。仅供学习交流，请支持正版。</string>
+    <string name="about_version_fmt">版本 %1$s · 构建ID %2$s</string>
+
+    <!-- v3.5 精灵图鉴与streak -->
+    <string name="gallery_btn">🎨 图鉴</string>
+    <string name="gallery_title">精灵图鉴</string>
+    <string name="streak_fmt">🔥 连续听剧 %1$d 天</string>
+    <string name="streak_best_fmt">最长 %1$d 天</string>
+    <string name="toast_rare_energy">⚡ 稀有雷暴能量 +%1$d！</string>
+    <string name="toast_skin_unlock">🎨 新皮肤解锁：%1$s</string>
+    <string name="toast_skin_worn">已换上「%1$s」</string>
+    <string name="gallery_wear">穿戴</string>
+    <string name="gallery_worn">使用中</string>
+    <string name="skin_default_n">经典配色</string>
+    <string name="skin_cond_default">默认形态</string>
+    <string name="skin_star_n">星夜之魂</string>
+    <string name="skin_cond_star">累计听剧 10 小时</string>
+    <string name="skin_aurora_n">极光之灵</string>
+    <string name="skin_cond_aurora">累计听剧 50 小时</string>
+    <string name="skin_sakura_n">樱雨精灵</string>
+    <string name="skin_cond_sakura">连续听剧 7 天</string>
+    <string name="skin_magma_n">熔岩暴君</string>
+    <string name="skin_cond_magma">累计省电 5000 mAh</string>
+    <string name="skin_jade_n">翡翠雷公</string>
+    <string name="skin_cond_jade">连续听剧 30 天</string>
+</resources>

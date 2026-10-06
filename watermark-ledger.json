@@ -1,0 +1,58 @@
+{
+  "note": "构建流水：trace_id → 分发渠道/对象，收到盗版包用 tools/trace.py 比对",
+  "ledger_status": "⚠ 本台账已滞后。当前应用版本 v3.5.0，但台账仅登记到 v2.3.0；v3.2.0 起的构建均未登记，LICENSE 所依赖的溯源链路存在缺口。补登时每个版本需要三个字段：build_id、sha256（对该版本 APK 求值）、target（分发渠道与对象）。这些信息无法从代码或构建产物自动推断（每次构建的 build_id 由 gradle 随机生成，仅存在于已发布 APK 内），必须由发布人在分发当时记录，故此处不代填。发布流程建议：在每次分发前执行 tools/trace.py 从 APK 内读出 build_id/dist/时间戳并回填本台账。",
+  "builds": [
+    {
+      "app": "XiTing",
+      "version": "2.1.1",
+      "dist": "public-github",
+      "build_id": "52e9c104",
+      "time": "2026-09-28 00:55:20",
+      "author": "ch1209498273",
+      "contact": "1209498273@qq.com",
+      "repo": "https://github.com/ch1209498273/XiTing",
+      "license": "non-commercial",
+      "sha256": "8d32848f5686946bdd263fabb953cfd3051d34cead0375170fa0cc863c555eef",
+      "target": "GitHub Releases v2.1.1（公开渠道）"
+    },
+    {
+      "app": "XiTing",
+      "version": "2.2.0",
+      "dist": "public-github",
+      "build_id": "d1daa7cf",
+      "time": "2026-09-28 01:09:19",
+      "author": "ch1209498273",
+      "contact": "1209498273@qq.com",
+      "repo": "https://github.com/ch1209498273/XiTing",
+      "license": "non-commercial",
+      "sha256": "c55d2731e439e6da94431be11476e22689ce1ffa08efa499e51db7a6524488e1",
+      "target": "GitHub Releases v2.2.0（公开渠道）"
+    },
+    {
+      "app": "XiTing",
+      "version": "2.2.1",
+      "dist": "public-github",
+      "build_id": "d5ea855c",
+      "time": "2026-09-28 02:03:35",
+      "author": "ch1209498273",
+      "contact": "1209498273@qq.com",
+      "repo": "https://github.com/ch1209498273/XiTing",
+      "license": "non-commercial",
+      "sha256": "973c7ac886aa9d64cedb6f72a788c17269cb94ffe078da149d2952c6310a550a",
+      "target": "GitHub Releases v2.2.1（公开渠道）"
+    },
+    {
+      "app": "XiTing",
+      "version": "2.3.0",
+      "dist": "public-github",
+      "build_id": "bad3eb5d",
+      "time": "2026-09-28 02:21:47",
+      "author": "ch1209498273",
+      "contact": "1209498273@qq.com",
+      "repo": "https://github.com/ch1209498273/XiTing",
+      "license": "non-commercial",
+      "sha256": "8813270bdc3fb8d602cc3fcd85568ea58424a368ed7ce43348fb37e1dd16ea63",
+      "target": "GitHub Releases v2.3.0（公开渠道）"
+    }
+  ]
+}

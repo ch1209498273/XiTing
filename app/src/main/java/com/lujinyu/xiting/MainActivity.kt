@@ -270,11 +270,21 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         Thread({ BackupManager.save(applicationContext) }, "XiTing-backup").start()
     }
 
-    /** 重装恢复引导：本地为空时提示可从下载目录恢复历史数据（SAF 文件选择器） */
-    private fun checkRestore() {
+    /**
+ * 重装恢复引导：**仅当本地无数据、且下载目录确有本机备份时**才提示。
+ *
+ * 原先只判 localGp==0 就弹窗，于是全新用户首次启动也会看到
+ * 「你以前用过息屏听剧吗」的恢复引导——而他根本没有备份可恢复。
+ * findBackup() 早就是为此写好的（查 Download/XiTing 并校验 ANDROID_ID），
+ * 但一直没被调用，这里接通。
+ *
+ * findBackup 已在内部按设备过滤：非本机备份返回 null，同样不弹。
+ * 它只在启动时跑一次（save() 是每次 onStop 都跑，所以那个才需要挪出主线程）。
+ */
+private fun checkRestore() {
         if (isFinishing) return
-        val localGp = EnergyStore.collectedTotal(this)
-        if (localGp > 0) return
+        if (EnergyStore.collectedTotal(this) > 0) return
+        if (BackupManager.findBackup(this) == null) return
         android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.restore_title))
             .setMessage(

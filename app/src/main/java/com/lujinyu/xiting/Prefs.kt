@@ -21,9 +21,6 @@ object Prefs {
     /** 主设置文件（几乎所有设置与养成数据） */
     const val FILE = "xiiting_prefs"
 
-    /** 累计听剧时长统计文件，与 FILE 分开存放 */
-    const val FILE_STATS = "xiiting_stats"
-
     // ---- 助手生命周期 ----
     /** 用户是否希望助手运行：区分「系统杀了」与「用户主动退出」 */
     const val ASSISTANT_WANTED = "assistant_wanted"
@@ -78,16 +75,8 @@ object Prefs {
     const val CALIB_ON_UA = "calib_on_ua"
     const val CALIB_OFF_UA = "calib_off_ua"
     const val CALIB_TS = "calib_ts"
-
-    // ---- FILE_STATS ----
-    const val STATS_TOTAL_MS = "total_ms"
-    const val STATS_COUNT = "count"
 }
 
 /** 主 prefs。此前 `getSharedPreferences("xiiting_prefs", MODE_PRIVATE)` 在 MainActivity 内就重复 11 次。 */
 fun Context.prefs(): SharedPreferences =
     getSharedPreferences(Prefs.FILE, Context.MODE_PRIVATE)
-
-/** 累计时长统计 prefs，与主设置分开存放 */
-fun Context.prefsStats(): SharedPreferences =
-    getSharedPreferences(Prefs.FILE_STATS, Context.MODE_PRIVATE)

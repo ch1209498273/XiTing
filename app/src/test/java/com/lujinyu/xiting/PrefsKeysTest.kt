@@ -16,7 +16,6 @@ class PrefsKeysTest {
     @Test
     fun `文件名与历史一致`() {
         assertEquals("xiiting_prefs", Prefs.FILE)
-        assertEquals("xiiting_stats", Prefs.FILE_STATS)
     }
 
     @Test
@@ -69,12 +68,6 @@ class PrefsKeysTest {
         assertEquals("calib_on_ua", Prefs.CALIB_ON_UA)
         assertEquals("calib_off_ua", Prefs.CALIB_OFF_UA)
         assertEquals("calib_ts", Prefs.CALIB_TS)
-    }
-
-    @Test
-    fun `统计文件键名不变`() {
-        assertEquals("total_ms", Prefs.STATS_TOTAL_MS)
-        assertEquals("count", Prefs.STATS_COUNT)
     }
 
     @Test

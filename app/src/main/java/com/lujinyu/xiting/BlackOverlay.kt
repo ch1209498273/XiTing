@@ -379,7 +379,6 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             // 只有设备中途重启（elapsed回绕为负）才退回墙钟差。
             val elapsed = SystemClock.elapsedRealtime() - sessionStartElapsed
             val dur = if (elapsed >= 0) elapsed else now - sessionStart
-            Stats.addDelta(context, dur)
             SessionLog.add(context, ListenSession(sessionStart, now, dur, SessionLog.MODE_BLACK))
             // 稀有能量掉落：≥5 分钟的会话 10% 概率刷出雷暴能量（每日一次），惊喜钩子
             try {

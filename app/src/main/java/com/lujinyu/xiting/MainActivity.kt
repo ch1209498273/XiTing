@@ -533,27 +533,126 @@ private fun checkRestore() {
 
     private val calibHandler = Handler(Looper.getMainLooper())
 
-    /** 皮肤图鉴弹窗：6 款皮肤，已解锁可穿戴 */
-    private fun showSkinGallery() {
-        val totalMs = SessionLog.sessions(this).sumOf { it.durationMs }
-        val streakInfo = Streaks.compute(SessionLog.sessions(this))
+    /** 换肤选择器弹窗：点选某款皮肤后需要主动关闭自己 */
+    private var dlg: android.app.AlertDialog? = null
+
+    /**
+ * 精灵图鉴：可视化换肤选择器。
+ *
+ * 此前这里是个纯文本 AlertDialog，只有「好的」一个按钮 —— 也就是**只能看不能换**，
+ * KDoc 写的「已解锁可穿戴」名不副实；PetSkins.wear() 的唯一调用点是调试广播，
+ * 正式版里根本走不到，pet_skin 键只写不进。
+ *
+ * 现在每行渲染真实精灵缩略图（PetSkins.snapshot，小部件已在用），
+ * 点击已解锁的即换上并同步刷新精灵 / 悬浮球 / 小组件；未解锁的置灰并提示条件。
+ */
+private fun showSkinGallery() {
+        val sessions = SessionLog.sessions(this)
+        val totalMs = sessions.sumOf { it.durationMs }
+        val maxSingleMs = sessions.maxOfOrNull { it.durationMs } ?: 0L
+        val streakDays = Streaks.compute(sessions).current
         val mah = Stats.estimatedMah(totalMs)
-        val active = PetSkins.active(this)
-        val msg = PetSkins.ALL.joinToString("\n\n") { s ->
-            val unlocked = PetSkins.isUnlocked(this, s, totalMs, streakInfo.current, mah)
-            val wearing = s.id == active.id
-            val prefix = when {
-                wearing -> "⭐ "
-                unlocked -> "✅ "
-                else -> "🔒 "
-            }
-            prefix + PetSkins.name(this, s) + " · " + PetSkins.cond(this, s)
+        val gp = EnergyStore.collectedTotal(this).toLong()
+        val progress = PetSkins.SkinProgress(totalMs, maxSingleMs, streakDays, mah, gp)
+
+        // 先评估一次，保证刚达成的皮肤立刻出现在「已解锁」里
+        val fresh = PetSkins.evaluate(this, progress)
+        fresh.forEach {
+            Toast.makeText(this, getString(R.string.toast_skin_unlock, PetSkins.name(this, it)),
+                Toast.LENGTH_SHORT).show()
         }
-        android.app.AlertDialog.Builder(this)
+        val unlockedIds = PetSkins.unlockedIds(this)
+        val active = PetSkins.active(this)
+        val stage = PetView.stageOf(gp)
+
+        val view = layoutInflater.inflate(R.layout.dialog_skin_picker, null)
+        val list = view.findViewById<LinearLayout>(R.id.skin_list)
+        val d = resources.displayMetrics.density
+        val thumbPx = (56 * d).toInt()
+
+        PetSkins.ALL.forEach { skin ->
+            val unlocked = skin.id in unlockedIds
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                val pad = (10 * d).toInt()
+                setPadding(pad, pad, pad, pad)
+                background = if (skin.id == active.id) {
+                    android.graphics.drawable.GradientDrawable().apply {
+                        cornerRadius = 14 * d
+                        setColor(0x1420B26B)
+                        setStroke((1 * d).toInt().coerceAtLeast(1), 0xFF20B26B.toInt())
+                    }
+                } else {
+                    android.graphics.drawable.GradientDrawable().apply {
+                        cornerRadius = 14 * d
+                        setColor(0x0A000000)
+                    }
+                }
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { bottomMargin = (6 * d).toInt() }
+            }
+
+            val img = android.widget.ImageView(this).apply {
+                setImageBitmap(PetSkins.snapshot(this@MainActivity, stage, skin.hue, thumbPx, withBar = false, pct = 0))
+                alpha = if (unlocked) 1f else 0.3f
+                layoutParams = LinearLayout.LayoutParams(thumbPx, thumbPx)
+            }
+            row.addView(img)
+
+            val texts = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    marginStart = (14 * d).toInt()
+                }
+            }
+            texts.addView(TextView(this).apply {
+                text = if (skin.id == active.id) "⭐ ${PetSkins.name(this@MainActivity, skin)}"
+                       else PetSkins.name(this@MainActivity, skin)
+                textSize = 16f
+                setTextColor(0xFF1E8E5A.toInt())
+                alpha = if (unlocked) 1f else 0.55f
+            })
+            texts.addView(TextView(this).apply {
+                text = PetSkins.cond(this@MainActivity, skin)
+                textSize = 13f
+                setTextColor(0xFF6B7280.toInt())
+                alpha = if (unlocked) 1f else 0.55f
+            })
+            row.addView(texts)
+
+            row.setOnClickListener {
+                if (!unlocked) {
+                    Toast.makeText(this,
+                        getString(R.string.gallery_locked, PetSkins.name(this, skin), PetSkins.cond(this, skin)),
+                        Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                PetSkins.wear(this, skin)
+                Toast.makeText(this, getString(R.string.gallery_worn, PetSkins.name(this, skin)),
+                    Toast.LENGTH_SHORT).show()
+                applySkinEverywhere()
+                dlg?.dismiss()
+            }
+            list.addView(row)
+        }
+
+        dlg = android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.gallery_title))
-            .setMessage(msg)
+            .setMessage(getString(R.string.gallery_hint))
+            .setView(view)
             .setPositiveButton(getString(R.string.dlg_ok), null)
-            .show()
+            .create()
+        dlg?.show()
+    }
+
+    /** 换肤后同步：主页精灵 / 悬浮球 / 三档小组件 */
+    private fun applySkinEverywhere() {
+        renderStats()
+        OverlayService.instance?.rebuildBubble()
+        WidgetData.refreshAll(this)
     }
 
     private fun onMahCardClick() {
@@ -934,7 +1033,14 @@ private fun checkRestore() {
         val activeSkin = PetSkins.active(this)
         petView.skinHue = activeSkin.hue
         val mahSaved = Stats.estimatedMah(allMs)
-        val freshSkins = PetSkins.evaluate(this, allMs, streakInfo.current, mahSaved)
+        val skinProgress = PetSkins.SkinProgress(
+            totalMs = allMs,
+            maxSingleMs = sessions.maxOfOrNull { it.durationMs } ?: 0L,
+            streakDays = streakInfo.current,
+            mah = mahSaved,
+            gp = gpNow.toLong()
+        )
+        val freshSkins = PetSkins.evaluate(this, skinProgress)
         freshSkins.take(2).forEach {
             Toast.makeText(this, getString(R.string.toast_skin_unlock, PetSkins.name(this, it)), Toast.LENGTH_LONG).show()
         }

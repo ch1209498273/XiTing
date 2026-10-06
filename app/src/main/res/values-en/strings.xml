@@ -264,13 +264,16 @@
     <string name="skin_default_n">Classic</string>
     <string name="skin_cond_default">Default look</string>
     <string name="skin_star_n">Starlight</string>
-    <string name="skin_cond_star">10h total listening</string>
+    <string name="skin_cond_star">1000 mAh saved</string>
     <string name="skin_aurora_n">Aurora</string>
-    <string name="skin_cond_aurora">50h total listening</string>
+    <string name="skin_cond_aurora">2h in one listening session</string>
     <string name="skin_sakura_n">Sakura</string>
-    <string name="skin_cond_sakura">7-day streak</string>
+    <string name="skin_cond_sakura">14-day streak</string>
     <string name="skin_magma_n">Magma</string>
-    <string name="skin_cond_magma">5000 mAh saved</string>
+    <string name="skin_cond_magma">Bank 2000 more growth after max stage</string>
     <string name="skin_jade_n">Jade</string>
-    <string name="skin_cond_jade">30-day streak</string>
+    <string name="skin_cond_jade">60-day streak</string>
+    <string name="gallery_hint">Tap an unlocked skin to wear it</string>
+    <string name="gallery_locked">🔒 %1$s (%2$s)</string>
+    <string name="gallery_worn">Now wearing \"%1$s\"</string>
 </resources>

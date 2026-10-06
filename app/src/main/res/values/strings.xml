@@ -264,13 +264,16 @@
     <string name="skin_default_n">经典配色</string>
     <string name="skin_cond_default">默认形态</string>
     <string name="skin_star_n">星夜之魂</string>
-    <string name="skin_cond_star">累计听剧 10 小时</string>
+    <string name="skin_cond_star">累计省电 1000 mAh</string>
     <string name="skin_aurora_n">极光之灵</string>
-    <string name="skin_cond_aurora">累计听剧 50 小时</string>
+    <string name="skin_cond_aurora">单次连续听剧 2 小时</string>
     <string name="skin_sakura_n">樱雨精灵</string>
-    <string name="skin_cond_sakura">连续听剧 7 天</string>
+    <string name="skin_cond_sakura">连续听剧 14 天</string>
     <string name="skin_magma_n">熔岩暴君</string>
-    <string name="skin_cond_magma">累计省电 5000 mAh</string>
+    <string name="skin_cond_magma">满级后再积累 2000 成长值</string>
     <string name="skin_jade_n">翡翠雷公</string>
-    <string name="skin_cond_jade">连续听剧 30 天</string>
+    <string name="skin_cond_jade">连续听剧 60 天</string>
+    <string name="gallery_hint">点已解锁的皮肤即可换上</string>
+    <string name="gallery_locked">🔒 %1$s（%2$s）</string>
+    <string name="gallery_worn">已换上「%1$s」</string>
 </resources>

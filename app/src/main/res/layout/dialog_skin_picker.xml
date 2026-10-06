@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  精灵图鉴（换肤选择器）：每行一款皮肤，左边真实渲染的精灵缩略图，
+  右边名称 + 解锁条件。已解锁可点选换上，未解锁置灰并提示条件。
+  行由 MainActivity.showSkinGallery() 按 PetSkins.ALL 动态填充。
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:id="@+id/skin_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+</ScrollView>

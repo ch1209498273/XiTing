@@ -9,12 +9,39 @@ import android.graphics.Paint
 import android.view.View
 
 /**
- * 精灵皮肤（图鉴收集）：同一套 Canvas 绘制按色相旋转换装。
- * 解锁条件基于累计听剧/连续天数/累计省电，全部离线。
+ * 皮肤（图鉴收集）：同一套 Canvas 绘制按色相旋转换装。
+ *
+ * 解锁维度与成就系统**刻意不重叠**：成就已占用「累计时长 1/10/50 小时、
+ * 会话 100 次、单次 1 小时、连续 7 天、满级」，皮肤改用省电量、单次更长时长、
+ * 更长连续天数、以及满级后继续储备的成长值。此前皮肤条件是
+ * 10h / 50h / 7 天，与 h10 / h50 / week 三个成就同一时刻点亮 ——
+ * 同一个里程碑拿两次奖励，用户没有任何额外获得感。
+ *
+ * 全部离线，不涉及网络。
  */
 object PetSkins {
 
     data class Skin(val id: String, val hue: Float, val nameRes: Int, val condRes: Int)
+
+    /**
+     * 换肤解锁所需的统计快照。
+     *
+     * 用具名字段而不是一串位置参数：五个同型参数（三个 Long、两个 Int）迟早会被
+     * 调用方传错顺序，而传错顺序不会编译失败，只会安静地给出错误的解锁判定。
+     */
+    data class SkinProgress(
+        val totalMs: Long,
+        val maxSingleMs: Long,
+        val streakDays: Int,
+        val mah: Int,
+        val gp: Long
+    )
+
+    /** 满级形态在 THRESHOLDS 中的门槛，用于「满级后储备」类条件 */
+    private val KING_AT = PetView.THRESHOLDS[PetView.STAGE_KING]
+
+    /** 满级后需额外储备的成长值（承接「已至巅峰·继续储备」设定） */
+    private const val KING_RESERVE = 2000L
 
     val ALL = listOf(
         Skin("default", 0f, R.string.skin_default_n, R.string.skin_cond_default),
@@ -33,14 +60,21 @@ object PetSkins {
         return (p.getStringSet(Prefs.SKINS_UNLOCKED, setOf("default")) ?: setOf("default")).toMutableSet()
     }
 
-    fun isUnlocked(ctx: Context, s: Skin, totalMs: Long, streakDays: Int, mah: Int): Boolean = when (s.id) {
+    /**
+     * 各皮肤的解锁判定。
+     *
+     * 与成就零重叠：省电量、单次 2 小时、连续 14/60 天、满级后储备 2000 成长值。
+     * 已解锁过的皮肤一律保持解锁（`else -> id in unlocked`），避免条件调低后
+     * 老用户反而掉解锁。
+     */
+    fun isUnlocked(s: Skin, p: SkinProgress): Boolean = when (s.id) {
         "default" -> true
-        "star" -> totalMs >= 36_000_000L
-        "aurora" -> totalMs >= 180_000_000L
-        "sakura" -> streakDays >= 7
-        "magma" -> mah >= 5000
-        "jade" -> streakDays >= 30
-        else -> s.id in unlocked(ctx)
+        "star" -> p.mah >= 1000
+        "aurora" -> p.maxSingleMs >= 2 * 3600_000L
+        "sakura" -> p.streakDays >= 14
+        "magma" -> p.gp >= KING_AT + KING_RESERVE
+        "jade" -> p.streakDays >= 60
+        else -> false
     }
 
     /** 调试用：一键全解锁（仅通过 adb 广播触发，普通用户不可达） */
@@ -52,9 +86,10 @@ object PetSkins {
     }
 
     /** 条件评估并持久化，返回本次新解锁（可能为空） */
-    fun evaluate(ctx: Context, totalMs: Long, streakDays: Int, mah: Int): List<Skin> {
+    fun evaluate(ctx: Context, p: SkinProgress): List<Skin> {
         val got = unlocked(ctx)
-        val fresh = ALL.filter { it.id !in got && isUnlocked(ctx, it, totalMs, streakDays, mah) }
+        // 条件已满足或历史已解锁的都要计入，否则调低条件后老用户会掉解锁
+        val fresh = ALL.filter { it.id !in got && isUnlocked(it, p) }
         if (fresh.isNotEmpty()) {
             got.addAll(fresh.map { it.id })
             ctx.prefs()
@@ -62,6 +97,9 @@ object PetSkins {
         }
         return fresh
     }
+
+    /** 已解锁集合（图鉴用：置灰未解锁项） */
+    fun unlockedIds(ctx: Context): Set<String> = unlocked(ctx).toSet()
 
     /** 当前穿戴的皮肤（默认=经典） */
     fun active(ctx: Context): Skin {

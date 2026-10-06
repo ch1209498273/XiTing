@@ -36,6 +36,9 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
 
         val THRESHOLDS = longArrayOf(0, 30, 300, 1500, 6000)
 
+        /** 新点亮徽章的脉冲高亮时长（ms） */
+        private const val BADGE_GLOW_MS = 1400L
+
         fun stageOf(gp: Long): Int = when {
             gp >= THRESHOLDS[4] -> STAGE_KING
             gp >= THRESHOLDS[3] -> STAGE_STORM
@@ -62,6 +65,33 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     var pending: List<PendingEnergy> = emptyList()   // 待收集能量球
     var onCollectAll: (() -> Unit)? = null           // 收集全部回调（延迟到飞入动画后）
     var onHelp: (() -> Unit)? = null                 // ? 说明图标点击回调
+
+    /**
+     * 成就徽章列（自下而上，难度递进）。空列表 = 不显示。
+     *
+     * 这里刻意不让 PetView 自己按「下标 = 第几格」去推断徽章种类 —— 那样徽章顺序
+     * 就会同时存在于 Achievements.ALL 和本文件里，加一条成就漏改一处就是错位。
+     * 改成由调用方直接给 [Badges.Badge] 列表，本类只负责画。
+     *
+     * setter 顺手记下「本次新点亮的最靠上那一格」，给它一段脉冲高亮。
+     */
+    var badges: List<Badges.Badge> = emptyList()
+        set(value) {
+            if (field == value) return
+            // 只对「本次新点亮」记高亮；已点亮的重复赋值（每次 refreshPetPanel 都会调）不该闪
+            val prev = field.map { it.kind to it.unlocked }.toSet()
+            var newly = -1
+            value.forEachIndexed { i, b -> if (b.unlocked && (b.kind to true) !in prev) newly = i }
+            field = value
+            if (newly >= 0) {
+                badgeGlowIndex = newly
+                badgeGlowAt = System.currentTimeMillis()
+            }
+            invalidate()
+        }
+
+    private var badgeGlowIndex = -1
+    private var badgeGlowAt = 0L
 
     // 收集动画内部状态
     private data class FlyBall(val value: Int, val sx: Float, val sy: Float, val startAt: Long)
@@ -170,6 +200,26 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private fun helpCenter(): Pair<Float, Float> {
         val bar = energyBar()
         return Pair(bar.centerX(), bar.bottom + 46f)
+    }
+
+    /**
+     * 徽章列几何：能量条右侧、纵向与能量条居中对齐。
+     *
+     * **为什么不是叠在 ? 按钮上方**：PetView 高 180dp，能量条独占 [0.25h, 0.75h]，
+     * 其上方只剩 0.25h —— 4 枚徽章均分的话直径上限仅 11dp，手绘皇冠在里面会糊成
+     * 一坨色块。挪到能量条右侧后那段（到精灵身体之间约 250px）本来就是空的，
+     * 徽章直径能到 15dp，与 ? 按钮同量级，图形才认得出。
+     *
+     * **徽章不可点**：这一列完整落在能量条的既有点击区里，若再挂点击命中，
+     * 「点徽章看成就」就会变成「误触发收取全部能量」。所以点击语义保持不变。
+     */
+    private fun badgeColumn(): Triple<Float, Float, Float> {
+        val h = height.toFloat()
+        val bar = energyBar()
+        val r = h * Badges.RADIUS_RATIO
+        val gap = h * Badges.GAP_RATIO
+        val x = bar.right + gap + r          // 圆心 = 条右缘 + 间隙 + 半径，保证不压到条
+        return Triple(x, bar.centerY(), r)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -478,6 +528,21 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             canvas.drawText("?", hx, hy + 10f, popPaint)
             popPaint.color = 0xFF1E8E5A.toInt()
 
+            // 成就徽章列（能量条右侧，第 1 格最下）
+            if (badges.isNotEmpty()) {
+                val (bx, by, br) = badgeColumn()
+                val ys = Badges.columnCenters(
+                    badges.size, by, br, height * Badges.GAP_RATIO
+                )
+                badges.forEachIndexed { i, b ->
+                    val glow = if (i == badgeGlowIndex && badgeGlowAt > 0L) {
+                        val dt = now - badgeGlowAt
+                        if (dt in 0 until BADGE_GLOW_MS) 1f - dt / BADGE_GLOW_MS.toFloat() else 0f
+                    } else 0f
+                    Badges.draw(canvas, bx, ys[i], br, b.kind, b.unlocked, glow)
+                }
+            }
+
             // 飞入动画：从能量条飞向精灵中心
             flyBalls.removeAll { now - it.startAt > 320 }
             flyBalls.forEach { fb ->
@@ -773,24 +838,13 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         drawFace(canvas, cx, cy - r * 0.1f, r * 0.15f, blinking, fierce = true)
     }
 
-    // ─────────────────── 金冠 ───────────────────
+    // ─────────────────── 金冠（路径与皇冠徽章共用，见 Badges.crownPath） ───────────────────
     private fun drawCrown(canvas: Canvas, cx: Float, topY: Float, w: Float) {
-        val h = w * 0.85f
-        val p = Path()
-        p.moveTo(cx - w / 2, topY + h)
-        p.lineTo(cx - w / 2, topY + h * 0.4f)
-        p.lineTo(cx - w * 0.3f, topY + h * 0.72f)
-        p.lineTo(cx - w * 0.16f, topY)
-        p.lineTo(cx, topY + h * 0.5f)
-        p.lineTo(cx + w * 0.16f, topY)
-        p.lineTo(cx + w * 0.3f, topY + h * 0.72f)
-        p.lineTo(cx + w / 2, topY + h * 0.4f)
-        p.lineTo(cx + w / 2, topY + h)
-        p.close()
         val gold = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFC94D.toInt() }
-        canvas.drawPath(p, gold)
+        canvas.drawPath(Badges.crownPath(cx, topY + w * 0.85f / 2f, w), gold)
         // 冠底宝石
         val jewel = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFE53935.toInt() }
+        val h = w * 0.85f
         canvas.drawCircle(cx, topY + h * 0.62f, w * 0.09f, jewel)
         jewel.color = 0xFF42A5F5.toInt()
         canvas.drawCircle(cx - w * 0.28f, topY + h * 0.78f, w * 0.06f, jewel)

@@ -16,14 +16,28 @@ import android.content.Context
  */
 object Achievements {
 
-    data class A(val id: String, val icon: String, val titleRes: Int, val descRes: Int)
-
-    val ALL = listOf(
-        A("marathon", "🏃", R.string.ach_marathon_t, R.string.ach_marathon_d),
-        A("week", "📅", R.string.ach_week_t, R.string.ach_week_d),
-        A("c100", "🎧", R.string.ach_c100_t, R.string.ach_c100_d),
-        A("king", "⚡", R.string.ach_king_t, R.string.ach_king_d)
+    data class A(
+        val id: String,
+        val icon: String,
+        val titleRes: Int,
+        val descRes: Int,
+        /** 精灵左侧点亮的那枚徽章；[icon] 仍用于 toast 文本 */
+        val badge: Badges.Kind
     )
+
+    /**
+     * 顺序即徽章格位顺序：**第 1 项在最下、难度最低**，往上依次递进。
+     * 改这个列表的顺序会同时改掉徽章列的排列和成就弹窗的排列，两处永远一致。
+     */
+    val ALL = listOf(
+        A("marathon", "🏃", R.string.ach_marathon_t, R.string.ach_marathon_d, Badges.Kind.HOURGLASS),
+        A("week", "📅", R.string.ach_week_t, R.string.ach_week_d, Badges.Kind.FLAME),
+        A("c100", "🎧", R.string.ach_c100_t, R.string.ach_c100_d, Badges.Kind.TARGET),
+        A("king", "⚡", R.string.ach_king_t, R.string.ach_king_d, Badges.Kind.CROWN)
+    )
+
+    /** 精灵徽章列的当前状态（按 [ALL] 顺序） */
+    fun badgeStates(ctx: Context): List<Badges.Badge> = badgeList(unlocked(ctx))
 
     fun title(ctx: Context, a: A): String = ctx.getString(a.titleRes)
     fun desc(ctx: Context, a: A): String = ctx.getString(a.descRes)
@@ -62,6 +76,15 @@ object Achievements {
         return known.size to sub
     }
 }
+
+/**
+ * 徽章列状态映射（纯函数，可单测）。
+ *
+ * 与 [knownUnlocked] 同一套防御：传进来的残留 id 只会让对应格子保持未点亮，
+ * 不会平白多出一枚徽章，也不会让格数超过 [Achievements.ALL] 的大小。
+ */
+internal fun badgeList(got: Set<String>): List<Badges.Badge> =
+    Achievements.ALL.map { Badges.Badge(it.badge, it.id in got) }
 
 /**
  * 已知成就与已解锁集合的交集（纯函数，可单测）。

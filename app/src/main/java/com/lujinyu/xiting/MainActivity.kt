@@ -514,7 +514,12 @@ private fun checkRestore() {
         Toast.makeText(this, getString(R.string.toast_episode_done, mins, secs), Toast.LENGTH_LONG).show()
     }
 
-    /** 成就明细弹窗 */
+    /**
+     * 成就明细弹窗：每条一枚手绘徽章（已点亮金色实心 / 未解锁暗色轮廓）。
+     *
+     * 原来是纯文本的 ✅/🔒 列表，解锁之后什么都不给 —— 用户评价「没啥意思」。
+     * 现在徽章直接挂在精灵左侧身上，弹窗是它的明细视图。
+     */
     private fun showAchievements() {
         val raw = prefs()
             .getStringSet(Prefs.ACH_UNLOCKED, emptySet()) ?: emptySet()
@@ -522,13 +527,53 @@ private fun checkRestore() {
         // 老用户 prefs 里还留着已砍掉的 first/h1/h10/h50，直接取大小会显示「6/4」。
         val known = knownUnlocked(raw)
         val gotIds = known.map { it.id }.toSet()
-        val msg = Achievements.ALL.joinToString("\n\n") { a ->
-            (if (a.id in gotIds) "✅ " else "🔒 ") + a.icon + " " +
-                    Achievements.title(this, a) + " · " + Achievements.desc(this, a)
+
+        val view = layoutInflater.inflate(R.layout.dialog_achievements, null)
+        view.findViewById<TextView>(R.id.ach_dlg_title).text =
+            getString(R.string.ach_dlg_title_fmt, known.size, Achievements.ALL.size)
+        val rows = view.findViewById<LinearLayout>(R.id.ach_rows)
+        val d = resources.displayMetrics.density
+
+        for (a in Achievements.ALL) {
+            val got = a.id in gotIds
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(0, (10 * d).toInt(), 0, (10 * d).toInt())
+            }
+            row.addView(BadgeView(this).apply {
+                val s = (40 * d).toInt()
+                layoutParams = LinearLayout.LayoutParams(s, s)
+                bind(a.badge, got)
+            })
+            val textCol = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    marginStart = (14 * d).toInt()
+                }
+            }
+            textCol.addView(TextView(this).apply {
+                text = Achievements.title(this@MainActivity, a)
+                setTextColor(if (got) 0xFF111418.toInt() else 0xFF8A9099.toInt())
+                textSize = 15f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            })
+            textCol.addView(TextView(this).apply {
+                text = Achievements.desc(this@MainActivity, a)
+                setTextColor(0xFF8A9099.toInt())
+                textSize = 12f
+            })
+            textCol.addView(TextView(this).apply {
+                text = getString(if (got) R.string.ach_row_unlocked else R.string.ach_row_locked)
+                setTextColor(if (got) 0xFF1E8E5A.toInt() else 0xFFB0B5BD.toInt())
+                textSize = 11f
+            })
+            row.addView(textCol)
+            rows.addView(row)
         }
+
         android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.ach_dlg_title_fmt, known.size, Achievements.ALL.size))
-            .setMessage(msg)
+            .setView(view)
             .setPositiveButton(getString(R.string.dlg_ok), null)
             .show()
     }
@@ -915,6 +960,8 @@ private fun showSkinGallery() {
         // 显示哪个形态由 PetForm 统一决定（成长值只决定能选到哪一形态）
         pet.stage = showStage
         pet.hideProgress = false
+        // 成就徽章列（自下而上，与能量条并列）
+        pet.badges = Achievements.badgeStates(this)
         // 成长值装载与收取回调（点击左侧条=收取全部；回调在飞入动画完成后触发）
         pet.pending = EnergyStore.pending(this)
         pet.onCollectAll = {

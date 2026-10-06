@@ -61,4 +61,34 @@ class AchievementsTest {
         val all = Achievements.ALL.map { it.id }.toSet()
         assertEquals(Achievements.ALL.size, knownUnlocked(all).size)
     }
+
+    // ───────── 徽章化：徽章格位与 ALL 严格一一对应 ─────────
+
+    @Test
+    fun `每条成就都有徽章且四枚互不重复`() {
+        val badges = Achievements.ALL.map { it.badge }
+        assertEquals("每条成就必须配一枚徽章", Achievements.ALL.size, badges.size)
+        assertEquals("四枚徽章不能撞车，否则精灵身上会出现两个一样的图案", badges.size, badges.toSet().size)
+    }
+
+    @Test
+    fun `badgeList 顺序与 ALL 一致`() {
+        val list = badgeList(emptySet())
+        assertEquals(Achievements.ALL.size, list.size)
+        list.forEachIndexed { i, b -> assertEquals(Achievements.ALL[i].badge, b.kind) }
+    }
+
+    @Test
+    fun `badgeList 按 id 点亮，不受残留 id 影响`() {
+        val list = badgeList(setOf("marathon", "legacy_removed_a", "h50"))
+        // 格子顺序固定为 marathon/week/c100/king → 只有第 1 格亮
+        assertEquals(listOf(true, false, false, false), list.map { it.unlocked })
+        assertEquals(Achievements.ALL.size, list.size)
+    }
+
+    @Test
+    fun `badgeList 全解锁时全部点亮`() {
+        val all = Achievements.ALL.map { it.id }.toSet()
+        assertTrue(badgeList(all).all { it.unlocked })
+    }
 }

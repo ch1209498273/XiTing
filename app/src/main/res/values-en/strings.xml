@@ -230,10 +230,8 @@
     <string name="update_value_fmt">Now v%1$s</string>
     <string name="bubble_default">Screen-off (default)</string>
     <string name="bubble_label_off">Screen-off</string>
-    <string name="bubble_locked_fmt">%1$s (🔒 needs %2$d)</string>
     <string name="bubble_dlg_title">Bubble style (live preview)</string>
     <string name="toast_bubble_locked">%1$s locked · needs %2$d growth</string>
-    <string name="toast_bubble_set">Bubble set to %1$s — check the corner</string>
     <string name="bubble_value_default">Default</string>
 
     <!-- Duration units -->
@@ -273,7 +271,13 @@
     <string name="skin_cond_magma">Bank 2000 more growth after max stage</string>
     <string name="skin_jade_n">Jade</string>
     <string name="skin_cond_jade">60-day streak</string>
-    <string name="gallery_hint">Tap an unlocked skin to wear it</string>
     <string name="gallery_locked">🔒 %1$s (%2$s)</string>
     <string name="gallery_worn">Now wearing \"%1$s\"</string>
+    <string name="gallery_form_label">Form</string>
+    <string name="gallery_skin_label">Colour</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">Reach %1$d growth to unlock this form</string>
+    <string name="gallery_form_next">Bank %1$d more growth for the next form</string>
+    <string name="gallery_form_maxed">All forms unlocked</string>
+    <string name="bubble_style_title">Bubble style</string>
 </resources>

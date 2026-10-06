@@ -553,104 +553,145 @@ private fun showSkinGallery() {
         val streakDays = Streaks.compute(sessions).current
         val mah = Stats.estimatedMah(totalMs)
         val gp = EnergyStore.collectedTotal(this).toLong()
-        val progress = PetSkins.SkinProgress(totalMs, maxSingleMs, streakDays, mah, gp)
 
-        // 先评估一次，保证刚达成的皮肤立刻出现在「已解锁」里
-        val fresh = PetSkins.evaluate(this, progress)
-        fresh.forEach {
-            Toast.makeText(this, getString(R.string.toast_skin_unlock, PetSkins.name(this, it)),
-                Toast.LENGTH_SHORT).show()
-        }
-        val unlockedIds = PetSkins.unlockedIds(this)
-        val active = PetSkins.active(this)
-        val stage = PetView.stageOf(gp)
+        // 先评估一次配色，保证刚达成的立刻出现在「已解锁」里
+        PetSkins.evaluate(this, PetSkins.SkinProgress(totalMs, maxSingleMs, streakDays, mah, gp))
+            .forEach {
+                Toast.makeText(this, getString(R.string.toast_skin_unlock, PetSkins.name(this, it)),
+                    Toast.LENGTH_SHORT).show()
+            }
+        val unlockedSkinIds = PetSkins.unlockedIds(this)
 
         val view = layoutInflater.inflate(R.layout.dialog_skin_picker, null)
-        val list = view.findViewById<LinearLayout>(R.id.skin_list)
+        val preview = view.findViewById<ImageView>(R.id.preview)
+        val previewLabel = view.findViewById<TextView>(R.id.preview_label)
+        val growthHint = view.findViewById<TextView>(R.id.growth_hint)
+        val formRow = view.findViewById<LinearLayout>(R.id.form_row)
+        val skinRow = view.findViewById<LinearLayout>(R.id.skin_row)
+
         val d = resources.displayMetrics.density
         val thumbPx = (56 * d).toInt()
 
-        PetSkins.ALL.forEach { skin ->
-            val unlocked = skin.id in unlockedIds
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                val pad = (10 * d).toInt()
-                setPadding(pad, pad, pad, pad)
-                background = if (skin.id == active.id) {
-                    android.graphics.drawable.GradientDrawable().apply {
-                        cornerRadius = 14 * d
-                        setColor(0x1420B26B)
-                        setStroke((1 * d).toInt().coerceAtLeast(1), 0xFF20B26B.toInt())
-                    }
+        // 当前选择：形态 + 配色
+        var curForm = PetForm.selected(this)
+        var curSkin = PetSkins.active(this)
+        val formBoxes = mutableListOf<View>()
+        val skinBoxes = mutableListOf<View>()
+
+        fun markSelected(box: View, selected: Boolean) {
+            box.background = android.graphics.drawable.GradientDrawable().apply {
+                cornerRadius = 12 * d
+                if (selected) {
+                    setColor(0x1420B26B)
+                    setStroke((1.5 * d).toInt().coerceAtLeast(1), 0xFF20B26B.toInt())
                 } else {
-                    android.graphics.drawable.GradientDrawable().apply {
-                        cornerRadius = 14 * d
-                        setColor(0x0A000000)
-                    }
+                    setColor(0x0A000000)
                 }
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { bottomMargin = (6 * d).toInt() }
             }
+        }
 
-            val img = android.widget.ImageView(this).apply {
-                setImageBitmap(PetSkins.snapshot(this@MainActivity, stage, skin.hue, thumbPx, withBar = false, pct = 0))
-                alpha = if (unlocked) 1f else 0.3f
-                layoutParams = LinearLayout.LayoutParams(thumbPx, thumbPx)
-            }
-            row.addView(img)
+        fun refreshPreview() {
+            preview.setImageBitmap(
+                PetSkins.snapshot(this, curForm, curSkin.hue, (110 * d).toInt(), withBar = false, pct = 0)
+            )
+            previewLabel.text = "${PetView.stageName(this, curForm)} · ${PetSkins.name(this, curSkin)}"
+            val maxed = curForm >= PetForm.unlockedStage(this)
+            growthHint.text = if (maxed) getString(R.string.gallery_form_maxed)
+            else getString(R.string.gallery_form_next, PetForm.requiredFor(curForm + 1))
+            formBoxes.forEachIndexed { i, v -> markSelected(v, i == curForm) }
+            skinBoxes.forEachIndexed { i, v -> markSelected(v, PetSkins.ALL[i].id == curSkin.id) }
+        }
 
-            val texts = LinearLayout(this).apply {
+        // ---- 形态区：成长值决定能选到哪一形态，选哪个由用户 ----
+        for (i in 0..PetView.STAGE_KING) {
+            val unlocked = PetForm.isUnlocked(this, i)
+            val box = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                    marginStart = (14 * d).toInt()
-                }
+                gravity = android.view.Gravity.CENTER_HORIZONTAL
+                val pad = (6 * d).toInt()
+                setPadding(pad, pad, pad, pad)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { marginEnd = (8 * d).toInt() }
             }
-            texts.addView(TextView(this).apply {
-                text = if (skin.id == active.id) "⭐ ${PetSkins.name(this@MainActivity, skin)}"
-                       else PetSkins.name(this@MainActivity, skin)
-                textSize = 16f
-                setTextColor(0xFF1E8E5A.toInt())
-                alpha = if (unlocked) 1f else 0.55f
+            box.addView(ImageView(this).apply {
+                setImageBitmap(PetSkins.snapshot(this@MainActivity, i, curSkin.hue, thumbPx, withBar = false, pct = 0))
+                alpha = if (unlocked) 1f else 0.3f
             })
-            texts.addView(TextView(this).apply {
-                text = PetSkins.cond(this@MainActivity, skin)
-                textSize = 13f
+            box.addView(TextView(this).apply {
+                text = if (unlocked) PetView.stageName(this@MainActivity, i)
+                       else getString(R.string.gallery_locked_short, PetView.stageName(this@MainActivity, i))
+                textSize = 11f
                 setTextColor(0xFF6B7280.toInt())
-                alpha = if (unlocked) 1f else 0.55f
             })
-            row.addView(texts)
+            box.setOnClickListener {
+                if (!PetForm.select(this, i)) {
+                    Toast.makeText(this,
+                        getString(R.string.gallery_form_locked_toast, PetForm.requiredFor(i)),
+                        Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                curForm = i
+                refreshPreview()
+                applySkinEverywhere()
+                Toast.makeText(this, getString(R.string.gallery_worn, PetView.stageName(this, i)),
+                    Toast.LENGTH_SHORT).show()
+            }
+            formBoxes.add(box)
+            formRow.addView(box)
+        }
 
-            row.setOnClickListener {
+        // ---- 配色区 ----
+        PetSkins.ALL.forEach { skin ->
+            val unlocked = skin.id in unlockedSkinIds
+            val box = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = android.view.Gravity.CENTER_HORIZONTAL
+                val pad = (6 * d).toInt()
+                setPadding(pad, pad, pad, pad)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { marginEnd = (8 * d).toInt() }
+            }
+            box.addView(ImageView(this).apply {
+                setImageBitmap(PetSkins.snapshot(this@MainActivity, curForm, skin.hue, thumbPx, withBar = false, pct = 0))
+                alpha = if (unlocked) 1f else 0.3f
+            })
+            box.addView(TextView(this).apply {
+                text = if (unlocked) PetSkins.name(this@MainActivity, skin) else "🔒"
+                textSize = 11f
+                setTextColor(0xFF6B7280.toInt())
+            })
+            box.setOnClickListener {
                 if (!unlocked) {
                     Toast.makeText(this,
                         getString(R.string.gallery_locked, PetSkins.name(this, skin), PetSkins.cond(this, skin)),
                         Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
+                curSkin = skin
                 PetSkins.wear(this, skin)
-                Toast.makeText(this, getString(R.string.gallery_worn, PetSkins.name(this, skin)),
-                    Toast.LENGTH_SHORT).show()
+                refreshPreview()
                 applySkinEverywhere()
-                dlg?.dismiss()
             }
-            list.addView(row)
+            skinBoxes.add(box)
+            skinRow.addView(box)
         }
+
+        refreshPreview()
 
         dlg = android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.gallery_title))
-            .setMessage(getString(R.string.gallery_hint))
             .setView(view)
             .setPositiveButton(getString(R.string.dlg_ok), null)
             .create()
         dlg?.show()
     }
 
-    /** 换肤后同步：主页精灵 / 悬浮球 / 三档小组件 */
+    /** 形态/配色变更后同步：主页精灵 / 悬浮球 / 三档小组件 */
     private fun applySkinEverywhere() {
         renderStats()
+        refreshHomeStats()
         OverlayService.instance?.rebuildBubble()
         WidgetData.refreshAll(this)
     }
@@ -834,7 +875,8 @@ private fun showSkinGallery() {
         // 因此这行必须保留——它不是死代码，是升级兼容点。
         EnergyStore.migrateIfNeeded(this, allMs / 60000, prefs.getInt(Prefs.SHARE_BONUS_GP_LEGACY, 0))
         val gp = EnergyStore.collectedTotal(this).toLong()
-        val stage = PetView.stageOf(gp)
+        // 显示哪个形态由用户在图鉴里选（成长值只决定能选到哪一形态）
+        val stage = PetForm.selected(this)
         pet.stage = stage
         val lastSessionAt = sessions.maxOfOrNull { it.start } ?: 0L
         pet.sleepy = lastSessionAt > 0 && (now - lastSessionAt) / (24L * 3600 * 1000) >= 3
@@ -1234,113 +1276,51 @@ private fun showSkinGallery() {
         refreshBubbleStyleValue()
     }
 
-    /** 悬浮球样式选择：带实时预览（每项直接显示该样式的实际长相） */
+    /**
+     * 悬浮球样式：只决定「文字 / 精灵」。
+     *
+     * 形态与配色已归图鉴统一管（PetForm + PetSkins）。这里再放一份 pet_0..pet_4
+     * 就是两套状态各说各话 —— 早期正因如此：在设置里选了形态，主页精灵纹丝不动。
+     * 所以这里只留二选一，形态跟着图鉴走。
+     */
     private fun showBubbleStyleDialog() {
-        val prefs = prefs()
-        val gp = EnergyStore.collectedTotal(this).toLong()
-        val unlocked = PetView.stageOf(gp)
-        val labels = ArrayList<String>()
-        val values = ArrayList<String>()
-        labels.add(getString(R.string.bubble_default))
-        values.add("text")
-        // 全部形态都列出（含未解锁：可预览外观，但不能选中）
-        for (i in 0..4) {
-            labels.add(
-                if (i <= unlocked) PetView.stageName(this, i)
-                else getString(R.string.bubble_locked_fmt, PetView.stageName(this, i), PetView.THRESHOLDS[i])
-            )
-            values.add("pet_$i")
-        }
-        val current = prefs.getString(Prefs.BUBBLE_STYLE, "text") ?: "text"
-        val density = resources.displayMetrics.density
-        val adapter = object : android.widget.ArrayAdapter<String>(this, 0, labels) {
-            override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
-                val row = LinearLayout(this@MainActivity).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    gravity = android.view.Gravity.CENTER_VERTICAL
-                    setPadding((16 * density).toInt(), (10 * density).toInt(), (16 * density).toInt(), (10 * density).toInt())
-                    if (values[position] == current) setBackgroundColor(0x1A1E8E5A)
-                }
-                if (position == 0) {
-                    // 「息屏」文字样式预览
-                    row.addView(
-                        TextView(this@MainActivity).apply {
-                            text = getString(R.string.bubble_label_off)
-                            textSize = 13f
-                            setTextColor(0xFFFFFFFF.toInt())
-                            gravity = android.view.Gravity.CENTER
-                            val bg = android.graphics.drawable.GradientDrawable().apply {
-                                shape = android.graphics.drawable.GradientDrawable.OVAL
-                                setColor(0xB3000000.toInt())
-                            }
-                            background = bg
-                            layoutParams = LinearLayout.LayoutParams((56 * density).toInt(), (56 * density).toInt())
-                        }
-                    )
-                } else {
-                    // 全部形态显示真实彩色效果（未解锁用 🔒 标签区分，不灰化——要看就看真实样子）
-                    row.addView(
-                        BubblePetView(this@MainActivity).apply {
-                            stage = position - 1
-                            layoutParams = LinearLayout.LayoutParams((56 * density).toInt(), (56 * density).toInt())
-                        }
-                    )
-                }
-                row.addView(
-                    TextView(this@MainActivity).apply {
-                        text = labels[position]
-                        textSize = 15f
-                        setTextColor(0xFF111418.toInt())
-                        layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        ).apply { marginStart = (16 * density).toInt() }
-                    }
-                )
-                return row
-            }
-        }
+        val usesPet = PetForm.bubbleUsesPet(this)
+        val labels = arrayOf(
+            getString(R.string.bubble_default),
+            getString(R.string.gallery_form_label) + " · " + PetView.stageName(this, PetForm.selected(this))
+        )
         android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.bubble_dlg_title))
-            .setAdapter(adapter) { d, which ->
-                val stageOfItem = which - 1
-                if (stageOfItem in 0..4 && stageOfItem > unlocked) {
-                    // 未解锁：可预览外观但不能选中
-                    Toast.makeText(
-                        this,
-                        getString(R.string.toast_bubble_locked, PetView.stageName(this, stageOfItem), PetView.THRESHOLDS[stageOfItem]),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return@setAdapter
-                }
-                prefs.edit().putString(Prefs.BUBBLE_STYLE, values[which]).apply()
+            .setTitle(getString(R.string.bubble_style_title))
+            .setSingleChoiceItems(labels, if (usesPet) 1 else 0) { d, which ->
+                PetForm.setBubbleUsesPet(this, which == 1)
                 OverlayService.instance?.rebuildBubble()
                 refreshBubbleStyleValue()
-                val name = if (which == 0) getString(R.string.bubble_label_off) else PetView.stageName(this, stageOfItem)
-                Toast.makeText(this, getString(R.string.toast_bubble_set, name), Toast.LENGTH_SHORT).show()
                 d.dismiss()
             }
             .setNegativeButton(getString(R.string.dlg_cancel), null)
             .show()
     }
 
+
     private fun refreshBubbleStyleValue() {
-        val style = prefs()
-            .getString(Prefs.BUBBLE_STYLE, "text") ?: "text"
-        // 行内直接显示当前悬浮球的真实样子 + 名称
+        val usesPet = PetForm.bubbleUsesPet(this)
+        // 行内直接显示当前悬浮球的真实样子 + 名称（形态/配色跟随图鉴的选择）
         val box = pageSettings.findViewById<LinearLayout>(R.id.bubble_style_preview)
         box.removeAllViews()
         val density = resources.displayMetrics.density
         val size = (52 * density).toInt()
-        if (style.startsWith("pet_")) {
-            val st = (style.removePrefix("pet_").toIntOrNull() ?: 0).coerceIn(0, 4)
+        val stage = PetForm.selected(this)
+        val skin = PetSkins.active(this)
+        if (usesPet) {
             box.addView(
                 BubblePetView(this).apply {
-                    stage = st
+                    this.stage = stage
+                    skinHue = skin.hue
                     layoutParams = LinearLayout.LayoutParams(size, size)
                 }
             )
-            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text = PetView.stageName(this, st)
+            pageSettings.findViewById<TextView>(R.id.bubble_style_value).text =
+                "${PetView.stageName(this, stage)} · ${PetSkins.name(this, skin)}"
         } else {
             box.addView(
                 TextView(this).apply {

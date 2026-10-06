@@ -44,6 +44,27 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
     private var blinkUntil = 0L
 
     /**
+     * 配色（色相旋转角度）。与主页精灵/小组件共用同一套皮肤值，
+     * 在图鉴里换配色后悬浮球立即跟着变。
+     */
+    var skinHue = 0f
+        set(value) {
+            if (field != value) {
+                field = value
+                hueLayerPaint.colorFilter = if (value == 0f) null else PetSkins.hueFilter(value)
+                invalidate()
+            }
+        }
+
+    /**
+     * 套色相旋转用的图层画笔。
+     *
+     * 用 saveLayer + ColorMatrixColorFilter 而不是画一张离屏位图：悬浮球 48dp 很小，
+     * 但它 10fps 常驻重绘，离屏位图每帧都要分配一次。缓存 filter 也避免每帧 new。
+     */
+    private val hueLayerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
      * 动画是否运行。
      *
      * 黑幕是一整块不透明全屏窗，把悬浮球完全盖住，此时它在背后继续 10fps 重绘
@@ -108,6 +129,11 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         }
         val blinking = now < blinkUntil
 
+        // 配色：整只精灵做色相旋转。默认配色(0)不走图层，省一次 saveLayer
+        val layer = if (skinHue != 0f) {
+            canvas.saveLayer(0f, 0f, width.toFloat(), height.toFloat(), hueLayerPaint)
+        } else -1
+
         when (stage) {
             STAGE_SPARK -> drawSpark(canvas, cx, cy, s, t, blinking)
             STAGE_BALL -> drawBall(canvas, cx, cy, s, t, blinking)
@@ -115,6 +141,8 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
             STAGE_STORM -> drawStorm(canvas, cx, cy, s, t, blinking)
             else -> drawKing(canvas, cx, cy, s, t, blinking)
         }
+
+        if (layer != -1) canvas.restoreToCount(layer)
 
         if (animating) postInvalidateDelayed(FRAME_MS)
     }

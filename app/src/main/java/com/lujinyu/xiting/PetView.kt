@@ -433,7 +433,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             popPaint.alpha = 255
             popPaint.textSize = 24f
             val numStr = "$total"
-            val maxStr = "/200"
+            // 分母必须与填充用的是同一个常量，否则 MAX_PENDING 一改文案就在撒谎
+            val maxStr = "/${EnergyStore.MAX_PENDING}"
             val w1 = popPaint.measureText(numStr)
             val w2 = popPaint.measureText(maxStr)
             val startX = bar.centerX() - (w1 + w2) / 2f

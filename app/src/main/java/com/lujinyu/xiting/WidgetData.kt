@@ -81,11 +81,14 @@ object WidgetData {
 
             // ---- 数据 ----
             val gp = EnergyStore.collectedTotal(context).toLong()
-            val stage = PetView.stageOf(gp)
+            // 成长进度按「已达到的形态」算，与当前显示哪个形态无关 ——
+            // 用户可以切回低形态看长相，但进度文案必须如实反映养成进度
+            val growthStage = PetView.stageOf(gp)
+            val showStage = PetForm.selected(context)
             val th = PetView.THRESHOLDS
             var pct = 100
-            if (stage < PetView.STAGE_KING) {
-                pct = (((gp - th[stage]) * 100) / (th[stage + 1] - th[stage])).toInt().coerceIn(0, 100)
+            if (growthStage < PetView.STAGE_KING) {
+                pct = (((gp - th[growthStage]) * 100) / (th[growthStage + 1] - th[growthStage])).toInt().coerceIn(0, 100)
             }
             val sessions = SessionLog.sessions(context)
             val cal = Calendar.getInstance().apply {
@@ -107,13 +110,13 @@ object WidgetData {
             val skin = PetSkins.active(context)
             views.setImageViewBitmap(
                 R.id.widget_pet_img,
-                PetSkins.snapshot(context, stage, skin.hue, 160, withBar = true, pct = pct)
+                PetSkins.snapshot(context, showStage, skin.hue, 160, withBar = true, pct = pct)
             )
-            views.setTextViewText(R.id.widget_pet, PetView.stageName(c, stage))
+            views.setTextViewText(R.id.widget_pet, PetView.stageName(c, showStage))
             views.setTextViewText(
                 R.id.widget_growth,
-                if (stage >= PetView.STAGE_KING) c.getString(R.string.widget_growth_max, gp)
-                else c.getString(R.string.widget_growth_next, gp, th[stage + 1] - gp)
+                if (growthStage >= PetView.STAGE_KING) c.getString(R.string.widget_growth_max, gp)
+                else c.getString(R.string.widget_growth_next, gp, th[growthStage + 1] - gp)
             )
             views.setTextViewText(R.id.widget_today, c.getString(R.string.widget_today_fmt, fmtMin(todayMs)))
             views.setTextViewText(

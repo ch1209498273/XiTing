@@ -63,6 +63,8 @@ object Prefs {
     const val ACH_UNLOCKED = "ach_unlocked"
     const val SKINS_UNLOCKED = "skins_unlocked"
     const val PET_SKIN = "pet_skin"
+    /** 当前展示的精灵形态（0..4）。成长值只决定「解锁到哪一形态」，显示哪个由用户选 */
+    const val PET_FORM = "pet_form"
     /** 上次展示过的精灵形态，用于「新形态进化」提示去重 */
     const val LAST_SEEN_STAGE = "last_seen_stage"
 

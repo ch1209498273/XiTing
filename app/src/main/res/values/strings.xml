@@ -230,10 +230,8 @@
     <string name="update_value_fmt">当前 v%1$s</string>
     <string name="bubble_default">息屏（默认）</string>
     <string name="bubble_label_off">息屏</string>
-    <string name="bubble_locked_fmt">%1$s（🔒需%2$d成长值）</string>
     <string name="bubble_dlg_title">悬浮球样式（实时预览）</string>
     <string name="toast_bubble_locked">「%1$s」尚未解锁 · 需 %2$d 成长值</string>
-    <string name="toast_bubble_set">悬浮球已切换为「%1$s」，看右下角</string>
     <string name="bubble_value_default">默认</string>
 
     <!-- 时长单位 -->
@@ -273,7 +271,13 @@
     <string name="skin_cond_magma">满级后再积累 2000 成长值</string>
     <string name="skin_jade_n">翡翠雷公</string>
     <string name="skin_cond_jade">连续听剧 60 天</string>
-    <string name="gallery_hint">点已解锁的皮肤即可换上</string>
     <string name="gallery_locked">🔒 %1$s（%2$s）</string>
     <string name="gallery_worn">已换上「%1$s」</string>
+    <string name="gallery_form_label">形态</string>
+    <string name="gallery_skin_label">配色</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">成长值达到 %1$d 才能解锁该形态</string>
+    <string name="gallery_form_next">再积累 %1$d 成长值解锁下一形态</string>
+    <string name="gallery_form_maxed">已解锁全部形态</string>
+    <string name="bubble_style_title">悬浮球样式</string>
 </resources>

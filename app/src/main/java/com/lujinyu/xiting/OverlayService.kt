@@ -357,12 +357,14 @@ class OverlayService : Service() {
         val density = resources.displayMetrics.density
         val size = (48 * density).toInt()
 
-        // 悬浮球样式：默认「息屏」文字；已解锁形态可切换为精灵头像
-        val style = prefs.getString(Prefs.BUBBLE_STYLE, "text") ?: "text"
-        val tv: View = if (style.startsWith("pet_")) {
-            val st = style.removePrefix("pet_").toIntOrNull() ?: 1
+        // 悬浮球样式：默认「息屏」文字，可换成精灵形象（形态与配色跟随图鉴里的选择）
+        val usePet = PetForm.bubbleUsesPet(this)
+        val tv: View = if (usePet) {
+            val st = PetForm.selected(this)
+            val skin = PetSkins.active(this)
             BubblePetView(this).apply {
-                stage = st.coerceIn(0, 4)
+                stage = st
+                skinHue = skin.hue
                 layoutParams = android.view.ViewGroup.LayoutParams(size, size)
             }
         } else {

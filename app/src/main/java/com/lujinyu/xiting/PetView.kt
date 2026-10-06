@@ -103,6 +103,20 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private val barTrackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFECEEF1.toInt() }
     private val barFillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
+    // ---- onDraw 热路径复用对象 ----
+    // 精灵在统计页以 30fps 自续挂重绘（onDraw 末尾 postInvalidateDelayed）。
+    // 以前每次 drawMiniFace 都要 new 两个 Paint（五个形态每帧都调它），
+    // 进度条每帧还要 new 两个 RectF 和一个 LinearGradient。
+    // 这些颜色/几何在一次布局内是常量，复用后把每帧的对象分配降到 0。
+    private val faceGlowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x33FFFFFF }
+    private val faceHiPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
+    private val scratchRect = RectF()
+    private val scratchRect2 = RectF()
+
+    /** 进度条渐变缓存：几何随 view 尺寸而定，尺寸不变就不必每帧重建 */
+    private var barGradient: android.graphics.LinearGradient? = null
+    private var barGradientKey = 0L
+
     init {
         setOnClickListener {
             dischargeUntil = System.currentTimeMillis() + 500
@@ -119,7 +133,9 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
-        if (visibility == VISIBLE) startAnimating()
+        // thumbMode 是静态图（缩略图/图鉴），不参与动画循环 ——
+        // 与 onAttachedToWindow、onDraw 末尾的判断保持一致
+        if (visibility == VISIBLE && !thumbMode) startAnimating()
     }
 
     /** 当前帧精灵几何（绘制与点击命中共用） */
@@ -484,14 +500,22 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             val left = cx - barW / 2
             val top = height - 30f
             val rr = barH / 2
-            canvas.drawRoundRect(RectF(left, top, left + barW, top + barH), rr, rr, barTrackPaint)
+            scratchRect.set(left, top, left + barW, top + barH)
+            canvas.drawRoundRect(scratchRect, rr, rr, barTrackPaint)
             if (progress > 0.01f) {
-                barFillPaint.shader = android.graphics.LinearGradient(
-                    left, top, left + barW, top,
-                    0xFFFFC107.toInt(), 0xFFFF9800.toInt(), Shader.TileMode.CLAMP
-                )
+                // 渐变几何只随 view 尺寸变化，按 key 缓存，避免 30fps 每帧重建 shader
+                val key = (left.toLong() shl 32) or (top.toLong() and 0xFFFFFFFFL)
+                if (key != barGradientKey) {
+                    barGradientKey = key
+                    barGradient = android.graphics.LinearGradient(
+                        left, top, left + barW, top,
+                        0xFFFFC107.toInt(), 0xFFFF9800.toInt(), Shader.TileMode.CLAMP
+                    )
+                }
+                barFillPaint.shader = barGradient
                 val fw = barW * progress.coerceIn(0f, 1f)
-                canvas.drawRoundRect(RectF(left, top, left + fw.coerceAtLeast(barH), top + barH), rr, rr, barFillPaint)
+                scratchRect2.set(left, top, left + fw.coerceAtLeast(barH), top + barH)
+                canvas.drawRoundRect(scratchRect2, rr, rr, barFillPaint)
                 barFillPaint.shader = null
             }
         }
@@ -769,10 +793,10 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             // 瞳孔：深色主体 + 底部反光 + 双高光（精致有神）
             canvas.drawCircle(cx - off, cy, er, eyePaint)
             canvas.drawCircle(cx + off, cy, er, eyePaint)
-            val glow = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x33FFFFFF }
+            val glow = faceGlowPaint
             canvas.drawCircle(cx - off + er * 0.25f, cy + er * 0.3f, er * 0.55f, glow)
             canvas.drawCircle(cx + off + er * 0.25f, cy + er * 0.3f, er * 0.55f, glow)
-            val hi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
+            val hi = faceHiPaint
             canvas.drawCircle(cx - off - er * 0.34f, cy - er * 0.36f, er * 0.34f, hi)
             canvas.drawCircle(cx + off - er * 0.34f, cy - er * 0.36f, er * 0.34f, hi)
             canvas.drawCircle(cx - off + er * 0.3f, cy + er * 0.34f, er * 0.14f, hi)

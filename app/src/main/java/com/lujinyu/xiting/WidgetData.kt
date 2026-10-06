@@ -28,9 +28,44 @@ object WidgetData {
         Triple(WidgetData::refresh, XiTingWidgetLarge::class.java, Style.LARGE)
     )
 
-    /** 全部小部件统一刷新（OverlayService/MainActivity 状态变化时调用） */
+    /**
+     * 桌面上确实存在实例的档位。
+     *
+     * refresh() 每档都要 PetSkins.snapshot 画一张精灵位图（大号还要再画
+     * 560×150 柱状图并新建 3 个 PendingIntent），而 refreshAll 此前无条件
+     * 渲染三档。onWindowFocusChanged 每次获得焦点都会走到 refreshStates →
+     * refreshAll：关掉任意弹窗、切一次应用、拉一次输入法都白渲染一遍，
+     * 一个小组件都没装也照画。
+     */
+    private fun activeStyles(context: Context): List<Style> {
+        val awm = try {
+            AppWidgetManager.getInstance(context)
+        } catch (_: Exception) {
+            null
+        } ?: return emptyList()
+        val out = ArrayList<Style>(PROVIDERS.size)
+        for ((_, cls, style) in PROVIDERS) {
+            try {
+                if (awm.getAppWidgetIds(ComponentName(context, cls)).isNotEmpty()) out.add(style)
+            } catch (_: Exception) {
+            }
+        }
+        return out
+    }
+
+    /**
+     * 全部小部件统一刷新（OverlayService/MainActivity 状态变化时调用）。
+     *
+     * 只刷新桌面真有实例的档位；一个都没装就直接返回。
+     * 注意：小组件刚被添加时由各 provider 的 onUpdate 直接调 refresh()，
+     * 不经过这里，因此新添加的实例一定能被画出来。
+     */
     fun refreshAll(context: Context) {
-        for ((fn, _, style) in PROVIDERS) fn(context, style)
+        val styles = activeStyles(context)
+        if (styles.isEmpty()) return
+        for ((fn, _, style) in PROVIDERS) {
+            if (style in styles) fn(context, style)
+        }
     }
 
     fun refresh(context: Context, style: Style) {

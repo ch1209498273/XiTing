@@ -58,6 +58,10 @@ LANG_NAMES = {
 
 STRING_RE = re.compile(r'<string name="([^"]+)"[^>]*>(.*?)</string>', re.S)
 TODO_RE = re.compile(r'^⟨TODO⟨.*⟩⟩$', re.S)
+# 裸 % （用于定位需要转义的百分号）
+RE_PCT = re.compile(r'%.')
+# 真正的格式占位符：%1$s、%2$.0f、%d、%s、%% —— 这些不能转义
+FORMAT_TOKEN = re.compile(r'^(%%|%\d+\$[-\d.]*[a-zA-Z]|%[-#+ 0,(]*\d*(?:\.\d+)?[a-zA-Z])')
 
 
 def parse(path):
@@ -68,16 +72,46 @@ def parse(path):
         return STRING_RE.findall(f.read())
 
 
+def _token_at(s, i):
+    """从位置 i（指向一个 %）取出完整的格式 token。
+
+    %1$s / %2$.0f / %% 都是以 % 起始的**整体**，单看 % 这一个字符
+    判断不出来——%1$s 的首字符就是个裸 %。所以按「% + 后续非空白」
+    切一段再交给 FORMAT_TOKEN 判定。
+    """
+    j = i
+    while j < len(s) and s[j] not in " \n":
+        j += 1
+    return s[i:j]
+
+
 def esc(v):
-    """Android 资源里的转义：& < > ' 都要处理，撇号不转义 aapt 会直接报错"""
-    return (v.replace("&", "&amp;")
-             .replace("<", "&lt;")
-             .replace(">", "&gt;")
-             .replace("'", "\\'"))
+    """Android 资源里的转义。
+
+    `&` `<` `>` `'` 都要处理，撇号不转义 aapt 会直接报错。
+
+    ⚠ **`%` 也要转义，而且这条最容易踩**：只要一条 string 里含裸 `%`，
+    aapt 就会把它当格式占位符解析。法语「100 % hors ligne」里的 `% `
+    会被判成「转换字符 h 缺少参数」——这是 **error**（lint StringFormatInvalid），
+    而 release 构建不跑 lint，所以**编译能过、装到手机上才炸**。
+
+    真占位符（%1$s、%d、%2$.0f、%%）不能动，只转义那些不属于格式串的裸 `%`。
+    """
+    def pct(m):
+        return m.group(0) if FORMAT_TOKEN.match(_token_at(v, m.start())) else "%%"
+
+    # ⚠ 必须用 re.sub 而不是 str.replace：str.replace 的第二个参数只能是
+    # 字符串，不接受函数（那是 re.sub 的 API）。
+    return re.sub('%', pct,
+                  v.replace("&", "&amp;")
+                   .replace("<", "&lt;")
+                   .replace(">", "&gt;")
+                   .replace("'", "\\'"))
 
 
 def unesc(v):
     return (v.replace("\\'", "'")
+             .replace("%%", "%")
              .replace("&lt;", "<")
              .replace("&gt;", ">")
              .replace("&amp;", "&"))
@@ -211,6 +245,10 @@ def cmd_check():
             print("      ... 还有 %d 条" % (len(missing + todo + stale) - 8))
         if missing or todo or stale:
             bad = 1
+    print()
+    bad += check_placeholders(os.path.join(SRC, "strings.xml"), None)
+    if bad:
+        print("⚠ 有 %d 处问题（占位符不一致会在运行时崩溃）" % bad)
     return bad
 
 
@@ -225,6 +263,36 @@ def cmd_table():
         need = len(src) - done
         print("%-8s %5.1f%%  %4d  %4d" % (
             lang, 100.0 * done / len(src) if src else 0, done, need))
+
+
+def check_placeholders(src_path, lang_path):
+    """比较各语言与源文的占位符集合。
+
+    这是**运行时会崩**的那类错：某语言把 %1$s 写成了 %%1$s（或反之），
+    aapt 不会报错，但 getString(id, args) 运行时抛
+    IllegalFormatException / MissingFormatArgumentException。
+    lint 能报一部分，但手改文件时很容易踩。
+    """
+    src = dict(parse(src_path))
+    bad = 0
+    for lang, path in targets():
+        cur = dict(parse(path))
+        for k, v in cur.items():
+            if k not in src:
+                continue
+            a = set(FMT.findall(unesc(src[k]).replace('%%', '\x00')))
+            b = set(FMT.findall(unesc(v).replace('%%', '\x00')))
+            if a != b:
+                print("   ✗ %-7s %-20s 源=%s 本地=%s" % (lang, k, sorted(a), sorted(b)))
+                bad += 1
+    return bad
+
+
+# 格式占位符：%1$s / %2$.0f / %d
+# ⚠ 中间**不能有空格**。Java 的 Formatter 允许「% 1$s」这种写法，但 aapt 不允许，
+# 而且它会把「100 % hors ligne」里的「% h」误当成占位符（实际上那是个语法错误，
+# 运行时会抛 UnknownFormatConversionException）。
+FMT = re.compile(r'%(?!%)(?:\d+\$)?[-#+0,(]*\d*(?:\.\d+)?[a-zA-Z]')
 
 
 if __name__ == "__main__":

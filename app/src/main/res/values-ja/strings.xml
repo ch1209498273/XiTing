@@ -172,7 +172,7 @@
 ① 画面をオンにしたまま任意の動画を3分再生
 ② アプリが自動的に画面を消し、3分待機
 
-充電しないでください。バッテリーは15%〜95%に保ってください。</string>
+充電しないでください。バッテリーは15%%〜95%%に保ってください。</string>
     <string name="calib_btn_restart">再校正</string>
     <string name="calib_btn_start">校正を開始</string>
     <string name="calib_btn_close">閉じる</string>

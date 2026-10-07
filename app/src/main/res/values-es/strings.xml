@@ -6,7 +6,7 @@
     <string name="nav_home">Inicio</string>
     <string name="nav_stats">Estadísticas</string>
     <string name="nav_settings">Ajustes</string>
-    <string name="footer_offline">100 % sin conexión · sin recopilar datos</string>
+    <string name="footer_offline">100 %% sin conexión · sin recopilar datos</string>
     <string name="title_stats">Estadísticas de ahorro</string>
     <string name="title_settings">Ajustes</string>
     <string name="status_running">En marcha</string>
@@ -172,7 +172,7 @@ Ahorro medido ≈ %2$.0f mAh/h</string>
 ① Reproduce un vídeo con la pantalla encendida 3 minutos
 ② La app pasa a pantalla negra 3 minutos automáticamente
 
-No cargues; mantén la batería entre el 15 % y el 95 %.</string>
+No cargues; mantén la batería entre el 15 %% y el 95 %%.</string>
     <string name="calib_btn_restart">Recalibrar</string>
     <string name="calib_btn_start">Iniciar calibración</string>
     <string name="calib_btn_close">Cerrar</string>

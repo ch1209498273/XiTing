@@ -6,7 +6,7 @@
     <string name="nav_home">Accueil</string>
     <string name="nav_stats">Stats</string>
     <string name="nav_settings">Réglages</string>
-    <string name="footer_offline">100 % hors ligne · aucune collecte</string>
+    <string name="footer_offline">100 %% hors ligne · aucune collecte</string>
     <string name="title_stats">Statistiques d\'économie</string>
     <string name="title_settings">Réglages</string>
     <string name="status_running">En marche</string>
@@ -172,7 +172,7 @@ Débit d\'économie mesuré ≈ %2$.0f mAh/h</string>
 ① Lisez une vidéo écran allumé pendant 3 minutes
 ② L\'application passe automatiquement en écran noir 3 minutes
 
-Ne chargez pas ; gardez la batterie entre 15 % et 95 %.</string>
+Ne chargez pas ; gardez la batterie entre 15 %% et 95 %%.</string>
     <string name="calib_btn_restart">Recalibrer</string>
     <string name="calib_btn_start">Lancer le calibrage</string>
     <string name="calib_btn_close">Fermer</string>

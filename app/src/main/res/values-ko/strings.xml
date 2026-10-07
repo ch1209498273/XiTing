@@ -172,7 +172,7 @@
 ① 화면을 켠 채로 아무 영상이나 3분 재생
 ② 앱이 자동으로 화면을 끄고 3분 대기
 
-충전하지 마세요. 배터리를 15%~95%로 유지하세요.</string>
+충전하지 마세요. 배터리를 15%%~95%%로 유지하세요.</string>
     <string name="calib_btn_restart">재보정</string>
     <string name="calib_btn_start">보정 시작</string>
     <string name="calib_btn_close">닫기</string>

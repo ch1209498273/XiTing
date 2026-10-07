@@ -156,7 +156,7 @@
     <string name="calib_msg_calibrated">Calibrated on %1$s\nMeasured rate ≈ %2$.0f mAh/h</string>
     <string name="calib_msg_uncalibrated">Not calibrated yet (using the generic OLED model)</string>
     <string name="calib_msg_ambient">\n\nMeasured black-screen draw ≈ %1$.0f mA (%2$d samples)</string>
-    <string name="calib_msg_flow">\n\nCalibration (~6 min):\n① Play any video with the screen on for 3 min\n② The app blacks the screen for 3 min\n\nDon\'t charge; keep battery between 15%–95%.</string>
+    <string name="calib_msg_flow">\n\nCalibration (~6 min):\n① Play any video with the screen on for 3 min\n② The app blacks the screen for 3 min\n\nDon\'t charge; keep battery between 15%%–95%%.</string>
     <string name="calib_btn_restart">Recalibrate</string>
     <string name="calib_btn_start">Start</string>
     <string name="calib_btn_close">Close</string>

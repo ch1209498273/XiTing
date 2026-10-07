@@ -469,7 +469,7 @@ private fun checkRestore() {
                 } catch (_: Exception) {
                 }
             }
-            .setNegativeButton("知道了", null)
+            .setNegativeButton(getString(R.string.dlg_got_it), null)
             .show()
     }
 
@@ -789,7 +789,8 @@ private fun showSkinGallery() {
                 if (calib != null) {
                     val rate = (calib.first - calib.second) / 1000.0
                     getString(R.string.calib_msg_calibrated,
-                        SimpleDateFormat("M月d日", Locale.getDefault()).format(Date(calib.third)),
+                        SimpleDateFormat(getString(R.string.calib_date_fmt), Locale.getDefault())
+                            .format(Date(calib.third)),
                         rate.toFloat())
                 } else {
                     getString(R.string.calib_msg_uncalibrated)
@@ -840,7 +841,10 @@ private fun showSkinGallery() {
                     )
                     waitForCalibration()
                 } else {
-                    dlg.setMessage("请保持亮屏播放视频，不要操作手机\n剩余 ${left / 60}:${"%02d".format(left % 60)}（已采样 $n 次）")
+                    dlg.setMessage(getString(
+                        R.string.calib_progress_fmt,
+                        (left / 60).toInt(), left % 60, n
+                    ))
                     calibHandler.postDelayed(this, 30_000)
                 }
             }
@@ -1005,7 +1009,7 @@ private fun showSkinGallery() {
         if (seen in 0 until growthStage) {
             Toast.makeText(
                 this,
-                "🎉 进化！${PetView.stageName(this, seen)} → ${PetView.stageName(this, growthStage)}",
+                getString(R.string.evolve_fmt, PetView.stageName(this, seen), PetView.stageName(this, growthStage)),
                 Toast.LENGTH_LONG
             ).show()
         }

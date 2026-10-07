@@ -97,7 +97,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         override fun onReceive(ctx: Context?, i: Intent?) {
             val level = i?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
             val scale = i?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1) ?: -1
-            if (level >= 0 && scale > 0) batteryText?.text = "电量 $level%"
+            if (level >= 0 && scale > 0) {
+                batteryText?.text = context.getString(R.string.battery_fmt, level)
+            }
         }
     }
 
@@ -194,11 +196,11 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
                 setOnClickListener { sendMediaKey(code) }
             }
         }
-        media.addView(mkBtn(R.drawable.ic_media_prev, KeyEvent.KEYCODE_MEDIA_PREVIOUS, "上一集"))
-        val ppBtn = mkBtn(R.drawable.ic_media_pause, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "播放/暂停")
+        media.addView(mkBtn(R.drawable.ic_media_prev, KeyEvent.KEYCODE_MEDIA_PREVIOUS, context.getString(R.string.cd_prev_episode)))
+        val ppBtn = mkBtn(R.drawable.ic_media_pause, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, context.getString(R.string.cd_play_pause))
         playPauseBtn = ppBtn
         media.addView(ppBtn)
-        media.addView(mkBtn(R.drawable.ic_media_next, KeyEvent.KEYCODE_MEDIA_NEXT, "下一集"))
+        media.addView(mkBtn(R.drawable.ic_media_next, KeyEvent.KEYCODE_MEDIA_NEXT, context.getString(R.string.cd_next_episode)))
         if (showMedia) {
             f.addView(
                 media,

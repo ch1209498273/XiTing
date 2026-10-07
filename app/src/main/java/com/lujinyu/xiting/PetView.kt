@@ -551,7 +551,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         // 点击储能弹字
         if (now < energyPopUntil) {
             popPaint.alpha = ((energyPopUntil - now).coerceAtMost(1000) / 10).toInt().coerceIn(0, 255)
-            canvas.drawText("⚡ 已储存 $totalMah mAh", cx, cy - r * 1.5f - 26f, popPaint)
+            canvas.drawText(context.getString(R.string.mah_saved_fmt, totalMah), cx, cy - r * 1.5f - 26f, popPaint)
             popPaint.alpha = 255
         }
 

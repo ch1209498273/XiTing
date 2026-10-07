@@ -300,5 +300,21 @@
     <string name="lang_name_fr">Français</string>
     <string name="lang_name_de">Deutsch</string>
     <string name="lang_name_es">Español</string>
-    <string name="lang_name_ru">Русский</string>    <string name="lang_restart_note">切换语言后立即生效，无需重启</string>
+    <string name="lang_name_ru">Русский</string>
+    <!-- 从 Kotlin 代码搬来的文案。之前直接写死在 .kt 里，切语言时不跟着变。 -->
+    <string name="dur_sec_fmt">%1$d秒</string>
+    <string name="dur_min_fmt">%1$d分钟</string>
+    <string name="dur_hour_fmt">%1$.1f小时</string>
+    <string name="battery_fmt">电量 %1$d%%</string>
+    <string name="cd_prev_episode">上一集</string>
+    <string name="cd_play_pause">播放/暂停</string>
+    <string name="cd_next_episode">下一集</string>
+    <string name="bubble_label_plain">息屏</string>
+    <string name="notif_timer_fmt"> · 定时%1$d分钟后关闭</string>
+    <string name="dlg_got_it">知道了</string>
+    <string name="calib_date_fmt">M月d日</string>
+    <string name="calib_progress_fmt">请保持亮屏播放视频，不要操作手机\n剩余 %1$d:%2$02d（已采样 %3$d 次）</string>
+    <string name="mah_saved_fmt">⚡ 已储存 %1$d mAh</string>
+    <string name="evolve_fmt">🎉 进化！%1$s → %2$s</string>
+    <string name="lang_restart_note">切换语言后立即生效，无需重启</string>
 </resources>

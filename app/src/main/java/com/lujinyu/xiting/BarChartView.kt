@@ -72,10 +72,14 @@ class BarChartView(context: Context, attrs: AttributeSet?) : View(context, attrs
 
     /** 柱顶数值：按毫秒实际值显示，秒/分钟/小时自动档 */
     private fun fmtDur(ms: Long): String = when {
-        ms < 60_000L -> "${ms / 1000}秒"
-        ms < 3_600_000L -> "${ms / 60_000}分钟"
-        // 必须显式传 Locale：土耳其语区等会把 '.' 当成 '.'以外的东西，
+        ms < 60_000L -> context.getString(R.string.dur_sec_fmt, (ms / 1000).toInt())
+        ms < 3_600_000L -> context.getString(R.string.dur_min_fmt, (ms / 60_000).toInt())
+        // 必须显式传 Locale：土耳其语区等会把 '.' 当成别的东西，
         // 产出「1,5小时」这类错位的数字（lint DefaultLocale）
-        else -> String.format(java.util.Locale.getDefault(), "%.1f小时", ms / 3_600_000.0)
+        else -> String.format(
+            java.util.Locale.getDefault(),
+            context.getString(R.string.dur_hour_fmt),
+            ms / 3_600_000.0
+        )
     }
 }

@@ -298,5 +298,20 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="lang_name_de">Deutsch</string>
     <string name="lang_name_es">Español</string>
     <string name="lang_name_ru">Русский</string>
+    <string name="dur_sec_fmt">%1$d с</string>
+    <string name="dur_min_fmt">%1$d мин</string>
+    <string name="dur_hour_fmt">%1$.1f ч</string>
+    <string name="battery_fmt">Батарея %1$d%%%</string>
+    <string name="cd_prev_episode">Предыдущая серия</string>
+    <string name="cd_play_pause">Воспроизведение / пауза</string>
+    <string name="cd_next_episode">Следующая серия</string>
+    <string name="bubble_label_plain">Выключенный экран</string>
+    <string name="notif_timer_fmt">· выключится через %1$d мин</string>
+    <string name="dlg_got_it">Понятно</string>
+    <string name="calib_date_fmt">%2$d.%1$d</string>
+    <string name="calib_progress_fmt">Оставьте экран включённым и воспроизведение идущим, не трогайте телефон
+Осталось %1$d:%2$02d (%3$d замеров)</string>
+    <string name="mah_saved_fmt">⚡ Сэкономлено %1$d мА·ч</string>
+    <string name="evolve_fmt">🎉 Эволюция! %1$s → %2$s</string>
     <string name="lang_restart_note">Wirkt sofort, kein Neustart nötig</string>
 </resources>

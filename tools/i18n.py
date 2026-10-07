@@ -280,6 +280,10 @@ def check_placeholders(src_path, lang_path):
         for k, v in cur.items():
             if k not in src:
                 continue
+            # 日期/数字格式串（SimpleDateFormat 模式）各语言顺序本来就不同
+            # （M月d日 vs 1.2.），它们不作为 getString 参数传入，不参与比对。
+            if k.endswith("_date_fmt"):
+                continue
             a = set(FMT.findall(unesc(src[k]).replace('%%', '\x00')))
             b = set(FMT.findall(unesc(v).replace('%%', '\x00')))
             if a != b:

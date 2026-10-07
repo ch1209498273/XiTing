@@ -401,7 +401,7 @@ class OverlayService : Service() {
             }
         } else {
             TextView(this).apply {
-                text = "息屏"
+                text = getString(R.string.bubble_label_plain)
                 textSize = 13f
                 setTextColor(Color.WHITE)
                 gravity = Gravity.CENTER
@@ -780,7 +780,7 @@ class OverlayService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val remainMin = timerRemainingMs() / 60000
-        val timerText = if (timerEndAt > 0) " · 定时${remainMin + 1}分钟后关闭" else ""
+        val timerText = if (timerEndAt > 0) getString(R.string.notif_timer_fmt, remainMin + 1) else ""
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
             .setContentTitle(getString(R.string.notif_title))

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 日语。由 tools/mk_ja.py 从 values/strings.xml 的键顺序生成，勿手改。 -->
+<!-- 日本語。由 tools/i18n.py sync 从 values/strings.xml 同步，请勿手改。 -->
 <resources>
     <string name="app_name">画面オフ再生</string>
     <string name="tile_label">画面オフ再生</string>
@@ -167,12 +167,8 @@
     <string name="calib_msg_calibrated">本機の実測で校正済み（%1$s）
 実測の節約レート ≈ %2$.0f mAh/時</string>
     <string name="calib_msg_uncalibrated">まだ実測校正していません（現在はOLEDの汎用モデルで推定）</string>
-    <string name="calib_msg_ambient">
-
-画面オフ中の端末消費電力の実測 ≈ %1$.0f mA（%2$d 回サンプル）</string>
-    <string name="calib_msg_flow">
-
-校正手順（約6分）：
+    <string name="calib_msg_ambient">画面オフ中の端末消費電力の実測 ≈ %1$.0f mA（%2$d 回サンプル）</string>
+    <string name="calib_msg_flow">校正手順（約6分）：
 ① 画面をオンにしたまま任意の動画を3分再生
 ② アプリが自動的に画面を消し、3分待機
 
@@ -294,8 +290,13 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="lang_title">言語 / Language</string>
     <string name="lang_sub">表示言語</string>
     <string name="lang_system">システムに従う</string>
-    <string name="lang_zh">简体中文</string>
-    <string name="lang_en">English</string>
-    <string name="lang_ja">日本語</string>
+    <string name="lang_name_zh">简体中文</string>
+    <string name="lang_name_en">English</string>
+    <string name="lang_name_ja">日本語</string>
+    <string name="lang_name_ko">한국어</string>
+    <string name="lang_name_fr">Français</string>
+    <string name="lang_name_de">Deutsch</string>
+    <string name="lang_name_es">Español</string>
+    <string name="lang_name_ru">Русский</string>
     <string name="lang_restart_note">変更は即座に反映されます</string>
 </resources>

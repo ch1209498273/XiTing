@@ -27,7 +27,30 @@ object AppLocales {
     const val SYSTEM = ""
 
     /** 支持的语言。tag 必须与 res/values-xxx 目录名一致。 */
-    val SUPPORTED = listOf(SYSTEM, "zh", "en", "ja")
+    val SUPPORTED = listOf(SYSTEM, "zh", "en", "ja", "ko", "fr", "de", "es", "ru")
+
+    /**
+     * 每种语言的显示名。
+     *
+     * 故意用**非本地化**资源（res/values/ 下的 lang_name_*，不写 values-XX）：
+     * 语言列表是在“当前语言”下渲染的，如果显示名也跟着本地化，
+     * 切到日语后列表里就变成「English」而不是「English」以外的样子，
+     * 用户反而认不出自己选的是哪一项。自称名是稳定的。
+     */
+    fun labels(ctx: Context): Array<String> = SUPPORTED.map { tag ->
+        when (tag) {
+            SYSTEM -> ctx.getString(R.string.lang_system)
+            "zh" -> ctx.getString(R.string.lang_name_zh)
+            "en" -> ctx.getString(R.string.lang_name_en)
+            "ja" -> ctx.getString(R.string.lang_name_ja)
+            "ko" -> ctx.getString(R.string.lang_name_ko)
+            "fr" -> ctx.getString(R.string.lang_name_fr)
+            "de" -> ctx.getString(R.string.lang_name_de)
+            "es" -> ctx.getString(R.string.lang_name_es)
+            "ru" -> ctx.getString(R.string.lang_name_ru)
+            else -> tag
+        }
+    }.toTypedArray()
 
     fun current(ctx: Context): String =
         ctx.prefs().getString(Prefs.LANG, SYSTEM) ?: SYSTEM

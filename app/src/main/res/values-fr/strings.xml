@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Français。由 tools/i18n.py sync 从 values/strings.xml 同步，请勿手改。 -->
+<resources>
+    <string name="app_name">Écoute écran off</string>
+    <string name="tile_label">Écoute écran off</string>
+    <string name="nav_home">Accueil</string>
+    <string name="nav_stats">Stats</string>
+    <string name="nav_settings">Réglages</string>
+    <string name="footer_offline">100 % hors ligne · aucune collecte</string>
+    <string name="title_stats">Statistiques d\'économie</string>
+    <string name="title_settings">Réglages</string>
+    <string name="status_running">En marche</string>
+    <string name="status_idle">Arrêté</string>
+    <string name="pill_on">Activé</string>
+    <string name="pill_off">Activer</string>
+    <string name="pill_battery_on">Inscrit</string>
+    <string name="pill_battery_off">Inscrire</string>
+    <string name="pill_abnormal">Anomalie · Réparer</string>
+    <string name="hero_title_start">Démarrer l\'écoute écran off</string>
+    <string name="hero_title_stop">Écoute écran off en cours</string>
+    <string name="hero_sub_start">Une fois lancé, touchez la bulle pendant une vidéo</string>
+    <string name="hero_sub_stop">Touchez la bulle : l\'écran s\'éteint, le son continue · Touchez pour arrêter</string>
+    <string name="timer_title">Arrêt programmé</string>
+    <string name="keepalive_title">Anti-arrêt</string>
+    <string name="keepalive_sub">Guide de config</string>
+    <string name="stats_section">Statistiques d\'économie</string>
+    <string name="view_details">Voir le détail ›</string>
+    <string name="label_today">Aujourd\'hui</string>
+    <string name="label_week">7 derniers jours</string>
+    <string name="label_total">Cumulé</string>
+    <string name="perm_section">Services et autorisations</string>
+    <string name="perm_overlay">Autorisation de superposition</string>
+    <string name="perm_battery">Liste blanche batterie</string>
+    <string name="perm_notify">Autorisation de notification</string>
+    <string name="stats_hint">Durée d\'écoute et estimation d\'économie (stockées localement)</string>
+    <string name="chart_title">Durée écran off par jour sur 7 jours</string>
+    <string name="ach_sub_empty">Chaque écoute allume une icône</string>
+    <string name="ach_sub_latest">Dernier déblocage : %1$s</string>
+    <string name="ach_progress">Réalisations</string>
+    <string name="pet_subtitle">Esprit électrique · nourri par votre temps d\'écoute réel</string>
+    <string name="sum_mah_default">Économie cumulée estimée ≈ 0 mAh</string>
+    <string name="sum_extra_default">Plus longue session — · 0 écran off</string>
+    <string name="timer_none">Non défini</string>
+    <string name="recent_records">Sessions récentes · 30 derniers jours uniquement</string>
+    <string name="pager_prev">‹ Précédent</string>
+    <string name="pager_next">Suivant ›</string>
+    <string name="settings_personal">Personnalisation</string>
+    <string name="switch_direct">Déverrouiller d\'un toucher</string>
+    <string name="switch_info">Afficher heure et batterie sur l\'écran noir</string>
+    <string name="switch_media">Commandes de lecture sur l\'écran noir</string>
+    <string name="switch_headset">Retour vidéo au débranchement</string>
+    <string name="bubble_style">Style de bulle</string>
+    <string name="settings_data">Données</string>
+    <string name="row_export">Exporter la sauvegarde</string>
+    <string name="row_export_sub">N\'importe où</string>
+    <string name="row_restore">Restaurer depuis une sauvegarde</string>
+    <string name="row_restore_sub">Progression et statistiques</string>
+    <string name="settings_about">À propos</string>
+    <string name="row_update">Vérifier les mises à jour</string>
+    <string name="row_share">Partager</string>
+    <string name="share_sub">Une fois par jour · +5 en attente</string>
+    <string name="row_about">À propos de l\'app</string>
+    <string name="row_about_sub">Utilisation / Confidentialité / Open source</string>
+    <string name="widget_black">Éteindre</string>
+    <string name="widget_active">En marche</string>
+    <string name="widget_idle">Arrêté</string>
+    <string name="widget_today_fmt">Aujourd\'hui %1$s</string>
+    <string name="widget_growth_next">Progression %1$d · %2$d avant la forme suivante</string>
+    <string name="widget_growth_max">Progression %1$d · Au sommet</string>
+    <string name="black_hint">Écoute écran off · Touchez pour déverrouiller</string>
+    <string name="black_return">🔒 Toucher pour revenir à la vidéo</string>
+    <string name="channel_name">Assistant Écran off</string>
+    <string name="notif_title">Assistant écran off en marche</string>
+    <string name="notif_text">Touchez la bulle : l\'écran s\'éteint, le son continue%1$s</string>
+    <string name="notif_action_listen">Écouter</string>
+    <string name="notif_action_restore">Restaurer l\'écran</string>
+    <string name="notif_action_stop">Quitter l\'assistant</string>
+    <string name="exit_confirm_title">Quitter l\'écoute écran off ?</string>
+    <string name="exit_confirm_yes">Quitter</string>
+    <string name="exit_notif_title">Écoute écran off quittée</string>
+    <string name="exit_notif_text">Appuyez sur « Annuler » pour restaurer la bulle</string>
+    <string name="exit_notif_undo">Annuler</string>
+    <string name="notif_action_bubble_hide">Masquer la bulle</string>
+    <string name="notif_action_bubble_show">Afficher la bulle</string>
+    <string name="switch_bubble">Afficher la bulle</string>
+    <string name="pet_spark">Étincelle</string>
+    <string name="pet_ball">Orbe</string>
+    <string name="pet_cloud">Esprit d\'orage</string>
+    <string name="pet_storm">Esprit de tempête</string>
+    <string name="pet_king">Roi du tonnerre</string>
+    <string name="perm_fix_hint">Désactivez puis réactivez « Superposition » dans les paramètres</string>
+    <string name="perm_need_overlay">Veuillez autoriser la superposition</string>
+    <string name="toast_overlay_granted">Autorisation de superposition accordée</string>
+    <string name="toast_battery_ok">Déjà exclu de l\'optimisation batterie</string>
+    <string name="toast_notify_granted">Autorisation de notification accordée</string>
+    <string name="toast_assistant_stopped">Assistant arrêté</string>
+    <string name="toast_assistant_started">Assistant démarré, touchez la bulle pendant une vidéo</string>
+    <string name="toast_call">Appel entrant, écran noir levé automatiquement</string>
+    <string name="toast_headset">Écouteurs débranchés, retour à la vidéo</string>
+    <string name="timer_item_episode">🎧 Finir cet épisode</string>
+    <string name="timer_15">15 min</string>
+    <string name="timer_30">30 min</string>
+    <string name="timer_60">60 min</string>
+    <string name="timer_cancel">Annuler la minuterie</string>
+    <string name="toast_timer_set">Arrêt dans %1$d min</string>
+    <string name="toast_timer_episode">Arrêt à la fin de l\'épisode</string>
+    <string name="toast_timer_expired">Minuterie expirée</string>
+    <string name="toast_timer_done">Minuterie terminée, écran rallumé</string>
+    <string name="toast_timer_cancelled">Arrêt programmé annulé</string>
+    <string name="toast_episode_done">Éteindre à la fin de l\'épisode (dans %1$d min %2$d s)</string>
+    <string name="timer_remain_fmt">Il reste %1$d min</string>
+    <string name="restore_title">Restaurer les données</string>
+    <string name="restore_msg">Si vous avez déjà utilisé « Écoute écran off » puis l\'avez désinstallé : la sauvegarde se trouve dans le dossier XiTing de Téléchargements (XiTing-backup.json). Vous pouvez restaurer ici la progression et les statistiques en un geste.
+
+Si vous êtes nouveau, appuyez sur « Non merci ».</string>
+    <string name="restore_pick">Choisir le fichier de sauvegarde</string>
+    <string name="restore_no">Non merci</string>
+    <string name="toast_invalid_backup">Fichier de sauvegarde invalide</string>
+    <string name="restore_other_title">Sauvegarde provenant d\'un autre appareil</string>
+    <string name="restore_other_msg">Cette sauvegarde contient %1$d de progression, mais l\'identifiant d\'appareil diffère du vôtre (changement de téléphone ou migration depuis une ancienne version signée). Restaurer quand même ?</string>
+    <string name="restore_ok_btn">Restaurer</string>
+    <string name="dlg_cancel">Annuler</string>
+    <string name="toast_restore_done">Données restaurées ✓ (progression %1$d)</string>
+    <string name="toast_restore_fail">Échec de la restauration</string>
+    <string name="toast_picker_fail">Impossible d\'ouvrir le sélecteur de fichiers</string>
+    <string name="toast_export_ok">Exporté ✓</string>
+    <string name="toast_export_fail">Échec de l\'export</string>
+    <string name="keepalive_dlg_title">Configuration anti-arrêt</string>
+    <string name="keepalive_msg">Le système purge les applications en arrière-plan, ce qui fait disparaître la bulle. Trois étapes pour une stabilité durable :
+
+1. Liste blanche batterie (%1$s) — appuyez sur « Réglages batterie » ci-dessous
+
+2. Démarrage auto : « Infos de l\'app » → Utilisation de la batterie → autoriser le démarrage auto et l\'activité en arrière-plan
+
+3. Verrouiller la carte : ouvrez les applications récentes et appuyez sur l\'icône cadenas sur la carte Écoute écran off</string>
+    <string name="state_done">Fait ✓</string>
+    <string name="state_todo">À faire</string>
+    <string name="keepalive_btn_battery">Réglages batterie</string>
+    <string name="keepalive_btn_ok">J\'ai compris</string>
+    <string name="locale_dlg_title">Accès aux notifications requis</string>
+    <string name="locale_dlg_msg">« Finir cet épisode » doit lire la progression de lecture en cours.
+Autorisez l\'accès aux notifications pour Écoute écran off dans les paramètres système (utilisé uniquement pour lire la progression).
+
+Sans autorisation, le compte à rebours normal fonctionne aussi.</string>
+    <string name="locale_dlg_go">Autoriser</string>
+    <string name="locale_dlg_fallback">Utiliser le minuteur</string>
+    <string name="toast_no_progress">Progression de lecture illisible : lisez un épisode d\'abord, ou utilisez le compte à rebours.</string>
+    <string name="ach_toast_fmt">🏆 Réalisation : %1$s %2$s</string>
+    <string name="ach_dlg_title_fmt">Réalisations %1$d/%2$d</string>
+    <string name="ach_dlg_hint">Les badges s\'allument à gauche de l\'esprit, du plus facile au plus dur</string>
+    <string name="ach_row_unlocked">Allumé</string>
+    <string name="ach_row_locked">Verrouillé</string>
+    <string name="dlg_ok">OK</string>
+    <string name="toast_charge">+%1$d de progression récupérés ✓</string>
+    <string name="pet_caption_sleepy">%1$s somnole · Écoutez un épisode pour le réveiller</string>
+    <string name="pet_caption_max">%1$s · Au sommet · Progression %2$d en réserve</string>
+    <string name="pet_caption_progress">%1$s · Progression %2$d / %3$d</string>
+    <string name="ach_c100_t">Cent fois</string>
+    <string name="ach_c100_d">100 écrans off cumulés</string>
+    <string name="ach_marathon_t">Marathon</string>
+    <string name="ach_marathon_d">1 heure d\'écoute d\'affilée</string>
+    <string name="ach_week_t">Régularité</string>
+    <string name="ach_week_d">Écoute sur 7 jours différents</string>
+    <string name="ach_king_t">Couronnement</string>
+    <string name="ach_king_d">L\'esprit atteint le Roi du tonnerre</string>
+    <string name="calib_title">Mesure d\'économie</string>
+    <string name="calib_msg_calibrated">Calibré sur cet appareil (%1$s)
+Débit d\'économie mesuré ≈ %2$.0f mAh/h</string>
+    <string name="calib_msg_uncalibrated">Pas encore calibré (estimation selon le modèle OLED standard)</string>
+    <string name="calib_msg_ambient">Consommation mesurée en écran noir ≈ %1$.0f mA (%2$d échantillons)</string>
+    <string name="calib_msg_flow">Procédure (environ 6 minutes) :
+① Lisez une vidéo écran allumé pendant 3 minutes
+② L\'application passe automatiquement en écran noir 3 minutes
+
+Ne chargez pas ; gardez la batterie entre 15 % et 95 %.</string>
+    <string name="calib_btn_restart">Recalibrer</string>
+    <string name="calib_btn_start">Lancer le calibrage</string>
+    <string name="calib_btn_close">Fermer</string>
+    <string name="calib_step1_title">Calibrage 1/2 · Écran allumé</string>
+    <string name="calib_step1_init">Commencez à lire une vidéo et laissez l\'écran allumé…</string>
+    <string name="toast_calib_too_few">Échantillons insuffisants (en charge ?), calibration annulée</string>
+    <string name="toast_calib_need_service">Démarrez d\'abord l\'assistant, puis calibrez</string>
+    <string name="toast_calib_step2">Calibrage 2/2 : laissez l\'écran noir 3 minutes, rien à faire</string>
+    <string name="toast_calib_ok">Calibrage terminé ✓ (%1$d échantillons valides)</string>
+    <string name="toast_calib_invalid">Échantillons invalides (en charge ?), réessayez</string>
+    <string name="toast_calib_done">Calibrage terminé : économie mesurée ≈ %1$.0f mAh/h</string>
+    <string name="toast_calib_timeout">Calibrage expiré, réessayez</string>
+    <string name="saved_basis_measured">Mesuré sur cet appareil</string>
+    <string name="saved_basis_model">Estimé d\'après un écran OLED</string>
+    <string name="sum_saved_fmt">%1$s économisés ≈ %2$d mAh (%3$s)</string>
+    <string name="fmt_sessions">%1$d fois</string>
+    <string name="sum_extra_fmt">Plus longue %1$s · %2$d écrans off au total</string>
+    <string name="list_empty">Aucun enregistrement — lancez une écoute pour voir le détail</string>
+    <string name="pager_info_fmt">Page %1$d / %2$d · %3$d entrées</string>
+    <string name="day_today">Aujourd\'hui</string>
+    <string name="day_yesterday">Hier</string>
+    <string name="share_chooser">Partager vers</string>
+    <string name="share_text">⚡ Avec « Écoute écran off » j\'ai écouté %1$s écran éteint, soit environ %2$d mAh économisés
+Mon esprit électrique a évolué jusqu\'à « %3$s »
+Une appli gratuite, sans publicité, hors ligne (0,6 Mo)
+https://github.com/ch1209498273/XiTing</string>
+    <string name="toast_share_done">Partagé · +%1$d en attente (récupérez sur la page Stats)</string>
+    <string name="toast_share_claimed">Récompense du jour déjà récupérée, revenez demain</string>
+    <string name="share_sub_claimed">Récupéré aujourd\'hui ✓ · Revenez demain</string>
+    <string name="share_sub_avail">+%1$d disponibles aujourd\'hui · en attente</string>
+    <string name="help_title">À propos de la progression</string>
+    <string name="help_msg">· 1 point de progression par minute d\'écoute (d\'abord en attente)
+· 5 points pour le premier partage de la journée (d\'abord en attente)
+· Plafond de 200 points en attente ; récupérez avant d\'écouter
+· Les points en attente expirent après 3 jours ; ceux qui expirent bientôt s\'affichent en rouge
+· Appuyez sur la barre de gauche pour récupérer : ils comptent alors dans le niveau de l\'esprit</string>
+    <string name="toast_media_on">Activé : commandes ⏮ ⏸ ⏭ après réveil</string>
+    <string name="toast_browser_fail">Impossible d\'ouvrir le navigateur</string>
+    <string name="update_value_fmt">v%1$s</string>
+    <string name="bubble_default">Écran off (défaut)</string>
+    <string name="bubble_label_off">Écran off</string>
+    <string name="bubble_dlg_title">Style de bulle (aperçu en direct)</string>
+    <string name="toast_bubble_locked">« %1$s » verrouillé · %2$d de progression requis</string>
+    <string name="bubble_value_default">Défaut</string>
+    <string name="unit_h">h</string>
+    <string name="unit_m">min</string>
+    <string name="unit_m_full">min</string>
+    <string name="unit_s">s</string>
+    <string name="about_title">À propos</string>
+    <string name="about_section_app">À propos de cette app</string>
+    <string name="about_intro">Vous voulez écouter les yeux fermés pendant une vidéo ? Touchez la bulle et l\'écran s\'éteint complètement : rétroéclairage coupé, toucher bloqué, le son continue — fonctionne avec n\'importe quelle app vidéo.
+
+Horloge sombre et batterie optionnelles (visibles à la luminosité minimale après re-verrouillage, contenu légèrement déplacé pour protéger l\'OLED) ; les appels font sortir automatiquement de l\'écran noir, donc aucun appel manqué ; arrêt programmé et minuterie « finir cet épisode » ; le débranchement des écouteurs ramène à la vidéo.
+
+Après réveil : épisode précédent / lecture-pause / suivant (activables dans les réglages).
+
+Esprit électrique : l\'écoute fait grandir un esprit à cinq formes (Étincelle → Orbe → Esprit d\'orage → Esprit de tempête → Roi du tonnerre), utilisable comme avatar de la bulle ; les succès enregistrent vos étapes.
+
+Widgets : trois tailles avec l\'esprit, les statistiques et un appui pour éteindre ; appui long sur la bulle pour quitter.
+
+Sauvegarde : automatique dans le dossier XiTing de Téléchargements (appareil uniquement), restaurable en un geste après réinstallation. Aucune donnée ne quitte l\'appareil, aucune permission réseau.</string>
+    <string name="about_section_privacy">Confidentialité et sécurité</string>
+    <string name="about_privacy">· Aucune permission INTERNET : connexion réseau impossible
+· Aucune capture ni lecture du contenu de l\'écran
+· Toutes les données restent sur l\'appareil (sauvegarde cloud et transfert automatique désactivés)
+· La sauvegarde n\'est écrite que lorsque vous appuyez sur Exporter, dans Téléchargements/XiTing, et vous la gérez
+· Le nombre de notifications n\'est compté (pour l\'indicateur de l\'écran noir) qu\'après votre autorisation explicite ; ni titre ni contenu ne sont lus, et la fonction reste inactive sans autorisation
+· L\'app contient un identifiant de build (ID et canal), uniquement pour tracer les copies pirates, sans aucune information d\'appareil
+· Pas de publicité, pas de tracking, pas de télémétrie</string>
+    <string name="about_section_open">Open source et contact</string>
+    <string name="about_github">GitHub : github.com/ch1209498273/XiTing
+(appuyez pour ouvrir la page du projet)</string>
+    <string name="about_feedback">Retour : 1209498273@qq.com</string>
+    <string name="about_section_license">Licence</string>
+    <string name="about_license">Licence non commerciale (voir LICENSE) : usage et partage libres pour l\'apprentissage personnel, à condition de conserver la paternité ; tout usage commercial est interdit ; la suppression ou la modification des mentions et de la traçabilité est interdite.
+
+Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vidéo. Usage éducatif uniquement, merci de soutenir les œuvres originales.</string>
+    <string name="about_version_fmt">Version %1$s · Build ID %2$s</string>
+    <string name="gallery_title">Bestiaire</string>
+    <string name="count_placeholder">0 fois</string>
+    <string name="dur_min_placeholder">0 min</string>
+    <string name="dur_placeholder">0 s</string>
+    <string name="update_placeholder">v—</string>
+    <string name="version_placeholder">Version —</string>
+    <string name="pager_placeholder">1 / 1</string>
+    <string name="gallery_btn">🎨 Bestiaire</string>
+    <string name="streak_fmt">🔥 %1$d jours d\'affilée</string>
+    <string name="streak_best_fmt">Record : %1$d jours</string>
+    <string name="toast_rare_energy">⚡ Énergie d\'orage rare +%1$d !</string>
+    <string name="toast_skin_unlock">🎨 Nouveau skin : %1$s</string>
+    <string name="skin_default_n">Palette classique</string>
+    <string name="skin_cond_default">Forme par défaut</string>
+    <string name="skin_star_n">Âme nocturne</string>
+    <string name="skin_cond_star">1000 mAh économisés</string>
+    <string name="skin_aurora_n">Esprit d\'aurore</string>
+    <string name="skin_cond_aurora">2 h d\'affilée</string>
+    <string name="skin_sakura_n">Esprit sakura</string>
+    <string name="skin_cond_sakura">14 jours d\'affilée</string>
+    <string name="skin_magma_n">Tyran de magma</string>
+    <string name="skin_cond_magma">2000 de plus après le sommet</string>
+    <string name="skin_jade_n">Dieu de jade</string>
+    <string name="skin_cond_jade">60 jours d\'affilée</string>
+    <string name="gallery_locked">🔒 %1$s (%2$s)</string>
+    <string name="gallery_worn">« %1$s » équipé</string>
+    <string name="gallery_form_label">Forme</string>
+    <string name="gallery_skin_label">Palette</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">Il faut %1$d de progression pour débloquer</string>
+    <string name="gallery_form_next">Encore %1$d pour la forme suivante</string>
+    <string name="gallery_form_maxed">Toutes les formes débloquées</string>
+    <string name="bubble_style_title">Style de bulle</string>
+    <string name="toast_battery_fail">Impossible d\'ouvrir les réglages, faites-le manuellement</string>
+    <string name="keepalive_btn_appdetail">Infos de l\'app</string>
+    <string name="chart_no_data">Aucune donnée</string>
+    <string name="lang_title">Langue / Language</string>
+    <string name="lang_sub">Langue de l\'interface</string>
+    <string name="lang_system">Suivre le système</string>
+    <string name="lang_name_zh">简体中文</string>
+    <string name="lang_name_en">English</string>
+    <string name="lang_name_ja">日本語</string>
+    <string name="lang_name_ko">한국어</string>
+    <string name="lang_name_fr">Français</string>
+    <string name="lang_name_de">Deutsch</string>
+    <string name="lang_name_es">Español</string>
+    <string name="lang_name_ru">Русский</string>
+    <string name="lang_restart_note">Prend effet immédiatement</string>
+</resources>

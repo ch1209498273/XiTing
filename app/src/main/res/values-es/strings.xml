@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Español。由 tools/i18n.py sync 从 values/strings.xml 同步，请勿手改。 -->
+<resources>
+    <string name="app_name">Escucha con pantalla apagada</string>
+    <string name="tile_label">Pantalla apagada</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_stats">Estadísticas</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="footer_offline">100 % sin conexión · sin recopilar datos</string>
+    <string name="title_stats">Estadísticas de ahorro</string>
+    <string name="title_settings">Ajustes</string>
+    <string name="status_running">En marcha</string>
+    <string name="status_idle">Detenido</string>
+    <string name="pill_on">Activado</string>
+    <string name="pill_off">Activar</string>
+    <string name="pill_battery_on">Incluido</string>
+    <string name="pill_battery_off">Incluir</string>
+    <string name="pill_abnormal">Error · Reparar</string>
+    <string name="hero_title_start">Iniciar escucha con pantalla apagada</string>
+    <string name="hero_title_stop">Escucha con pantalla apagada en marcha</string>
+    <string name="hero_sub_start">Al iniciar, toca la burbuja mientras ves un vídeo</string>
+    <string name="hero_sub_stop">Toca la burbuja: pantalla negra, el sonido sigue · Toca para detener</string>
+    <string name="timer_title">Apagado automático</string>
+    <string name="keepalive_title">Evitar el cierre</string>
+    <string name="keepalive_sub">Guía de configuración</string>
+    <string name="stats_section">Estadísticas de ahorro</string>
+    <string name="view_details">Ver detalle ›</string>
+    <string name="label_today">Hoy</string>
+    <string name="label_week">Últimos 7 días</string>
+    <string name="label_total">Total</string>
+    <string name="perm_section">Servicios y permisos</string>
+    <string name="perm_overlay">Permiso de superposición</string>
+    <string name="perm_battery">Lista blanca de batería</string>
+    <string name="perm_notify">Permiso de notificaciones</string>
+    <string name="stats_hint">Tiempo de escucha y ahorro estimado (guardado solo en el dispositivo)</string>
+    <string name="chart_title">Tiempo con pantalla apagada por día (7 días)</string>
+    <string name="ach_sub_empty">Cada escucha enciende uno más</string>
+    <string name="ach_sub_latest">Último desbloqueo: %1$s</string>
+    <string name="ach_progress">Logros</string>
+    <string name="pet_subtitle">Espíritu eléctrico · alimentado con tu tiempo real</string>
+    <string name="sum_mah_default">Ahorro acumulado estimado ≈ 0 mAh</string>
+    <string name="sum_extra_default">Sesión más larga — · 0 pantallas apagadas</string>
+    <string name="timer_none">Sin configurar</string>
+    <string name="recent_records">Sesiones recientes · solo 30 días</string>
+    <string name="pager_prev">‹ Anterior</string>
+    <string name="pager_next">Siguiente ›</string>
+    <string name="settings_personal">Personalización</string>
+    <string name="switch_direct">Desbloquear con un toque</string>
+    <string name="switch_info">Mostrar hora y batería en la pantalla negra</string>
+    <string name="switch_media">Controles de reproducción en pantalla negra</string>
+    <string name="switch_headset">Volver al vídeo al quitar los auriculares</string>
+    <string name="bubble_style">Estilo de burbuja</string>
+    <string name="settings_data">Datos</string>
+    <string name="row_export">Exportar copia de seguridad</string>
+    <string name="row_export_sub">En cualquier lugar</string>
+    <string name="row_restore">Restaurar desde copia</string>
+    <string name="row_restore_sub">Progreso y estadísticas</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="row_update">Buscar actualizaciones</string>
+    <string name="row_share">Compartir con amigos</string>
+    <string name="share_sub">Una vez al día · +5 pendiente</string>
+    <string name="row_about">Acerca de la app</string>
+    <string name="row_about_sub">Uso / Privacidad / Código abierto</string>
+    <string name="widget_black">Apagar</string>
+    <string name="widget_active">En marcha</string>
+    <string name="widget_idle">Detenido</string>
+    <string name="widget_today_fmt">Hoy %1$s</string>
+    <string name="widget_growth_next">Progreso %1$d · faltan %2$d para la siguiente forma</string>
+    <string name="widget_growth_max">Progreso %1$d · Máximo alcanzado</string>
+    <string name="black_hint">Escuchando con pantalla apagada · Toca para desbloquear</string>
+    <string name="black_return">🔒 Toca para volver al vídeo</string>
+    <string name="channel_name">Asistente de pantalla apagada</string>
+    <string name="notif_title">Asistente en marcha</string>
+    <string name="notif_text">Toca la burbuja: pantalla apagada, el sonido sigue%1$s</string>
+    <string name="notif_action_listen">Escuchar</string>
+    <string name="notif_action_restore">Restaurar pantalla</string>
+    <string name="notif_action_stop">Salir del asistente</string>
+    <string name="exit_confirm_title">¿Salir de la escucha con pantalla apagada?</string>
+    <string name="exit_confirm_yes">Salir</string>
+    <string name="exit_notif_title">Escucha finalizada</string>
+    <string name="exit_notif_text">Toca [Deshacer] para restaurar la burbuja</string>
+    <string name="exit_notif_undo">Deshacer</string>
+    <string name="notif_action_bubble_hide">Ocultar burbuja</string>
+    <string name="notif_action_bubble_show">Mostrar burbuja</string>
+    <string name="switch_bubble">Mostrar burbuja</string>
+    <string name="pet_spark">Chispa</string>
+    <string name="pet_ball">Esfera</string>
+    <string name="pet_cloud">Espíritu de tormenta</string>
+    <string name="pet_storm">Espíritu de tempestad</string>
+    <string name="pet_king">Rey del trueno</string>
+    <string name="perm_fix_hint">En los ajustes del sistema, desactiva y reactiva [Superposición]</string>
+    <string name="perm_need_overlay">Concede el permiso de superposición</string>
+    <string name="toast_overlay_granted">Permiso de superposición concedido</string>
+    <string name="toast_battery_ok">Ya está exento de la optimización de batería</string>
+    <string name="toast_notify_granted">Permiso de notificaciones concedido</string>
+    <string name="toast_assistant_stopped">Asistente detenido</string>
+    <string name="toast_assistant_started">Asistente iniciado, toca la burbuja al ver un vídeo</string>
+    <string name="toast_call">Llamada entrante, pantalla negra levantada</string>
+    <string name="toast_headset">Auriculares desconectados, volviendo al vídeo</string>
+    <string name="timer_item_episode">🎧 Terminar este capítulo</string>
+    <string name="timer_15">15 min</string>
+    <string name="timer_30">30 min</string>
+    <string name="timer_60">60 min</string>
+    <string name="timer_cancel">Cancelar temporizador</string>
+    <string name="toast_timer_set">Apagado en %1$d min</string>
+    <string name="toast_timer_episode">Se apagará al terminar el capítulo</string>
+    <string name="toast_timer_expired">Temporizador agotado</string>
+    <string name="toast_timer_done">Temporizador terminado, pantalla encendida</string>
+    <string name="toast_timer_cancelled">Apagado automático cancelado</string>
+    <string name="toast_episode_done">Se apagará al terminar el capítulo (en %1$d min %2$d s)</string>
+    <string name="timer_remain_fmt">Quedan %1$d min</string>
+    <string name="restore_title">Restaurar datos</string>
+    <string name="restore_msg">Si ya usaste « Escucha con pantalla apagada » y la desinstalaste: la copia está en la carpeta XiTing de Descargas (XiTing-backup.json). Aquí puedes restaurar el progreso y las estadísticas con un toque.
+
+Si eres nuevo, pulsa « No, gracias ».</string>
+    <string name="restore_pick">Elegir archivo de copia</string>
+    <string name="restore_no">No, gracias</string>
+    <string name="toast_invalid_backup">Archivo de copia no válido</string>
+    <string name="restore_other_title">Copia de otro dispositivo</string>
+    <string name="restore_other_msg">Esta copia tiene %1$d de progreso pero el ID de dispositivo no coincide (cambio de móvil o migración desde una versión firmada antigua). ¿Restaurar de todos modos?</string>
+    <string name="restore_ok_btn">Restaurar</string>
+    <string name="dlg_cancel">Cancelar</string>
+    <string name="toast_restore_done">Datos restaurados ✓ (progreso %1$d)</string>
+    <string name="toast_restore_fail">Error al restaurar</string>
+    <string name="toast_picker_fail">No se pudo abrir el selector de archivos</string>
+    <string name="toast_export_ok">Exportado ✓</string>
+    <string name="toast_export_fail">Error al exportar</string>
+    <string name="keepalive_dlg_title">Configurar protección de cierre</string>
+    <string name="keepalive_msg">El sistema limpia las apps en segundo plano y la burbuja desaparece. Tres pasos para que sea estable:
+
+1. Lista blanca de batería (%1$s): pulsa « Ajustes de batería » abajo
+
+2. Inicio automático: « Info de la app » → Uso de batería → permitir inicio automático y actividad en segundo plano
+
+3. Bloquear la tarjeta: abre las apps recientes y pulsa el candado en la tarjeta Escucha con pantalla apagada</string>
+    <string name="state_done">Hecho ✓</string>
+    <string name="state_todo">Pendiente</string>
+    <string name="keepalive_btn_battery">Ajustes de batería</string>
+    <string name="keepalive_btn_ok">Entendido</string>
+    <string name="locale_dlg_title">Se necesita acceso a notificaciones</string>
+    <string name="locale_dlg_msg">« Terminar este capítulo » necesita leer el progreso de reproducción.
+Permite el acceso a las notificaciones de Escucha con pantalla apagada en los ajustes del sistema (solo para leer el progreso).
+
+Sin permiso, el temporizador normal también sirve.</string>
+    <string name="locale_dlg_go">Permitir</string>
+    <string name="locale_dlg_fallback">Usar temporizador</string>
+    <string name="toast_no_progress">No se pudo leer el progreso: reproduce un capítulo primero o usa el temporizador.</string>
+    <string name="ach_toast_fmt">🏆 Logro: %1$s %2$s</string>
+    <string name="ach_dlg_title_fmt">Logros %1$d/%2$d</string>
+    <string name="ach_dlg_hint">Las insignias se encienden a la izquierda del espíritu, de menor a mayor</string>
+    <string name="ach_row_unlocked">Encendido</string>
+    <string name="ach_row_locked">Bloqueado</string>
+    <string name="dlg_ok">Aceptar</string>
+    <string name="toast_charge">+%1$d de progreso recogido ✓</string>
+    <string name="pet_caption_sleepy">%1$s se ha dormido · Escucha un capítulo para despertarlo</string>
+    <string name="pet_caption_max">%1$s · Máximo alcanzado · Progreso %2$d acumulado</string>
+    <string name="pet_caption_progress">%1$s · Progreso %2$d / %3$d</string>
+    <string name="ach_c100_t">Cien veces</string>
+    <string name="ach_c100_d">100 pantallas apagadas acumuladas</string>
+    <string name="ach_marathon_t">Maratón</string>
+    <string name="ach_marathon_d">1 hora de escucha seguida</string>
+    <string name="ach_week_t">Constancia</string>
+    <string name="ach_week_d">Escucha en 7 días distintos</string>
+    <string name="ach_king_t">Coronación</string>
+    <string name="ach_king_d">El espíritu alcanza al Rey del Trueno</string>
+    <string name="calib_title">Medir el ahorro</string>
+    <string name="calib_msg_calibrated">Calibrado en este dispositivo (%1$s)
+Ahorro medido ≈ %2$.0f mAh/h</string>
+    <string name="calib_msg_uncalibrated">Aún sin calibrar (ahora se estima con el modelo OLED estándar)</string>
+    <string name="calib_msg_ambient">Consumo medido en pantalla negra ≈ %1$.0f mA (%2$d muestras)</string>
+    <string name="calib_msg_flow">Procedimiento (unos 6 minutos):
+① Reproduce un vídeo con la pantalla encendida 3 minutos
+② La app pasa a pantalla negra 3 minutos automáticamente
+
+No cargues; mantén la batería entre el 15 % y el 95 %.</string>
+    <string name="calib_btn_restart">Recalibrar</string>
+    <string name="calib_btn_start">Iniciar calibración</string>
+    <string name="calib_btn_close">Cerrar</string>
+    <string name="calib_step1_title">Calibración 1/2 · Pantalla encendida</string>
+    <string name="calib_step1_init">Empieza a reproducir un vídeo y deja la pantalla encendida…</string>
+    <string name="toast_calib_too_few">Muestras insuficientes (¿está cargando?), calibración cancelada</string>
+    <string name="toast_calib_need_service">Primero inicia el asistente y luego calibra</string>
+    <string name="toast_calib_step2">Calibración 2/2: deja la pantalla negra 3 minutos, no hace falta hacer nada</string>
+    <string name="toast_calib_ok">Calibración completada ✓ (%1$d muestras válidas)</string>
+    <string name="toast_calib_invalid">Muestras no válidas (¿está cargando?), inténtalo de nuevo</string>
+    <string name="toast_calib_done">Calibración completada: ahorro medido ≈ %1$.0f mAh/h</string>
+    <string name="toast_calib_timeout">La calibración expiró, inténtalo de nuevo</string>
+    <string name="saved_basis_measured">Medido en este dispositivo</string>
+    <string name="saved_basis_model">Estimado según consumo de pantallas OLED</string>
+    <string name="sum_saved_fmt">%1$s ahorrado ≈ %2$d mAh (%3$s)</string>
+    <string name="fmt_sessions">%1$d veces</string>
+    <string name="sum_extra_fmt">Más larga %1$s · %2$d pantallas apagadas en total</string>
+    <string name="list_empty">Sin registros: inicia una escucha para ver el detalle</string>
+    <string name="pager_info_fmt">Página %1$d / %2$d · %3$d entradas</string>
+    <string name="day_today">Hoy</string>
+    <string name="day_yesterday">Ayer</string>
+    <string name="share_chooser">Compartir en</string>
+    <string name="share_text">⚡ Con « Escucha con pantalla apagada » escuché %1$s a pantalla apagada, ahorrando unos %2$d mAh
+Mi espíritu eléctrico ya evolucionó a « %3$s »
+App gratuita, sin anuncios, totalmente offline (0,6 MB)
+https://github.com/ch1209498273/XiTing</string>
+    <string name="toast_share_done">Compartido · +%1$d pendiente (recógelo en Estadísticas)</string>
+    <string name="toast_share_claimed">Recompensa de hoy ya recogida, vuelve mañana</string>
+    <string name="share_sub_claimed">Recogido hoy ✓ · Vuelve mañana</string>
+    <string name="share_sub_avail">Hoy +%1$d · pendiente</string>
+    <string name="help_title">Sobre el progreso</string>
+    <string name="help_msg">· 1 punto de progreso por minuto de escucha (primero en pendientes)
+· 5 puntos por compartir la primera vez cada día (primero en pendientes)
+· Máximo 200 pendientes; recógelos antes de seguir escuchando
+· Los pendientes caducan a los 3 días; los que caducan pronto se ven en rojo
+· Pulsa la barra de la izquierda para recogerlos, y contarán para el nivel del espíritu</string>
+    <string name="toast_media_on">Activado: controles ⏮ ⏸ ⏭ tras despertar</string>
+    <string name="toast_browser_fail">No se pudo abrir el navegador</string>
+    <string name="update_value_fmt">v%1$s</string>
+    <string name="bubble_default">Pantalla apagada (por defecto)</string>
+    <string name="bubble_label_off">Pantalla apagada</string>
+    <string name="bubble_dlg_title">Estilo de burbuja (vista previa)</string>
+    <string name="toast_bubble_locked">[%1$s] bloqueado · Necesita %2$d de progreso</string>
+    <string name="bubble_value_default">Por defecto</string>
+    <string name="unit_h">h</string>
+    <string name="unit_m">min</string>
+    <string name="unit_m_full">min</string>
+    <string name="unit_s">s</string>
+    <string name="about_title">Acerca de</string>
+    <string name="about_section_app">Sobre esta app</string>
+    <string name="about_intro">¿Quieres escuchar con los ojos cerrados durante un vídeo? Toca la burbuja y la pantalla se apaga por completo: retroiluminación apagada, táctil bloqueado, el sonido sigue — sirve con cualquier app de vídeo.
+
+Reloj oscuro y batería opcionales (visibles al brillo mínimo tras volver a bloquear; el contenido se desplaza ligeramente para proteger la OLED); las llamadas levantan la pantalla negra automáticamente, así que no te pierdes ninguna; apagado programado y temporizador inteligente « Terminar este capítulo »; al quitar los auriculares vuelves al vídeo.
+
+Tras despertar: capítulo anterior / reproducir-pausa / siguiente (activable en Ajustes).
+
+Espíritu eléctrico: escuchar hace crecer un espíritu de cinco formas (Chispa → Esfera → Espíritu de tormenta → Espíritu de tempestad → Rey del trueno), usable como avatar de la burbuja; los logros guardan tus hitos.
+
+Widgets: tres tamaños con el espíritu, las estadísticas y un toque para apagar; pulsación larga en la burbuja para salir.
+
+Copia de seguridad: automática en la carpeta XiTing de Descargas (solo en el dispositivo), restaurable con un toque tras reinstalar. Todos los datos se quedan en el dispositivo, sin permiso de red.</string>
+    <string name="about_section_privacy">Privacidad y seguridad</string>
+    <string name="about_privacy">· Sin permiso INTERNET: físicamente no puede conectarse
+· No lee el contenido de la pantalla
+· Todos los datos se quedan en el dispositivo (copia en la nube y transferencia automática desactivadas)
+· La copia solo se escribe al pulsar Exportar, en Descargas/XiTing, y la gestionas tú
+· Solo se cuentan las notificaciones (para el indicador de la pantalla negra) tras tu permiso explícito; nunca se lee el título ni el contenido, y sin permiso la función no se activa
+· La app incluye una identificación de compilación (ID y canal), solo para rastrear copias piratas, sin información del dispositivo
+· Sin anuncios, sin rastreo, sin telemetría</string>
+    <string name="about_section_open">Código abierto y contacto</string>
+    <string name="about_github">GitHub: github.com/ch1209498273/XiTing
+(pulsa para abrir la página del proyecto)</string>
+    <string name="about_feedback">Comentarios: 1209498273@qq.com</string>
+    <string name="about_section_license">Licencia</string>
+    <string name="about_license">Licencia no comercial (ver LICENSE): uso y compartición libres para aprendizaje e intercambio, conservando la autoría; se prohíbe cualquier uso comercial; no se permite eliminar ni alterar la autoría ni la marca de rastreo.
+
+Este proyecto no tiene relación con YouTube, Google ni ninguna plataforma de vídeo. Solo para aprender e intercambiar: apoya lo original.</string>
+    <string name="about_version_fmt">Versión %1$s · ID de compilación %2$s</string>
+    <string name="gallery_title">Bestiario</string>
+    <string name="count_placeholder">0 veces</string>
+    <string name="dur_min_placeholder">0 min</string>
+    <string name="dur_placeholder">0 s</string>
+    <string name="update_placeholder">v—</string>
+    <string name="version_placeholder">Versión —</string>
+    <string name="pager_placeholder">1 / 1</string>
+    <string name="gallery_btn">🎨 Bestiario</string>
+    <string name="streak_fmt">🔥 %1$d días seguidos</string>
+    <string name="streak_best_fmt">Récord: %1$d días</string>
+    <string name="toast_rare_energy">⚡ ¡Energía de tormenta rara! +%1$d</string>
+    <string name="toast_skin_unlock">🎨 Nueva piel: %1$s</string>
+    <string name="skin_default_n">Paleta clásica</string>
+    <string name="skin_cond_default">Forma por defecto</string>
+    <string name="skin_star_n">Alma nocturna</string>
+    <string name="skin_cond_star">1000 mAh ahorrados</string>
+    <string name="skin_aurora_n">Espíritu del amanecer</string>
+    <string name="skin_cond_aurora">2 horas seguidas</string>
+    <string name="skin_sakura_n">Espíritu sakura</string>
+    <string name="skin_cond_sakura">14 días seguidos</string>
+    <string name="skin_magma_n">Tirano de magma</string>
+    <string name="skin_cond_magma">2000 más tras el máximo</string>
+    <string name="skin_jade_n">Dios del jade</string>
+    <string name="skin_cond_jade">60 días seguidos</string>
+    <string name="gallery_locked">🔒 %1$s (%2$s)</string>
+    <string name="gallery_worn">[%1$s] equipado</string>
+    <string name="gallery_form_label">Forma</string>
+    <string name="gallery_skin_label">Paleta</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">Necesitas %1$d de progreso para desbloquearla</string>
+    <string name="gallery_form_next">Acumula %1$d más para la siguiente forma</string>
+    <string name="gallery_form_maxed">Todas las formas desbloqueadas</string>
+    <string name="bubble_style_title">Estilo de burbuja</string>
+    <string name="toast_battery_fail">No se pudieron abrir los ajustes del sistema, hazlo manualmente</string>
+    <string name="keepalive_btn_appdetail">Info de la app</string>
+    <string name="chart_no_data">Sin datos</string>
+    <string name="lang_title">Idioma / Language</string>
+    <string name="lang_sub">Idioma de la interfaz</string>
+    <string name="lang_system">Seguir al sistema</string>
+    <string name="lang_name_zh">简体中文</string>
+    <string name="lang_name_en">English</string>
+    <string name="lang_name_ja">日本語</string>
+    <string name="lang_name_ko">한국어</string>
+    <string name="lang_name_fr">Français</string>
+    <string name="lang_name_de">Deutsch</string>
+    <string name="lang_name_es">Español</string>
+    <string name="lang_name_ru">Русский</string>
+    <string name="lang_restart_note">Se aplica al instante, sin reiniciar</string>
+</resources>

@@ -291,9 +291,14 @@
     <!-- 语言选择 -->
     <string name="lang_title">语言 / Language</string>
     <string name="lang_sub">界面显示语言</string>
-    <string name="lang_system">跟随系统</string>
-    <string name="lang_zh">简体中文</string>
-    <string name="lang_en">English</string>
-    <string name="lang_ja">日本語</string>
-    <string name="lang_restart_note">切换语言后立即生效，无需重启</string>
+    <string name="lang_system">跟随系统</string>    <!-- 语言自称名。不放进 values-XX，因为切换语言后列表里每一项都该显示它自己的名字；
+         sync 会把同一份内容复制到所有语言文件，所以七种语言下这七行完全一致。 -->
+    <string name="lang_name_zh">简体中文</string>
+    <string name="lang_name_en">English</string>
+    <string name="lang_name_ja">日本語</string>
+    <string name="lang_name_ko">한국어</string>
+    <string name="lang_name_fr">Français</string>
+    <string name="lang_name_de">Deutsch</string>
+    <string name="lang_name_es">Español</string>
+    <string name="lang_name_ru">Русский</string>    <string name="lang_restart_note">切换语言后立即生效，无需重启</string>
 </resources>

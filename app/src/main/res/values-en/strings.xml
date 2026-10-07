@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- English。由 tools/i18n.py sync 从 values/strings.xml 同步，请勿手改。 -->
 <resources>
-    <!-- App -->
     <string name="app_name">XiTing</string>
     <string name="tile_label">XiTing</string>
     <string name="nav_home">Home</string>
@@ -9,8 +9,6 @@
     <string name="footer_offline">Fully offline · No data collected</string>
     <string name="title_stats">Energy Stats</string>
     <string name="title_settings">Settings</string>
-
-    <!-- Status pills -->
     <string name="status_running">Active</string>
     <string name="status_idle">Idle</string>
     <string name="pill_on">On</string>
@@ -18,8 +16,6 @@
     <string name="pill_battery_on">Exempted</string>
     <string name="pill_battery_off">Exempt</string>
     <string name="pill_abnormal">Broken · Tap to fix</string>
-
-    <!-- Home -->
     <string name="hero_title_start">Start Screen-Off Listening</string>
     <string name="hero_title_stop">Screen-Off Listening Active</string>
     <string name="hero_sub_start">Once started, tap the bubble while watching to black the screen</string>
@@ -36,13 +32,10 @@
     <string name="perm_overlay">Overlay permission</string>
     <string name="perm_battery">Battery exemption</string>
     <string name="perm_notify">Notification permission</string>
-
-    <!-- Stats -->
     <string name="stats_hint">Listening time &amp; power saved (stored on device)</string>
     <string name="chart_title">Daily screen-off time (7 days)</string>
     <string name="ach_sub_empty">Keep listening to light them up</string>
     <string name="ach_sub_latest">Latest: %1$s</string>
-    <!-- Design-time placeholder only; renderStats() overwrites it with ach_dlg_title_fmt at runtime -->
     <string name="ach_progress">Pet Achievements</string>
     <string name="pet_subtitle">Energy Pet · fed by your real listening time</string>
     <string name="sum_mah_default">Total saved ≈ 0 mAh</string>
@@ -51,8 +44,6 @@
     <string name="recent_records">Recent sessions · last 30 days</string>
     <string name="pager_prev">‹ Prev</string>
     <string name="pager_next">Next ›</string>
-
-    <!-- Settings -->
     <string name="settings_personal">Personalize</string>
     <string name="switch_direct">Single-tap unlock</string>
     <string name="switch_info">Show clock &amp; battery on black screen</string>
@@ -70,20 +61,14 @@
     <string name="share_sub">Once daily · +5 pending growth</string>
     <string name="row_about">About XiTing</string>
     <string name="row_about_sub">Guide / Privacy / Open source</string>
-
-    <!-- Widget -->
     <string name="widget_black">Black</string>
     <string name="widget_active">Active</string>
     <string name="widget_idle">Idle</string>
     <string name="widget_today_fmt">Today %1$s</string>
     <string name="widget_growth_next">Growth %1$d · %2$d to next</string>
     <string name="widget_growth_max">Growth %1$d · Maxed</string>
-
-    <!-- Black overlay -->
     <string name="black_hint">Screen-off listening · Tap to unlock</string>
     <string name="black_return">🔒 Tap to return to video</string>
-
-    <!-- Notification -->
     <string name="channel_name">XiTing assistant</string>
     <string name="notif_title">XiTing assistant running</string>
     <string name="notif_text">Tap the bubble to black the screen — sound keeps playing%1$s</string>
@@ -98,15 +83,11 @@
     <string name="notif_action_bubble_hide">Hide bubble</string>
     <string name="notif_action_bubble_show">Show bubble</string>
     <string name="switch_bubble">Show floating bubble</string>
-
-    <!-- Pet stages -->
     <string name="pet_spark">Spark</string>
     <string name="pet_ball">Orb</string>
     <string name="pet_cloud">Storm Cloud</string>
     <string name="pet_storm">Tempest</string>
     <string name="pet_king">Thunder King</string>
-
-    <!-- Dynamic: assistant & permissions -->
     <string name="perm_fix_hint">Turn the overlay switch OFF and back ON in system settings to fix it</string>
     <string name="perm_need_overlay">Enable overlay permission</string>
     <string name="toast_overlay_granted">Overlay permission granted</string>
@@ -116,8 +97,6 @@
     <string name="toast_assistant_started">Assistant started — tap the bubble while watching</string>
     <string name="toast_call">Incoming call — black screen removed</string>
     <string name="toast_headset">Headphones disconnected — back to video</string>
-
-    <!-- Dynamic: timer -->
     <string name="timer_item_episode">🎧 Finish this episode</string>
     <string name="timer_15">15 min</string>
     <string name="timer_30">30 min</string>
@@ -130,8 +109,6 @@
     <string name="toast_timer_cancelled">Timer cancelled</string>
     <string name="toast_episode_done">Screen off after this episode (~%1$dm %2$ds)</string>
     <string name="timer_remain_fmt">%1$d min left</string>
-
-    <!-- Dynamic: backup & restore -->
     <string name="restore_title">Restore history</string>
     <string name="restore_msg">Used XiTing before and uninstalled it? Your backup lives in Download/XiTing (XiTing-backup.json) and can restore growth &amp; stats in one tap.\n\nNew here? Tap \"No thanks\".</string>
     <string name="restore_pick">Choose backup file</string>
@@ -146,28 +123,22 @@
     <string name="toast_picker_fail">Cannot open the file picker</string>
     <string name="toast_export_ok">Exported ✓</string>
     <string name="toast_export_fail">Export failed</string>
-
-    <!-- Dynamic: keep-alive -->
     <string name="keepalive_dlg_title">Keep-alive setup</string>
     <string name="keepalive_msg">The system may kill background apps and remove the bubble. Three steps for long-term stability:\n\n1. Battery exemption (%1$s) — tap \"Battery settings\" below\n\n2. Auto-start: \"App info\" → Battery usage → allow auto-start &amp; background activity\n\n3. Lock the card: open recents, swipe down on XiTing, tap the lock icon</string>
     <string name="state_done">Done ✓</string>
     <string name="state_todo">Pending</string>
     <string name="keepalive_btn_battery">Battery settings</string>
     <string name="keepalive_btn_ok">Got it</string>
-
-    <!-- Dynamic: finish this episode -->
     <string name="locale_dlg_title">Notification access needed</string>
     <string name="locale_dlg_msg">\"Finish this episode\" reads the current playback progress.\nAllow \"Notification access\" for XiTing in system settings (used only to read playback progress).\n\nOr just use the regular timer.</string>
     <string name="locale_dlg_go">Grant</string>
     <string name="locale_dlg_fallback">Use timer</string>
     <string name="toast_no_progress">No playback progress found — play an episode first, or use the timer</string>
-
-    <!-- Dynamic: achievements & pet -->
     <string name="ach_toast_fmt">🏆 Unlocked: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">Pet Achievements %1$d/%2$d</string>
-<string name="ach_dlg_hint">Badges light up on the left of the pet, easiest at the bottom</string>
-<string name="ach_row_unlocked">Unlocked</string>
-<string name="ach_row_locked">Locked</string>
+    <string name="ach_dlg_hint">Badges light up on the left of the pet, easiest at the bottom</string>
+    <string name="ach_row_unlocked">Unlocked</string>
+    <string name="ach_row_locked">Locked</string>
     <string name="dlg_ok">OK</string>
     <string name="toast_charge">+%1$d growth collected ✓</string>
     <string name="pet_caption_sleepy">%1$s is napping · play an episode to wake it</string>
@@ -181,8 +152,6 @@
     <string name="ach_week_d">Sessions on 7 different days</string>
     <string name="ach_king_t">Crowned</string>
     <string name="ach_king_d">Evolve to Thunder King</string>
-
-    <!-- Dynamic: calibration -->
     <string name="calib_title">Power measurement</string>
     <string name="calib_msg_calibrated">Calibrated on %1$s\nMeasured rate ≈ %2$.0f mAh/h</string>
     <string name="calib_msg_uncalibrated">Not calibrated yet (using the generic OLED model)</string>
@@ -200,8 +169,6 @@
     <string name="toast_calib_invalid">Invalid samples (charging?) — try again</string>
     <string name="toast_calib_done">Calibrated: measured saving ≈ %1$.0f mAh/h</string>
     <string name="toast_calib_timeout">Calibration timed out — try again</string>
-
-    <!-- Dynamic: stats & share -->
     <string name="saved_basis_measured">measured on device</string>
     <string name="saved_basis_model">generic OLED model</string>
     <string name="sum_saved_fmt">Power saved (%1$s) ≈ %2$d mAh (%3$s)</string>
@@ -219,8 +186,6 @@
     <string name="share_sub_avail">+%1$d available today</string>
     <string name="help_title">Growth points guide</string>
     <string name="help_msg">· 1 growth point per minute of listening (goes to pending first)\n· +5 for the first share each day (pending first)\n· Pending caps at 200 — collect before it fills\n· Pending expires after 3 days; expiring part shows red on the bar\n· Tap the bar to collect into your pet\'s level</string>
-
-    <!-- Dynamic: settings -->
     <string name="toast_media_on">Media controls (⏮ ⏸ ⏭) will show after wake</string>
     <string name="toast_browser_fail">Cannot open the browser</string>
     <string name="update_value_fmt">Now v%1$s</string>
@@ -229,14 +194,10 @@
     <string name="bubble_dlg_title">Bubble style (live preview)</string>
     <string name="toast_bubble_locked">%1$s locked · needs %2$d growth</string>
     <string name="bubble_value_default">Default</string>
-
-    <!-- Duration units -->
     <string name="unit_h">h</string>
     <string name="unit_m">m</string>
     <string name="unit_m_full">m</string>
     <string name="unit_s">s</string>
-
-    <!-- About page -->
     <string name="about_title">About XiTing</string>
     <string name="about_section_app">About this app</string>
     <string name="about_intro">Want to just listen while watching? Tap the bubble and the screen goes fully black: backlight physically off, touches blocked, sound keeps playing — works with any video app.\n\nOptional night clock &amp; battery display (stays visible at minimum brightness after re-lock, content micro-shifts to protect OLED); incoming calls exit the black screen so you never miss one; sleep timer and \"finish this episode\" smart timer; headphones unplug returns you to video.\n\nAfter wake you can skip tracks: previous / play-pause / next (enable in Settings).\n\nEnergy Pet: listening earns growth points to evolve a five-form pet (Spark → Orb → Storm Cloud → Tempest → Thunder King), usable as your bubble avatar; achievements track your listening milestones.\n\nHome-screen widgets: three sizes with your pet, listening stats and one-tap screen-off; long-press the bubble to exit quickly.\n\nData backup: auto-backed up to the XiTing folder in Downloads (on device only), restored in one tap after reinstall. Everything stays on this device — no network permission.</string>
@@ -248,8 +209,6 @@
     <string name="about_section_license">License</string>
     <string name="about_license">Non-commercial license (see LICENSE): free to use and share for personal learning with attribution; any commercial use prohibited; removing or altering attribution/tracing marks forbidden.\n\nThis project is not affiliated with YouTube, Google or any video platform. For study only — please support official releases.</string>
     <string name="about_version_fmt">Version %1$s · Build %2$s</string>
-
-    <!-- v3.5 skin gallery & streak -->
     <string name="gallery_title">Skin Gallery</string>
     <string name="count_placeholder">0 times</string>
     <string name="dur_min_placeholder">0 min</string>
@@ -286,13 +245,16 @@
     <string name="toast_battery_fail">Could not open system settings. Please set it manually in App info.</string>
     <string name="keepalive_btn_appdetail">App info</string>
     <string name="chart_no_data">No data yet</string>
-
-    <!-- Language -->
     <string name="lang_title">Language</string>
     <string name="lang_sub">Interface language</string>
     <string name="lang_system">Follow system</string>
-    <string name="lang_zh">简体中文</string>
-    <string name="lang_en">English</string>
-    <string name="lang_ja">日本語</string>
+    <string name="lang_name_zh">简体中文</string>
+    <string name="lang_name_en">English</string>
+    <string name="lang_name_ja">日本語</string>
+    <string name="lang_name_ko">한국어</string>
+    <string name="lang_name_fr">Français</string>
+    <string name="lang_name_de">Deutsch</string>
+    <string name="lang_name_es">Español</string>
+    <string name="lang_name_ru">Русский</string>
     <string name="lang_restart_note">Takes effect immediately, no restart needed</string>
 </resources>

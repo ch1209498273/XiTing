@@ -1420,12 +1420,7 @@ private fun showSkinGallery() {
      */
     private fun showLangDialog() {
         val tags = AppLocales.SUPPORTED.toTypedArray()
-        val labels = arrayOf(
-            getString(R.string.lang_system),
-            getString(R.string.lang_zh),
-            getString(R.string.lang_en),
-            getString(R.string.lang_ja)
-        )
+        val labels = AppLocales.labels(this)
         val cur = AppLocales.current(this)
         val checked = tags.indexOf(cur).let { if (it < 0) 0 else it }
         android.app.AlertDialog.Builder(this)
@@ -1446,12 +1441,10 @@ private fun showSkinGallery() {
     /** 设置页「语言」行右侧的当前值 */
     private fun refreshLangValue() {
         val tv = pageSettings.findViewById<TextView>(R.id.lang_value) ?: return
-        tv.text = when (AppLocales.current(this)) {
-            "zh" -> getString(R.string.lang_zh)
-            "en" -> getString(R.string.lang_en)
-            "ja" -> getString(R.string.lang_ja)
-            else -> getString(R.string.lang_system)
-        }
+        val tags = AppLocales.SUPPORTED
+        val labels = AppLocales.labels(this)
+        val i = tags.indexOf(AppLocales.current(this))
+        tv.text = if (i in labels.indices) labels[i] else getString(R.string.lang_system)
     }
 
 

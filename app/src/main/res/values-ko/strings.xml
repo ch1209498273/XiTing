@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 한국어。由 tools/i18n.py sync 从 values/strings.xml 同步，请勿手改。 -->
+<resources>
+    <string name="app_name">스크린 오프 듣기</string>
+    <string name="tile_label">스크린 오프 듣기</string>
+    <string name="nav_home">홈</string>
+    <string name="nav_stats">통계</string>
+    <string name="nav_settings">설정</string>
+    <string name="footer_offline">완전 오프라인 · 데이터 수집 없음</string>
+    <string name="title_stats">절전 통계</string>
+    <string name="title_settings">설정</string>
+    <string name="status_running">실행 중</string>
+    <string name="status_idle">정지됨</string>
+    <string name="pill_on">켜짐</string>
+    <string name="pill_off">켜기</string>
+    <string name="pill_battery_on">등록됨</string>
+    <string name="pill_battery_off">등록</string>
+    <string name="pill_abnormal">오류 · 복구</string>
+    <string name="hero_title_start">스크린 오프 듣기 시작</string>
+    <string name="hero_title_stop">스크린 오프 듣기 실행 중</string>
+    <string name="hero_sub_start">시작 후 영상 보면서 버블을 누르면 화면이 꺼집니다</string>
+    <string name="hero_sub_stop">영상 중에 버블을 누르면 화면은 꺼지고 소리는 계속 · 누르면 도우미 정지</string>
+    <string name="timer_title">자동 종료</string>
+    <string name="keepalive_title">자동 종료 방지</string>
+    <string name="keepalive_sub">설정 가이드</string>
+    <string name="stats_section">절전 통계</string>
+    <string name="view_details">상세 보기 ›</string>
+    <string name="label_today">오늘</string>
+    <string name="label_week">최근 7일</string>
+    <string name="label_total">누적</string>
+    <string name="perm_section">서비스와 권한</string>
+    <string name="perm_overlay">오버레이 권한</string>
+    <string name="perm_battery">배터리 화이트리스트</string>
+    <string name="perm_notify">알림 권한</string>
+    <string name="stats_hint">스크린 오프 듣기 시간과 절전 추정 (기기에만 저장)</string>
+    <string name="chart_title">최근 7일 일별 스크린 오프 시간</string>
+    <string name="ach_sub_empty">듣기 쌓을수록 하나씩 점등</string>
+    <string name="ach_sub_latest">최근 해금: %1$s</string>
+    <string name="ach_progress">정령 업적</string>
+    <string name="pet_subtitle">전기 정령 · 실제 듣기 시간으로 키움</string>
+    <string name="sum_mah_default">누적 절전 추정 ≈ 0 mAh</string>
+    <string name="sum_extra_default">최장 1회 — · 스크린 오프 0회</string>
+    <string name="timer_none">설정 안 됨</string>
+    <string name="recent_records">최근 세션 기록 · 최근 30일만 보관</string>
+    <string name="pager_prev">‹ 이전</string>
+    <string name="pager_next">다음 ›</string>
+    <string name="settings_personal">개인화</string>
+    <string name="switch_direct">화면을 가볍게 눌러 바로 해제</string>
+    <string name="switch_info">화면 꺼짐 상태에 시간·배터리 표시</string>
+    <string name="switch_media">화면 꺼짐 상태에 재생 컨트롤</string>
+    <string name="switch_headset">이어폰 뽑으면 자동으로 영상으로</string>
+    <string name="bubble_style">버블 표시</string>
+    <string name="settings_data">데이터</string>
+    <string name="row_export">데이터 백업 내보내기</string>
+    <string name="row_export_sub">원하는 위치에 저장</string>
+    <string name="row_restore">백업 파일에서 복원</string>
+    <string name="row_restore_sub">성장값과 통계</string>
+    <string name="settings_about">정보</string>
+    <string name="row_update">업데이트 확인</string>
+    <string name="row_share">친구에게 공유</string>
+    <string name="share_sub">하루 한 번 · +5 성장값 적립</string>
+    <string name="row_about">스크린 오프 듣기 정보</string>
+    <string name="row_about_sub">사용법 / 개인정보 / 오픈소스</string>
+    <string name="widget_black">화면 끄기</string>
+    <string name="widget_active">실행 중</string>
+    <string name="widget_idle">정지됨</string>
+    <string name="widget_today_fmt">오늘 %1$s</string>
+    <string name="widget_growth_next">성장값 %1$d · 다음 형태까지 %2$d</string>
+    <string name="widget_growth_max">성장값 %1$d · 최고 도달</string>
+    <string name="black_hint">스크린 오프 듣기 중 · 화면을 가볍게 누르면 잠금 해제</string>
+    <string name="black_return">🔒 누르면 영상으로 돌아가기</string>
+    <string name="channel_name">스크린 오프 듣기 도우미</string>
+    <string name="notif_title">스크린 오프 듣기 도우미 실행 중</string>
+    <string name="notif_text">버블을 누르면 화면이 꺼지고 소리는 계속됩니다%1$s</string>
+    <string name="notif_action_listen">스크린 오프 듣기</string>
+    <string name="notif_action_restore">화면 복원</string>
+    <string name="notif_action_stop">도우미 종료</string>
+    <string name="exit_confirm_title">스크린 오프 듣기를 종료할까요?</string>
+    <string name="exit_confirm_yes">종료</string>
+    <string name="exit_notif_title">스크린 오프 듣기가 종료되었습니다</string>
+    <string name="exit_notif_text">「되돌리기」를 누르면 버블과 화면 끄기가 복구됩니다</string>
+    <string name="exit_notif_undo">되돌리기</string>
+    <string name="notif_action_bubble_hide">버블 숨기기</string>
+    <string name="notif_action_bubble_show">버블 표시</string>
+    <string name="switch_bubble">버블 표시</string>
+    <string name="pet_spark">전 스파크</string>
+    <string name="pet_ball">전 구슬</string>
+    <string name="pet_cloud">뇌우 정령</string>
+    <string name="pet_storm">폭풍 정령</string>
+    <string name="pet_king">천왕</string>
+    <string name="perm_fix_hint">시스템 설정에서 「오버레이」를 끄고 다시 켜면 복구됩니다</string>
+    <string name="perm_need_overlay">오버레이 권한을 허용해 주세요</string>
+    <string name="toast_overlay_granted">오버레이 권한이 허용되었습니다</string>
+    <string name="toast_battery_ok">이미 배터리 최적화 제외 대상입니다</string>
+    <string name="toast_notify_granted">알림 권한이 허용되었습니다</string>
+    <string name="toast_assistant_stopped">도우미가 정지되었습니다</string>
+    <string name="toast_assistant_started">도우미가 시작되었습니다. 영상 중에 버블을 누르세요</string>
+    <string name="toast_call">전화가 와서 화면 끄기가 자동으로 해제되었습니다</string>
+    <string name="toast_headset">이어폰이 끊겨 영상으로 돌아왔습니다</string>
+    <string name="timer_item_episode">🎧 이 편 끝까지 듣기</string>
+    <string name="timer_15">15분</string>
+    <string name="timer_30">30분</string>
+    <string name="timer_60">60분</string>
+    <string name="timer_cancel">타이머 해제</string>
+    <string name="toast_timer_set">자동 종료: %1$d분 후</string>
+    <string name="toast_timer_episode">이 편 끝나면 자동으로 꺼집니다</string>
+    <string name="toast_timer_expired">타이머가 만료되었습니다</string>
+    <string name="toast_timer_done">타이머 종료, 화면을 껐습니다</string>
+    <string name="toast_timer_cancelled">자동 종료를 해제했습니다</string>
+    <string name="toast_episode_done">이 편 끝나면 자동으로 화면이 꺼집니다(약 %1$d분%2$d초 후)</string>
+    <string name="timer_remain_fmt">남은 시간 %1$d분</string>
+    <string name="restore_title">기록 복원</string>
+    <string name="restore_msg">이전에 「스크린 오프 듣기」를 쓰다가 삭제했다면: 백업이 다운로드의 XiTing 폴더(XiTing-backup.json)에 있습니다. 여기서 성장값과 통계를 한 번에 복원할 수 있습니다.
+
+처음이시면 「필요 없음」을 누르세요.</string>
+    <string name="restore_pick">백업 파일 선택</string>
+    <string name="restore_no">필요 없음</string>
+    <string name="toast_invalid_backup">유효하지 않은 백업 파일입니다</string>
+    <string name="restore_other_title">다른 기기의 백업입니다</string>
+    <string name="restore_other_msg">이 백업의 성장값은 %1$d이며 기기 ID가 본인과 다릅니다(기종 변경 또는 이전 서명 버전에서 이전). 복원할까요?</string>
+    <string name="restore_ok_btn">복원</string>
+    <string name="dlg_cancel">취소</string>
+    <string name="toast_restore_done">데이터를 복원했습니다 ✓ (성장값 %1$d)</string>
+    <string name="toast_restore_fail">복원 실패</string>
+    <string name="toast_picker_fail">파일 선택기를 열 수 없습니다</string>
+    <string name="toast_export_ok">내보냈습니다 ✓</string>
+    <string name="toast_export_fail">내보내기 실패</string>
+    <string name="keepalive_dlg_title">자동 종료 방지 설정</string>
+    <string name="keepalive_msg">시스템이 백그라운드 앱을 정리하면 버블이 사라집니다. 아래 세 단계로 설정하면 오래 안정적으로 동작합니다:
+
+1. 배터리 화이트리스트(%1$s) — 아래 「배터리 설정으로」 터치
+
+2. 자동 실행: 「앱 정보로」 → 배터리 사용량 → 자동 실행/완전 백그라운드 동작 허용
+
+3. 카드 잠금: 최근 앱을 열어 스크린 오프 듣기 카드의 자물쇠 아이콘 터치</string>
+    <string name="state_done">완료 ✓</string>
+    <string name="state_todo">미완료</string>
+    <string name="keepalive_btn_battery">배터리 설정으로</string>
+    <string name="keepalive_btn_ok">알겠습니다</string>
+    <string name="locale_dlg_title">「알림 사용 권한」이 필요합니다</string>
+    <string name="locale_dlg_msg">「이 편 끝까지 듣기」는 재생 중인 편수를 읽어야 합니다.
+시스템 설정에서 스크린 오프 듣기의 「알림 사용 권한」을 허용해 주세요(재생 위치 읽기에만 사용하며 다른 용도로 쓰지 않습니다).
+
+권한을 주지 않아도 일반 카운트다운 타이머로 사용할 수 있습니다.</string>
+    <string name="locale_dlg_go">권한 허용</string>
+    <string name="locale_dlg_fallback">타이머 사용</string>
+    <string name="toast_no_progress">재생 위치를 읽지 못했습니다: 먼저 한 편을 재생한 뒤 고르거나 타이머를 쓰세요</string>
+    <string name="ach_toast_fmt">🏆 업적 해금: %1$s %2$s</string>
+    <string name="ach_dlg_title_fmt">정령 업적 %1$d/%2$d</string>
+    <string name="ach_dlg_hint">배지는 정령 왼쪽에, 아래에서 위로 난이도순으로 점등됩니다</string>
+    <string name="ach_row_unlocked">점등됨</string>
+    <string name="ach_row_locked">미해금</string>
+    <string name="dlg_ok">확인</string>
+    <string name="toast_charge">성장값 +%1$d 를 받았습니다 ✓</string>
+    <string name="pet_caption_sleepy">%1$s (으) 잠듦 · 한 편 들으면 깨어납니다</string>
+    <string name="pet_caption_max">%1$s · 최고 도달 · 성장값 %2$d 계속 저장</string>
+    <string name="pet_caption_progress">%1$s · 성장값 %2$d / %3$d</string>
+    <string name="ach_c100_t">백 번의 습관</string>
+    <string name="ach_c100_d">스크린 오프 누적 100회</string>
+    <string name="ach_marathon_t">마라톤</string>
+    <string name="ach_marathon_d">1회에 1시간 연속 듣기</string>
+    <string name="ach_week_t">꾸준히</string>
+    <string name="ach_week_d">7일 동안 서로 다른 날짜에 스크린 오프 기록</string>
+    <string name="ach_king_t">천왕의 대관식</string>
+    <string name="ach_king_d">정령이 천왕으로 진화</string>
+    <string name="calib_title">절전 실측</string>
+    <string name="calib_msg_calibrated">본기 실측으로 보정됨(%1$s)
+실측 절전률 ≈ %2$.0f mAh/시</string>
+    <string name="calib_msg_uncalibrated">아직 실측 보정하지 않음(현재 OLED 범용 모델로 추정)</string>
+    <string name="calib_msg_ambient">화면 꺼짐 상태의 전체 소비 전력 실측 ≈ %1$.0f mA(%2$d회 샘플링)</string>
+    <string name="calib_msg_flow">보정 절차(약 6분):
+① 화면을 켠 채로 아무 영상이나 3분 재생
+② 앱이 자동으로 화면을 끄고 3분 대기
+
+충전하지 마세요. 배터리를 15%~95%로 유지하세요.</string>
+    <string name="calib_btn_restart">재보정</string>
+    <string name="calib_btn_start">보정 시작</string>
+    <string name="calib_btn_close">닫기</string>
+    <string name="calib_step1_title">보정 1/2 · 화면 켜고 재생</string>
+    <string name="calib_step1_init">지금 아무 영상이나 재생을 시작하고 화면을 켜 두세요…</string>
+    <string name="toast_calib_too_few">유효한 샘플이 부족합니다(충전 중이신가요?). 보정을 취소했습니다</string>
+    <string name="toast_calib_need_service">먼저 스크린 오프 듣기 도우미를 시작한 뒤 보정하세요</string>
+    <string name="toast_calib_step2">보정 2/2: 화면을 끈 채 3분 대기하세요. 조작할 필요 없습니다</string>
+    <string name="toast_calib_ok">보정 완료 ✓(유효 샘플 %1$d)</string>
+    <string name="toast_calib_invalid">보정 샘플이 유효하지 않습니다(충전 중이신가요?). 다시 시도하세요</string>
+    <string name="toast_calib_done">보정 완료: 본기 실측 절전 ≈ %1$.0f mAh/시</string>
+    <string name="toast_calib_timeout">보정 시간이 초과되었습니다. 다시 시도하세요</string>
+    <string name="saved_basis_measured">본기 실측 기준</string>
+    <string name="saved_basis_model">OLED 화면 소비 전력으로 추정</string>
+    <string name="sum_saved_fmt">%1$s 절전 ≈ %2$d mAh (%3$s)</string>
+    <string name="fmt_sessions">%1$d 회</string>
+    <string name="sum_extra_fmt">최장 1회 %1$s · 스크린 오프 %2$d회</string>
+    <string name="list_empty">기록이 없습니다 — 스크린 오프 듣기를 한 번 하면 여기에 표시됩니다</string>
+    <string name="pager_info_fmt">%1$d / %2$d 페이지 · 총 %3$d건</string>
+    <string name="day_today">오늘</string>
+    <string name="day_yesterday">어제</string>
+    <string name="share_chooser">공유</string>
+    <string name="share_text">⚡ 「스크린 오프 듣기」로 화면을 끄고 %1$s을(를) 들었어요. 예상 절전 %2$d mAh
+저의 전기 정령이 「%3$s」까지 진화했어요
+무료·무광고 오프라인 앱(0.6MB)
+https://github.com/ch1209498273/XiTing</string>
+    <string name="toast_share_done">공유 완료 · +%1$d 성장값 적립 (통계 페이지 왼쪽 바를 눌러 받기)</string>
+    <string name="toast_share_claimed">오늘 공유 보상은 받았습니다. 내일 다시 (하루 한 번)</string>
+    <string name="share_sub_claimed">오늘 받음 ✓ · 내일 다시</string>
+    <string name="share_sub_avail">오늘 +%1$d 받을 수 있어요 · 미수령</string>
+    <string name="help_title">성장값 안내</string>
+    <string name="help_msg">· 듣기 1분당 성장값 1점(먼저 미수령에 쌓임)
+· 매일 첫 공유 시 성장값 5점(먼저 미수령에 쌓임)
+· 미수령 한도 200점, 초과분은 쌓이지 않음 — 먼저 받고 다시 듣기
+· 미수령 성장값은 3일간 유효하며, 곧 만료되는 항목은 막대 위에 빨간색으로 표시
+· 왼쪽 막대를 누르면 수령하며, 수령분은 정령 레벨에 반영</string>
+    <string name="toast_media_on">켰습니다: 화면 끄기 해제 후 ⏮ ⏸ ⏭ 키 표시</string>
+    <string name="toast_browser_fail">브라우저를 열 수 없습니다</string>
+    <string name="update_value_fmt">현재 v%1$s</string>
+    <string name="bubble_default">화면 끄기(기본)</string>
+    <string name="bubble_label_off">화면 끄기</string>
+    <string name="bubble_dlg_title">버블 표시 (실시간 미리보기)</string>
+    <string name="toast_bubble_locked">「%1$s」아직 미해금 · 성장값 %2$d 필요</string>
+    <string name="bubble_value_default">기본</string>
+    <string name="unit_h">시</string>
+    <string name="unit_m">분</string>
+    <string name="unit_m_full">분</string>
+    <string name="unit_s">초</string>
+    <string name="about_title">스크린 오프 듣기 정보</string>
+    <string name="about_section_app">이 앱에 대하여</string>
+    <string name="about_intro">영상을 보면서 눈을 감고 듣고 싶으신가요? 버블을 한 번 누르면 화면이 완전히 꺼집니다: 백라이트가 물리적으로 꺼지고 터치는 차단되며 소리는 계속 재생됩니다 — 어떤 영상 앱에서도 동작합니다.
+
+어두운 시계와 배터리 표시를 선택할 수 있습니다(다시 잠그면 최저 밝기로 계속 보이며, OLED 보호를 위해 내용이 주기적으로 조금 움직입니다). 전화가 오면 자동으로 꺼져서 전화를 놓치지 않습니다. 자동 종료와 「이 편 끝까지 듣기」 스마트 타이머를 지원하며, 이어폰을 뽑으면 영상으로 돌아갑니다.
+
+화면을 깨우면 편 넘기기가 가능합니다: 이전 / 재생·일시정지 / 다음(설정에서 켤 수 있음).
+
+전기 정령: 듣기 시간이 쌓여 다섯 형태의 정령으로 성장합니다(전 스파크 → 전 구슬 → 뇌우 정령 → 폭풍 정령 → 천왕). 버블 아바타로도 쓸 수 있으며, 업적이 듣기 이력을 기록합니다.
+
+위젯: 세 가지 크기로 정령과 듣기 데이터, 한 번 탭으로 화면 끄기를 제공합니다. 버블을 길게 누르면 빠르게 종료됩니다.
+
+데이터 백업: 다운로드의 XiTing 폴더에 자동 백업(기기 내 전용), 재설치 후 한 번 탭으로 복원. 모든 데이터는 기기 안에만 저장되며 네트워크 권한이 없습니다.</string>
+    <string name="about_section_privacy">개인정보와 안전</string>
+    <string name="about_privacy">· INTERNET 권한 없음: 물리적으로 인터넷에 연결할 수 없음
+· 화면의 내용을 읽지 않음
+· 모든 데이터는 기기 안에만 저장(시스템 클라우드 백업과 기기 변경 자동 이전을 명시적으로 끔)
+· 백업은 직접 「내보내기」를 누를 때에만 「다운로드/XiTing」 폴더에 기록되며, 관리는 사용자가 직접 함
+· 「알림 사용 권한」을 직접 허용한 경우에만 화면 끔 표시용 알림 개수를 집계하며, 알림 제목과 내용은 읽지 않고 권한이 없으면 기능이 아예 동작하지 않음
+· 앱에 빌드 식별자(빌드 ID와 채널)가 포함됨 — 불법 복제 역추적 전용이며 기기 정보는 포함하지 않음
+· 광고 없음, 추적 없음, 분석 없음</string>
+    <string name="about_section_open">오픈소스와 연락</string>
+    <string name="about_github">GitHub: github.com/ch1209498273/XiTing
+(누르면 프로젝트 페이지를 엽니다)</string>
+    <string name="about_feedback">의견: 1209498273@qq.com</string>
+    <string name="about_section_license">라이선스</string>
+    <string name="about_license">비상업 라이선스(LICENSE 참고): 개인 학습·교환 목적으로 자유롭게 사용·공유 가능(출처 표기 유지 필요). 모든 상업적 용도는 금지되며, 출처와 역추적 표기를 제거하거나 변조하는 것도 금지됩니다.
+
+본 프로젝트는 YouTube, Google 및 모든 영상 플랫폼과 관련이 없습니다. 학습과 교환만을 위한 것으로, 정품을 지지해 주시기 바랍니다.</string>
+    <string name="about_version_fmt">버전 %1$s · 빌드 ID %2$s</string>
+    <string name="gallery_title">정령 도감</string>
+    <string name="count_placeholder">0회</string>
+    <string name="dur_min_placeholder">0분</string>
+    <string name="dur_placeholder">0초</string>
+    <string name="update_placeholder">현재 v—</string>
+    <string name="version_placeholder">버전 —</string>
+    <string name="pager_placeholder">1 / 1</string>
+    <string name="gallery_btn">🎨 도감</string>
+    <string name="streak_fmt">🔥 연속 듣기 %1$d일</string>
+    <string name="streak_best_fmt">최장 %1$d일</string>
+    <string name="toast_rare_energy">⚡ 희귀 천둥 에너지 +%1$d!</string>
+    <string name="toast_skin_unlock">🎨 새 스킨 해금: %1$s</string>
+    <string name="skin_default_n">클래식 색상</string>
+    <string name="skin_cond_default">기본 형태</string>
+    <string name="skin_star_n">별밤의 혼</string>
+    <string name="skin_cond_star">누적 절전 1000 mAh</string>
+    <string name="skin_aurora_n">오로라 정령</string>
+    <string name="skin_cond_aurora">1회에 2시간 연속 듣기</string>
+    <string name="skin_sakura_n">벚꽃비 정령</string>
+    <string name="skin_cond_sakura">연속 듣기 14일</string>
+    <string name="skin_magma_n">용암 군주</string>
+    <string name="skin_cond_magma">최고 도달 후 성장값 2000 추가</string>
+    <string name="skin_jade_n">옥빛 뇌신</string>
+    <string name="skin_cond_jade">연속 듣기 60일</string>
+    <string name="gallery_locked">🔒 %1$s (%2$s)</string>
+    <string name="gallery_worn">「%1$s」로 변경했습니다</string>
+    <string name="gallery_form_label">형태</string>
+    <string name="gallery_skin_label">색상</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">성장값 %1$d 에 도달하면 이 형태가 해금됩니다</string>
+    <string name="gallery_form_next">성장값 %1$d 더 쌓으면 다음 형태가 해금됩니다</string>
+    <string name="gallery_form_maxed">모든 형태를 해금했습니다</string>
+    <string name="bubble_style_title">버블 표시</string>
+    <string name="toast_battery_fail">시스템 설정을 열 수 없습니다. 앱 정보에서 직접 설정해 주세요</string>
+    <string name="keepalive_btn_appdetail">앱 정보로</string>
+    <string name="chart_no_data">데이터 없음</string>
+    <string name="lang_title">언어 / Language</string>
+    <string name="lang_sub">인터페이스 언어</string>
+    <string name="lang_system">시스템 따르기</string>
+    <string name="lang_name_zh">简体中文</string>
+    <string name="lang_name_en">English</string>
+    <string name="lang_name_ja">日本語</string>
+    <string name="lang_name_ko">한국어</string>
+    <string name="lang_name_fr">Français</string>
+    <string name="lang_name_de">Deutsch</string>
+    <string name="lang_name_es">Español</string>
+    <string name="lang_name_ru">Русский</string>
+    <string name="lang_restart_note">언어를 바꾸면 즉시 적용됩니다</string>
+</resources>

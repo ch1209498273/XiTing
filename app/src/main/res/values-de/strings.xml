@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Deutsch。由 tools/i18n.py sync 从 values/strings.xml 同步，请勿手改。 -->
+<resources>
+    <string name="app_name">Bildschirm-aus-Zuhören</string>
+    <string name="tile_label">Bildschirm-aus-Zuhören</string>
+    <string name="nav_home">Start</string>
+    <string name="nav_stats">Statistik</string>
+    <string name="nav_settings">Einstellungen</string>
+    <string name="footer_offline">Komplett offline · keine Datenerfassung</string>
+    <string name="title_stats">Energiespar-Statistik</string>
+    <string name="title_settings">Einstellungen</string>
+    <string name="status_running">Läuft</string>
+    <string name="status_idle">Gestoppt</string>
+    <string name="pill_on">Ein</string>
+    <string name="pill_off">Einschalten</string>
+    <string name="pill_battery_on">Eingetragen</string>
+    <string name="pill_battery_off">Eintragen</string>
+    <string name="pill_abnormal">Fehler · Reparieren</string>
+    <string name="hero_title_start">Bildschirm-aus-Zuhören starten</string>
+    <string name="hero_title_stop">Bildschirm-aus-Zuhören läuft</string>
+    <string name="hero_sub_start">Nach dem Start: beim Video einfach die Blase antippen</string>
+    <string name="hero_sub_stop">Beim Video Blase antippen: Bildschirm aus, Ton läuft weiter · Tippen zum Stoppen</string>
+    <string name="timer_title">Auto-Aus</string>
+    <string name="keepalive_title">Schutz vor Abschalten</string>
+    <string name="keepalive_sub">Anleitung</string>
+    <string name="stats_section">Energiespar-Statistik</string>
+    <string name="view_details">Details ›</string>
+    <string name="label_today">Heute</string>
+    <string name="label_week">Letzte 7 Tage</string>
+    <string name="label_total">Gesamt</string>
+    <string name="perm_section">Dienste und Berechtigungen</string>
+    <string name="perm_overlay">Overlay-Berechtigung</string>
+    <string name="perm_battery">Akku-Whitelist</string>
+    <string name="perm_notify">Benachrichtigungen</string>
+    <string name="stats_hint">Zuhörzeit und Ersparnisschätzung (nur auf diesem Gerät gespeichert)</string>
+    <string name="chart_title">Bildschirm-aus-Zeit pro Tag (letzte 7 Tage)</string>
+    <string name="ach_sub_empty">Jedes Zuhören entzündet ein Licht</string>
+    <string name="ach_sub_latest">Zuletzt freigeschaltet: %1$s</string>
+    <string name="ach_progress">Erfolge</string>
+    <string name="pet_subtitle">Elektro-Wesen · gefüttert mit echter Hörzeit</string>
+    <string name="sum_mah_default">Gesamtersparnis ≈ 0 mAh</string>
+    <string name="sum_extra_default">Längste — · 0 Mal Bildschirm aus</string>
+    <string name="timer_none">Nicht gesetzt</string>
+    <string name="recent_records">Letzte Sitzungen · nur 30 Tage</string>
+    <string name="pager_prev">‹ Zurück</string>
+    <string name="pager_next">Weiter ›</string>
+    <string name="settings_personal">Personalisierung</string>
+    <string name="switch_direct">Durch Antippen direkt entsperren</string>
+    <string name="switch_info">Uhrzeit und Akku im schwarzen Bildschirm anzeigen</string>
+    <string name="switch_media">Wiedergabesteuerung im schwarzen Bildschirm</string>
+    <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
+    <string name="bubble_style">Blasen-Stil</string>
+    <string name="settings_data">Daten</string>
+    <string name="row_export">Daten-Backup exportieren</string>
+    <string name="row_export_sub">Beliebiger Ort</string>
+    <string name="row_restore">Aus Backup wiederherstellen</string>
+    <string name="row_restore_sub">Fortschritt und Statistik</string>
+    <string name="settings_about">Über</string>
+    <string name="row_update">Nach Updates suchen</string>
+    <string name="row_share">Mit Freunden teilen</string>
+    <string name="share_sub">Einmal täglich · +5 gesammelt</string>
+    <string name="row_about">Über die App</string>
+    <string name="row_about_sub">Anleitung / Datenschutz / Open Source</string>
+    <string name="widget_black">Aus</string>
+    <string name="widget_active">Läuft</string>
+    <string name="widget_idle">Gestoppt</string>
+    <string name="widget_today_fmt">Heute %1$s</string>
+    <string name="widget_growth_next">Fortschritt %1$d · noch %2$d bis zur nächsten Form</string>
+    <string name="widget_growth_max">Fortschritt %1$d · Höchststand</string>
+    <string name="black_hint">Bildschirm aus · Zum Entsperren antippen</string>
+    <string name="black_return">🔒 Zurück zum Video tippen</string>
+    <string name="channel_name">Bildschirm-aus-Assistent</string>
+    <string name="notif_title">Assistent läuft</string>
+    <string name="notif_text">Blase antippen: Bildschirm aus, Ton läuft weiter%1$s</string>
+    <string name="notif_action_listen">Zuhören</string>
+    <string name="notif_action_restore">Bildschirm zurück</string>
+    <string name="notif_action_stop">Assistent beenden</string>
+    <string name="exit_confirm_title">Bildschirm-aus-Zuhören beenden?</string>
+    <string name="exit_confirm_yes">Beenden</string>
+    <string name="exit_notif_title">Zuhören beendet</string>
+    <string name="exit_notif_text">Auf [R.ckg.ngig] tippen, um die Blase wiederherzustellen</string>
+    <string name="exit_notif_undo">Rückgängig</string>
+    <string name="notif_action_bubble_hide">Blase ausblenden</string>
+    <string name="notif_action_bubble_show">Blase anzeigen</string>
+    <string name="switch_bubble">Blase anzeigen</string>
+    <string name="pet_spark">Funke</string>
+    <string name="pet_ball">Kugel</string>
+    <string name="pet_cloud">Gewitterwölkchen</string>
+    <string name="pet_storm">Sturmgeist</string>
+    <string name="pet_king">Donnerkönig</string>
+    <string name="perm_fix_hint">In den Systemeinstellungen [Overlay] aus- und wieder einschalten</string>
+    <string name="perm_need_overlay">Bitte Overlay-Berechtigung erteilen</string>
+    <string name="toast_overlay_granted">Overlay-Berechtigung erteilt</string>
+    <string name="toast_battery_ok">Bereits von der Akku-Optimierung ausgenommen</string>
+    <string name="toast_notify_granted">Benachrichtigungen erlaubt</string>
+    <string name="toast_assistant_stopped">Assistent gestoppt</string>
+    <string name="toast_assistant_started">Assistent gestartet, Blase beim Video antippen</string>
+    <string name="toast_call">Anruf, schwarzer Bildschirm automatisch aufgehoben</string>
+    <string name="toast_headset">Kopfhörer getrennt, zurück zum Video</string>
+    <string name="timer_item_episode">🎧 Diese Folge fertig</string>
+    <string name="timer_15">15 Min.</string>
+    <string name="timer_30">30 Min.</string>
+    <string name="timer_60">60 Min.</string>
+    <string name="timer_cancel">Timer abbrechen</string>
+    <string name="toast_timer_set">Auto-Aus in %1$d Min.</string>
+    <string name="toast_timer_episode">Schaltet am Folgenende aus</string>
+    <string name="toast_timer_expired">Timer abgelaufen</string>
+    <string name="toast_timer_done">Timer beendet, Bildschirm an</string>
+    <string name="toast_timer_cancelled">Auto-Aus abgebrochen</string>
+    <string name="toast_episode_done">Geht am Folgenende aus (in ca. %1$d Min. %2$d Sek.)</string>
+    <string name="timer_remain_fmt">Noch %1$d Min.</string>
+    <string name="restore_title">Verlauf wiederherstellen</string>
+    <string name="restore_msg">Если вы уже пользовались « Слушай с выключенным экраном » и удалили приложение: копия лежит в папке XiTing в Загрузках (XiTing-backup.json). Здесь можно одним касанием вернуть прогресс и статистику.
+
+Если вы новый пользователь, нажмите « Не нужно ».</string>
+    <string name="restore_pick">Backup-Datei wählen</string>
+    <string name="restore_no">Nein danke</string>
+    <string name="toast_invalid_backup">Ungültige Backup-Datei</string>
+    <string name="restore_other_title">Backup von einem anderen Gerät</string>
+    <string name="restore_other_msg">В этой копии %1$d прогресса, но идентификатор устройства не совпадает (смена телефона или переход со старой подписанной версии). Всё равно восстановить?</string>
+    <string name="restore_ok_btn">Wiederherstellen</string>
+    <string name="dlg_cancel">Abbrechen</string>
+    <string name="toast_restore_done">Daten wiederhergestellt ✓ (Fortschritt %1$d)</string>
+    <string name="toast_restore_fail">Wiederherstellung fehlgeschlagen</string>
+    <string name="toast_picker_fail">Dateiauswahl nicht möglich</string>
+    <string name="toast_export_ok">Exportiert ✓</string>
+    <string name="toast_export_fail">Export fehlgeschlagen</string>
+    <string name="keepalive_dlg_title">Abschaltschutz einrichten</string>
+    <string name="keepalive_msg">Система вычищает фоновые приложения, из-за чего пузырёк исчезает. Три шага для стабильной работы:
+
+1. Белый список батареи (%1$s) — нажмите « Настройки батареи » ниже
+
+2. Автозапуск: « О приложении » → Использование батареи → разрешите автозапуск и работу в фоне
+
+3. Закрепите карточку: откройте недавние приложения и нажмите замок на карточке « Слушай с выключенным экраном »</string>
+    <string name="state_done">Erledigt ✓</string>
+    <string name="state_todo">Offen</string>
+    <string name="keepalive_btn_battery">Zu den Akku-Einstellungen</string>
+    <string name="keepalive_btn_ok">Verstanden</string>
+    <string name="locale_dlg_title">Benachrichtigungszugriff nötig</string>
+    <string name="locale_dlg_msg">Функции « Дослушать серию » нужно читать прогресс воспроизведения.
+Разрешите доступ к уведомлениям в настройках системы (используется только для чтения прогресса).
+
+Без разрешения работает обычный обратный отсчёт.</string>
+    <string name="locale_dlg_go">Erlauben</string>
+    <string name="locale_dlg_fallback">Timer verwenden</string>
+    <string name="toast_no_progress">Не удалось прочитать прогресс: сначала включите серию или используйте таймер.</string>
+    <string name="ach_toast_fmt">🏆 Erfolg: %1$s %2$s</string>
+    <string name="ach_dlg_title_fmt">Erfolge %1$d/%2$d</string>
+    <string name="ach_dlg_hint">Abzeichen leuchten links vom Wesen, von leicht nach schwer</string>
+    <string name="ach_row_unlocked">Erleuchtet</string>
+    <string name="ach_row_locked">Gesperrt</string>
+    <string name="dlg_ok">OK</string>
+    <string name="toast_charge">+%1$d Fortschritt gesammelt ✓</string>
+    <string name="pet_caption_sleepy">%1$s schläft · Eine Folge weckt es</string>
+    <string name="pet_caption_max">%1$s · Höchststand · Fortschritt %2$d gesammelt</string>
+    <string name="pet_caption_progress">%1$s · Fortschritt %2$d / %3$d</string>
+    <string name="ach_c100_t">Hundertmal</string>
+    <string name="ach_c100_d">100 Mal Bildschirm aus</string>
+    <string name="ach_marathon_t">Marathon</string>
+    <string name="ach_marathon_d">1 Stunde am Stück</string>
+    <string name="ach_week_t">Beständig</string>
+    <string name="ach_week_d">An 7 verschiedenen Tagen</string>
+    <string name="ach_king_t">Königskrönung</string>
+    <string name="ach_king_d">Wesen wird zum Donnerkönig</string>
+    <string name="calib_title">Ersparnis messen</string>
+    <string name="calib_msg_calibrated">Откалибровано на этом устройстве (%1$s)
+Измеренная экономия ≈ %2$.0f мА·ч/ч</string>
+    <string name="calib_msg_uncalibrated">Ещё не откалибровано (сейчас оценка по стандартной модели OLED)</string>
+    <string name="calib_msg_ambient">Измеренное потребление при чёрном экране ≈ %1$.0f мА (%2$d замеров)</string>
+    <string name="calib_msg_flow">Порядок действий (около 6 минут):
+① 3 минуты смотрите видео при включённом экране
+② Приложение само переключит экран в чёрный на 3 минуты
+
+Не заряжайте; держите заряд между 15 % и 95 %.</string>
+    <string name="calib_btn_restart">Neu kalibrieren</string>
+    <string name="calib_btn_start">Kalibrieren</string>
+    <string name="calib_btn_close">Schließen</string>
+    <string name="calib_step1_title">Kalibrierung 1/2 · Bildschirm an</string>
+    <string name="calib_step1_init">Начните смотреть видео и не выключайте экран…</string>
+    <string name="toast_calib_too_few">Недостаточно замеров (зарядка включена?), калибровка отменена</string>
+    <string name="toast_calib_need_service">Сначала запустите помощника, затем калибруйте</string>
+    <string name="toast_calib_step2">Калибровка 2/2: оставьте чёрный экран на 3 минуты, ничего делать не нужно</string>
+    <string name="toast_calib_ok">Калибровка завершена ✓ (%1$d действительных замеров)</string>
+    <string name="toast_calib_invalid">Замеры недействительны (зарядка включена?), повторите</string>
+    <string name="toast_calib_done">Калибровка завершена: измеренная экономия ≈ %1$.0f мА·ч/ч</string>
+    <string name="toast_calib_timeout">Время калибровки истекло, повторите</string>
+    <string name="saved_basis_measured">Auf diesem Gerät gemessen</string>
+    <string name="saved_basis_model">Geschätzt nach OLED-Verbrauch</string>
+    <string name="sum_saved_fmt">%1$s gespart ≈ %2$d mAh (%3$s)</string>
+    <string name="fmt_sessions">%1$d Mal</string>
+    <string name="sum_extra_fmt">Längste %1$s · %2$d Mal Bildschirm aus</string>
+    <string name="list_empty">Noch keine Einträge — nach einer Sitzung erscheint hier der Verlauf</string>
+    <string name="pager_info_fmt">Seite %1$d / %2$d · %3$d Einträge</string>
+    <string name="day_today">Heute</string>
+    <string name="day_yesterday">Gestern</string>
+    <string name="share_chooser">Teilen mit</string>
+    <string name="share_text">⚡ Я слушал %1$s с выключенным экраном в « Слушай с выключенным экраном », сэкономив около %2$d мА·ч
+Мой электрический дух развился до « %3$s »
+Бесплатное приложение без рекламы, полностью офлайн (0,6 МБ)
+https://github.com/ch1209498273/XiTing</string>
+    <string name="toast_share_done">Geteilt · +%1$d gesammelt (auf der Statistik-Seite abholen)</string>
+    <string name="toast_share_claimed">Belohnung heute schon geholt, morgen wieder</string>
+    <string name="share_sub_claimed">Heute geholt ✓ · Morgen wieder</string>
+    <string name="share_sub_avail">Heute +%1$d · gesammelt</string>
+    <string name="help_title">Über den Fortschritt</string>
+    <string name="help_msg">· 1 единица прогресса за минуту прослушивания (сначала в накопленные)
+· 5 единиц за первую отправку в день (сначала в накопленные)
+· Максимум 200 накопленных; сначала заберите, потом слушайте
+· Накопленные единицы хранятся 3 дня; почти истекающие показываются красным
+· Нажмите на левую полосу, чтобы забрать — они засчитаются в уровень духа</string>
+    <string name="toast_media_on">Ein: Steuerung ⏮ ⏸ ⏭ nach dem Aufwachen</string>
+    <string name="toast_browser_fail">Browser nicht zu öffnen</string>
+    <string name="update_value_fmt">v%1$s</string>
+    <string name="bubble_default">Bildschirm aus (Standard)</string>
+    <string name="bubble_label_off">Bildschirm aus</string>
+    <string name="bubble_dlg_title">Blasen-Stil (Live-Vorschau)</string>
+    <string name="toast_bubble_locked">[%1$s] gesperrt · %2$d Fortschritt nötig</string>
+    <string name="bubble_value_default">Standard</string>
+    <string name="unit_h">Std.</string>
+    <string name="unit_m">Min.</string>
+    <string name="unit_m_full">Min.</string>
+    <string name="unit_s">Sek.</string>
+    <string name="about_title">Über die App</string>
+    <string name="about_section_app">Über diese App</string>
+    <string name="about_intro">Хотите слушать с закрытыми глазами во время видео? Коснитесь пузырька — экран полностью погаснет: подсветка физически выключена, касания заблокированы, звук продолжает играть — работает с любым видеоприложением.
+
+Необязательные тёмные часы и индикатор батареи (видны на минимальной яркости после повторной блокировки, содержимое слегка сдвигается для защиты OLED); при входящем звонке чёрный экран выключается автоматически, так что вы не пропустите звонок; есть таймер выключения и умный таймер « Дослушать серию »; при отключении наушников происходит возврат к видео.
+
+После пробуждения: предыдущая серия / пауза / следующая (включается в настройках).
+
+Электрический дух: прослушивание развивает существо пяти форм (Искра → Сфера → Грозовой дух → Дух бури → Король грома), его можно использовать как аватар пузырька; достижения отмечают ваши вехи.
+
+Виджеты: три размера с духом, статистикой и одним касанием для затемнения; долгое нажатие на пузырёк завершает работу.
+
+Резервная копия: автоматически в папке XiTing в Загрузках (только на устройстве), восстанавливается одним касанием после переустановки. Все данные остаются на устройстве, сетевых разрешений нет.</string>
+    <string name="about_section_privacy">Datenschutz und Sicherheit</string>
+    <string name="about_privacy">· Нет разрешения INTERNET: физически не может выходить в сеть
+· Не читает содержимое экрана
+· Все данные хранятся только на устройстве (облачное резервное копирование и перенос при смене телефона отключены)
+· Копия записывается только когда вы сами нажмёте « Экспорт», в папку Загрузки/XiTing, и храните её вы
+· Уведомления считаются (для индикатора на чёрном экране) только после вашего явного разрешения; заголовок и содержимое не читаются, без разрешения функция полностью неактивна
+· Приложение содержит идентификатор сборки (ID и канал) — только для отслеживания пиратских копий, без сведений об устройстве
+· Без рекламы, без трекинга, без аналитики</string>
+    <string name="about_section_open">Open Source und Kontakt</string>
+    <string name="about_github">GitHub: github.com/ch1209498273/XiTing
+(нажмите, чтобы открыть страницу проекта)</string>
+    <string name="about_feedback">Feedback: 1209498273@qq.com</string>
+    <string name="about_section_license">Lizenz</string>
+    <string name="about_license">Некоммерческая лицензия (см. LICENSE): свободное использование и распространение в учебных целях с сохранением авторства; любое коммерческое использование запрещено; удаление или подмена авторства и отслеживающей метки запрещены.
+
+Проект не связан с YouTube, Google и любыми видеоплатформами. Только для обучения и обмена — поддерживайте оригиналы.</string>
+    <string name="about_version_fmt">Version %1$s · Build-ID %2$s</string>
+    <string name="gallery_title">Wesen-Lexikon</string>
+    <string name="count_placeholder">0 Mal</string>
+    <string name="dur_min_placeholder">0 Min.</string>
+    <string name="dur_placeholder">0 Sek.</string>
+    <string name="update_placeholder">v—</string>
+    <string name="version_placeholder">Version —</string>
+    <string name="pager_placeholder">1 / 1</string>
+    <string name="gallery_btn">🎨 Lexikon</string>
+    <string name="streak_fmt">🔥 %1$d Tage am Stück</string>
+    <string name="streak_best_fmt">Bestwert: %1$d Tage</string>
+    <string name="toast_rare_energy">⚡ Seltene Donnerenergie +%1$d!</string>
+    <string name="toast_skin_unlock">🎨 Neues Skin: %1$s</string>
+    <string name="skin_default_n">Klassische Farben</string>
+    <string name="skin_cond_default">Standardform</string>
+    <string name="skin_star_n">Seelennacht</string>
+    <string name="skin_cond_star">1000 mAh gespart</string>
+    <string name="skin_aurora_n">Polarlichtgeist</string>
+    <string name="skin_cond_aurora">2 Stunden am Stück</string>
+    <string name="skin_sakura_n">Kirschblütengeist</string>
+    <string name="skin_cond_sakura">14 Tage am Stück</string>
+    <string name="skin_magma_n">Magma-Tyrann</string>
+    <string name="skin_cond_magma">2000 Fortschritt nach dem Höchststand</string>
+    <string name="skin_jade_n">Jade-Donnergott</string>
+    <string name="skin_cond_jade">60 Tage am Stück</string>
+    <string name="gallery_locked">🔒 %1$s (%2$s)</string>
+    <string name="gallery_worn">[%1$s] angelegt</string>
+    <string name="gallery_form_label">Form</string>
+    <string name="gallery_skin_label">Farben</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">Braucht %1$d Fortschritt zum Entsperren</string>
+    <string name="gallery_form_next">Noch %1$d für die nächste Form</string>
+    <string name="gallery_form_maxed">Alle Formen freigeschaltet</string>
+    <string name="bubble_style_title">Blasen-Stil</string>
+    <string name="toast_battery_fail">Systemeinstellungen nicht zu öffnen, bitte manuell einrichten</string>
+    <string name="keepalive_btn_appdetail">App-Info</string>
+    <string name="chart_no_data">Keine Daten</string>
+    <string name="lang_title">Sprache / Language</string>
+    <string name="lang_sub">Sprache der Oberfläche</string>
+    <string name="lang_system">System folgen</string>
+    <string name="lang_name_zh">简体中文</string>
+    <string name="lang_name_en">English</string>
+    <string name="lang_name_ja">日本語</string>
+    <string name="lang_name_ko">한국어</string>
+    <string name="lang_name_fr">Français</string>
+    <string name="lang_name_de">Deutsch</string>
+    <string name="lang_name_es">Español</string>
+    <string name="lang_name_ru">Русский</string>
+    <string name="lang_restart_note">Wirkt sofort, kein Neustart nötig</string>
+</resources>

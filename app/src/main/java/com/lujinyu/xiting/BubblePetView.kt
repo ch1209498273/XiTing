@@ -254,48 +254,27 @@ class BubblePetView(context: Context, attrs: AttributeSet? = null) : View(contex
         drawMiniFace(canvas, cx, cy - s * 0.06f, s * 0.22f, blinking)
     }
 
-    // 形态四：小龙卷风（与主页同做法：淡漏斗 + 错位旋转弧）
+    // 形态四：小龙卷风（与主页同做法：重叠圆堆，无硬边）
     private fun drawStorm(canvas: Canvas, cx: Float, cy: Float, s: Float, t: Float, blinking: Boolean) {
         val pal = palette()
-        val topY = cy - s * 0.72f
-        val h = s * 1.45f
-        val funnel = pathA
-        funnel.reset()
-        funnel.moveTo(cx - s * 0.26f, topY)
-        funnel.cubicTo(cx - s * 0.34f, topY + h * 0.36f, cx - s * 0.68f, topY + h * 0.70f, cx - s * 0.95f, topY + h)
-        funnel.lineTo(cx + s * 0.95f, topY + h)
-        funnel.cubicTo(cx + s * 0.68f, topY + h * 0.70f, cx + s * 0.34f, topY + h * 0.36f, cx + s * 0.26f, topY)
-        funnel.close()
-        bodyPaint.shader = cachedShader("storm") {
-            android.graphics.LinearGradient(
-                cx, topY, cx, topY + h, pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
-            )
+        val n = 7
+        val topY = cy - s * 0.58f
+        val h = s * 1.16f
+        for (i in 0 until n) {
+            val tt = i / (n - 1f)
+            val rad = s * (0.15f + 0.30f * tt)
+            val y = topY + tt * h
+            val off = sin(t * 1.5f - tt * 2.4f) * s * (0.05f + 0.16f * tt)
+            bodyPaint.shader = cachedShader("stormBall$i") {
+                android.graphics.LinearGradient(
+                    cx + off, y - rad, cx + off, y + rad,
+                    pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
+                )
+            }
+            canvas.drawCircle(cx + off, y, rad, bodyPaint)
+            bodyPaint.shader = null
         }
-        bodyPaint.alpha = 95
-        canvas.drawPath(funnel, bodyPaint)
-        bodyPaint.shader = null
-        bodyPaint.alpha = 255
-        bodyPaint.color = pal.highlight
-        canvas.drawCircle(cx, topY + s * 0.16f, r0(s), bodyPaint)
-        // 四层错位旋转弧
-        linePaint.strokeCap = android.graphics.Paint.Cap.ROUND
-        for (i in 0 until 4) {
-            val tt = i / 3f
-            val w = s * (0.30f + 0.68f * tt)
-            val y = topY + s * 0.18f + tt * (h - s * 0.18f)
-            val ry = s * 0.16f * (0.75f + 0.45f * tt)
-            canvas.save()
-            canvas.rotate(t * 26f + tt * 52f, cx, y)
-            linePaint.strokeWidth = s * 0.17f * (1f - 0.4f * tt)
-            linePaint.color = if (i % 2 == 0) pal.accent else pal.accentSoft
-            linePaint.alpha = (225 - tt * 70).toInt().coerceIn(0, 255)
-            scratchRect.set(cx - w, y - ry, cx + w, y + ry)
-            canvas.drawArc(scratchRect, 28f, 124f, false, linePaint)
-            canvas.drawArc(scratchRect, 208f, 124f, false, linePaint)
-            canvas.restore()
-        }
-        linePaint.alpha = 255
-        drawMiniFace(canvas, cx, topY + s * 0.58f, s * 0.20f, blinking, fierce = true)
+        drawMiniFace(canvas, cx, topY + s * 0.24f, s * 0.18f, blinking, fierce = true)
     }
 
     private fun r0(s: Float) = s * 0.19f

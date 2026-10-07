@@ -374,9 +374,6 @@ class OverlayService : Service() {
 
         // 悬浮球样式：默认「息屏」文字，可换成精灵形象（形态与配色跟随图鉴里的选择）
         val usePet = PetForm.bubbleUsesPet(this)
-        // 记下当前外观，供 syncBubbleAppearance() 对账
-        bubbleStage = if (usePet) PetForm.selected(this) else -1
-        bubbleSkinId = if (usePet) PetSkins.active(this).id else ""
         val tv: View = if (usePet) {
             val st = PetForm.selected(this)
             val skin = PetSkins.active(this)
@@ -503,32 +500,16 @@ class OverlayService : Service() {
     /** 悬浮球是否存在（供自愈检测：服务在跑但球丢了就重建） */
     fun isBubbleVisible(): Boolean = bubble != null
 
-    /** 当前球实际用的形态与皮肤（用于判断是否已陈旧） */
-    private var bubbleStage = -1
-    private var bubbleSkinId = ""
-
     /**
-     * 同步悬浮球的**外观**：球丢了、或形态/皮肤已经不是当前选择时就重建。
+     * 同步悬浮球的**外观**（已于 2026-10-07 删除）。
      *
-     * 起因：实测「统计页与设置页都显示雷霆之王，悬浮球却还是风暴之灵」。
-     * 日志证明 `rebuildBubble()` 确实被调用过（15 次），所以不是「没重建」，
-     * 而是**某条改形态/换皮肤的路径没有触发它** —— 具体是哪条当时未能定位。
+     * 起因是一个**误诊**：当时报「悬浮球没跟着形态变」，我去查了 logcat、导出备份、
+     * 写了对账逻辑，结果真机证据表明悬浮球显示的**一直是正确**的，
+     * 过期的是**设置页「悬浮球样式」那一行**（`switchTab` 里只给统计页加了重绘）。
      *
-     * 与其堵一个可能堵不住的漏洞，不如在这里做一次**幂等的对账**：
-     * 只要球的样子和用户的选择不一致就重建。代价是每次刷新多读两个 pref（可忽略），
-     * 收益是**无论从哪条路径改，外观都不会再陈旧**。
+     * 保留这段说明是为了不让后人重蹈：一个「看起来像缓存没刷新」的现象，
+     * 先分清是**哪一块 UI 陈旧**再动手 —— 我当时把锅扣在了错的组件上。
      */
-    fun syncBubbleAppearance() {
-        // 用 prefs() 扩展而不是服务里的 prefs 字段：instance 在 onCreate() 开头就被赋值，
-        // 而字段 prefs 要到 onCreate() 中段才初始化，中间有个窗口期字段还是 null。
-        val hidden = prefs().getBoolean(Prefs.BUBBLE_HIDDEN, false)
-        val wantPet = PetForm.bubbleUsesPet(this)
-        val stage = if (wantPet) PetForm.selected(this) else -1
-        val skinId = if (wantPet) PetSkins.active(this).id else ""
-        if (bubble != null && !hidden && stage == bubbleStage && skinId == bubbleSkinId) return
-        if (hidden) return
-        rebuildBubble()
-    }
 
     /** 悬浮球显隐（通知按钮/设置开关/长按退出共用）：状态持久化，重启尊重 */
     fun setBubbleVisible(visible: Boolean) {

@@ -122,6 +122,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         tintNav(findViewById(R.id.nav_icon_stats), findViewById(R.id.nav_label_stats), target == TAB_STATS, sel, unsel)
         tintNav(findViewById(R.id.nav_icon_settings), findViewById(R.id.nav_label_settings), target == TAB_SETTINGS, sel, unsel)
         if (target == TAB_STATS) renderStats()
+        // 设置页也有动态内容：「悬浮球样式」那一行显示的是**当前**的形态·配色。
+        // 以前只有统计页在切回时重绘，设置页完全不管，于是用户在图鉴里换了形态、
+        // 切到设置页看到的还是 App 启动时的旧值（用户反馈「悬浮球样式显示的和我选的不一样」）。
+        // 与 renderStats() 对称：切过去就重绘。
+        if (target == TAB_SETTINGS) refreshBubbleStyleValue()
     }
 
     private fun tintNav(icon: ImageView, label: TextView, selected: Boolean, sel: Int, unsel: Int) {
@@ -389,9 +394,17 @@ private fun checkRestore() {
             else getString(R.string.hero_sub_start)
 
         // 自愈：服务在跑、悬浮球未隐藏但球丢失（ColorOS 偶发吞掉纯浮窗）→ 自动重建
-        // syncBubbleAppearance() 内部已经含了「球丢了就重建」+「外观陈旧就重建」，
-        // 所以不再单独判 isBubbleVisible() —— 后者只能管存在，管不了形态/皮肤变没变。
-        OverlayService.instance?.syncBubbleAppearance()
+        // ⚠️ 这里曾经换成过 OverlayService.syncBubbleAppearance()（会对账形态/皮肤）。
+        // 那是我把「设置页显示旧值」误诊成「悬浮球没跟着变」加的 —— 事后看真机证据：
+        // 悬浮球当时显示的是**正确**的形态，过期的是设置页那一行。
+        // 多出来的一次性开销不值得，留回原来的「只看存不存在」。
+        OverlayService.instance?.let { svc ->
+            val bubbleHidden = prefs()
+                .getBoolean(Prefs.BUBBLE_HIDDEN, false)
+            if (!svc.isBubbleVisible() && !bubbleHidden) {
+                svc.rebuildBubble()
+            }
+        }
         val overlayOk = Settings.canDrawOverlays(this)
         val permError = prefs()
             .getBoolean(Prefs.BUBBLE_PERM_ERROR, false)

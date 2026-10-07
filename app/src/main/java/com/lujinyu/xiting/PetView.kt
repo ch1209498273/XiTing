@@ -810,69 +810,43 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         drawFace(canvas, cx - r * 0.06f, cy - r * 0.10f, r * 0.15f, blinking, fierce = false)
     }
 
-    // ─────────────────── 形态四：风暴之灵（裁剪漏斗 + 内部斜向风线） ───────────────────
+    // ─────────────────── 形态四：风暴之灵（重叠圆堆） ───────────────────
     /**
-     * 走过四轮弯路，结论有两条：
+     * 改了五版才明白两件事：
      *
-     * 1. **风线必须用 [android.graphics.Canvas.clipPath] 裁在漏斗里**。
-     *    前两版（螺旋飘带、旋转弧）都是不裁剪直接画，于是线条必然甩到轮廓外
-     *    变成杂毛；裁剪之后画多长多偏都不会破形。
-     * 2. **不要用横杠去“堆”**。第三版换成圆头横杠，结果又回到「一叠盘子」。
-     *    横杠天生是水平分隔线，不管怎么摆都像台阶。
+     * 1. **不要用几何轮廓画有机体**。漏斗三角 + 硬边描边，配上脸，就是「一个睁着大眼的
+     *    三角形」，用户反馈「非常诡异」。结论：所有层都必须圆。
+     * 2. **脸部只能有一组圆**。之前在脸上方又画了个「涡眼」小圆，
+     *    两个圆紧叠在一起，是「诡异」观感的重要来源。
      *
-     * 现在是：平滑漏斗打底 + 内部斜向风线 —— 斜线才有缠绕感，水平的就是楼梯。
+     * 现在：7 个**重叠的圆**，自上而下逐个变大，横向位置随高度缓慢摆动。
+     * 圆彼此遮挡 + 竖向渐变 → 自然叠出体积与旋转感，且没有任何硬边。
+     * 另外整体宽度收到 ~1.2r（之前是 2r），不再占满整个视图。
      */
     private fun drawTornado(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
         val pal = palette()
-        val topY = cy - r * 0.90f
-        val h = r * 1.80f
-
-        // 漏斗体：顶部窄、底部宽且带圆角，整体是一条平滑曲线而不是硬边三角形
-        val funnel = pathA
-        funnel.reset()
-        funnel.moveTo(cx - r * 0.30f, topY)
-        funnel.cubicTo(cx - r * 0.34f, topY + h * 0.30f, cx - r * 0.72f, topY + h * 0.62f, cx - r * 0.97f, topY + h * 0.90f)
-        funnel.cubicTo(cx - r * 1.04f, topY + h, cx + r * 1.04f, topY + h, cx + r * 0.97f, topY + h * 0.90f)
-        funnel.cubicTo(cx + r * 0.72f, topY + h * 0.62f, cx + r * 0.34f, topY + h * 0.30f, cx + r * 0.30f, topY)
-        funnel.close()
-        bodyPaint.shader = cachedShader("tornado") {
-            android.graphics.LinearGradient(
-                cx, topY, cx, topY + h, pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
-            )
+        val n = 7
+        val topY = cy - r * 0.72f
+        val h = r * 1.44f
+        for (i in 0 until n) {
+            val tt = i / (n - 1f)                 // 0=顶 1=底
+            val rad = r * (0.19f + 0.37f * tt)
+            val y = topY + tt * h
+            // 摆动：频率慢（快了像发抖），但幅度必须够大，否则三个相位看起来一模一样、
+            // 看上去根本不动。幅度随高度增大，越往下甩得越开。
+            val off = sin(t * 1.5f - tt * 2.4f) * r * (0.06f + 0.20f * tt)
+            bodyPaint.shader = cachedShader("tornadoBall$i") {
+                android.graphics.LinearGradient(
+                    cx + off, y - rad, cx + off, y + rad,
+                    pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
+                )
+            }
+            canvas.drawCircle(cx + off, y, rad, bodyPaint)
+            bodyPaint.shader = null
         }
-        canvas.drawPath(funnel, bodyPaint)
-        bodyPaint.shader = null
-
-        // 内部风线：**裁剪在漏斗里**。
-        // 前两版都是不裁剪直接画，于是线条必然甩到轮廓外变成杂毛；
-        // 裁剪之后无论线画多长多偏都不会破形。
-        canvas.save()
-        canvas.clipPath(funnel)
-        linePaint.strokeCap = Paint.Cap.ROUND
-        for (i in 0 until 5) {
-            val tt = i / 4f
-            val y = topY + h * (0.08f + 0.84f * tt)
-            val w = r * (0.24f + 0.70f * tt)
-            val off = sin(t * 1.8f - tt * 2.6f) * r * (0.05f + 0.15f * tt)
-            linePaint.strokeWidth = r * (0.09f + 0.05f * tt)
-            linePaint.color = if (i % 2 == 0) pal.accentSoft else pal.bodyLight
-            linePaint.alpha = (205 - tt * 60).toInt().coerceIn(0, 255)
-            // 斜着画才有缠绕感，水平的话就是个楼梯
-            canvas.drawLine(cx + off - w, y - r * 0.11f, cx + off + w, y + r * 0.11f, linePaint)
-        }
-        linePaint.alpha = 255
-        canvas.restore()
-
-        // 轮廓线：把漏斗的形“钉”住，避免内部斜线把边界冲淡
-        linePaint.color = pal.shade
-        linePaint.strokeWidth = r * 0.055f
-        canvas.drawPath(funnel, linePaint)
-
-        if (!sleepy) {
-            bodyPaint.color = pal.highlight
-            canvas.drawCircle(cx, topY + r * 0.15f, r * 0.16f, bodyPaint)
-        }
-        drawFace(canvas, cx, topY + r * 0.56f, r * 0.15f, blinking, fierce = true)
+        // ⚠️ 不要在底部再加一颗深色球：它会被读成「脚」或「底座」，
+        // 圆堆本身已经收口了，多一个反而破坏整体。
+        drawFace(canvas, cx, topY + r * 0.30f, r * 0.15f, blinking, fierce = true)
     }
 
     // ─────────────────── 形态五：雷霆之王（尖锐能量核心 + 倾斜光环 + 头顶星芒） ───────────────────

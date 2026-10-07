@@ -23,4 +23,7 @@ EN = {
     "calib_progress_fmt": "Keep the screen on and playing, do not touch the phone\nRemaining %1$d:%2$02d (%3$d samples)",
     "evolve_fmt": "🎉 Evolved! %1$s → %2$s",
     "mah_saved_fmt": "⚡ Saved %1$d mAh",
+    "toast_calib_fail_few": "Only %1$d valid samples (need 4). Keep the screen on and playing the whole time, and don't charge the phone.",
+    "toast_calib_fail_zerocurrent": "The phone reported a current of 0, so it can't be measured here. This happens on some devices when they aren't charging.",
+    "toast_calib_fail_reversed": "Measured: screen on %1$d microamps, screen off %2$d microamps — the screen-off phase used MORE power, so it can't be used to estimate savings. Keep the phone face-up and try again.",
 }

@@ -396,12 +396,15 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             try {
                 if (dur >= 300_000) {
                     val sp = context.prefs()
-                    val sdf = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault())
-                    val today = sdf.format(java.util.Date())
-                    if (sp.getString(Prefs.LAST_RARE_DATE, "") != today &&
+                    // 用 epochDayOf 而不是 SimpleDateFormat("yyyyMMdd")：
+                    // 后者受 locale 影响（th-TH 佛历、阿拉伯语非 ASCII 数字），
+                    // 用户换语言/换系统区域后可能算出不同的「今天」，
+                    // 于是“每日一次”的去重失效，同一天能反复掉能量。
+                    val today = Streaks.epochDayOf(now)
+                    if (sp.getLong(Prefs.LAST_RARE_DAY, -1L) != today &&
                         java.util.Random().nextFloat() < 0.10f
                     ) {
-                        sp.edit().putString(Prefs.LAST_RARE_DATE, today).apply()
+                        sp.edit().putLong(Prefs.LAST_RARE_DAY, today).apply()
                         val bonus = (dur / 60_000).toInt().coerceAtLeast(15)
                         EnergyStore.add(context, bonus)
                         android.widget.Toast.makeText(

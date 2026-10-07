@@ -1162,9 +1162,12 @@ private fun showSkinGallery() {
         // 精灵成就（精灵二期·一期）：依据统计评估解锁并渲染
         val gpNow = EnergyStore.collectedTotal(this)
         val stageNow = PetView.stageOf(gpNow.toLong())
-        val listenDays = sessions
-            .map { SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date(it.start)) }
-            .distinct().size
+        // ⚠ 两种「天数」是两回事，别混用：
+        //   · listenDays = **累计**不同日期数 → 「持之以恒」成就
+        //   · streakDays = **连续**天数（Streaks.current）→ 皮肤解锁、首页展示
+        // 两者文案各自描述的是对的，但改一处忘另一处就会不一致。
+        // 这里是「累计」口径，所以用 distinctListenDays 而不是 Streaks.current。
+        val listenDays = Streaks.distinctListenDays(sessions)
         val freshAch = Achievements.evaluate(
             this, sessions.size,
             sessions.maxOfOrNull { it.durationMs } ?: 0L, listenDays, stageNow

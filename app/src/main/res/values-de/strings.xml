@@ -182,7 +182,6 @@ Nicht laden; Akkustand zwischen 15 %% und 95 %% halten.</string>
     <string name="toast_calib_need_service">Bitte zuerst den Assistenten starten, dann kalibrieren</string>
     <string name="toast_calib_step2">Kalibrierung 2/2: 3 Minuten schwarzen Bildschirm lassen, nichts tun</string>
     <string name="toast_calib_ok">Kalibrierung abgeschlossen ✓ (%1$d gültige Messungen)</string>
-    <string name="toast_calib_invalid">Messung ungültig (wird geladen?), bitte erneut versuchen</string>
     <string name="toast_calib_done">Kalibrierung abgeschlossen: gemessene Einsparung ≈ %1$.0f mAh/h</string>
     <string name="toast_calib_timeout">Zeitüberschreitung bei der Kalibrierung, bitte erneut versuchen</string>
     <string name="saved_basis_measured">Auf diesem Gerät gemessen</string>
@@ -309,6 +308,9 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="calib_date_fmt">%2$d.%1$d.</string>
     <string name="calib_progress_fmt">Bildschirm eingeschaltet lassen und weiter abspielen, das Handy nicht anfassen
 Noch %1$d:%2$02d (%3$d Messungen)</string>
+    <string name="toast_calib_fail_few">Nur %1$d gültige Messungen (4 benötigt). Bildschirm die ganze Zeit eingeschaltet lassen und abspielen, nicht laden.</string>
+    <string name="toast_calib_fail_zerocurrent">Das Handy meldet 0, lässt sich hier also nicht messen. Passiert bei manchen Geräten im nicht geladenen Zustand.</string>
+    <string name="toast_calib_fail_reversed">Gemessen: Bildschirm an %1$d, aus %2$d Mikroampere — die Schwarzphase verbrauchte mehr, damit lässt sich nichts schätzen. Handy flach hinlegen und erneut versuchen.</string>
     <string name="mah_saved_fmt">⚡ %1$d mAh gespart</string>
     <string name="evolve_fmt">🎉 Entwickelt! %1$s → %2$s</string>
 </resources>

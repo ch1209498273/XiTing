@@ -182,7 +182,6 @@
     <string name="toast_calib_need_service">先に画面オフ再生アシスタントを起動してください</string>
     <string name="toast_calib_step2">校正手順 2/2：画面を消したまま3分待機、操作は不要です</string>
     <string name="toast_calib_ok">校正完了 ✓（有効サンプル %1$d）</string>
-    <string name="toast_calib_invalid">校正サンプルが無効です（充電中ではありませんか？）。再試行してください</string>
     <string name="toast_calib_done">校正完了：本機の実測節約 ≈ %1$.0f mAh/時</string>
     <string name="toast_calib_timeout">校正がタイムアウトしました。再試行してください</string>
     <string name="saved_basis_measured">本機の実測に基づく</string>
@@ -304,11 +303,14 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="cd_play_pause">再生 / 一時停止</string>
     <string name="cd_next_episode">次の話</string>
     <string name="bubble_label_plain">画面オフ</string>
-    <string name="notif_timer_fmt"> · %1$d分後に終了</string>
+    <string name="notif_timer_fmt">· %1$d分後に終了</string>
     <string name="dlg_got_it">了解</string>
     <string name="calib_date_fmt">M月d日</string>
     <string name="calib_progress_fmt">画面をオンにしたまま再生してください。端末には触れないでください
 残り %1$d:%2$02d（%3$d 回サンプル）</string>
+    <string name="toast_calib_fail_few">有効なサンプルが %1$d 件しかありません（4 件必要）。間は全て画面をオンにしたまま再生し、充電しないでください。</string>
+    <string name="toast_calib_fail_zerocurrent">端末が電流 0 を報告したため測定できません。充電していない状態では一部の端末でこうなります。</string>
+    <string name="toast_calib_fail_reversed">実測：画面オン %1$d マイクロアンペア、画面オフ %2$d マイクロアンペア — 画面オフのほうが高い消費になったため、削減量の算出には使えません。端末を裏面上に置いて再試行してください。</string>
     <string name="mah_saved_fmt">⚡ %1$d mAh 蓄積</string>
     <string name="evolve_fmt">🎉 進化！%1$s → %2$s</string>
 </resources>

@@ -51,6 +51,15 @@ object Prefs {
     /** 每满 1 分钟 1 点能量的跨会话余数累积（毫秒），不浪费零头 */
     const val ENERGY_CARRY_MS = "energy_carry_ms"
     const val LAST_RARE_DATE = "last_rare_date"
+    /**
+     * 稀有雷暴能量的「掉落日」（epoch day，整数）。
+     *
+     * ⚠ 不是字符串日期：旧的 [LAST_RARE_DATE] 用 `yyyyMMdd` 格式化字符串存，
+     * 而格式化结果受 locale 影响（th-TH 佛历、阿拉伯语非 ASCII 数字），
+     * 用户改系统区域后可能算出不同的「今天」，“每日一次”的去重就失效了。
+     * 改存整数天号，与 [Streaks.epochDayOf] 一致。
+     */
+    const val LAST_RARE_DAY = "last_rare_day"
 
     /**
      * 只读遗留键：早期版本写入的「分享奖励成长值」，当前版本不再写，
@@ -69,6 +78,13 @@ object Prefs {
     const val LAST_SEEN_STAGE = "last_seen_stage"
 
     // ---- 分享 ----
+    /**
+     * 分享奖励的「已领日期」（yyyy-MM-dd 字符串）。
+     *
+     * 与 [LAST_RARE_DAY] 的区别：这里存字符串是因为它**只在内部与自身比较**
+     * （今天 != 上次），不参与任何集合/去重运算，locale 变了不影响正确性；
+     * 而掉落去重要算「同一天」，必须用与 locale 无关的 epoch day。
+     */
     const val LAST_SHARE_DATE = "last_share_date"
 
     // ---- 界面语言 ----

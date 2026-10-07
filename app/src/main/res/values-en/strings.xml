@@ -166,7 +166,6 @@
     <string name="toast_calib_need_service">Start the assistant first, then calibrate</string>
     <string name="toast_calib_step2">Calibration 2/2 · stay black for 3 min, hands off</string>
     <string name="toast_calib_ok">Calibrated ✓ (%1$d valid samples)</string>
-    <string name="toast_calib_invalid">Invalid samples (charging?) — try again</string>
     <string name="toast_calib_done">Calibrated: measured saving ≈ %1$.0f mAh/h</string>
     <string name="toast_calib_timeout">Calibration timed out — try again</string>
     <string name="saved_basis_measured">measured on device</string>
@@ -262,11 +261,14 @@
     <string name="cd_play_pause">Play / pause</string>
     <string name="cd_next_episode">Next episode</string>
     <string name="bubble_label_plain">Screen off</string>
-    <string name="notif_timer_fmt"> · turns off in %1$d min</string>
+    <string name="notif_timer_fmt">· turns off in %1$d min</string>
     <string name="dlg_got_it">Got it</string>
     <string name="calib_date_fmt">MMM d</string>
     <string name="calib_progress_fmt">Keep the screen on and playing, do not touch the phone
 Remaining %1$d:%2$02d (%3$d samples)</string>
+    <string name="toast_calib_fail_few">Only %1$d valid samples (need 4). Keep the screen on and playing the whole time, and don\'t charge the phone.</string>
+    <string name="toast_calib_fail_zerocurrent">The phone reported a current of 0, so it can\'t be measured here. This happens on some devices when they aren\'t charging.</string>
+    <string name="toast_calib_fail_reversed">Measured: screen on %1$d microamps, screen off %2$d microamps — the screen-off phase used MORE power, so it can\'t be used to estimate savings. Keep the phone face-up and try again.</string>
     <string name="mah_saved_fmt">⚡ Saved %1$d mAh</string>
     <string name="evolve_fmt">🎉 Evolved! %1$s → %2$s</string>
 </resources>

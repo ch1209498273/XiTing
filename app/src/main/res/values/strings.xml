@@ -198,7 +198,6 @@
     <string name="toast_calib_need_service">请先启动息屏听剧助手，再进行校准</string>
     <string name="toast_calib_step2">校准步骤 2/2：保持黑屏 3 分钟，无需操作</string>
     <string name="toast_calib_ok">校准完成 ✓（有效样本 %1$d）</string>
-    <string name="toast_calib_invalid">校准样本无效（是否在充电？），请重试</string>
     <string name="toast_calib_done">校准完成：本机实测省电 ≈ %1$.0f mAh/小时</string>
     <string name="toast_calib_timeout">校准超时，请重试</string>
 
@@ -311,7 +310,11 @@
     <string name="notif_timer_fmt"> · 定时%1$d分钟后关闭</string>
     <string name="dlg_got_it">知道了</string>
     <string name="calib_date_fmt">M月d日</string>
-    <string name="calib_progress_fmt">请保持亮屏播放视频，不要操作手机\n剩余 %1$d:%2$02d（已采样 %3$d 次）</string>
+    <string name="calib_progress_fmt">请保持亮屏播放视频，不要操作手机\n剩余 %1$d:%2$02d（已采样 %3$d 次）</string>    <!-- 省电校准失败的三种原因。原来只有一句「是否在充电？」，用户看到
+         「校准无效」却不知道该做什么，只能反复重试。 -->
+    <string name="toast_calib_fail_few">有效样本仅 %1$d 个（需 4 个）。请全程亮屏播放，且不要充电。</string>
+    <string name="toast_calib_fail_zerocurrent">手机报告电流为 0，无法测量。部分机型在不充电时如此。</string>
+    <string name="toast_calib_fail_reversed">实测：亮屏 %1$d μA，黑屏 %2$d μA —— 黑屏段反而更耗电，不能用于估算省电。请将手机平放后重试。</string>
     <string name="mah_saved_fmt">⚡ 已储存 %1$d mAh</string>
     <string name="evolve_fmt">🎉 进化！%1$s → %2$s</string>
 </resources>

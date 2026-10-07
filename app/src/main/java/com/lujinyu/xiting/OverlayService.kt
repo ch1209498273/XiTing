@@ -145,10 +145,17 @@ class OverlayService : Service() {
     fun isAnyBlackShowing(): Boolean = black?.isShowing == true
 
     private fun hideAllBlack() {
+        val wasShowing = black?.isShowing == true
         black?.hide()
         black = null
         main.removeCallbacks(powerTick) // 停止会话功耗采样
         setBubbleAnimating(true)
+        // 小组件必须在这里刷，而不是依赖 BlackOverlay 的 onDismissCallback：
+        // 那个回调**只在轻点解锁那条路径上被调用**（BlackOverlay.hide() 结尾会把
+        // 它置空），而耳机拔出、来电、退出助手、磁贴都走本方法。
+        // 结果就是：这些路径结束了一次听剧（有新记录、能量可能入账），
+        // 小组件却一直显示旧数据，直到 30 分钟轮询才纠正。
+        if (wasShowing) refreshNotification()
     }
 
     /**
@@ -181,8 +188,9 @@ class OverlayService : Service() {
                     it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO
             }
             if (headsetGone && prefs.getBoolean(Prefs.SWITCH_HEADSET, true) && black?.isShowing == true) {
+                // hideAllBlack() 内部已经 refreshNotification()（修小组件漏刷新那次加的），
+                // 不要再调一次
                 hideAllBlack()
-                refreshNotification()
                 Toast.makeText(this@OverlayService, getString(R.string.toast_headset), Toast.LENGTH_SHORT).show()
             }
         }
@@ -213,14 +221,22 @@ class OverlayService : Service() {
         if (calibTicks < 6) {
             main.postDelayed(calibTick, 30_000)
         } else {
-            hideAllBlack()
-            refreshNotification()
+            hideAllBlack()   // 内部已 refreshNotification()
             val avgOff = if (calibSamples.size >= 4) calibSamples.average().toLong() else 0L
             if (avgOff > 0 && calibOnUa > avgOff) {
                 PowerCalib.storeCalibration(this, calibOnUa, avgOff)
                 Toast.makeText(this, getString(R.string.toast_calib_ok, calibSamples.size), Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(this, getString(R.string.toast_calib_invalid), Toast.LENGTH_LONG).show()
+                // 三种完全不同的失败原因，原来只给一句「是否在充电」，
+                // 用户看到「校准无效」却不知道该做什么，只能反复重试。
+                // 尤其第三种：黑屏段确实比亮屏段耗电（后台进程被唤醒、定位等），
+                // 这在技术上不算「操作错」，只是结果不能用来估算——必须说清楚。
+                val msg = when {
+                    calibSamples.size < 4 -> getString(R.string.toast_calib_fail_few, calibSamples.size)
+                    avgOff <= 0L -> getString(R.string.toast_calib_fail_zerocurrent)
+                    else -> getString(R.string.toast_calib_fail_reversed, calibOnUa, avgOff)
+                }
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -242,8 +258,7 @@ class OverlayService : Service() {
                 Intent.ACTION_SCREEN_OFF -> {
                     // 电源键/自动息屏时若黑幕还开着：撤掉遮罩，唤醒后直接回到视频画面
                     if (isAnyBlackShowing()) {
-                        hideAllBlack()
-                        refreshNotification()
+                        hideAllBlack()   // 内部已 refreshNotification()
                     }
                 }
             }

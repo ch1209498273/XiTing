@@ -1,10 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ⚠ updatePeriodMillis=0 是**故意**的，不是漏写。
+
+  原来是 1800000（30 分钟，Android 允许的最小周期），意味着系统每天要把进程
+  唤醒 48 次去刷一个大多数时候没变化的小部件。
+
+  可以关掉的前提：更新全部靠推送。OverlayService.refreshNotification() 里调
+  WidgetData.refreshAll()，而 refreshNotification() 在服务里有 13 个调用点
+  （黑幕显示/隐藏、悬浮球显隐、定时到期、退出、磁贴……），
+  外加 MainActivity 打开/刷新时也会调。
+
+  ⚠ 但推送曾经**漏过一条路径**：BlackOverlay 的 onDismissCallback 只在轻点解锁时
+  被调用，而 hide() 结尾会把它置空。耳机拔出、来电、退出助手都走
+  OverlayService.hideAllBlack()，那条路以前不刷小组件 —— 结束了一次听剧
+  （有新记录、能量入账）却要等 30 分钟轮询才纠正。
+  已修：hideAllBlack() 内部按 wasShowing 统一 refreshNotification()。
+
+  如果以后发现小组件数据不更新，先查推送路径，而不是把这里改回 1800000。
+-->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="250dp"
     android:minHeight="57dp"
     android:targetCellWidth="4"
     android:targetCellHeight="2"
-    android:updatePeriodMillis="1800000"
+    android:updatePeriodMillis="0"
     android:initialLayout="@layout/widget_main"
     android:previewLayout="@layout/widget_main"
     android:widgetFeatures="reconfigurable"

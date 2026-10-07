@@ -182,7 +182,6 @@ Ne chargez pas ; gardez la batterie entre 15 %% et 95 %%.</string>
     <string name="toast_calib_need_service">Démarrez d\'abord l\'assistant, puis calibrez</string>
     <string name="toast_calib_step2">Calibrage 2/2 : laissez l\'écran noir 3 minutes, rien à faire</string>
     <string name="toast_calib_ok">Calibrage terminé ✓ (%1$d échantillons valides)</string>
-    <string name="toast_calib_invalid">Échantillons invalides (en charge ?), réessayez</string>
     <string name="toast_calib_done">Calibrage terminé : économie mesurée ≈ %1$.0f mAh/h</string>
     <string name="toast_calib_timeout">Calibrage expiré, réessayez</string>
     <string name="saved_basis_measured">Mesuré sur cet appareil</string>
@@ -309,6 +308,9 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="calib_date_fmt">%2$d/%1$d</string>
     <string name="calib_progress_fmt">Laissez l\'écran allumé et la lecture continuer, ne touchez pas le téléphone
 Restant %1$d:%2$02d (%3$d échantillons)</string>
+    <string name="toast_calib_fail_few">Seulement %1$d échantillons valides (4 nécessaires). Laissez l\'écran allumé et la lecture continuer, sans charger.</string>
+    <string name="toast_calib_fail_zerocurrent">Le téléphone indique 0, la mesure est donc impossible ici. Certains appareils font cela hors charge.</string>
+    <string name="toast_calib_fail_reversed">Mesuré : écran allumé %1$d, écran noir %2$d microampères — la phase écran noir a consommé davantage, impossible d\'en déduire une économie. Posez le téléphone à plat et réessayez.</string>
     <string name="mah_saved_fmt">⚡ %1$d mAh économisés</string>
     <string name="evolve_fmt">🎉 Évolution ! %1$s → %2$s</string>
 </resources>

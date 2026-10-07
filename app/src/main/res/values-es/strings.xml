@@ -182,7 +182,6 @@ No cargues; mantén la batería entre el 15 %% y el 95 %%.</string>
     <string name="toast_calib_need_service">Primero inicia el asistente y luego calibra</string>
     <string name="toast_calib_step2">Calibración 2/2: deja la pantalla negra 3 minutos, no hace falta hacer nada</string>
     <string name="toast_calib_ok">Calibración completada ✓ (%1$d muestras válidas)</string>
-    <string name="toast_calib_invalid">Muestras no válidas (¿está cargando?), inténtalo de nuevo</string>
     <string name="toast_calib_done">Calibración completada: ahorro medido ≈ %1$.0f mAh/h</string>
     <string name="toast_calib_timeout">La calibración expiró, inténtalo de nuevo</string>
     <string name="saved_basis_measured">Medido en este dispositivo</string>
@@ -309,6 +308,9 @@ Este proyecto no tiene relación con YouTube, Google ni ninguna plataforma de v�
     <string name="calib_date_fmt">%2$d/%1$d</string>
     <string name="calib_progress_fmt">Deja la pantalla encendida y reproduciendo, no toques el móvil
 Quedan %1$d:%2$02d (%3$d muestras)</string>
+    <string name="toast_calib_fail_few">Solo %1$d muestras válidas (hacen falta 4). Deja la pantalla encendida y reproduciendo todo el tiempo, sin cargar.</string>
+    <string name="toast_calib_fail_zerocurrent">El móvil indica 0, así que no se puede medir aquí. Pasa en algunos dispositivos sin estar cargando.</string>
+    <string name="toast_calib_fail_reversed">Medido: pantalla encendida %1$d, apagada %2$d microamperios — la fase apagada consumió más, así que no sirve para estimar el ahorro. Deja el móvil boca arriba e inténtalo de nuevo.</string>
     <string name="mah_saved_fmt">⚡ %1$d mAh ahorrados</string>
     <string name="evolve_fmt">🎉 ¡Evolución! %1$s → %2$s</string>
 </resources>

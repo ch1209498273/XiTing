@@ -182,7 +182,6 @@
     <string name="toast_calib_need_service">Сначала запустите помощника, затем калибруйте</string>
     <string name="toast_calib_step2">Калибровка 2/2: оставьте чёрный экран на 3 минуты, ничего делать не нужно</string>
     <string name="toast_calib_ok">Калибровка завершена ✓ (%1$d действительных замеров)</string>
-    <string name="toast_calib_invalid">Замеры недействительны (зарядка включена?), повторите</string>
     <string name="toast_calib_done">Калибровка завершена: измеренная экономия ≈ %1$.0f мА·ч/ч</string>
     <string name="toast_calib_timeout">Время калибровки истекло, повторите</string>
     <string name="saved_basis_measured">По замерам на устройстве</string>
@@ -309,6 +308,9 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="calib_date_fmt">%2$d.%1$d</string>
     <string name="calib_progress_fmt">Оставьте экран включённым и воспроизведение идущим, не трогайте телефон
 Осталось %1$d:%2$02d (%3$d замеров)</string>
+    <string name="toast_calib_fail_few">Всего %1$d действительных замеров (нужно 4). Оставьте экран включённым и не отключайте воспроизведение, не заряжайте.</string>
+    <string name="toast_calib_fail_zerocurrent">Телефон сообщает 0, измерить здесь нельзя. Так бывает на некоторых устройствах вне зарядки.</string>
+    <string name="toast_calib_fail_reversed">Замерено: экран включён %1$d, выключен %2$d микроампер — выключенный экран потреблял больше, оценить экономию не по чему. Положите телефон экраном вверх и повторите.</string>
     <string name="mah_saved_fmt">⚡ Сэкономлено %1$d мА·ч</string>
     <string name="evolve_fmt">🎉 Эволюция! %1$s → %2$s</string>
 </resources>

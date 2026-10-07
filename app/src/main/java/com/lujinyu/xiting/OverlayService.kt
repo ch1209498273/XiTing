@@ -637,7 +637,10 @@ class OverlayService : Service() {
         try {
             wm.addView(pill, lp)
             exitConfirm = pill
-            // pill 本身的点击已由子 View 的 OnClickListener 处理，这里只负责「点外面就收起」
+            // pill 本身的点击已由子 View 的 OnClickListener 处理，这里只负责「点外面就收起」。
+            // ACTION_OUTSIDE 不是点击，不该调 performClick()——调了会对无障碍服务
+            // 谎报一次点击（@SuppressLint 写在下面那句 lambda 上）。
+            @SuppressLint("ClickableViewAccessibility")
             pill.setOnTouchListener { _, e ->
                 if (e.actionMasked == MotionEvent.ACTION_OUTSIDE) { hideExitConfirm(); true } else false
             }

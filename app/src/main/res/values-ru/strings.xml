@@ -214,8 +214,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="update_value_fmt">v%1$s</string>
     <string name="bubble_default">Выключенный экран (по умолчанию)</string>
     <string name="bubble_label_off">Выкл. экран</string>
-    <string name="bubble_dlg_title">Вид пузырька (предпросмотр)</string>
-    <string name="toast_bubble_locked">[%1$s] закрыт · Нужно %2$d прогресса</string>
     <string name="bubble_value_default">По умолчанию</string>
     <string name="unit_h">ч</string>
     <string name="unit_m">мин</string>
@@ -301,7 +299,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="dur_sec_fmt">%1$d с</string>
     <string name="dur_min_fmt">%1$d мин</string>
     <string name="dur_hour_fmt">%1$.1f ч</string>
-    <string name="battery_fmt">Батарея %1$d%%%</string>
+    <string name="battery_fmt">Батарея %1$d%%</string>
     <string name="cd_prev_episode">Предыдущая серия</string>
     <string name="cd_play_pause">Воспроизведение / пауза</string>
     <string name="cd_next_episode">Следующая серия</string>
@@ -313,5 +311,4 @@ https://github.com/ch1209498273/XiTing</string>
 Осталось %1$d:%2$02d (%3$d замеров)</string>
     <string name="mah_saved_fmt">⚡ Сэкономлено %1$d мА·ч</string>
     <string name="evolve_fmt">🎉 Эволюция! %1$s → %2$s</string>
-    <string name="lang_restart_note">Применяется сразу, перезагрузка не нужна</string>
 </resources>

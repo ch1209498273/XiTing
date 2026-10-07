@@ -64,14 +64,14 @@
     <string name="widget_black">Éteindre</string>
     <string name="widget_active">En marche</string>
     <string name="widget_idle">Arrêté</string>
-    <string name="widget_today_fmt">Aujourd\'hui %%1$s</string>
+    <string name="widget_today_fmt">Aujourd\'hui %1$s</string>
     <string name="widget_growth_next">Progression %1$d · %2$d avant la forme suivante</string>
     <string name="widget_growth_max">Progression %1$d · Au sommet</string>
     <string name="black_hint">Écoute écran off · Touchez pour déverrouiller</string>
     <string name="black_return">🔒 Toucher pour revenir à la vidéo</string>
     <string name="channel_name">Assistant Écran off</string>
     <string name="notif_title">Assistant écran off en marche</string>
-    <string name="notif_text">Touchez la bulle : l\'écran s\'éteint, le son continue%%1$s</string>
+    <string name="notif_text">Touchez la bulle : l\'écran s\'éteint, le son continue%1$s</string>
     <string name="notif_action_listen">Écouter</string>
     <string name="notif_action_restore">Restaurer l\'écran</string>
     <string name="notif_action_stop">Quitter l\'assistant</string>
@@ -107,7 +107,7 @@
     <string name="toast_timer_expired">Minuterie expirée</string>
     <string name="toast_timer_done">Minuterie terminée, écran rallumé</string>
     <string name="toast_timer_cancelled">Arrêt programmé annulé</string>
-    <string name="toast_episode_done">Éteindre à la fin de l\'épisode (dans %%1$d min %%2$d s)</string>
+    <string name="toast_episode_done">Éteindre à la fin de l\'épisode (dans %1$d min %2$d s)</string>
     <string name="timer_remain_fmt">Il reste %1$d min</string>
     <string name="restore_title">Restaurer les données</string>
     <string name="restore_msg">Si vous avez déjà utilisé « Écoute écran off » puis l\'avez désinstallé : la sauvegarde se trouve dans le dossier XiTing de Téléchargements (XiTing-backup.json). Vous pouvez restaurer ici la progression et les statistiques en un geste.
@@ -165,7 +165,7 @@ Sans autorisation, le compte à rebours normal fonctionne aussi.</string>
     <string name="ach_king_d">L\'esprit atteint le Roi du tonnerre</string>
     <string name="calib_title">Mesure d\'économie</string>
     <string name="calib_msg_calibrated">Calibré sur cet appareil (%1$s)
-Débit d\'économie mesuré ≈ %%2$.0f mAh/h</string>
+Débit d\'économie mesuré ≈ %2$.0f mAh/h</string>
     <string name="calib_msg_uncalibrated">Pas encore calibré (estimation selon le modèle OLED standard)</string>
     <string name="calib_msg_ambient">Consommation mesurée en écran noir ≈ %1$.0f mA (%2$d échantillons)</string>
     <string name="calib_msg_flow">Procédure (environ 6 minutes) :
@@ -195,8 +195,8 @@ Ne chargez pas ; gardez la batterie entre 15 %% et 95 %%.</string>
     <string name="day_today">Aujourd\'hui</string>
     <string name="day_yesterday">Hier</string>
     <string name="share_chooser">Partager vers</string>
-    <string name="share_text">⚡ Avec « Écoute écran off » j\'ai écouté %%1$s écran éteint, soit environ %%2$d mAh économisés
-Mon esprit électrique a évolué jusqu\'à « %%3$s »
+    <string name="share_text">⚡ Avec « Écoute écran off » j\'ai écouté %1$s écran éteint, soit environ %2$d mAh économisés
+Mon esprit électrique a évolué jusqu\'à « %3$s »
 Une appli gratuite, sans publicité, hors ligne (0,6 Mo)
 https://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">Partagé · +%1$d en attente (récupérez sur la page Stats)</string>
@@ -214,8 +214,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="update_value_fmt">v%1$s</string>
     <string name="bubble_default">Écran off (défaut)</string>
     <string name="bubble_label_off">Écran off</string>
-    <string name="bubble_dlg_title">Style de bulle (aperçu en direct)</string>
-    <string name="toast_bubble_locked">« %1$s » verrouillé · %2$d de progression requis</string>
     <string name="bubble_value_default">Défaut</string>
     <string name="unit_h">h</string>
     <string name="unit_m">min</string>
@@ -261,7 +259,7 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="gallery_btn">🎨 Bestiaire</string>
     <string name="streak_fmt">🔥 %1$d jours d\'affilée</string>
     <string name="streak_best_fmt">Record : %1$d jours</string>
-    <string name="toast_rare_energy">⚡ Énergie d\'orage rare +%%1$d !</string>
+    <string name="toast_rare_energy">⚡ Énergie d\'orage rare +%1$d !</string>
     <string name="toast_skin_unlock">🎨 Nouveau skin : %1$s</string>
     <string name="skin_default_n">Palette classique</string>
     <string name="skin_cond_default">Forme par défaut</string>
@@ -298,20 +296,19 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="lang_name_de">Deutsch</string>
     <string name="lang_name_es">Español</string>
     <string name="lang_name_ru">Русский</string>
-    <string name="dur_sec_fmt">%1$d с</string>
-    <string name="dur_min_fmt">%1$d мин</string>
-    <string name="dur_hour_fmt">%1$.1f ч</string>
-    <string name="battery_fmt">Батарея %1$d%%%</string>
-    <string name="cd_prev_episode">Предыдущая серия</string>
-    <string name="cd_play_pause">Воспроизведение / пауза</string>
-    <string name="cd_next_episode">Следующая серия</string>
-    <string name="bubble_label_plain">Выключенный экран</string>
-    <string name="notif_timer_fmt">· выключится через %1$d мин</string>
-    <string name="dlg_got_it">Понятно</string>
-    <string name="calib_date_fmt">%2$d.%1$d</string>
-    <string name="calib_progress_fmt">Оставьте экран включённым и воспроизведение идущим, не трогайте телефон
-Осталось %1$d:%2$02d (%3$d замеров)</string>
-    <string name="mah_saved_fmt">⚡ Сэкономлено %1$d мА·ч</string>
-    <string name="evolve_fmt">🎉 Эволюция! %1$s → %2$s</string>
-    <string name="lang_restart_note">Prend effet immédiatement</string>
+    <string name="dur_sec_fmt">%1$d s</string>
+    <string name="dur_min_fmt">%1$d min</string>
+    <string name="dur_hour_fmt">%1$.1f h</string>
+    <string name="battery_fmt">Batterie %1$d%%</string>
+    <string name="cd_prev_episode">Épisode précédent</string>
+    <string name="cd_play_pause">Lecture / pause</string>
+    <string name="cd_next_episode">Épisode suivant</string>
+    <string name="bubble_label_plain">Écran off</string>
+    <string name="notif_timer_fmt">· extinction dans %1$d min</string>
+    <string name="dlg_got_it">J\'ai compris</string>
+    <string name="calib_date_fmt">%2$d/%1$d</string>
+    <string name="calib_progress_fmt">Laissez l\'écran allumé et la lecture continuer, ne touchez pas le téléphone
+Restant %1$d:%2$02d (%3$d échantillons)</string>
+    <string name="mah_saved_fmt">⚡ %1$d mAh économisés</string>
+    <string name="evolve_fmt">🎉 Évolution ! %1$s → %2$s</string>
 </resources>

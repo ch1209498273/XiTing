@@ -100,13 +100,18 @@ def esc(v):
     def pct(m):
         return m.group(0) if FORMAT_TOKEN.match(_token_at(v, m.start())) else "%%"
 
-    # ⚠ 必须用 re.sub 而不是 str.replace：str.replace 的第二个参数只能是
-    # 字符串，不接受函数（那是 re.sub 的 API）。
-    return re.sub('%', pct,
-                  v.replace("&", "&amp;")
-                   .replace("<", "&lt;")
-                   .replace(">", "&gt;")
-                   .replace("'", "\\'"))
+    # ⚠ 两个关键点，全部踩过：
+    # 1. 必须用 re.sub 而不是 str.replace：str.replace 的第二个参数只能是
+    #    字符串，不接受函数（那是 re.sub 的 API）。
+    # 2. **re.sub 必须在最原始的字符串上跑**。之前是先做 & < > ' 的替换、
+    #    再对结果跑 re.sub，而回调里用 m.start() 去原串 v 切 token ——
+    #    `&` → `&amp;` 改变了长度，索引错位，于是 `%1$s` 被当成裸 `%`，
+    #    最终写出 `%%1$s`。运行时 getString(id, args) 直接抛异常，而
+    #    release 构建不跑 lint，编译期完全看不出来。
+    return re.sub('%', pct, v).replace("&", "&amp;") \
+                               .replace("<", "&lt;") \
+                               .replace(">", "&gt;") \
+                               .replace("'", "\\'")
 
 
 def unesc(v):
@@ -124,9 +129,11 @@ _DICTS = {}
 def load_dicts():
     """tools/i18n/*.py 里的 dict：人工维护的译文。
 
-    文件名约定：`<lang>.py`（单个语言）或 `long_<lang>.py`（同语言的长段落）。
-    文件里可以用 `LANGS = ["de", "en", ...]` 声明这份词典适用于哪些语言——
-    语言名与译文无关的内容（如「语言自称名」）就靠这个跨语言共用一份。
+    文件名约定：`<lang>.py`（短文案）、`long_<lang>.py`（长段落）、
+    `code_<lang>.py`（从 Kotlin 代码搬来的文案）。三个前缀都表示
+    「去掉前缀后的部分就是语言码」，所以一个文件里只放一种语言。
+    文件里可以用 `LANGS = [...]` 声明一份词典跨哪些语言共用——
+    语言名与译文无关的内容（如「语言自称名」）就靠这个。
     按**文件名排序**依次 merge，靠后的覆盖靠前的。
     """
     d = os.path.join(os.path.dirname(os.path.abspath(__file__)), "i18n")
@@ -135,7 +142,7 @@ def load_dicts():
     out = {}
     for f in sorted(glob.glob(os.path.join(d, "*.py"))):
         base = os.path.basename(f)[:-3]
-        default_lang = base[5:] if base.startswith("long_") else base
+        default_lang = base.split("_", 1)[1] if "_" in base else base
         ns = {}
         try:
             with open(f, encoding="utf-8") as fh:
@@ -144,12 +151,30 @@ def load_dicts():
             print("⚠ 读取 %s 失败: %s" % (f, e))
             continue
         langs = ns.get("LANGS") or [default_lang]
+        dicts = [
+            (k, v) for k, v in ns.items()
+            if k.isupper() and k != "LANGS" and isinstance(v, dict)
+        ]
+        # 防呆 1：一份文件里多个 dict + LANGS 指定多语言 = 它们会互相覆盖，
+        # 加载顺序决定谁赢。这种错误很隐蔽（所有语言被写成同一种），
+        # 而且往往是因为「顺手把两种语言放一个文件」造成的。
+        if len(langs) > 1 and len(dicts) > 1:
+            print("⚠ 词典 %-16s 声明了多语言 %s，文件里却有 %d 个 dict（%s）："
+                  % (base, langs, len(dicts), ", ".join(k for k, _ in dicts)))
+            print("     它们会互相覆盖，结果所有语言都变成最后一条的内容。")
+            print("     若确实要共用，请合并成一个 dict；否则去掉 LANGS。")
+        # 防呆 2：单语言文件里出现多个 dict，同样可疑 ——
+        # 实际发生过：code_en.py 里同时放了 EN 和 JA，结果日语灌进了英语。
+        if len(langs) == 1 and len(dicts) > 1:
+            print("⚠ 词典 %-16s 属于语言「%s」，却含 %d 个 dict（%s）。"
+                  % (base, langs[0], len(dicts), ", ".join(k for k, _ in dicts)))
+            print("     全部都会归到「%s」，靠后的覆盖靠前的。请拆成每个语言一个文件。"
+                  % langs[0])
         n = 0
-        for k, v in ns.items():
-            if k.isupper() and k != "LANGS" and isinstance(v, dict):
-                for lg in langs:
-                    out.setdefault(lg, {}).update(v)
-                n += len(v)
+        for k, v in dicts:
+            for lg in langs:
+                out.setdefault(lg, {}).update(v)
+            n += len(v)
         print("  词典 %-16s -> %-18s %3d 条" % (base, ",".join(langs), n))
     _DICTS.clear()
     _DICTS.update(out)

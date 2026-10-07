@@ -117,7 +117,7 @@
     <string name="restore_no">필요 없음</string>
     <string name="toast_invalid_backup">유효하지 않은 백업 파일입니다</string>
     <string name="restore_other_title">다른 기기의 백업입니다</string>
-    <string name="restore_other_msg">이 백업의 성장값은 %1$d이며 기기 ID가 본인과 다릅니다(기종 변경 또는 이전 서명 버전에서 이전). 복원할까요?</string>
+    <string name="restore_other_msg">이 백업의 성장값은 %1$d이며 기기 ID가 본인과 다릅니다(기종 변경 또는 이전 서명 버전에서 이전). 그래도 복원할까요?</string>
     <string name="restore_ok_btn">복원</string>
     <string name="dlg_cancel">취소</string>
     <string name="toast_restore_done">데이터를 복원했습니다 ✓ (성장값 %1$d)</string>
@@ -144,7 +144,7 @@
 권한을 주지 않아도 일반 카운트다운 타이머로 사용할 수 있습니다.</string>
     <string name="locale_dlg_go">권한 허용</string>
     <string name="locale_dlg_fallback">타이머 사용</string>
-    <string name="toast_no_progress">재생 위치를 읽지 못했습니다: 먼저 한 편을 재생한 뒤 고르거나 타이머를 쓰세요</string>
+    <string name="toast_no_progress">재생 위치를 읽지 못했습니다: 먼저 한 편을 재생한 뒤 고르거나 타이머를 사용하세요.</string>
     <string name="ach_toast_fmt">🏆 업적 해금: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">정령 업적 %1$d/%2$d</string>
     <string name="ach_dlg_hint">배지는 정령 왼쪽에, 아래에서 위로 난이도순으로 점등됩니다</string>
@@ -214,8 +214,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="update_value_fmt">현재 v%1$s</string>
     <string name="bubble_default">화면 끄기(기본)</string>
     <string name="bubble_label_off">화면 끄기</string>
-    <string name="bubble_dlg_title">버블 표시 (실시간 미리보기)</string>
-    <string name="toast_bubble_locked">「%1$s」아직 미해금 · 성장값 %2$d 필요</string>
     <string name="bubble_value_default">기본</string>
     <string name="unit_h">시</string>
     <string name="unit_m">분</string>
@@ -298,20 +296,19 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="lang_name_de">Deutsch</string>
     <string name="lang_name_es">Español</string>
     <string name="lang_name_ru">Русский</string>
-    <string name="dur_sec_fmt">%1$d с</string>
-    <string name="dur_min_fmt">%1$d мин</string>
-    <string name="dur_hour_fmt">%1$.1f ч</string>
-    <string name="battery_fmt">Батарея %1$d%%%</string>
-    <string name="cd_prev_episode">Предыдущая серия</string>
-    <string name="cd_play_pause">Воспроизведение / пауза</string>
-    <string name="cd_next_episode">Следующая серия</string>
-    <string name="bubble_label_plain">Выключенный экран</string>
-    <string name="notif_timer_fmt">· выключится через %1$d мин</string>
-    <string name="dlg_got_it">Понятно</string>
-    <string name="calib_date_fmt">%2$d.%1$d</string>
-    <string name="calib_progress_fmt">Оставьте экран включённым и воспроизведение идущим, не трогайте телефон
-Осталось %1$d:%2$02d (%3$d замеров)</string>
-    <string name="mah_saved_fmt">⚡ Сэкономлено %1$d мА·ч</string>
-    <string name="evolve_fmt">🎉 Эволюция! %1$s → %2$s</string>
-    <string name="lang_restart_note">언어를 바꾸면 즉시 적용됩니다</string>
+    <string name="dur_sec_fmt">%1$d초</string>
+    <string name="dur_min_fmt">%1$d분</string>
+    <string name="dur_hour_fmt">%1$.1f시간</string>
+    <string name="battery_fmt">배터리 %1$d%%</string>
+    <string name="cd_prev_episode">이전 편</string>
+    <string name="cd_play_pause">재생 / 일시정지</string>
+    <string name="cd_next_episode">다음 편</string>
+    <string name="bubble_label_plain">화면 끄기</string>
+    <string name="notif_timer_fmt">· %1$d분 후 종료</string>
+    <string name="dlg_got_it">확인</string>
+    <string name="calib_date_fmt">M월 d일</string>
+    <string name="calib_progress_fmt">화면을 켠 채로 재생해 주세요. 휴대폰을 만지지 마세요
+남은 시간 %1$d:%2$02d (%3$d회 샘플링)</string>
+    <string name="mah_saved_fmt">⚡ %1$d mAh 저장됨</string>
+    <string name="evolve_fmt">🎉 진화! %1$s → %2$s</string>
 </resources>

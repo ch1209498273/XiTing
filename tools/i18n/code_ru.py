@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+"""ru —— 从 Kotlin 代码搬来的文案。由 zz_code_texts.py 拆出。"""
+
+CT = {
+
+    "dur_sec_fmt": "%1$d с", "dur_min_fmt": "%1$d мин", "dur_hour_fmt": "%1$.1f ч",
+    "battery_fmt": "Батарея %1$d%",
+    "cd_prev_episode": "Предыдущая серия", "cd_play_pause": "Воспроизведение / пауза",
+    "cd_next_episode": "Следующая серия", "bubble_label_plain": "Выключенный экран",
+    "notif_timer_fmt": " · выключится через %1$d мин", "dlg_got_it": "Понятно",
+    "calib_date_fmt": "%2$d.%1$d",
+    "calib_progress_fmt": "Оставьте экран включённым и воспроизведение идущим, не трогайте телефон\nОсталось %1$d:%2$02d (%3$d замеров)",
+    "evolve_fmt": "🎉 Эволюция! %1$s → %2$s", "mah_saved_fmt": "⚡ Сэкономлено %1$d мА·ч",
+}

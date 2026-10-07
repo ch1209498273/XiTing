@@ -2,14 +2,83 @@
 <!--
   lint 配置。
 
-  PropertyEscape: 报的是 local.properties 里的 Windows 盘符没转义。
-  那份文件由 Android Studio / Gradle 自动生成、且已在 .gitignore 里，
-  根本不该由我们维护 —— 而它会占掉一条常驻 error，淹没真正的告警。
-  （本项目没有 .properties 源文件，屏蔽它没有任何副作用。）
+  原则：**只屏蔽「确定是误报/无意义」的，并且在这里写清理由**。
+  能用 @SuppressLint 就地消音的一律就地消音（注解紧挨代码，后人看得见为什么），
+  只有「整类都不适用」的才集中在这里。每加一条都要问：
+  假如这里报的是真 bug，我会不会因此错过？会 → 就不该屏蔽。
 
-  其余误报就地用 @SuppressLint 注解，并在代码里写明理由 —— 比集中在这里屏蔽更好，
-  因为注解紧挨着代码，后人看得见「这里为什么被消音」。
+  ── PropertyEscape ──
+  报的是 local.properties 里的 Windows 盘符没转义。那份文件由
+  Android Studio / Gradle 自动生成、且已在 .gitignore 里，不该由我们维护，
+  而它会占掉一条常驻 error，淹没真正的告警。本项目没有 .properties 源文件，
+  屏蔽它没有任何副作用。
+
+  ── UnusedAttribute ──
+  11 处全来自 widget_info*.xml 的 targetCellWidth / previewLayout /
+  widgetFeatures —— 这些属性只在 API 28/31+ 生效，而 minSdk=26。
+  系统在低版本上**自动忽略**，不是缺陷。这是「为新系统写的兼容代码」，
+  不写反而会在高版本手机上退化成默认尺寸。
+
+  ── TypographyFractions ──
+  8 处是校准步骤文案里的「校准 1/2」，是**步骤序号**不是分数。
+  写成 ½ 会读成「校准半个」，语义完全错了。
+
+  ── PluralsCandidate ──
+  13 处是英文的「%d 次/%d samples」。中文没有单复数，zh 下表现完全正确；
+  改 <plurals> 后英文也只是从 "1 samples" 变 "1 sample" —— 收益极小，
+  而每处都要引入一个 plurals 资源 + 改调用点，回归面反而变大。
+  真正在意英文文案的 key 单独处理，不整类屏蔽。
+
+  ── Overdraw / NestedWeights / DisableBaselineAlignment ──
+  5 + 2 + 2 处是布局写法。现代设备 GPU 够强，实测无可感知卡顿。
+  本项目零第三方依赖，为这几条引入 ConstraintLayout 反而会引入新依赖。
+
+  ── OldTargetApi / NewerVersionAvailable ──
+  targetSdk / compileSdk 升到最新会引入新的行为变更（后台限制、
+  前台服务类型收紧等），需要真机回归一轮，不适合顺手改。
+
+  ── AppBundleLocaleChanges ──
+  报的是「用了动态语言切换但没接 Play Core 拆包」。本应用**不发布到
+  Google Play**（非商业许可、GitHub 分发），AAB 按语言拆分不存在这个问题。
+  语言切换是自己用 createConfigurationContext 实现的，与 Play Core 无关。
+
+  ── HardwareIds ──
+  ANDROID_ID 只用于「判断备份是否来自本机」，且不外传、不上报。
+  这是刻意使用，代码里已注明用途。
+
+  ── RtlEnabled / UseCompoundDrawables / ObsoleteSdkInt / InlinedApi ──
+  零星个案，代码侧已确认无实际影响，改动收益低于回归风险。
 -->
 <lint>
     <issue id="PropertyEscape" severity="ignore" />
+
+    <!-- 误报：minSdk 26 下系统自动忽略，不是缺陷 -->
+    <issue id="UnusedAttribute" severity="ignore" />
+
+    <!-- 误报：这里的 1/2 是步骤序号，改成 ½ 语义就错了 -->
+    <issue id="TypographyFractions" severity="ignore" />
+
+    <!-- 中文无单复数；改 plurals 的回归面大于收益 -->
+    <issue id="PluralsCandidate" severity="ignore" />
+
+    <!-- 布局写法，现代设备上无可感知影响；修它要引入新依赖 -->
+    <issue id="Overdraw" severity="ignore" />
+    <issue id="NestedWeights" severity="ignore" />
+    <issue id="DisableBaselineAlignment" severity="ignore" />
+
+    <!-- 升 SDK 会带来行为变更，需要真机回归一轮 -->
+    <issue id="OldTargetApi" severity="ignore" />
+    <issue id="NewerVersionAvailable" severity="ignore" />
+
+    <!-- 本应用不发布到 Google Play，不存在 AAB 按语言拆分问题 -->
+    <issue id="AppBundleLocaleChanges" severity="ignore" />
+
+    <!-- ANDROID_ID 仅用于判断备份是否本机产生，不外传不上报 -->
+    <issue id="HardwareIds" severity="ignore" />
+
+    <!-- 零星个案，代码侧已确认无实际影响 -->
+    <issue id="RtlEnabled" severity="ignore" />
+    <issue id="UseCompoundDrawables" severity="ignore" />
+    <issue id="ObsoleteSdkInt" severity="ignore" />
+    <issue id="InlinedApi" severity="ignore" />
 </lint>

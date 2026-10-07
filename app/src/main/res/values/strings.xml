@@ -227,8 +227,6 @@
     <string name="update_value_fmt">当前 v%1$s</string>
     <string name="bubble_default">息屏（默认）</string>
     <string name="bubble_label_off">息屏</string>
-    <string name="bubble_dlg_title">悬浮球样式（实时预览）</string>
-    <string name="toast_bubble_locked">「%1$s」尚未解锁 · 需 %2$d 成长值</string>
     <string name="bubble_value_default">默认</string>
 
     <!-- 时长单位 -->
@@ -316,5 +314,4 @@
     <string name="calib_progress_fmt">请保持亮屏播放视频，不要操作手机\n剩余 %1$d:%2$02d（已采样 %3$d 次）</string>
     <string name="mah_saved_fmt">⚡ 已储存 %1$d mAh</string>
     <string name="evolve_fmt">🎉 进化！%1$s → %2$s</string>
-    <string name="lang_restart_note">切换语言后立即生效，无需重启</string>
 </resources>

@@ -58,10 +58,19 @@ LANG_NAMES = {
 
 STRING_RE = re.compile(r'<string name="([^"]+)"[^>]*>(.*?)</string>', re.S)
 TODO_RE = re.compile(r'^⟨TODO⟨.*⟩⟩$', re.S)
-# 裸 % （用于定位需要转义的百分号）
-RE_PCT = re.compile(r'%.')
-# 真正的格式占位符：%1$s、%2$.0f、%d、%s、%% —— 这些不能转义
-FORMAT_TOKEN = re.compile(r'^(%%|%\d+\$[-\d.]*[a-zA-Z]|%[-#+ 0,(]*\d*(?:\.\d+)?[a-zA-Z])')
+# 真正的格式占位符：%1$s、%2$.0f、%d、%s、%% —— 这些不能转义。
+# 不带结尾的 $ 锚：用 re.match(s, i) 从任意位置起匹配「最长的合法 token」，
+# 匹配多长取多长，而不是先切一段再判断。
+FORMAT_TOKEN = re.compile(r'%%|%\d+\$[-\d.]*[a-zA-Z]|%[-#+0,(]*\d*(?:\.\d+)?[a-zA-Z]')
+# TOKEN_RE 在 FORMAT_TOKEN 之后**多一个「单个 % 」分支**：
+# 一次扫描就把合法的 token 与裸 % 都吃掉，回调拿到的是完整的一段，
+# 不存在「第二个 % 又被当新起点」的重叠问题。
+TOKEN_RE = re.compile(
+    r'%%|%\d+\$[-\d.]*[a-zA-Z]|%[-#+0,(]*\d*(?:\.\d+)?[a-zA-Z]|%')
+
+
+def _is_legal_token(t):
+    return FORMAT_TOKEN.fullmatch(t) is not None
 
 
 def parse(path):
@@ -73,16 +82,17 @@ def parse(path):
 
 
 def _token_at(s, i):
-    """从位置 i（指向一个 %）取出完整的格式 token。
+    """从位置 i（指向一个 %）取出**最长的合法格式 token**。
 
-    %1$s / %2$.0f / %% 都是以 % 起始的**整体**，单看 % 这一个字符
-    判断不出来——%1$s 的首字符就是个裸 %。所以按「% + 后续非空白」
-    切一段再交给 FORMAT_TOKEN 判定。
+    ⚠ 不能「切到空格为止」再整体匹配：像「比上周多了 %1$d%%（%2$s）」这种
+    中日韩文案里占位符后面紧跟全角标点、整串没有空格，切出来的是
+    「%1$d%%（%2$s）」，正则匹配不上 → 被当成裸 % 而整个转义成
+    「%%1$d%%%」，运行时 getString 直接抛异常。
+
+    所以改为：直接从 i 处正则匹配一个 token，匹配多长就取多长。
     """
-    j = i
-    while j < len(s) and s[j] not in " \n":
-        j += 1
-    return s[i:j]
+    m = FORMAT_TOKEN.match(s, i)
+    return m.group(0) if m else ""
 
 
 def esc(v):
@@ -98,17 +108,16 @@ def esc(v):
     真占位符（%1$s、%d、%2$.0f、%%）不能动，只转义那些不属于格式串的裸 `%`。
     """
     def pct(m):
-        return m.group(0) if FORMAT_TOKEN.match(_token_at(v, m.start())) else "%%"
+        return m.group(0) if _is_legal_token(m.group(0)) else "%%"
 
-    # ⚠ 两个关键点，全部踩过：
-    # 1. 必须用 re.sub 而不是 str.replace：str.replace 的第二个参数只能是
-    #    字符串，不接受函数（那是 re.sub 的 API）。
-    # 2. **re.sub 必须在最原始的字符串上跑**。之前是先做 & < > ' 的替换、
-    #    再对结果跑 re.sub，而回调里用 m.start() 去原串 v 切 token ——
-    #    `&` → `&amp;` 改变了长度，索引错位，于是 `%1$s` 被当成裸 `%`，
-    #    最终写出 `%%1$s`。运行时 getString(id, args) 直接抛异常，而
-    #    release 构建不跑 lint，编译期完全看不出来。
-    return re.sub('%', pct, v).replace("&", "&amp;") \
+    # ⚠ 三个关键点，全部是踩出来的：
+    # 1. **必须用 TOKEN_RE 一次吃掉整个 token**，不能对每个 % 单独跑
+    #    re.sub('%', ...)：「%1$d%%」里第二个 % 会被当成新起点再转义一次，
+    #    结果写出「%1$d%%%」——aapt 与运行时都对不上。
+    # 2. **必须在最原始的字符串上跑**。先做 & < > ' 的替换会改变长度，
+    #    之后再按原索引定位就全错位了。
+    # 3. str.replace 的第二个参数只能是字符串，不接受函数（那是 re.sub 的 API）。
+    return TOKEN_RE.sub(pct, v).replace("&", "&amp;") \
                                .replace("<", "&lt;") \
                                .replace(">", "&gt;") \
                                .replace("'", "\\'")

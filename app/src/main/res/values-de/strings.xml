@@ -311,6 +311,22 @@ Noch %1$d:%2$02d (%3$d Messungen)</string>
     <string name="toast_calib_fail_few">Nur %1$d gültige Messungen (4 benötigt). Bildschirm die ganze Zeit eingeschaltet lassen und abspielen, nicht laden.</string>
     <string name="toast_calib_fail_zerocurrent">Das Handy meldet 0, lässt sich hier also nicht messen. Passiert bei manchen Geräten im nicht geladenen Zustand.</string>
     <string name="toast_calib_fail_reversed">Gemessen: Bildschirm an %1$d, aus %2$d Mikroampere — die Schwarzphase verbrauchte mehr, damit lässt sich nichts schätzen. Handy flach hinlegen und erneut versuchen.</string>
+    <string name="week_report_share">Teilen</string>
+    <string name="week_report_title">Diese Woche %1$s gehört</string>
+    <string name="week_report_up">%1$d%% mehr als letzte Woche (%2$s)</string>
+    <string name="week_report_down">%1$d%% weniger als letzte Woche (%2$s)</string>
+    <string name="week_report_first_week">Deine erste Woche mit Aufzeichnung</string>
+    <string name="week_report_days">An %1$d Tagen gehört · %2$d Sitzungen</string>
+    <string name="week_report_mah">Diese Woche etwa %1$d mAh gespart</string>
+    <string name="week_report_evolved">Wesen %1$s → %2$s (+%3$d Fortschritt)</string>
+    <string name="week_report_gp">Diese Woche %1$d Fortschritt</string>
+    <string name="week_share_text">Ich habe diese Woche mit Bildschirm-aus-Zuhören %1$s gehört und an %2$d Tagen etwa %3$d mAh gespart
+Mein elektrisches Wesen ist jetzt „%4$s“
+Kostenlos, werbefrei, komplett offline (0,6 MB)
+https://github.com/ch1209498273/XiTing</string>
+    <string name="timer_custom">Eigene Minuten</string>
+    <string name="timer_custom_hint">1-600 Minuten</string>
+    <string name="timer_custom_bad">Bitte mindestens 1 Minute eingeben</string>
     <string name="mah_saved_fmt">⚡ %1$d mAh gespart</string>
     <string name="evolve_fmt">🎉 Entwickelt! %1$s → %2$s</string>
 </resources>

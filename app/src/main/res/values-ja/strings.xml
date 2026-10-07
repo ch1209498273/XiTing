@@ -311,6 +311,22 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="toast_calib_fail_few">有効なサンプルが %1$d 件しかありません（4 件必要）。間は全て画面をオンにしたまま再生し、充電しないでください。</string>
     <string name="toast_calib_fail_zerocurrent">端末が電流 0 を報告したため測定できません。充電していない状態では一部の端末でこうなります。</string>
     <string name="toast_calib_fail_reversed">実測：画面オン %1$d マイクロアンペア、画面オフ %2$d マイクロアンペア — 画面オフのほうが高い消費になったため、削減量の算出には使えません。端末を裏面上に置いて再試行してください。</string>
+    <string name="week_report_share">共有</string>
+    <string name="week_report_title">今週は %1$s 聴きました</string>
+    <string name="week_report_up">先週より %1$d%% 増（%2$s）</string>
+    <string name="week_report_down">先週より %1$d%% 減（%2$s）</string>
+    <string name="week_report_first_week">記録が残っている最初の週です</string>
+    <string name="week_report_days">%1$d 日 視聴 · 画面オフ %2$d 回</string>
+    <string name="week_report_mah">今週の節約 約 %1$d mAh</string>
+    <string name="week_report_evolved">精霊 %1$s → %2$s（成長値 +%3$d）</string>
+    <string name="week_report_gp">今週の成長値 +%1$d</string>
+    <string name="week_share_text">今週「画面オフ再生」で %1$s 聴きました。%2$d 日間で約 %3$d mAh 節約
+電能精霊は現在「%4$s」
+無料・無広告・完全オフライン（0.6MB）
+https://github.com/ch1209498273/XiTing</string>
+    <string name="timer_custom">分数を指定</string>
+    <string name="timer_custom_hint">1〜600 分</string>
+    <string name="timer_custom_bad">1 分以上を入力してください</string>
     <string name="mah_saved_fmt">⚡ %1$d mAh 蓄積</string>
     <string name="evolve_fmt">🎉 進化！%1$s → %2$s</string>
 </resources>

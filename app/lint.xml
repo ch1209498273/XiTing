@@ -48,6 +48,19 @@
 
   ── RtlEnabled / UseCompoundDrawables / ObsoleteSdkInt / InlinedApi ──
   零星个案，代码侧已确认无实际影响，改动收益低于回归风险。
+
+  ── StringFormatCount ──
+  4 处是 calib_date_fmt：它是 **SimpleDateFormat 的模式串**（中/日「M月d日」、
+  德/法/俄「%2$d.%1$d」），不作为 getString 参数传入。各语言日期顺序本就不同，
+  占位符数量不一致是**故意的**。i18n.py check 已对 `*_date_fmt` 跳过这项比对。
+
+  ── TypographyDashes ──
+  4 处是英文的「1-600 minutes」——数字范围的分隔符。换成 en dash 纯属排版偏好，
+  在 UI 上没有任何信息量差异。
+
+  ── HardcodedText ──
+  21 处全是符号（— › ← 🔥 🏆），不含任何中文；语言中性，不影响 i18n。
+  真正的中文硬编码已在上一个提交里全部搬进 strings.xml。
 -->
 <lint>
     <issue id="PropertyEscape" severity="ignore" />
@@ -81,4 +94,13 @@
     <issue id="UseCompoundDrawables" severity="ignore" />
     <issue id="ObsoleteSdkInt" severity="ignore" />
     <issue id="InlinedApi" severity="ignore" />
+
+    <!-- calib_date_fmt 是 SimpleDateFormat 模式串，各语言日期顺序故意不同 -->
+    <issue id="StringFormatCount" severity="ignore" />
+
+    <!-- 「1-600 minutes」的范围号换成 en dash 纯属排版偏好，零信息量差异 -->
+    <issue id="TypographyDashes" severity="ignore" />
+
+    <!-- 21 处全是 — › ← 之类的符号，不含中文，不影响 i18n -->
+    <issue id="HardcodedText" severity="ignore" />
 </lint>

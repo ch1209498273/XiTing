@@ -311,6 +311,22 @@ Restant %1$d:%2$02d (%3$d échantillons)</string>
     <string name="toast_calib_fail_few">Seulement %1$d échantillons valides (4 nécessaires). Laissez l\'écran allumé et la lecture continuer, sans charger.</string>
     <string name="toast_calib_fail_zerocurrent">Le téléphone indique 0, la mesure est donc impossible ici. Certains appareils font cela hors charge.</string>
     <string name="toast_calib_fail_reversed">Mesuré : écran allumé %1$d, écran noir %2$d microampères — la phase écran noir a consommé davantage, impossible d\'en déduire une économie. Posez le téléphone à plat et réessayez.</string>
+    <string name="week_report_share">Partager</string>
+    <string name="week_report_title">%1$s écoutés cette semaine</string>
+    <string name="week_report_up">%1$d%% de plus que la semaine dernière (%2$s)</string>
+    <string name="week_report_down">%1$d%% de moins que la semaine dernière (%2$s)</string>
+    <string name="week_report_first_week">Votre première semaine enregistrée</string>
+    <string name="week_report_days">Écouté %1$d jours · %2$d sessions</string>
+    <string name="week_report_mah">Environ %1$d mAh économisés cette semaine</string>
+    <string name="week_report_evolved">Esprit %1$s → %2$s (+%3$d progression)</string>
+    <string name="week_report_gp">%1$d de progression cette semaine</string>
+    <string name="week_share_text">J\'ai écouté %1$s cette semaine avec Écoute écran off, économisant environ %3$d mAh sur %2$d jours
+Mon esprit électrique est maintenant « %4$s »
+Gratuit, sans publicité, 100 %% hors ligne (0,6 Mo)
+https://github.com/ch1209498273/XiTing</string>
+    <string name="timer_custom">Minutes personnalisées</string>
+    <string name="timer_custom_hint">1 à 600 minutes</string>
+    <string name="timer_custom_bad">Saisissez au moins 1 minute</string>
     <string name="mah_saved_fmt">⚡ %1$d mAh économisés</string>
     <string name="evolve_fmt">🎉 Évolution ! %1$s → %2$s</string>
 </resources>

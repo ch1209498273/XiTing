@@ -315,6 +315,23 @@
     <string name="toast_calib_fail_few">有效样本仅 %1$d 个（需 4 个）。请全程亮屏播放，且不要充电。</string>
     <string name="toast_calib_fail_zerocurrent">手机报告电流为 0，无法测量。部分机型在不充电时如此。</string>
     <string name="toast_calib_fail_reversed">实测：亮屏 %1$d μA，黑屏 %2$d μA —— 黑屏段反而更耗电，不能用于估算省电。请将手机平放后重试。</string>
+    <!-- 本周小结。上面三张卡是绝对值（今日/近7天/累计），看不出习惯；
+         这里给的是有对比的信息：比上周增减、连续天数、精灵是否进化。 -->
+    <string name="week_report_share">分享</string>
+    <string name="week_report_title">本周听了 %1$s</string>
+    <string name="week_report_up">比上周多了 %1$d%%（%2$s）</string>
+    <string name="week_report_down">比上周少了 %1$d%%（%2$s）</string>
+    <string name="week_report_first_week">这是你有记录的第一周</string>
+    <string name="week_report_days">听了 %1$d 天 · %2$d 次息屏</string>
+    <string name="week_report_mah">本周省电约 %1$d mAh</string>
+    <string name="week_report_evolved">精灵 %1$s → %2$s（+%3$d 成长值）</string>
+    <string name="week_report_gp">本周获得 %1$d 成长值</string>
+    <string name="week_share_text">本周我用「息屏听剧」听了 %1$s，%2$d 天里省电约 %3$d mAh\n我的电能精灵现在是「%4$s」\n免费、无广告、完全离线（0.6MB）\nhttps://github.com/ch1209498273/XiTing</string>
+
+    <!-- 自定义定时 -->
+    <string name="timer_custom">自定义分钟</string>
+    <string name="timer_custom_hint">1–600 分钟</string>
+    <string name="timer_custom_bad">请输入 1 以上的分钟数</string>
     <string name="mah_saved_fmt">⚡ 已储存 %1$d mAh</string>
     <string name="evolve_fmt">🎉 进化！%1$s → %2$s</string>
 </resources>

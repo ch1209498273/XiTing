@@ -79,6 +79,11 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     private var todayMs = 0L
     private var weekMs = 0L
     private var allMs = 0L
+    /** 本周小结（分享时用；由 renderWeekReport 写入） */
+    private var weekSummary: WeekReport.Summary? = null
+
+    /** 自定义定时的上限（分钟）= 10 小时。再大就超出了「睡前听一集」的合理范围。 */
+    private val MAX_CUSTOM_TIMER_MIN = 600
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -209,24 +214,26 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             postRefresh()
         }
 
-        // 定时关闭：听完这集 / 15/30/60分钟，到点自动收黑幕
+        // 定时关闭：听完这集 / 15/30/60分钟 / 自定义，到点自动收黑幕
         pageHome.findViewById<View>(R.id.timer_chip).setOnClickListener {
-            val items = arrayOf(getString(R.string.timer_item_episode), getString(R.string.timer_15), getString(R.string.timer_30), getString(R.string.timer_60), getString(R.string.timer_cancel))
+            val items = arrayOf(
+                getString(R.string.timer_item_episode), getString(R.string.timer_15),
+                getString(R.string.timer_30), getString(R.string.timer_60),
+                getString(R.string.timer_custom), getString(R.string.timer_cancel)
+            )
             android.app.AlertDialog.Builder(this)
                 .setTitle(getString(R.string.timer_title))
                 .setItems(items) { _, which ->
-                    if (which == 0) {
-                        finishThisEpisode()
-                        return@setItems
+                    when (which) {
+                        0 -> { finishThisEpisode(); return@setItems }
+                        // 自定义：先弹数字输入，取消则不动现有定时
+                        4 -> { showCustomTimerDialog(); return@setItems }
+                        5 -> { startService(setTimerIntent(0L)); postRefresh(); return@setItems }
                     }
                     val minutes = when (which) {
                         1 -> 15L; 2 -> 30L; 3 -> 60L; else -> 0L
                     }
-                    startService(
-                        Intent(this, OverlayService::class.java)
-                            .setAction(OverlayService.ACTION_SET_TIMER)
-                            .putExtra(OverlayService.EXTRA_MINUTES, minutes)
-                    )
+                    startService(setTimerIntent(minutes))
                     postRefresh()
                 }
                 .show()
@@ -874,6 +881,115 @@ private fun showSkinGallery() {
         calibHandler.postDelayed(poll, 20_000)
     }
 
+    /**
+     * 本周小结卡片。
+     *
+     * 与上方三张卡片的区别：那些是**绝对值**（今日/近7天/累计），看不出习惯；
+     * 这里给的是**有对比**的信息——比上周多还是少、连续几天、精灵有没有进化。
+     */
+    private fun renderWeekReport(sessions: List<ListenSession>) {
+        val card = pageStats.findViewById<View>(R.id.card_week_report) ?: return
+        val s = WeekReport.summarize(
+            sessions = sessions,
+            nowMs = System.currentTimeMillis(),
+            currentGp = EnergyStore.collectedTotal(this).toLong(),
+            mahOf = { Stats.estimatedMah(it) },
+            stageOfGp = { PetView.stageOf(it) }
+        )
+        weekSummary = s
+
+        // 整周没听过：与其显示一串 0，不如说清楚「这周还没开始」并给个入口
+        if (s.weekMs <= 0L) {
+            card.visibility = View.GONE
+            return
+        }
+        card.visibility = View.VISIBLE
+        pageStats.findViewById<TextView>(R.id.week_report_title).text =
+            getString(R.string.week_report_title, fmtDur(s.weekMs))
+
+        val lines = ArrayList<String>(4)
+        s.deltaRatio()?.let {
+            val pct = (it * 100).toInt()
+            lines += if (s.deltaMs >= 0) getString(R.string.week_report_up, pct, fmtDur(s.deltaMs))
+            else getString(R.string.week_report_down, -pct, fmtDur(-s.deltaMs))
+        } ?: lines.add(getString(R.string.week_report_first_week))
+        lines += getString(R.string.week_report_days, s.listenDays, s.sessionCount)
+        lines += getString(R.string.week_report_mah, s.mahSaved)
+        lines += if (s.stageNow > s.stageAtWeekStart) {
+            getString(
+                R.string.week_report_evolved,
+                PetView.stageName(this, s.stageAtWeekStart),
+                PetView.stageName(this, s.stageNow),
+                s.weekGp
+            )
+        } else {
+            getString(R.string.week_report_gp, s.weekGp)
+        }
+        pageStats.findViewById<TextView>(R.id.week_report_body).text = lines.joinToString("\n")
+    }
+
+    /** 本周分享：复用现成的分享入口，文案独立（周报比累计值更适合传播） */
+    private fun shareWeekReport() {
+        val s = weekSummary ?: return
+        val txt = getString(
+            R.string.week_share_text,
+            fmtDur(s.weekMs), s.listenDays, s.mahSaved,
+            PetView.stageName(this, s.stageNow)
+        )
+        try {
+            startActivity(Intent.createChooser(
+                android.content.Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(android.content.Intent.EXTRA_TEXT, txt)
+                },
+                getString(R.string.share_chooser)
+            ))
+        } catch (_: Exception) {
+            Toast.makeText(this, getString(R.string.toast_browser_fail), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /** 定时 Intent（抽出来给预设与自定义两处共用） */
+    private fun setTimerIntent(minutes: Long): Intent =
+        Intent(this, OverlayService::class.java)
+            .setAction(OverlayService.ACTION_SET_TIMER)
+            .putExtra(OverlayService.EXTRA_MINUTES, minutes)
+
+    /**
+     * 自定义定时分钟数。
+     *
+     * 输入限 1..600（10 小时）：下限避免 0 被当成「取消」，上限防止误输入
+     * 一个巨大的数，结果定时形同虚设。
+     */
+    private fun showCustomTimerDialog() {
+        val input = android.widget.EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            hint = getString(R.string.timer_custom_hint)
+            setPadding((16 * resources.displayMetrics.density).toInt(),
+                       (12 * resources.displayMetrics.density).toInt(),
+                       (16 * resources.displayMetrics.density).toInt(),
+                       (12 * resources.displayMetrics.density).toInt())
+        }
+        android.app.AlertDialog.Builder(this)
+            .setTitle(getString(R.string.timer_custom))
+            .setView(input)
+            .setPositiveButton(getString(R.string.dlg_ok)) { _, _ ->
+                val min = input.text.toString().trim().toIntOrNull()
+                if (min == null || min < 1) {
+                    Toast.makeText(this, getString(R.string.timer_custom_bad), Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                val clamped = min.coerceAtMost(MAX_CUSTOM_TIMER_MIN)
+                startService(setTimerIntent(clamped.toLong()))
+                Toast.makeText(
+                    this, getString(R.string.toast_timer_set, clamped), Toast.LENGTH_SHORT
+                ).show()
+                postRefresh()
+            }
+            .setNegativeButton(getString(R.string.dlg_cancel), null)
+            .show()
+    }
+
     private fun refreshHomeStats() {
         val sessions = SessionLog.sessions(this)
         val cal = Calendar.getInstance().apply {
@@ -906,6 +1022,7 @@ private fun showSkinGallery() {
         pageStats.findViewById<View>(R.id.card_ach).setOnClickListener { showAchievements() }
         pageStats.findViewById<View>(R.id.card_mah).setOnClickListener { onMahCardClick() }
         pageStats.findViewById<View>(R.id.btn_gallery).setOnClickListener { showSkinGallery() }
+        pageStats.findViewById<View>(R.id.btn_week_share).setOnClickListener { shareWeekReport() }
         pageStats.findViewById<View>(R.id.btn_prev).setOnClickListener {
             if (listPage > 0) {
                 listPage--
@@ -1158,6 +1275,7 @@ private fun showSkinGallery() {
         pageStats.findViewById<TextView>(R.id.sum_extra).text =
             getString(R.string.sum_extra_fmt, fmtDur(sessions.maxOfOrNull { it.durationMs } ?: 0L), allCount)
         updateMah()
+        renderWeekReport(sessions)
 
         // 精灵成就（精灵二期·一期）：依据统计评估解锁并渲染
         val gpNow = EnergyStore.collectedTotal(this)

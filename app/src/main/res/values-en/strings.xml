@@ -269,6 +269,22 @@ Remaining %1$d:%2$02d (%3$d samples)</string>
     <string name="toast_calib_fail_few">Only %1$d valid samples (need 4). Keep the screen on and playing the whole time, and don\'t charge the phone.</string>
     <string name="toast_calib_fail_zerocurrent">The phone reported a current of 0, so it can\'t be measured here. This happens on some devices when they aren\'t charging.</string>
     <string name="toast_calib_fail_reversed">Measured: screen on %1$d microamps, screen off %2$d microamps — the screen-off phase used MORE power, so it can\'t be used to estimate savings. Keep the phone face-up and try again.</string>
+    <string name="week_report_share">Share</string>
+    <string name="week_report_title">Listened %1$s this week</string>
+    <string name="week_report_up">%1$d%% more than last week (%2$s)</string>
+    <string name="week_report_down">%1$d%% less than last week (%2$s)</string>
+    <string name="week_report_first_week">Your first week on record</string>
+    <string name="week_report_days">Listened %1$d days · %2$d sessions</string>
+    <string name="week_report_mah">About %1$d mAh saved this week</string>
+    <string name="week_report_evolved">Pet %1$s → %2$s (+%3$d growth)</string>
+    <string name="week_report_gp">Earned %1$d growth this week</string>
+    <string name="week_share_text">I listened for %1$s this week with XiTing, saving about %3$d mAh across %2$d days
+My energy pet is now "%4$s"
+Free, no ads, fully offline (0.6 MB)
+https://github.com/ch1209498273/XiTing</string>
+    <string name="timer_custom">Custom minutes</string>
+    <string name="timer_custom_hint">1-600 minutes</string>
+    <string name="timer_custom_bad">Enter at least 1 minute</string>
     <string name="mah_saved_fmt">⚡ Saved %1$d mAh</string>
     <string name="evolve_fmt">🎉 Evolved! %1$s → %2$s</string>
 </resources>

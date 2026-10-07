@@ -68,6 +68,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var batteryText: TextView? = null
     private var awake = false
     private var sessionStart = 0L          // 墙钟：用于记录起始时间与按天归属
+    /** 会话开始时的剩余能量（µWh）；null = 读不到（不支持或当时在充电） */
+    private var sessionStartUwh: Long? = null
     private var sessionStartElapsed = 0L   // 单调时钟：用于时长计算，不受时间跳变/跨天影响
     private val relockRunnable = Runnable { sleep() }
 
@@ -350,6 +352,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             isShowing = true
             sessionStart = System.currentTimeMillis()
             sessionStartElapsed = SystemClock.elapsedRealtime()
+            // 省电实测：记下会话开始时的能量计数器读数，作为差值法的起点
+            sessionStartUwh = PowerCalib.energyCounter(context)
             Log.i(TAG, "black overlay added, type=$windowType, backlight override OFF")
             hideSystemBars(f)
             f.post {
@@ -392,6 +396,14 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             val elapsed = SystemClock.elapsedRealtime() - sessionStartElapsed
             val dur = if (elapsed >= 0) elapsed else now - sessionStart
             SessionLog.add(context, ListenSession(sessionStart, now, dur, SessionLog.MODE_BLACK))
+            // 省电实测：用能量计数器的**差值**记录本次黑屏段真实能耗。
+            // 零打扰 —— 用户什么都没做，一次会话就是一个精确样本。
+            val startUwh = sessionStartUwh
+            if (startUwh != null && !PowerCalib.isCharging(context)) {
+                PowerCalib.energyCounter(context)?.let { endUwh ->
+                    PowerCalib.recordSegment(context, startUwh, endUwh, dur, black = true)
+                }
+            }
             // 稀有能量掉落：≥5 分钟的会话 10% 概率刷出雷暴能量（每日一次），惊喜钩子
             try {
                 if (dur >= 300_000) {
@@ -425,6 +437,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             } catch (_: Exception) {
             }
             sessionStart = 0
+            sessionStartUwh = null
         }
         badgeListener?.let { NotificationBadge.unregister(it) }
         badgeListener = null

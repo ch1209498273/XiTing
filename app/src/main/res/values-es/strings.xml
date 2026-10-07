@@ -163,27 +163,21 @@ Sin permiso, el temporizador normal también sirve.</string>
     <string name="ach_week_d">Escucha en 7 días distintos</string>
     <string name="ach_king_t">Coronación</string>
     <string name="ach_king_d">El espíritu alcanza al Rey del Trueno</string>
-    <string name="calib_title">Medir el ahorro</string>
-    <string name="calib_msg_calibrated">Calibrado en este dispositivo (%1$s)
-Ahorro medido ≈ %2$.0f mAh/h</string>
-    <string name="calib_msg_uncalibrated">Aún sin calibrar (ahora se estima con el modelo OLED estándar)</string>
-    <string name="calib_msg_ambient">Consumo medido en pantalla negra ≈ %1$.0f mA (%2$d muestras)</string>
-    <string name="calib_msg_flow">Procedimiento (unos 6 minutos):
-① Reproduce un vídeo con la pantalla encendida 3 minutos
-② La app pasa a pantalla negra 3 minutos automáticamente
+    <string name="meas_title">Medición de ahorro</string>
+    <string name="meas_purpose">Método: lee el contador de energía de la batería y compara el consumo real entre «uso normal» y «escucha con pantalla apagada» para calcular el ahorro.
 
-No cargues; mantén la batería entre el 15 %% y el 95 %%.</string>
-    <string name="calib_btn_restart">Recalibrar</string>
-    <string name="calib_btn_start">Iniciar calibración</string>
+No tienes que hacer nada: la medición es automática mientras usas el móvil. No se mide con el cargador (los datos no tendrían sentido).</string>
+    <string name="meas_progress_fmt">Recogido: pantalla apagada %1$d veces · pantalla encendida %2$d veces</string>
+    <string name="meas_level_0">Aún pocas muestras; ahora se usa un modelo genérico. Se afina tras unos días de uso normal.</string>
+    <string name="meas_level_1">Pocas muestras todavía; la estimación es aproximada. Mejora en unos días.</string>
+    <string name="meas_level_2">Muestras suficientes: la estimación es bastante fiable.</string>
+    <string name="meas_level_3">Muchas muestras: la estimación es fiable.</string>
+    <string name="meas_black_power_fmt">Consumo del móvil con pantalla apagada ≈ %1$.0f mW (según %2$d sesiones reales)</string>
+    <string name="meas_note_charging">· No se mide con el cargador (el contador sube)</string>
+    <string name="meas_note_screendim">· Con la pantalla apagada no cuenta como «pantalla encendida»</string>
+    <string name="meas_note_minlen">· Los tramos de menos de 2 minutos se descartan</string>
+    <string name="meas_reset">Borrar y empezar</string>
     <string name="calib_btn_close">Cerrar</string>
-    <string name="calib_step1_title">Calibración 1/2 · Pantalla encendida</string>
-    <string name="calib_step1_init">Empieza a reproducir un vídeo y deja la pantalla encendida…</string>
-    <string name="toast_calib_too_few">Muestras insuficientes (¿está cargando?), calibración cancelada</string>
-    <string name="toast_calib_need_service">Primero inicia el asistente y luego calibra</string>
-    <string name="toast_calib_step2">Calibración 2/2: deja la pantalla negra 3 minutos, no hace falta hacer nada</string>
-    <string name="toast_calib_ok">Calibración completada ✓ (%1$d muestras válidas)</string>
-    <string name="toast_calib_done">Calibración completada: ahorro medido ≈ %1$.0f mAh/h</string>
-    <string name="toast_calib_timeout">La calibración expiró, inténtalo de nuevo</string>
     <string name="saved_basis_measured">Medido en este dispositivo</string>
     <string name="saved_basis_model">Estimado según consumo de pantallas OLED</string>
     <string name="sum_saved_fmt">%1$s ahorrado ≈ %2$d mAh (%3$s)</string>
@@ -305,12 +299,6 @@ Este proyecto no tiene relación con YouTube, Google ni ninguna plataforma de v�
     <string name="bubble_label_plain">Pantalla apagada</string>
     <string name="notif_timer_fmt">· se apaga en %1$d min</string>
     <string name="dlg_got_it">Entendido</string>
-    <string name="calib_date_fmt">%2$d/%1$d</string>
-    <string name="calib_progress_fmt">Deja la pantalla encendida y reproduciendo, no toques el móvil
-Quedan %1$d:%2$02d (%3$d muestras)</string>
-    <string name="toast_calib_fail_few">Solo %1$d muestras válidas (hacen falta 4). Deja la pantalla encendida y reproduciendo todo el tiempo, sin cargar.</string>
-    <string name="toast_calib_fail_zerocurrent">El móvil indica 0, así que no se puede medir aquí. Pasa en algunos dispositivos sin estar cargando.</string>
-    <string name="toast_calib_fail_reversed">Medido: pantalla encendida %1$d, apagada %2$d microamperios — la fase apagada consumió más, así que no sirve para estimar el ahorro. Deja el móvil boca arriba e inténtalo de nuevo.</string>
     <string name="poster_preview_save">Guardar</string>
     <string name="poster_saved">Guardado en Pictures/XiTing</string>
     <string name="poster_save_fail">Error al guardar. Revisa el permiso o el espacio</string>

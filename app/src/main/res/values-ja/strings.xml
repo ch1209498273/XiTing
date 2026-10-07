@@ -163,27 +163,21 @@
     <string name="ach_week_d">7日間にわたって画面オフ記録あり</string>
     <string name="ach_king_t">雷王の戴冠式</string>
     <string name="ach_king_d">精霊が雷王に進化</string>
-    <string name="calib_title">省エネ実測</string>
-    <string name="calib_msg_calibrated">本機の実測で校正済み（%1$s）
-実測の節約レート ≈ %2$.0f mAh/時</string>
-    <string name="calib_msg_uncalibrated">まだ実測校正していません（現在はOLEDの汎用モデルで推定）</string>
-    <string name="calib_msg_ambient">画面オフ中の端末消費電力の実測 ≈ %1$.0f mA（%2$d 回サンプル）</string>
-    <string name="calib_msg_flow">校正手順（約6分）：
-① 画面をオンにしたまま任意の動画を3分再生
-② アプリが自動的に画面を消し、3分待機
+    <string name="meas_title">省エネの実測</string>
+    <string name="meas_purpose">測り方：バッテリーのエネルギーカウンタを読み取り、「通常の使用」と「画面オフ再生」の実際の消費電力の差から節約量を算出します。
 
-充電しないでください。バッテリーは15%%〜95%%に保ってください。</string>
-    <string name="calib_btn_restart">再校正</string>
-    <string name="calib_btn_start">校正を開始</string>
+あなたが做任何ことをする必要はありません — 普通に端末を使っている間に自動で採取されます。充電中は測定しません（データが意味を持たないため）。</string>
+    <string name="meas_progress_fmt">採取済み：画面オフ %1$d 回 · 画面オン %2$d 回</string>
+    <string name="meas_level_0">サンプルがまだ不足しています。暂时は汎用モデルで試算しています。数日間使うと正確になります。</string>
+    <string name="meas_level_1">サンプルはまだ少なめです。試算値は目安としてください。数日間で正確になります。</string>
+    <string name="meas_level_2">十分なサンプルが集まりました。試算値は比較的信じられます。</string>
+    <string name="meas_level_3">サンプルが十分です。試算値を信じてください。</string>
+    <string name="meas_black_power_fmt">画面オフ時の端末消費電力 ≈ %1$.0f mW（実際の %2$d 回から算出）</string>
+    <string name="meas_note_charging">· 充電中は採取しません（カウンタが戻ります）</string>
+    <string name="meas_note_screendim">· 画面消灯中は画面オンのサンプルに含めません</string>
+    <string name="meas_note_minlen">· 2 分未満の区間は集計しません</string>
+    <string name="meas_reset">消去してやり直す</string>
     <string name="calib_btn_close">閉じる</string>
-    <string name="calib_step1_title">校正 1/2 · 画面をオンで再生</string>
-    <string name="calib_step1_init">直ちに任意の動画を再生し、画面をオンにしたままにしてください…</string>
-    <string name="toast_calib_too_few">有効なサンプルが不足しています（充電中ではありませんか？）。校正を中止しました</string>
-    <string name="toast_calib_need_service">先に画面オフ再生アシスタントを起動してください</string>
-    <string name="toast_calib_step2">校正手順 2/2：画面を消したまま3分待機、操作は不要です</string>
-    <string name="toast_calib_ok">校正完了 ✓（有効サンプル %1$d）</string>
-    <string name="toast_calib_done">校正完了：本機の実測節約 ≈ %1$.0f mAh/時</string>
-    <string name="toast_calib_timeout">校正がタイムアウトしました。再試行してください</string>
     <string name="saved_basis_measured">本機の実測に基づく</string>
     <string name="saved_basis_model">OLED画面の消費電力で推定</string>
     <string name="sum_saved_fmt">%1$s節約 ≈ %2$d mAh（%3$s）</string>
@@ -305,12 +299,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="bubble_label_plain">画面オフ</string>
     <string name="notif_timer_fmt">· %1$d分後に終了</string>
     <string name="dlg_got_it">了解</string>
-    <string name="calib_date_fmt">M月d日</string>
-    <string name="calib_progress_fmt">画面をオンにしたまま再生してください。端末には触れないでください
-残り %1$d:%2$02d（%3$d 回サンプル）</string>
-    <string name="toast_calib_fail_few">有効なサンプルが %1$d 件しかありません（4 件必要）。間は全て画面をオンにしたまま再生し、充電しないでください。</string>
-    <string name="toast_calib_fail_zerocurrent">端末が電流 0 を報告したため測定できません。充電していない状態では一部の端末でこうなります。</string>
-    <string name="toast_calib_fail_reversed">実測：画面オン %1$d マイクロアンペア、画面オフ %2$d マイクロアンペア — 画面オフのほうが高い消費になったため、削減量の算出には使えません。端末を裏面上に置いて再試行してください。</string>
     <string name="poster_preview_save">保存</string>
     <string name="poster_saved">「Pictures/XiTing」に保存しました</string>
     <string name="poster_save_fail">保存に失敗しました。権限や空き容量を確認してください</string>

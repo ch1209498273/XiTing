@@ -8,85 +8,214 @@ import android.os.BatteryManager
 import android.util.Log
 
 /**
- * 省电实测：黑屏会话期间周期性采样电池瞬时电流（BATTERY_PROPERTY_CURRENT_NOW），
- * 积累"息屏听剧整机功耗"的本机真实均值；并提供 5 分钟校准向导所需的两段式采样
- * （亮屏看视频 vs 黑屏听剧）差值 → 本机真实省电速率（mAh/小时）。
+ * 省电实测：**被动测量**，用电池能量计数器的**差值**。
  *
- * 采样有效性规则：充电中 / 电量 <15% 或 >95% / 读数为 0 时丢弃（电流读数失真）。
+ * ## 为什么重做
+ * 旧实现要求用户「亮屏播 3 分钟 + 黑屏 3 分钟、不能碰手机、不能充电」——
+ * 6 分钟的打扰式测试换取一个估算数字，而且用的是 `BATTERY_PROPERTY_CURRENT_NOW`
+ * （瞬时电流）：噪声极大，需要采样 30 次求平均才能勉强压住，部分机型还直接返回 0。
+ *
+ * 真机探针（ProbeBattery，2026-10-07，OPPO PME110）确认：
+ * - `CHARGE_COUNTER`（剩余能量 µWh）**可用** → 差值测量成立
+ * - `CURRENT_AVERAGE` / `ENERGY_COUNTER` 返回 Long.MIN_VALUE，不可用
+ * - `CURRENT_NOW` 在本机亮屏时读到 542µA，量级与「整机耗电」不符，语义存疑
+ *
+ * ## 为什么差值比瞬时电流准
+ * 瞬时电流每分钟跳一次，屏幕内容、CPU 负载、信号强度都在影响它，采样 30 次求平均
+ * 仍是个粗糙估计。能量计数器给的是**累计消耗的绝对值**：读一次「开始」再读一次
+ * 「结束」，差值就是这段时间真实消耗的电能。**一次会话 = 一个精确样本**，
+ * 不需要攒量，也就不需要用户配合。
+ *
+ * ## 样本怎么来（零打扰）
+ * - **黑屏段**：每次息屏会话开始/结束时各读一次
+ * - **亮屏段**：App 运行时在后台周期读，**不需要用户做任何事**
+ *
+ * ## 有效性过滤
+ * - 充电中 → 丢弃（计数器会回升）
+ * - 计数不变或增加 → 丢弃（读数不可信）
+ * - 样本过短（<2 分钟）→ 丢弃（差值太小，被量化误差淹没）
+ * - 样本过短或耗电率离谱 → 丢弃
  */
 object PowerCalib {
 
     private const val TAG = "XiTing"
-    private const val K_SUM = "pwr_samp_ua_sum"   // 有效采样累计（µA）
-    private const val K_CNT = "pwr_samp_count"    // 有效采样次数
-    private const val K_ON = "calib_on_ua"        // 校准：亮屏均值（µA）
-    private const val K_OFF = "calib_off_ua"      // 校准：黑屏均值（µA）
-    private const val K_TS = "calib_ts"           // 校准完成时间
-    private const val MIN_SAMPLES = 30            // 会话采样达到该次数才展示实测均值
 
-    /** 读当前电池电流（µA，取绝对值）；无效场景返回 null */
-    fun sampleNow(ctx: Context): Long? {
+    // ---- 存储键（旧键保留只为读取，历史数据不丢）----
+    private const val K_ON_UA = "calib_on_ua"
+    private const val K_OFF_UA = "calib_off_ua"
+    private const val K_TS = "calib_ts"
+
+    /** 黑屏段累计耗电（µWh），用于取平均 */
+    private const val K_OFF_UWH = "meas_off_uwh"
+    private const val K_OFF_MS = "meas_off_ms"
+    /** 亮屏段累计耗电（µWh）与时长 */
+    private const val K_ON_UWH = "meas_on_uwh"
+    private const val K_ON_MS = "meas_on_ms"
+    /** 各自的样本数（用于置信度展示） */
+    private const val K_OFF_N = "meas_off_n"
+    private const val K_ON_N = "meas_on_n"
+    /** 已被过滤掉的样本数（诊断用） */
+    private const val K_DROPPED = "meas_dropped"
+
+    /** 样本最短时长：太短的差值会被计数器量化误差淹没，得不偿失 */
+    const val MIN_SAMPLE_MS = 120_000L          // 2 分钟
+    /** 黑屏段至少要这么多样本才认为亮屏基准可用（亮屏基准更容易被噪声污染） */
+    private const val MIN_OFF_SAMPLES = 3
+    private const val MIN_ON_SAMPLES = 3
+
+    /**
+     * 单样本的功耗率上限（µWh/ms → 折算 mA）。
+     * 超过 1500mA 的「整机功耗」不可能是听剧场景（那是充电或高负载），
+     * 判为异常样本丢弃。
+     */
+    private const val MAX_RATE_MA = 1500.0
+
+    // ────────────────────────── 采样 ──────────────────────────
+
+    /** 读当前剩余能量（µWh）。不可用返回 null */
+    fun energyCounter(ctx: Context): Long? {
         return try {
             val bm = ctx.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager ?: return null
-            val now = bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
-            if (now == 0L || now == Long.MIN_VALUE) return null
-            val intent = ctx.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-            val plugged = intent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0
-            if (plugged != 0) return null // 充电中读数失真
-            val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
-            val scale = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, 100) ?: 100
-            val pct = if (scale > 0) level * 100 / scale else 50
-            if (pct < 15 || pct > 95) return null
-            Math.abs(now)
+            val v = bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
+            if (v <= 0L || v == Long.MIN_VALUE) null else v
         } catch (_: Exception) {
             null
         }
     }
 
-    /** 会话期间采样入库 */
-    fun recordSample(ctx: Context, ua: Long) {
+    /** 是否在充电。**只要插着电就一律不测** —— 计数器会回升，差值无意义 */
+    fun isCharging(ctx: Context): Boolean {
+        return try {
+            val st = ctx.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+            val plugged = st?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0
+            val status = st?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+            plugged != 0 || status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    status == BatteryManager.BATTERY_STATUS_FULL
+        } catch (_: Exception) {
+            true // 读不到就当作在充电，宁可少测不可测错
+        }
+    }
+
+    /**
+     * 记录一个样本段。startUwh/endUwh 是同一时间轴上的两个能量读数。
+     *
+     * 返回是否采纳。
+     */
+    fun recordSegment(
+        ctx: Context, startUwh: Long, endUwh: Long, durationMs: Long, black: Boolean
+    ): Boolean {
+        if (durationMs < MIN_SAMPLE_MS) return false
+        // 算式统一在 MeasMath（纯函数，可单测）——不要在这里重写一遍，
+        // 否则单测测的就不是线上跑的那套了
+        val r = MeasMath.rate(startUwh, endUwh, durationMs, MAX_RATE_MA) ?: run {
+            bumpDropped(ctx); return false
+        }
         try {
             val p = ctx.prefs()
-            p.edit()
-                .putLong(K_SUM, p.getLong(K_SUM, 0L) + ua)
-                .putInt(K_CNT, p.getInt(K_CNT, 0) + 1)
-                .apply()
+            val ed = p.edit()
+            if (black) {
+                ed.putLong(K_OFF_UWH, p.getLong(K_OFF_UWH, 0L) + (startUwh - endUwh))
+                ed.putLong(K_OFF_MS, p.getLong(K_OFF_MS, 0L) + durationMs)
+                ed.putInt(K_OFF_N, p.getInt(K_OFF_N, 0) + 1)
+            } else {
+                ed.putLong(K_ON_UWH, p.getLong(K_ON_UWH, 0L) + (startUwh - endUwh))
+                ed.putLong(K_ON_MS, p.getLong(K_ON_MS, 0L) + durationMs)
+                ed.putInt(K_ON_N, p.getInt(K_ON_N, 0) + 1)
+            }
+            ed.putLong(K_TS, System.currentTimeMillis())
+            ed.apply()
+            return true
+        } catch (e: Exception) {
+            Log.w(TAG, "记录样本失败: $e")
+            return false
+        }
+    }
+
+    private fun bumpDropped(ctx: Context) {
+        try {
+            ctx.prefs().edit().putInt(K_DROPPED, ctx.prefs().getInt(K_DROPPED, 0) + 1).apply()
         } catch (_: Exception) {
         }
     }
 
-    /** 实测黑屏听剧整机均值（mA）与采样次数；样本不足返回 null */
-    fun ambientStats(ctx: Context): Pair<Double, Int>? {
-        val p = ctx.prefs()
-        val n = p.getInt(K_CNT, 0)
-        if (n < MIN_SAMPLES) return null
-        val avgUa = p.getLong(K_SUM, 0L).toDouble() / n
-        return (avgUa / 1000.0) to n
+    // ────────────────────────── 读取与折算 ──────────────────────────
+
+    data class Confidence(val offN: Int, val onN: Int, val dropped: Int) {
+        /** 样本越多越可信，UI 上照这个显示 */
+        val level: Int
+            get() = when {
+                offN >= 30 && onN >= 30 -> 3
+                offN >= 10 && onN >= 10 -> 2
+                offN >= MIN_OFF_SAMPLES && onN >= MIN_ON_SAMPLES -> 1
+                else -> 0
+            }
     }
 
-    /** 校准结果（亮屏µA, 黑屏µA, 完成时间）或 null */
+    fun confidence(ctx: Context): Confidence {
+        val p = ctx.prefs()
+        return Confidence(
+            p.getInt(K_OFF_N, 0), p.getInt(K_ON_N, 0), p.getInt(K_DROPPED, 0)
+        )
+    }
+
+    /**
+     * 依据实测的亮屏/黑屏能耗差，折算「用本 App 息屏听剧」的累计省电（mAh）。
+     *
+     * 未达最小样本返回 null（UI 回落���通用模型估算）。
+     *
+     * 数学：saveRate = onRate - offRate（µWh/ms）
+     *       savedUwh = saveRate × totalBlackMs
+     *       savedMwh = savedUwh / 1000
+     * 这里把 mWh 直接当 mA·h 报（1 mWh 在 3.7V 下约等于 1 mAh，量纲上是一致能量），
+     * 与旧版「(onUa - offUa) / 1000」同口径，数字可对照。
+     */
+    fun savingMah(ctx: Context, totalBlackMs: Long): Int? {
+        val p = ctx.prefs()
+        return MeasMath.savingMah(
+            onUwh = p.getLong(K_ON_UWH, 0L), onMs = p.getLong(K_ON_MS, 0L),
+            onN = p.getInt(K_ON_N, 0),
+            offUwh = p.getLong(K_OFF_UWH, 0L), offMs = p.getLong(K_OFF_MS, 0L),
+            offN = p.getInt(K_OFF_N, 0),
+            totalMs = totalBlackMs,
+            minOn = MIN_ON_SAMPLES, minOff = MIN_OFF_SAMPLES
+        )
+    }
+
+    /**
+     * 黑屏段整机能耗速率（µWh/ms）与样本数，用于「实测功耗」展示。样本不足返回 null。
+     *
+     * 不换算成 mA：mA 需要「功率 ÷ 电压」，而电池电压随电量在 3.5~4.4V 浮动，
+     * 换算反而引入误差。这里只保留能量速率，够用于「黑屏时每分钟消耗多少」这类展示。
+     */
+    fun blackScreenPower(ctx: Context): Pair<Double, Int>? {
+        val p = ctx.prefs()
+        val n = p.getInt(K_OFF_N, 0)
+        val ms = p.getLong(K_OFF_MS, 0L)
+        if (n < MIN_OFF_SAMPLES || ms <= 0L) return null
+        val rateUwhPerMs = p.getLong(K_OFF_UWH, 0L).toDouble() / ms
+        return rateUwhPerMs to n
+    }
+
+    /** 清空实测数据（重新开始） */
+    fun reset(ctx: Context) {
+        ctx.prefs().edit()
+            .remove(K_OFF_UWH).remove(K_OFF_MS).remove(K_ON_UWH).remove(K_ON_MS)
+            .remove(K_OFF_N).remove(K_ON_N).remove(K_DROPPED)
+            .apply()
+    }
+
+    // ────────────────────────── 旧接口（保留兼容，不再写入）──────────────────────────
+
+    /** 旧：瞬时电流均值。已不再用于折算，保留仅供旧 UI 读取 */
     fun calibrated(ctx: Context): Triple<Long, Long, Long>? {
         val p = ctx.prefs()
-        val on = p.getLong(K_ON, 0L)
-        val off = p.getLong(K_OFF, 0L)
+        val on = p.getLong(K_ON_UA, 0L)
+        val off = p.getLong(K_OFF_UA, 0L)
         val ts = p.getLong(K_TS, 0L)
-        if (ts == 0L || on <= off) return null
-        return Triple(on, off, ts)
+        return if (ts == 0L || on <= off) null else Triple(off, on, ts)
     }
 
-    /** 保存校准结果 */
-    fun storeCalibration(ctx: Context, onUa: Long, offUa: Long) {
-        ctx.prefs().edit()
-            .putLong(K_ON, onUa).putLong(K_OFF, offUa)
-            .putLong(K_TS, System.currentTimeMillis())
-            .apply()
-        Log.i(TAG, "省电校准完成: on=$onUa off=$offUa")
-    }
-
-    /** 按本机实测速率折算累计省电（mAh）；未校准返回 null */
-    fun calibratedSavingMah(ctx: Context, totalMs: Long): Int? {
-        val c = calibrated(ctx) ?: return null
-        val mahPerHour = (c.first - c.second) / 1000.0
-        return (mahPerHour * totalMs / 3_600_000.0).toInt()
-    }
+    /** 旧：按旧校准折算。已让位给 [savingMah] */
+    fun calibratedSavingMah(ctx: Context, totalMs: Long): Int? =
+        savingMah(ctx, totalMs)
 }

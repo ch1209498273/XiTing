@@ -163,27 +163,21 @@
     <string name="ach_week_d">7일 동안 서로 다른 날짜에 스크린 오프 기록</string>
     <string name="ach_king_t">천왕의 대관식</string>
     <string name="ach_king_d">정령이 천왕으로 진화</string>
-    <string name="calib_title">절전 실측</string>
-    <string name="calib_msg_calibrated">본기 실측으로 보정됨(%1$s)
-실측 절전률 ≈ %2$.0f mAh/시</string>
-    <string name="calib_msg_uncalibrated">아직 실측 보정하지 않음(현재 OLED 범용 모델로 추정)</string>
-    <string name="calib_msg_ambient">화면 꺼짐 상태의 전체 소비 전력 실측 ≈ %1$.0f mA(%2$d회 샘플링)</string>
-    <string name="calib_msg_flow">보정 절차(약 6분):
-① 화면을 켠 채로 아무 영상이나 3분 재생
-② 앱이 자동으로 화면을 끄고 3분 대기
+    <string name="meas_title">절전 실측</string>
+    <string name="meas_purpose">측정 방법: 배터리 에너지 카운터를 읽어 「일반 사용」과 「화면 끄기」의 실제 소비 전력 차이로 절전량을 계산합니다.
 
-충전하지 마세요. 배터리를 15%%~95%%로 유지하세요.</string>
-    <string name="calib_btn_restart">재보정</string>
-    <string name="calib_btn_start">보정 시작</string>
+별도로 하실 건 없습니다 — 휴대폰을 쓰는 동안 자동으로 수집됩니다. 충전 중에는 측정하지 않습니다(데이터가 의미 없기 때문).</string>
+    <string name="meas_progress_fmt">수집됨: 화면 끄기 %1$d회 · 화면 켜짐 %2$d회</string>
+    <string name="meas_level_0">표본이 아직 부족합니다. 지금은 일반 모델로 추정하며, 며칠 사용하면 더 정확해집니다.</string>
+    <string name="meas_level_1">표본이 아직 적습니다. 추정치를 참고용으로 보시고, 며칠 후 다시 확인하세요.</string>
+    <string name="meas_level_2">충분한 표본이 모였습니다. 추정치를 신뢰할 만합니다.</string>
+    <string name="meas_level_3">표본이 충분합니다. 추정치를 믿어도 좋습니다.</string>
+    <string name="meas_black_power_fmt">화면 끈 상태의 기기 소비 ≈ %1$.0f mW (실제 %2$d회 기준)</string>
+    <string name="meas_note_charging">· 충전 중에는 수집하지 않습니다(카운터가 되돌아갑니다)</string>
+    <string name="meas_note_screendim">· 화면이 꺼진 동안은 화면 켜짐 표본에 포함하지 않습니다</string>
+    <string name="meas_note_minlen">· 2분 미만 구간은 집계하지 않습니다</string>
+    <string name="meas_reset">지우고 다시 시작</string>
     <string name="calib_btn_close">닫기</string>
-    <string name="calib_step1_title">보정 1/2 · 화면 켜고 재생</string>
-    <string name="calib_step1_init">지금 아무 영상이나 재생을 시작하고 화면을 켜 두세요…</string>
-    <string name="toast_calib_too_few">유효한 샘플이 부족합니다(충전 중이신가요?). 보정을 취소했습니다</string>
-    <string name="toast_calib_need_service">먼저 스크린 오프 듣기 도우미를 시작한 뒤 보정하세요</string>
-    <string name="toast_calib_step2">보정 2/2: 화면을 끈 채 3분 대기하세요. 조작할 필요 없습니다</string>
-    <string name="toast_calib_ok">보정 완료 ✓(유효 샘플 %1$d)</string>
-    <string name="toast_calib_done">보정 완료: 본기 실측 절전 ≈ %1$.0f mAh/시</string>
-    <string name="toast_calib_timeout">보정 시간이 초과되었습니다. 다시 시도하세요</string>
     <string name="saved_basis_measured">본기 실측 기준</string>
     <string name="saved_basis_model">OLED 화면 소비 전력으로 추정</string>
     <string name="sum_saved_fmt">%1$s 절전 ≈ %2$d mAh (%3$s)</string>
@@ -305,12 +299,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="bubble_label_plain">화면 끄기</string>
     <string name="notif_timer_fmt">· %1$d분 후 종료</string>
     <string name="dlg_got_it">확인</string>
-    <string name="calib_date_fmt">M월 d일</string>
-    <string name="calib_progress_fmt">화면을 켠 채로 재생해 주세요. 휴대폰을 만지지 마세요
-남은 시간 %1$d:%2$02d (%3$d회 샘플링)</string>
-    <string name="toast_calib_fail_few">유효한 샘플이 %1$d개뿐입니다(4개 필요). 내내 화면을 켜고 재생하고 충전하지 마세요.</string>
-    <string name="toast_calib_fail_zerocurrent">휴대폰이 전류 0을 보고해 측정할 수 없습니다. 충전하지 않은 상태에서는 일부 기기에서 이렇게 나옵니다.</string>
-    <string name="toast_calib_fail_reversed">실측: 화면 켜짐 %1$d 마이크로암페어, 화면 끔 %2$d 마이크로암페어 — 화면을 끈 쪽이 더 많이 소모되어 절약량 산출에 쓸 수 없습니다. 휴대폰을 뒤집어 놓고 다시 시도하세요.</string>
     <string name="poster_preview_save">저장</string>
     <string name="poster_saved">Pictures/XiTing에 저장했습니다</string>
     <string name="poster_save_fail">저장 실패. 갤러리 권한이나 저장 공간을 확인하세요</string>

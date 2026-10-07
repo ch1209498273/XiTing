@@ -65,7 +65,7 @@ class OverlayService : Service() {
         const val ACTION_SET_TIMER = "com.lujinyu.xiting.SET_TIMER"
         const val EXTRA_MINUTES = "minutes"
         const val EXTRA_END_AT = "end_at"        // 听完这集：以绝对时刻（epoch ms）定时
-        const val ACTION_CALIB_START = "com.lujinyu.xiting.CALIB_START"
+        const val ACTION_CALIB_START = "com.lujinyu.xiting.CALIB_START"   // 保留：外部 adb 调试用
         const val EXTRA_CALIB_ON_UA = "calib_on_ua"
         private const val ACTION_TEST_TOGGLE = "com.lujinyu.xiting.TEST_TOGGLE"
         private const val ACTION_TEST_RUN_MODE = "com.lujinyu.xiting.TEST_RUN_MODE"
@@ -107,14 +107,12 @@ class OverlayService : Service() {
                     Log.i(TAG, "来电/通话中：黑幕解除 + 挂起自动动作")
                     hideAllBlack()   // 内部已停掉 powerTick（会话功耗采样）
                     // 只停「会被通话状态打断」的两条链：
-                    //  · calibTick —— 校准向导需要重新采一段干净样本
-                    //  · 悬浮球长按 —— 松手时机被通话打断，不该再弹出退出确认条
+                    //                    //  · 悬浮球长按 —— 松手时机被通话打断，不该再弹出退出确认条
                     //
                     // 绝不能改成 removeCallbacksAndMessages(null)：那会连带干掉
                     // timerTick。timerTick 的职责是在未到期时把自己重新 post 一次，
                     // 一旦被整体清空就没有任何人再挂它，睡眠定时器从此静默失效
                     // （timerEndAt 仍留着值，看起来一切正常，实际永远不会触发）。
-                    main.removeCallbacks(calibTick)
                     cancelLongPress()
                     refreshNotification()
                     try {
@@ -144,6 +142,9 @@ class OverlayService : Service() {
     /** 黑幕是否在显示，供磁贴等外部判断 */
     fun isAnyBlackShowing(): Boolean = black?.isShowing == true
 
+    /** 悬浮球是否存在（供自愈检测：服务在跑但球丢了就重建） */
+    fun isBubbleVisible(): Boolean = bubble != null
+
     private fun hideAllBlack() {
         val wasShowing = black?.isShowing == true
         black?.hide()
@@ -167,12 +168,53 @@ class OverlayService : Service() {
         (bubble as? BubblePetView)?.setAnimating(on)
     }
 
-    // ---------- 会话功耗采样（省电实测） ----------
+    // ---------- 省电实测：亮屏段被动采样（零打扰） ----------
 
+    /**
+     * 亮屏段采样。
+     *
+     * 这是**零打扰方案的关键一半**：用户不需要做任何事，App 就在后台
+     * 周期读能量计数器，累积「正常使用时的能耗速率」作为分母。
+     *
+     * 只有满足以下条件才计一个段：
+     * - 屏幕亮着（熄屏/锁屏时不算，否则混进待机功耗）
+     * - 没在充电（插电时计数器回升，差值无意义）
+     * - 黑幕没开（开了就是黑屏段，不能重复计）
+     */
     private val powerTick: Runnable = Runnable {
+        val now = System.currentTimeMillis()
         if (black?.isShowing == true) {
-            PowerCalib.sampleNow(this)?.let { PowerCalib.recordSample(this, it) }
-            main.postDelayed(powerTick, 60_000)
+            // 黑幕显示中 —— 这段归 BlackOverlay 自己记，这里不动
+        } else if (isScreenOn() && !PowerCalib.isCharging(this)) {
+            val start = onSegStartUwh
+            if (start != null) {
+                val dur = now - onSegStartAt
+                if (dur >= PowerCalib.MIN_SAMPLE_MS) {
+                    PowerCalib.energyCounter(this)?.let { end ->
+                        PowerCalib.recordSegment(this, start, end, dur, black = false)
+                    }
+                }
+                onSegStartUwh = null      // 本段结束，下次开屏重新起段
+            } else {
+                onSegStartUwh = PowerCalib.energyCounter(this)
+                onSegStartAt = now
+            }
+        } else {
+            onSegStartUwh = null          // 亮屏段中断
+        }
+        main.postDelayed(powerTick, 60_000)
+    }
+
+    private var onSegStartUwh: Long? = null
+    private var onSegStartAt = 0L
+
+    /** 屏幕是否亮着（读 PowerManager.isInteractive） */
+    private fun isScreenOn(): Boolean {
+        return try {
+            val pm = getSystemService(POWER_SERVICE) as android.os.PowerManager
+            pm.isInteractive
+        } catch (_: Exception) {
+            false   // 读不到就不计，宁可少测
         }
     }
 
@@ -192,51 +234,6 @@ class OverlayService : Service() {
                 // 不要再调一次
                 hideAllBlack()
                 Toast.makeText(this@OverlayService, getString(R.string.toast_headset), Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    // ---------- 省电校准（5分钟向导·黑屏段） ----------
-
-    private var calibOnUa = 0L
-    private var calibSamples = mutableListOf<Long>()
-    private var calibTicks = 0
-
-    private fun startCalibrationBlack(onUa: Long) {
-        calibOnUa = onUa
-        if (black?.isShowing != true) {
-            black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
-            black?.show { refreshNotification() }
-            setBubbleAnimating(false)
-        }
-        calibSamples = mutableListOf()
-        calibTicks = 0
-        Toast.makeText(this, getString(R.string.toast_calib_step2), Toast.LENGTH_LONG).show()
-        main.postDelayed(calibTick, 30_000)
-    }
-
-    private val calibTick: Runnable = Runnable {
-        calibTicks++
-        PowerCalib.sampleNow(this)?.let { calibSamples.add(it) }
-        if (calibTicks < 6) {
-            main.postDelayed(calibTick, 30_000)
-        } else {
-            hideAllBlack()   // 内部已 refreshNotification()
-            val avgOff = if (calibSamples.size >= 4) calibSamples.average().toLong() else 0L
-            if (avgOff > 0 && calibOnUa > avgOff) {
-                PowerCalib.storeCalibration(this, calibOnUa, avgOff)
-                Toast.makeText(this, getString(R.string.toast_calib_ok, calibSamples.size), Toast.LENGTH_LONG).show()
-            } else {
-                // 三种完全不同的失败原因，原来只给一句「是否在充电」，
-                // 用户看到「校准无效」却不知道该做什么，只能反复重试。
-                // 尤其第三种：黑屏段确实比亮屏段耗电（后台进程被唤醒、定位等），
-                // 这在技术上不算「操作错」，只是结果不能用来估算——必须说清楚。
-                val msg = when {
-                    calibSamples.size < 4 -> getString(R.string.toast_calib_fail_few, calibSamples.size)
-                    avgOff <= 0L -> getString(R.string.toast_calib_fail_zerocurrent)
-                    else -> getString(R.string.toast_calib_fail_reversed, calibOnUa, avgOff)
-                }
-                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -300,6 +297,10 @@ class OverlayService : Service() {
             Log.i(TAG, "来电监听已注册")
         }
         audioManager.registerAudioDeviceCallback(headsetCb, null)
+    // 省电实测：亮屏段被动采样的常驻循环。
+    // 不启动它的话，用户从不点悬浮球、只开 App 看统计，就完全不会有分母样本。
+    main.removeCallbacks(powerTick)
+    main.postDelayed(powerTick, 60_000)
         prefs = prefs()
         prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, true).apply()
         createChannel()
@@ -342,9 +343,8 @@ class OverlayService : Service() {
                 intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0,
                 intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0
             )
-            ACTION_CALIB_START -> startCalibrationBlack(
-                intent?.getLongExtra(EXTRA_CALIB_ON_UA, 0) ?: 0
-            )
+            // ⚠ 原来的 ACTION_CALIB_START 分支已删：省电实测改成**被动测量**，
+            // 不再需要「先亮屏采 3 分钟、再黑屏采 3 分钟」的向导。
             ACTION_TEST_TOGGLE -> toggleOverlay() // 测试广播
             ACTION_TEST_UNLOCK_SKINS -> PetSkins.unlockAllForDebug(this)
             ACTION_TEST_WEAR -> {
@@ -533,9 +533,6 @@ class OverlayService : Service() {
             prefs.edit().putBoolean(Prefs.BUBBLE_PERM_ERROR, true).apply()
         }
     }
-
-    /** 悬浮球是否存在（供自愈检测：服务在跑但球丢了就重建） */
-    fun isBubbleVisible(): Boolean = bubble != null
 
     /**
      * 同步悬浮球的**外观**（已于 2026-10-07 删除）。
@@ -764,7 +761,8 @@ class OverlayService : Service() {
             black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
             black?.show { refreshNotification() }
             setBubbleAnimating(false)
-            // 会话功耗采样：黑屏期间每 60 秒记录一次电池电流
+            // 省电实测：重启常驻循环。黑幕打开时它会自动让位给 BlackOverlay 记黑屏段。
+            // 先 remove 再 post，避免反复开关黑幕时排出一串重复任务。
             main.removeCallbacks(powerTick)
             main.postDelayed(powerTick, 60_000)
         }

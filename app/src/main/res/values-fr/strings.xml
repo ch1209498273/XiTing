@@ -163,27 +163,21 @@ Sans autorisation, le compte à rebours normal fonctionne aussi.</string>
     <string name="ach_week_d">Écoute sur 7 jours différents</string>
     <string name="ach_king_t">Couronnement</string>
     <string name="ach_king_d">L\'esprit atteint le Roi du tonnerre</string>
-    <string name="calib_title">Mesure d\'économie</string>
-    <string name="calib_msg_calibrated">Calibré sur cet appareil (%1$s)
-Débit d\'économie mesuré ≈ %2$.0f mAh/h</string>
-    <string name="calib_msg_uncalibrated">Pas encore calibré (estimation selon le modèle OLED standard)</string>
-    <string name="calib_msg_ambient">Consommation mesurée en écran noir ≈ %1$.0f mA (%2$d échantillons)</string>
-    <string name="calib_msg_flow">Procédure (environ 6 minutes) :
-① Lisez une vidéo écran allumé pendant 3 minutes
-② L\'application passe automatiquement en écran noir 3 minutes
+    <string name="meas_title">Mesure d\'économie</string>
+    <string name="meas_purpose">Méthode : lit le compteur d\'énergie de la batterie et compare la consommation réelle entre « usage normal » et « écoute écran off » pour en déduire l\'économie.
 
-Ne chargez pas ; gardez la batterie entre 15 %% et 95 %%.</string>
-    <string name="calib_btn_restart">Recalibrer</string>
-    <string name="calib_btn_start">Lancer le calibrage</string>
+Vous n\'avez rien à faire — la mesure se fait automatiquement pendant que vous utilisez le téléphone. Rien n\'est mesuré en charge (les données n\'auraient aucun sens).</string>
+    <string name="meas_progress_fmt">Collecté : écran off %1$d fois · écran allumé %2$d fois</string>
+    <string name="meas_level_0">Pas encore assez d\'échantillons, estimation sur un modèle générique. Plus juste après quelques jours d\'usage normal.</string>
+    <string name="meas_level_1">Peu d\'échantillons, l\'estimation est approximative. Elle s\'améliore après quelques jours.</string>
+    <string name="meas_level_2">Échantillons suffisants — l\'estimation est assez fiable.</string>
+    <string name="meas_level_3">Beaucoup d\'échantillons — l\'estimation est fiable.</string>
+    <string name="meas_black_power_fmt">Consommation écran éteint ≈ %1$.0f mW (d\'après %2$d sessions réelles)</string>
+    <string name="meas_note_charging">· Pas de mesure en charge (le compteur remonte)</string>
+    <string name="meas_note_screendim">· Écran éteint ne compte pas comme « écran allumé »</string>
+    <string name="meas_note_minlen">· Les segments de moins de 2 minutes sont ignorés</string>
+    <string name="meas_reset">Effacer et relancer</string>
     <string name="calib_btn_close">Fermer</string>
-    <string name="calib_step1_title">Calibrage 1/2 · Écran allumé</string>
-    <string name="calib_step1_init">Commencez à lire une vidéo et laissez l\'écran allumé…</string>
-    <string name="toast_calib_too_few">Échantillons insuffisants (en charge ?), calibration annulée</string>
-    <string name="toast_calib_need_service">Démarrez d\'abord l\'assistant, puis calibrez</string>
-    <string name="toast_calib_step2">Calibrage 2/2 : laissez l\'écran noir 3 minutes, rien à faire</string>
-    <string name="toast_calib_ok">Calibrage terminé ✓ (%1$d échantillons valides)</string>
-    <string name="toast_calib_done">Calibrage terminé : économie mesurée ≈ %1$.0f mAh/h</string>
-    <string name="toast_calib_timeout">Calibrage expiré, réessayez</string>
     <string name="saved_basis_measured">Mesuré sur cet appareil</string>
     <string name="saved_basis_model">Estimé d\'après un écran OLED</string>
     <string name="sum_saved_fmt">%1$s économisés ≈ %2$d mAh (%3$s)</string>
@@ -305,12 +299,6 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="bubble_label_plain">Écran off</string>
     <string name="notif_timer_fmt">· extinction dans %1$d min</string>
     <string name="dlg_got_it">J\'ai compris</string>
-    <string name="calib_date_fmt">%2$d/%1$d</string>
-    <string name="calib_progress_fmt">Laissez l\'écran allumé et la lecture continuer, ne touchez pas le téléphone
-Restant %1$d:%2$02d (%3$d échantillons)</string>
-    <string name="toast_calib_fail_few">Seulement %1$d échantillons valides (4 nécessaires). Laissez l\'écran allumé et la lecture continuer, sans charger.</string>
-    <string name="toast_calib_fail_zerocurrent">Le téléphone indique 0, la mesure est donc impossible ici. Certains appareils font cela hors charge.</string>
-    <string name="toast_calib_fail_reversed">Mesuré : écran allumé %1$d, écran noir %2$d microampères — la phase écran noir a consommé davantage, impossible d\'en déduire une économie. Posez le téléphone à plat et réessayez.</string>
     <string name="poster_preview_save">Enregistrer</string>
     <string name="poster_saved">Enregistré dans Pictures/XiTing</string>
     <string name="poster_save_fail">Échec de l\'enregistrement. Vérifiez l\'autorisation ou l\'espace libre</string>

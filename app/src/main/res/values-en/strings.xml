@@ -152,22 +152,21 @@
     <string name="ach_week_d">Sessions on 7 different days</string>
     <string name="ach_king_t">Crowned</string>
     <string name="ach_king_d">Evolve to Thunder King</string>
-    <string name="calib_title">Power measurement</string>
-    <string name="calib_msg_calibrated">Calibrated on %1$s\nMeasured rate ≈ %2$.0f mAh/h</string>
-    <string name="calib_msg_uncalibrated">Not calibrated yet (using the generic OLED model)</string>
-    <string name="calib_msg_ambient">\n\nMeasured black-screen draw ≈ %1$.0f mA (%2$d samples)</string>
-    <string name="calib_msg_flow">\n\nCalibration (~6 min):\n① Play any video with the screen on for 3 min\n② The app blacks the screen for 3 min\n\nDon\'t charge; keep battery between 15%%–95%%.</string>
-    <string name="calib_btn_restart">Recalibrate</string>
-    <string name="calib_btn_start">Start</string>
+    <string name="meas_title">Power measurement</string>
+    <string name="meas_purpose">Method: reads your battery\'s energy counter and compares the real consumption between "normal use" and "screen-off listening" to work out the saving.
+
+You don\'t need to do anything — samples are taken automatically as you use your phone. Not measured while charging (the data would be meaningless).</string>
+    <string name="meas_progress_fmt">Collected: screen-off %1$d times · screen-on %2$d times</string>
+    <string name="meas_level_0">Not enough samples yet, using a generic model for now. It gets more accurate after a few days of normal use.</string>
+    <string name="meas_level_1">Few samples so far, treat the estimate as rough. It improves after a few days.</string>
+    <string name="meas_level_2">A good number of samples — the estimate is fairly reliable.</string>
+    <string name="meas_level_3">Plenty of samples — the estimate is reliable.</string>
+    <string name="meas_black_power_fmt">Whole-device draw with screen off ≈ %1$.0f mW (from %2$d real sessions)</string>
+    <string name="meas_note_charging">· Not measured while charging (the counter goes back up)</string>
+    <string name="meas_note_screendim">· Not counted as screen-on while the display is off</string>
+    <string name="meas_note_minlen">· Segments shorter than 2 minutes are ignored</string>
+    <string name="meas_reset">Clear &amp; restart</string>
     <string name="calib_btn_close">Close</string>
-    <string name="calib_step1_title">Calibration 1/2 · Screen on</string>
-    <string name="calib_step1_init">Start playing any video now and keep the screen on…</string>
-    <string name="toast_calib_too_few">Not enough valid samples (charging?) — calibration cancelled</string>
-    <string name="toast_calib_need_service">Start the assistant first, then calibrate</string>
-    <string name="toast_calib_step2">Calibration 2/2 · stay black for 3 min, hands off</string>
-    <string name="toast_calib_ok">Calibrated ✓ (%1$d valid samples)</string>
-    <string name="toast_calib_done">Calibrated: measured saving ≈ %1$.0f mAh/h</string>
-    <string name="toast_calib_timeout">Calibration timed out — try again</string>
     <string name="saved_basis_measured">measured on device</string>
     <string name="saved_basis_model">generic OLED model</string>
     <string name="sum_saved_fmt">Power saved (%1$s) ≈ %2$d mAh (%3$s)</string>
@@ -263,12 +262,6 @@
     <string name="bubble_label_plain">Screen off</string>
     <string name="notif_timer_fmt">· turns off in %1$d min</string>
     <string name="dlg_got_it">Got it</string>
-    <string name="calib_date_fmt">MMM d</string>
-    <string name="calib_progress_fmt">Keep the screen on and playing, do not touch the phone
-Remaining %1$d:%2$02d (%3$d samples)</string>
-    <string name="toast_calib_fail_few">Only %1$d valid samples (need 4). Keep the screen on and playing the whole time, and don\'t charge the phone.</string>
-    <string name="toast_calib_fail_zerocurrent">The phone reported a current of 0, so it can\'t be measured here. This happens on some devices when they aren\'t charging.</string>
-    <string name="toast_calib_fail_reversed">Measured: screen on %1$d microamps, screen off %2$d microamps — the screen-off phase used MORE power, so it can\'t be used to estimate savings. Keep the phone face-up and try again.</string>
     <string name="poster_preview_save">Save</string>
     <string name="poster_saved">Saved to Pictures/XiTing</string>
     <string name="poster_save_fail">Save failed. Check gallery permission or storage space.</string>

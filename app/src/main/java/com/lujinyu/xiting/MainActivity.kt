@@ -603,9 +603,7 @@ private fun checkRestore() {
             .show()
     }
 
-    // ───────────────────────── 省电实测校准向导 ─────────────────────────
 
-    private val calibHandler = Handler(Looper.getMainLooper())
 
     /** 换肤选择器弹窗：点选某款皮肤后需要主动关闭自己 */
     private var dlg: android.app.AlertDialog? = null
@@ -789,97 +787,57 @@ private fun showSkinGallery() {
         WidgetData.refreshAll(this)
     }
 
+    /**
+     * 「省电估算」卡片：现在只展示**置信度**与实测进度，不再引导用户去做 6 分钟测试。
+     *
+     * 旧版是一个「开始校准」按钮，点进去要用户亮屏播 3 分钟 + 黑屏 3 分钟、
+     * 不能碰手机、不能充电 —— 拿产品体验换一个估算数字，而且样本只有一次。
+     * 新版改成被动测量：正常使用就在采样，信息改成「已采集 N 次」+ 置信度分级。
+     */
     private fun onMahCardClick() {
-        val calib = PowerCalib.calibrated(this)
-        val ambient = PowerCalib.ambientStats(this)
+        val c = PowerCalib.confidence(this)
         val msg = StringBuilder().apply {
+            append(getString(R.string.meas_purpose))
+            append("\n\n")
+            append(getString(R.string.meas_progress_fmt, c.offN, c.onN))
+            append("\n")
             append(
-                if (calib != null) {
-                    val rate = (calib.first - calib.second) / 1000.0
-                    getString(R.string.calib_msg_calibrated,
-                        SimpleDateFormat(getString(R.string.calib_date_fmt), Locale.getDefault())
-                            .format(Date(calib.third)),
-                        rate.toFloat())
-                } else {
-                    getString(R.string.calib_msg_uncalibrated)
-                }
+                getString(
+                    when (c.level) {
+                        3 -> R.string.meas_level_3
+                        2 -> R.string.meas_level_2
+                        1 -> R.string.meas_level_1
+                        else -> R.string.meas_level_0
+                    }
+                )
             )
-            ambient?.let { (ma, n) ->
-                append(getString(R.string.calib_msg_ambient, ma.toFloat(), n))
+            // ⚠ this@MainActivity：`this` 在 StringBuilder.apply{} 里指向 StringBuilder，
+            // 直接写 this 会把 StringBuilder 当 Context 传进去
+            PowerCalib.blackScreenPower(this@MainActivity)?.let { stat ->
+                val rateUwhPerMs = stat.first
+                val n = stat.second
+                // µWh/ms 换算成每分钟多少 mW：×60000/1000
+                val mPerMin = rateUwhPerMs * 60_000.0 / 1000.0
+                append("\n")
+                append(getString(R.string.meas_black_power_fmt, mPerMin.toFloat(), n))
             }
-            append(getString(R.string.calib_msg_flow))
+            append("\n\n")
+            append(getString(R.string.meas_note_charging))
+            append("\n")
+            append(getString(R.string.meas_note_screendim))
+            append("\n")
+            append(getString(R.string.meas_note_minlen))
         }
         android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.calib_title))
+            .setTitle(getString(R.string.meas_title))
             .setMessage(msg)
-            .setPositiveButton(if (calib != null) getString(R.string.calib_btn_restart) else getString(R.string.calib_btn_start)) { _, _ -> calibStep1() }
-            .setNegativeButton(getString(R.string.calib_btn_close), null)
+            .setPositiveButton(getString(R.string.calib_btn_close), null)
+            .setNeutralButton(getString(R.string.meas_reset)) { _, _ ->
+                PowerCalib.reset(this)
+                Toast.makeText(this, getString(R.string.meas_reset), Toast.LENGTH_SHORT).show()
+                updateMah()
+            }
             .show()
-    }
-
-    /** 步骤1：亮屏播放视频，采样 3 分钟 */
-    private fun calibStep1() {
-        val dlg = android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.calib_step1_title))
-            .setMessage(getString(R.string.calib_step1_init))
-            .setCancelable(false)
-            .create()
-        dlg.show()
-        var left = 180
-        var sum = 0L
-        var n = 0
-        val tick = object : Runnable {
-            override fun run() {
-                PowerCalib.sampleNow(this@MainActivity)?.let { sum += it; n++ }
-                left -= 30
-                if (left <= 0) {
-                    dlg.dismiss()
-                    if (n < 4) {
-                        Toast.makeText(this@MainActivity, getString(R.string.toast_calib_too_few), Toast.LENGTH_LONG).show()
-                        return
-                    }
-                    if (!OverlayService.isRunning) {
-                        Toast.makeText(this@MainActivity, getString(R.string.toast_calib_need_service), Toast.LENGTH_LONG).show()
-                        return
-                    }
-                    startService(
-                        Intent(this@MainActivity, OverlayService::class.java)
-                            .setAction(OverlayService.ACTION_CALIB_START)
-                            .putExtra(OverlayService.EXTRA_CALIB_ON_UA, sum / n)
-                    )
-                    waitForCalibration()
-                } else {
-                    dlg.setMessage(getString(
-                        R.string.calib_progress_fmt,
-                        (left / 60).toInt(), left % 60, n
-                    ))
-                    calibHandler.postDelayed(this, 30_000)
-                }
-            }
-        }
-        calibHandler.postDelayed(tick, 30_000)
-    }
-
-    /** 步骤2由服务完成（自动进黑屏采样后自动退出）；这里轮询结果 */
-    private fun waitForCalibration() {
-        val before = PowerCalib.calibrated(this)?.third ?: 0L
-        var waited = 0
-        val poll = object : Runnable {
-            override fun run() {
-                waited += 20
-                val c = PowerCalib.calibrated(this@MainActivity)
-                if (c != null && c.third != before) {
-                    val rate = (c.first - c.second) / 1000.0
-                    renderStats()
-                    Toast.makeText(this@MainActivity, getString(R.string.toast_calib_done, rate.toFloat()), Toast.LENGTH_LONG).show()
-                } else if (waited < 330) {
-                    calibHandler.postDelayed(this, 20_000)
-                } else {
-                    Toast.makeText(this@MainActivity, getString(R.string.toast_calib_timeout), Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        calibHandler.postDelayed(poll, 20_000)
     }
 
     /**
@@ -1393,9 +1351,8 @@ private fun showSkinGallery() {
             RANGE_WEEK -> getString(R.string.label_week) to weekMs
             else -> getString(R.string.label_total) to allMs
         }
-        val calib = PowerCalib.calibrated(this)
-        val mah = calib?.let { PowerCalib.calibratedSavingMah(this, ms) } ?: Stats.estimatedMah(ms)
-        val basis = if (calib != null) getString(R.string.saved_basis_measured) else getString(R.string.saved_basis_model)
+        val mah = PowerCalib.savingMah(this, ms) ?: Stats.estimatedMah(ms)
+        val basis = if (PowerCalib.savingMah(this, ms) != null) getString(R.string.saved_basis_measured) else getString(R.string.saved_basis_model)
         pageStats.findViewById<TextView>(R.id.sum_mah).text =
             getString(R.string.sum_saved_fmt, label, mah, basis)
     }

@@ -389,13 +389,9 @@ private fun checkRestore() {
             else getString(R.string.hero_sub_start)
 
         // 自愈：服务在跑、悬浮球未隐藏但球丢失（ColorOS 偶发吞掉纯浮窗）→ 自动重建
-        OverlayService.instance?.let { svc ->
-            val bubbleHidden = prefs()
-                .getBoolean(Prefs.BUBBLE_HIDDEN, false)
-            if (!svc.isBubbleVisible() && !bubbleHidden) {
-                svc.rebuildBubble()
-            }
-        }
+        // syncBubbleAppearance() 内部已经含了「球丢了就重建」+「外观陈旧就重建」，
+        // 所以不再单独判 isBubbleVisible() —— 后者只能管存在，管不了形态/皮肤变没变。
+        OverlayService.instance?.syncBubbleAppearance()
         val overlayOk = Settings.canDrawOverlays(this)
         val permError = prefs()
             .getBoolean(Prefs.BUBBLE_PERM_ERROR, false)

@@ -1078,20 +1078,29 @@ private fun showSkinGallery() {
             ))
         }
 
+        // ⚠ **不能在 onDismiss 里无条件 recycle**。
+        // 点「分享」/「保存」时，onClick 先启动后台线程去写盘，随后对话框 dismiss
+        // 触发 onDismiss 把 bitmap 回收掉 —— 后台线程再 compress 就拿到一张
+        // 已回收的位图，MediaStore 里留下一个 0 字节的 .pending- 文件，
+        // 而且 UI 上还提示「保存成功」。这个竞态真机必现。
+        // 所以：只有「取消」才回收，走保存路径的由保存分支自己负责。
+        var handedOff = false
         val dlg = android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.poster_preview_title))
             .setView(scroll)
             .setPositiveButton(getString(R.string.poster_preview_share)) { _, _ ->
+                handedOff = true
                 sendPoster(bmp, d.shareText, tag, share = true)
             }
             // 保存：不想分享、只想把这张图留在相册的场合。
             // 海报本来就是写进公共 Pictures 的，所以「保存」只是不拉起分享面板。
             .setNeutralButton(getString(R.string.poster_preview_save)) { _, _ ->
+                handedOff = true
                 sendPoster(bmp, d.shareText, tag, share = false)
             }
-            .setNegativeButton(getString(R.string.dlg_cancel)) { _, _ -> bmp.recycle() }
+            .setNegativeButton(getString(R.string.dlg_cancel), null)
             .create()
-        dlg.setOnDismissListener { if (!bmp.isRecycled) bmp.recycle() }
+        dlg.setOnDismissListener { if (!handedOff && !bmp.isRecycled) bmp.recycle() }
         dlg.show()
     }
 
@@ -1108,6 +1117,10 @@ private fun showSkinGallery() {
             } catch (e: Exception) {
                 Log.w("XiTing", "海报保存失败: $e")
                 null
+            } finally {
+                // 存盘结束后才回收；之前是由对话框的 onDismiss 回收的，
+                // 那会在后台线程开始前就把 bitmap 释放掉（见 showPosterPreview 的注释）
+                if (!bmp.isRecycled) bmp.recycle()
             }
             Handler(Looper.getMainLooper()).post {
                 if (uri == null) {

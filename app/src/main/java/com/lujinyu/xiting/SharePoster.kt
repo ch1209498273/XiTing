@@ -137,7 +137,7 @@ object SharePoster {
         c.drawText(d.hint, (W / 2f), headY + 58f, p)
 
         // ---- 明细卡片：收进半透明圆角矩形，视觉上才是一个「组」----
-        val cardTop = headY + 112f
+        val cardTop = headY + 100f
         val cardH = ROW_H * d.lines.size + 52f
         p.color = 0x14FFFFFF
         c.drawRoundRect(
@@ -145,7 +145,7 @@ object SharePoster {
             36f, 36f, p
         )
 
-        var y = cardTop + 72f
+        var y = cardTop + 68f
         p.textSize = 38f
         d.lines.forEach { (k, v) ->
             p.textAlign = Paint.Align.LEFT
@@ -159,14 +159,17 @@ object SharePoster {
             y += ROW_H
         }
 
-        // ---- 页脚 ----
+        // ---- 页脚：基线在卡片底之下，行间距 52px（36px 字体行高约 43px）----
+        // 坐标是**推演**出来的，不是估的：卡片底 = cardTop + cardH，
+        // 页脚两行必须落在它与 H 之间。
+        val cardBottom = cardTop + cardH
         p.textAlign = Paint.Align.CENTER
-        p.textSize = 36f
+        p.textSize = 34f
         p.color = 0x99FFFFFF.toInt()
-        c.drawText(d.footer, (W / 2f), (H - 128f), p)
-        p.textSize = 30f
+        c.drawText(d.footer, (W / 2f), cardBottom + 46f, p)
+        p.textSize = 28f
         p.color = 0x80FFFFFF.toInt()
-        c.drawText(REPO, (W / 2f), (H - 74f), p)
+        c.drawText(REPO, (W / 2f), cardBottom + 98f, p)
 
         return bmp
     }
@@ -174,14 +177,23 @@ object SharePoster {
     private const val REPO = "github.com/ch1209498273/XiTing"
 
     // ---- 版式常量。集中在这里，改版式不用翻绘制逻辑 ----
+    //
+    // ⚠ 这些数字是**互相约束**的：H=1440 要同时装下 顶栏(116) + 宠物 + 主数字 +
+    // 卡片 + 两行页脚。改任何一个都要重新推演总高，否则就会出现「页脚压在卡片上」。
+    //   116 顶栏基线
+    // + 200 (PET_TOP 196 + 宠物 598)  ->  宠物底 794
+    // + 172                        ->  主数字基线 966
+    // + 100                        ->  卡片顶 1066
+    // + 76*3+52 = 280               ->  卡片底 1346
+    // + 46 / 98                    ->  页脚两行基线 1392 / 1444（H 之内）
     /** 页面左右留白 */
     private const val PAD = 72
-    /** 精灵边长 = W * 0.58 */
-    private val petSize = (W * 0.58f).toInt()
+    /** 精灵边长 = W * 0.52（0.58 时卡片底到 1410，页脚两行只剩 30px 放不下） */
+    private val petSize = (W * 0.52f).toInt()
     /** 精灵顶部 y */
     private const val PET_TOP = 196f
     /** 明细每行高 */
-    private const val ROW_H = 84f
+    private const val ROW_H = 76f
     /** 数字与单位之间的间距 */
     private const val GAP = 16f
 
@@ -197,7 +209,9 @@ object SharePoster {
      */
     private fun fitHeadline(p: Paint, num: String, unit: String): HeadSizes {
         val maxW = (W - PAD * 2).toFloat()
-        var n = 176f
+        // 上限从 176 降到 150：第一版 176px 时「20时31分」几乎占满整行，
+        // 右侧的单位「本周」被挤到边缘，看着局促。
+        var n = 150f
         while (n > 48f) {
             p.textSize = n
             val nw = p.measureText(num)
@@ -253,10 +267,29 @@ object SharePoster {
                 ?: return null
             resolver.openOutputStream(uri)?.use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
                 ?: return null
-            // IS_PENDING 置 0 之后才会对其它 App 可见；不置 0 对方只会拿到一个空图
-            values.clear()
-            values.put(MediaStore.Images.Media.IS_PENDING, 0)
-            resolver.update(uri, values, null, null)
+
+            // IS_PENDING 置 0 之后才会对其它 App 可见；不置 0 对方只会拿到一个空图，
+            // 而且文件在文件管理器里显示成 `.pending-xxx` 前缀，相册根本看不到。
+            //
+            // ⚠ update 必须**只带 IS_PENDING** 一列：若沿用 insert 时那个 ContentValues
+            // （含 RELATIVE_PATH / DISPLAY_NAME），部分 ROM 的 MediaProvider 会在
+            // 这里因路径冲突而静默失败，update 返回 0 而我们不检查 —— 症状就是
+            // 「提示保存成功、相册里啥也没有」。
+            val done = ContentValues().apply {
+                put(MediaStore.Images.Media.IS_PENDING, 0)
+            }
+            val updated = try {
+                resolver.update(uri, done, null, null)
+            } catch (e: Exception) {
+                Log.w(TAG, "IS_PENDING 置 0 抛异常: $e")
+                0
+            }
+            if (updated <= 0) {
+                // 置位没成功就回滚：否则会留下一个永久不可见的 .pending- 文件占着空间
+                try { resolver.delete(uri, null, null) } catch (_: Exception) {}
+                Log.w(TAG, "IS_PENDING 置 0 失败（update=$updated），已删除残留行")
+                return null
+            }
             uri
         } catch (e: Exception) {
             Log.w(TAG, "海报保存失败: $e")

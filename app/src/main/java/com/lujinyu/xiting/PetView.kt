@@ -40,18 +40,15 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         private const val BADGE_GLOW_MS = 1400L
 
         /**
-         * 光晕**渐变**的半径（= 视图高度 × 本系数），必须是渐变淡出到透明的半径。
+         * 各形态的光晕半径（= 视图高度的比例）。
          *
-         * 而实际画出来的光晕圆半径是 `r × 1.8`（雷霆之王还会脉动到 `r × 1.85`），
-         * r 最大为 `0.25 × height` → 最远 `0.4625 × height`。
-         * 渐变半径一旦小于它，光晕就会被硬生生截断成一个可见的圆盘边界。
-         * [GLOW_CIRCLE_MAX_RATIO] 把这个不变量显式化（并有单测钉住），
-         * 以后改形态尺寸时就会立刻报错，而不是「看着有点怪但说不清」。
+         * **必须与实际画出的圆半径完全相等**。之前是渐变 0.475h、实际只画 0.396h，
+         * 于是圆边处渐变还剩 ~16% 不透明度，屏幕上是一个硬边圆盘而不是弥散的光。
+         *
+         * 雷霆之王的脉动因此改为**调制 alpha**（[glowPaint] 的 alpha 会乘在 shader 上），
+         * 而不是改半径 —— 改半径就得重建 shader，缓存当场失效。
          */
-        const val GLOW_GRADIENT_RATIO = 0.475f
-
-        /** 光晕圆半径相对视图高度的最大值（雷霆之王脉动峰值） */
-        const val GLOW_CIRCLE_MAX_RATIO = 0.25f * 1.85f
+        val GLOW_RATIO = floatArrayOf(0.20f, 0.28f, 0.34f, 0.40f, 0.475f)
 
         fun stageOf(gp: Long): Int = when {
             gp >= THRESHOLDS[4] -> STAGE_KING
@@ -396,25 +393,22 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
 
         // 光晕（雷霆之王为脉冲呼吸光晕）
         val king = stage == STAGE_KING && !sleepy
-        val glowR = if (king) r * (1.7f + 0.15f * sin(t * 3f)) else r * 1.8f
-        // 光晕颜色也从调色板取：之前是按形态硬编码的五种蓝紫，
-        // 换肤时又会被色相旋转搅乱，现在与主体同源。
+        val glowR = height * GLOW_RATIO[stage.coerceIn(0, STAGE_KING)]
         val glowColor = if (sleepy) 0x14222930.toInt()
         else (pal.glow and 0x00FFFFFF) or (0x50 shl 24)
         if (!thumbMode) {
             // 渐变以本点为圆心建立，再靠 canvas 平移绘制。
-            // 这样它只随尺寸变化 → 可缓存；同时精灵的上下浮动仍能正确带动光晕
-            // （直接用带偏移的 cy 建渐变就既不能缓存、也跟着一起动不了）。
-            glowPaint.shader = cachedShader("glow$sleepy") {
-                RadialGradient(
-                    0f, 0f, height * GLOW_GRADIENT_RATIO,
-                    glowColor, Color.TRANSPARENT, Shader.TileMode.CLAMP
-                )
+            // 这样它只随尺寸变化 → 可缓存；同时精灵的上下浮动仍能正确带动光晕。
+            glowPaint.shader = cachedShader("glow$sleepy$stage") {
+                RadialGradient(0f, 0f, glowR, glowColor, Color.TRANSPARENT, Shader.TileMode.CLAMP)
             }
+            // 脉动走 alpha，不走半径（否则每帧都要重建 shader，缓存直接失效）
+            glowPaint.alpha = if (king) (255 * (0.82f + 0.18f * sin(t * 3f))).toInt().coerceIn(0, 255) else 255
             canvas.save()
             canvas.translate(cx, cy)
             canvas.drawCircle(0f, 0f, glowR, glowPaint)
             canvas.restore()
+            glowPaint.alpha = 255
         }
 
         // 环绕微粒（形态越高越多）
@@ -816,77 +810,69 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         drawFace(canvas, cx - r * 0.06f, cy - r * 0.10f, r * 0.15f, blinking, fierce = false)
     }
 
-    // ─────────────────── 形态四：风暴之灵（旋转弧叠出的旋涡） ───────────────────
+    // ─────────────────── 形态四：风暴之灵（裁剪漏斗 + 内部斜向风线） ───────────────────
     /**
-     * 走过两轮弯路：
-     *  · 初版：8 个**实心椭圆**堆叠 → 看成一叠盘子。
-     *  · 二版：实心漏斗 + 3 条螺旋飘带 → 飘带在中间交叉成一个大 X，
-     *    甩出漏斗外的尾端像几根杂毛；而且实心漏斗把旋涡全糊死了。
+     * 走过四轮弯路，结论有两条：
      *
-     * 现在：漏斗体只留很淡的体积感，旋涡交给**六层错位旋转的弧** ——
-     * 每层逐次加宽、逐次多转一点，叠起来才有旋转感。每一层只画两段弧、留出缺口，
-     * 缺口正是让下层露出来的关键。
+     * 1. **风线必须用 [android.graphics.Canvas.clipPath] 裁在漏斗里**。
+     *    前两版（螺旋飘带、旋转弧）都是不裁剪直接画，于是线条必然甩到轮廓外
+     *    变成杂毛；裁剪之后画多长多偏都不会破形。
+     * 2. **不要用横杠去“堆”**。第三版换成圆头横杠，结果又回到「一叠盘子」。
+     *    横杠天生是水平分隔线，不管怎么摆都像台阶。
+     *
+     * 现在是：平滑漏斗打底 + 内部斜向风线 —— 斜线才有缠绕感，水平的就是楼梯。
      */
     private fun drawTornado(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
         val pal = palette()
         val topY = cy - r * 0.90f
         val h = r * 1.80f
 
-        // 极淡的漏斗体，只给体量感
+        // 漏斗体：顶部窄、底部宽且带圆角，整体是一条平滑曲线而不是硬边三角形
         val funnel = pathA
         funnel.reset()
-        funnel.moveTo(cx - r * 0.26f, topY)
-        funnel.cubicTo(cx - r * 0.34f, topY + h * 0.36f, cx - r * 0.68f, topY + h * 0.70f, cx - r * 1.00f, topY + h)
-        funnel.lineTo(cx + r * 1.00f, topY + h)
-        funnel.cubicTo(cx + r * 0.68f, topY + h * 0.70f, cx + r * 0.34f, topY + h * 0.36f, cx + r * 0.26f, topY)
+        funnel.moveTo(cx - r * 0.30f, topY)
+        funnel.cubicTo(cx - r * 0.34f, topY + h * 0.30f, cx - r * 0.72f, topY + h * 0.62f, cx - r * 0.97f, topY + h * 0.90f)
+        funnel.cubicTo(cx - r * 1.04f, topY + h, cx + r * 1.04f, topY + h, cx + r * 0.97f, topY + h * 0.90f)
+        funnel.cubicTo(cx + r * 0.72f, topY + h * 0.62f, cx + r * 0.34f, topY + h * 0.30f, cx + r * 0.30f, topY)
         funnel.close()
-        bodyPaint.shader = cachedShader("tornado${if (sleepy) 1 else 0}") {
+        bodyPaint.shader = cachedShader("tornado") {
             android.graphics.LinearGradient(
                 cx, topY, cx, topY + h, pal.bodyLight, pal.deep, Shader.TileMode.CLAMP
             )
         }
-        bodyPaint.alpha = if (sleepy) 170 else 95
         canvas.drawPath(funnel, bodyPaint)
         bodyPaint.shader = null
-        bodyPaint.alpha = 255
+
+        // 内部风线：**裁剪在漏斗里**。
+        // 前两版都是不裁剪直接画，于是线条必然甩到轮廓外变成杂毛；
+        // 裁剪之后无论线画多长多偏都不会破形。
+        canvas.save()
+        canvas.clipPath(funnel)
+        linePaint.strokeCap = Paint.Cap.ROUND
+        for (i in 0 until 5) {
+            val tt = i / 4f
+            val y = topY + h * (0.08f + 0.84f * tt)
+            val w = r * (0.24f + 0.70f * tt)
+            val off = sin(t * 1.8f - tt * 2.6f) * r * (0.05f + 0.15f * tt)
+            linePaint.strokeWidth = r * (0.09f + 0.05f * tt)
+            linePaint.color = if (i % 2 == 0) pal.accentSoft else pal.bodyLight
+            linePaint.alpha = (205 - tt * 60).toInt().coerceIn(0, 255)
+            // 斜着画才有缠绕感，水平的话就是个楼梯
+            canvas.drawLine(cx + off - w, y - r * 0.11f, cx + off + w, y + r * 0.11f, linePaint)
+        }
+        linePaint.alpha = 255
+        canvas.restore()
+
+        // 轮廓线：把漏斗的形“钉”住，避免内部斜线把边界冲淡
+        linePaint.color = pal.shade
+        linePaint.strokeWidth = r * 0.055f
+        canvas.drawPath(funnel, linePaint)
 
         if (!sleepy) {
-            // 涡眼（画在脸下方，两者不重叠）
             bodyPaint.color = pal.highlight
-            canvas.drawCircle(cx, topY + r * 0.16f, r * 0.19f, bodyPaint)
-            linePaint.strokeCap = Paint.Cap.ROUND
-            val n = 6
-            for (i in 0 until n) {
-                val tt = i / (n - 1f)
-                val w = r * (0.30f + 0.74f * tt)
-                val y = topY + r * 0.18f + tt * (h - r * 0.18f)
-                val ry = r * 0.15f * (0.75f + 0.45f * tt)
-                canvas.save()
-                canvas.rotate(t * 26f + tt * 52f, cx, y)
-                scratchRect.set(cx - w, y - ry, cx + w, y + ry)
-                linePaint.strokeWidth = r * 0.15f * (1f - 0.40f * tt)
-                linePaint.color = if (i % 2 == 0) pal.accent else pal.accentSoft
-                linePaint.alpha = (225 - tt * 80).toInt().coerceIn(0, 255)
-                canvas.drawArc(scratchRect, 28f, 124f, false, linePaint)
-                canvas.drawArc(scratchRect, 208f, 124f, false, linePaint)
-                canvas.restore()
-            }
-            linePaint.alpha = 255
-        } else {
-            // 打瞌睡：给几条静态横弧，至少别是个空锥
-            linePaint.strokeCap = Paint.Cap.ROUND
-            for (i in 0 until 4) {
-                val tt = i / 3f
-                val w = r * (0.34f + 0.68f * tt)
-                val y = topY + r * 0.3f + tt * (h - r * 0.4f)
-                linePaint.color = 0xFFB0BEC5.toInt()
-                linePaint.strokeWidth = r * 0.14f
-                scratchRect.set(cx - w, y - r * 0.13f, cx + w, y + r * 0.13f)
-                canvas.drawArc(scratchRect, 30f, 120f, false, linePaint)
-                canvas.drawArc(scratchRect, 210f, 120f, false, linePaint)
-            }
+            canvas.drawCircle(cx, topY + r * 0.15f, r * 0.16f, bodyPaint)
         }
-        drawFace(canvas, cx, topY + r * 0.64f, r * 0.15f, blinking, fierce = true)
+        drawFace(canvas, cx, topY + r * 0.56f, r * 0.15f, blinking, fierce = true)
     }
 
     // ─────────────────── 形态五：雷霆之王（尖锐能量核心 + 倾斜光环 + 头顶星芒） ───────────────────

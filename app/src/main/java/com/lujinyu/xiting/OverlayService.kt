@@ -300,7 +300,12 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
-            ACTION_BUBBLE -> setBubbleVisible(!prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false))
+            // 通知里的「显示/隐藏悬浮球」：把当前状态取反。
+            // ⚠️ 这里曾经写成 `setBubbleVisible(!BUBBLE_HIDDEN)` —— 而 BUBBLE_HIDDEN=false
+            // 时按钮文案正是「隐藏」，却去调 setBubbleVisible(true)，即「去显示一个已经显示着的球」。
+            // 两种状态都是空操作，所以这个按钮从来就没生效过。
+            // 正确写法：BUBBLE_HIDDEN 同时也是切换后的目标可见性（隐藏中→显示，未隐藏→隐藏）。
+            ACTION_BUBBLE -> setBubbleVisible(prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false))
             ACTION_SET_TIMER -> handleSetTimer(
                 intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0,
                 intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0
@@ -415,14 +420,6 @@ class OverlayService : Service() {
         var longPressFired = false
 
         cancelLongPress()
-        longPressCheck = Runnable {
-            longPressCheck = null
-            if (!moved) {
-                longPressFired = true
-                vibrateShort()
-                showExitConfirm()
-            }
-        }
 
         tv.setOnTouchListener { v, e ->
             when (e.actionMasked) {
@@ -434,7 +431,20 @@ class OverlayService : Service() {
                     moved = false
                     longPressFired = false
                     downAt = SystemClock.elapsedRealtime()
-                    longPressCheck?.let { main.postDelayed(it, 400) }
+                    // ⚠️ 必须在每次 DOWN **重建** longPressCheck，不能只在建 View 时建一次。
+                    // 原实现在这外面建好 Runnable，而 cancelLongPress() 会把它置为 null；
+                    // 于是第一次短按（正常点球切黑幕）后 longPressCheck 就永远是 null，
+                    // 后续 `?.let` 全部落空 —— 长按退出从那时起永久失效，
+                    // 要等悬浮球重建才恢复（用户反馈「用一段时间后长按退出失灵」）。
+                    longPressCheck = Runnable {
+                        longPressCheck = null
+                        if (!moved) {
+                            longPressFired = true
+                            vibrateShort()
+                            showExitConfirm()
+                        }
+                    }
+                    main.postDelayed(longPressCheck!!, 400)
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {

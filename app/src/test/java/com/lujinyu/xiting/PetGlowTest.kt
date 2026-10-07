@@ -1,5 +1,6 @@
 package com.lujinyu.xiting
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -15,31 +16,30 @@ import org.junit.Test
  */
 class PetGlowTest {
 
+    /**
+     * 光晕必须是「渐变半径 == 画圆半径」。
+     *
+     * 曾经是渐变 0.475h、只画 0.396h，于是圆边处渐变还剩 ~16% 不透明度，
+     * 真机上是**一个硬边圆盘**而不是弥散的光（预览与单测都看不见，纯靠肉眼）。
+     * 现在两者由同一个常量派生，关系不再可能漂移。
+     */
     @Test
-    fun `渐变半径必须覆盖所有形态的光晕圆半径`() {
-        assertTrue(
-            "渐变半径 ${PetView.GLOW_GRADIENT_RATIO} 小于光晕圆最大半径 ${PetView.GLOW_CIRCLE_MAX_RATIO}，" +
-                "光晕会被截成可见的圆盘边界",
-            PetView.GLOW_GRADIENT_RATIO >= PetView.GLOW_CIRCLE_MAX_RATIO
-        )
+    fun `各形态光晕半径单调递增且都在合法范围`() {
+        val r = PetView.GLOW_RATIO
+        assertEquals(PetView.STAGE_KING + 1, r.size)
+        for (i in 1 until r.size) {
+            assertTrue("形态越高光晕越大，但第 $i 级反而变小了", r[i] > r[i - 1])
+        }
+        assertTrue("光晕半径不能超过视图高度", r.last() <= 1f)
+        assertTrue("光晕半径也不能小到看不见", r.first() >= 0.15f)
     }
 
     @Test
-    fun `渐变半径不能大得离谱`() {
-        // 渐变半径远大于光晕圆的话，淡出会拖到光晕圈外，光晕看起来发虚不集中
-        val ratio = PetView.GLOW_GRADIENT_RATIO / PetView.GLOW_CIRCLE_MAX_RATIO
-        assertTrue("渐变半径是光晕圆的 ${"%.2f".format(ratio)} 倍，淡出拖得太远",
-            ratio <= 1.15f)
-    }
-
-    @Test
-    fun `最大形态半径就是常量的定义来源`() {
-        // GLOW_CIRCLE_MAX_RATIO = 最大形态半径(0.25) × 脉动系数(1.85)
-        val biggest = 0.25f
-        val pulse = 1.85f
-        assertTrue(
-            "常量与实际用到的最大圆半径对不上：${PetView.GLOW_CIRCLE_MAX_RATIO} vs ${biggest * pulse}",
-            kotlin.math.abs(PetView.GLOW_CIRCLE_MAX_RATIO - biggest * pulse) < 1e-6f
-        )
+    fun `光晕半径按体型递增，与形态尺寸单调对应`() {
+        // 电火花 r=0.11h、雷霆之王 r=0.25h，光晕应保持同一「倍数」关系
+        val sparkRatio = PetView.GLOW_RATIO[PetView.STAGE_SPARK] / 0.11f
+        val kingRatio = PetView.GLOW_RATIO[PetView.STAGE_KING] / 0.25f
+        assertTrue("光晕倍数不应相差太大：火花 ${"%.2f".format(sparkRatio)} vs 王 ${"%.2f".format(kingRatio)}",
+            kotlin.math.abs(sparkRatio - kingRatio) < 0.6f)
     }
 }

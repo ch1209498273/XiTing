@@ -56,29 +56,34 @@ object PetPalette {
     /**
      * 一整套派生色。
      *
-     * 全部来自同一个 hue，靠 s(饱和度) / v(明度) 拉开层次：
-     * 高光接近纯白但仍带一点色相，阴影压暗而不变灰，强调色饱和度拉满。
+     * 全部来自同一个 hue，靠 s(饱和度) / v(明度) 拉开层次。
+     *
+     * ⚠️ **明度不能太高、饱和度不能太低** —— 第一版把 body 定在 v=0.86 / s=0.52，
+     * 结果用户反馈「这几个精灵像鬼一样」。原因很直白：幽灵就是「又亮又淡的白」，
+     * 而整套配色收敛成单色之后，只剩下一个高明度低饱和的主体，没有任何东西压住它。
+     * 现在主体明显压暗、显著加饱和，只有受光面才留高光 —— 整体读作「有体积的实体」
+     * 而不是「一团发光的雾」。
      */
     class Palette(private val hue: Float, private val satMul: Float) {
         private fun c(s: Float, v: Float): Int =
             Color.HSVToColor(floatArrayOf(hue, (s * satMul).coerceIn(0f, 1f), v))
 
-        /** 受光高光面 */
-        val highlight = c(0.30f, 1.00f)
+        /** 受光高光面 —— 唯一允许接近纯白的一层 */
+        val highlight = c(0.45f, 1.00f)
         /** 主体亮面 */
-        val bodyLight = c(0.42f, 0.95f)
+        val bodyLight = c(0.62f, 0.86f)
         /** 主体本色 */
-        val body = c(0.52f, 0.86f)
+        val body = c(0.70f, 0.72f)
         /** 暗面 */
-        val shade = c(0.60f, 0.68f)
-        /** 最暗处（描边、内阴影） */
-        val deep = c(0.68f, 0.52f)
+        val shade = c(0.75f, 0.54f)
+        /** 最暗处（描边、内阴影）—— 必须真的暗，否则整体还是发灰 */
+        val deep = c(0.80f, 0.36f)
         /** 强调色：闪电、光环、螺旋臂 */
-        val accent = c(0.92f, 1.00f)
+        val accent = c(0.95f, 1.00f)
         /** 次强调色：远端闪电、尾部 */
-        val accentSoft = c(0.75f, 0.90f)
+        val accentSoft = c(0.85f, 0.88f)
         /** 光晕 */
-        val glow = c(0.52f, 1.00f)
+        val glow = c(0.62f, 1.00f)
     }
 
     fun of(stage: Int, skinHue: Float, satMul: Float) = Palette(hueFor(stage, skinHue), satMul)

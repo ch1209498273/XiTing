@@ -256,6 +256,13 @@ https://github.com/ch1209498273/XiTing</string>
 本プロジェクトは YouTube、Google およびあらゆる動画プラットフォームとは一切関係ありません。学習・交流目的のみを指了指し、正版の支援をお願いします。</string>
     <string name="about_version_fmt">バージョン %1$s · ビルドID %2$s</string>
     <string name="gallery_title">精霊図鑑</string>
+    <string name="count_placeholder">0 回</string>
+    <string name="dur_min_placeholder">0分</string>
+    <string name="dur_placeholder">0秒</string>
+    <string name="update_placeholder">現在 v—</string>
+    <string name="version_placeholder">バージョン —</string>
+    <string name="pager_placeholder">1 / 1</string>
+    <string name="gallery_btn">🎨 図鑑</string>
     <string name="streak_fmt">🔥 連続視聴 %1$d 日</string>
     <string name="streak_best_fmt">最長 %1$d 日</string>
     <string name="toast_rare_energy">⚡ レアな雷嵐エネルギー +%1$d！</string>

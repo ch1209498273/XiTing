@@ -251,6 +251,13 @@
 
     <!-- v3.5 skin gallery & streak -->
     <string name="gallery_title">Skin Gallery</string>
+    <string name="count_placeholder">0 times</string>
+    <string name="dur_min_placeholder">0 min</string>
+    <string name="dur_placeholder">0s</string>
+    <string name="update_placeholder">Current v—</string>
+    <string name="version_placeholder">Version —</string>
+    <string name="pager_placeholder">1 / 1</string>
+    <string name="gallery_btn">🎨 Gallery</string>
     <string name="streak_fmt">🔥 %1$d-day streak</string>
     <string name="streak_best_fmt">best %1$d</string>
     <string name="toast_rare_energy">⚡ Rare storm energy +%1$d!</string>

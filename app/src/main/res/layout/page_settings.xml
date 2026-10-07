@@ -177,7 +177,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
-                    android:text="默认"
+                    android:text="@string/bubble_value_default"
                     android:textColor="#FF8A9099"
                     android:textSize="13sp" />
 
@@ -363,7 +363,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
-                    android:text="当前 v—"
+                    android:text="@string/update_placeholder"
                     android:textColor="#FF8A9099"
                     android:textSize="13sp" />
 

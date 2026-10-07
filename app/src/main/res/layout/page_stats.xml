@@ -69,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:padding="6dp"
-                    android:text="🎨 图鉴"
+                    android:text="@string/gallery_btn"
                     android:textColor="#FF5F6570"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -116,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="0分钟"
+                    android:text="@string/dur_min_placeholder"
                     android:textColor="#FF111418"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -125,7 +125,7 @@
                     android:id="@+id/sum_today_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 次"
+                    android:text="@string/count_placeholder"
                     android:textColor="#FF5F6570"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -155,7 +155,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="0分钟"
+                    android:text="@string/dur_min_placeholder"
                     android:textColor="#FF111418"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -164,7 +164,7 @@
                     android:id="@+id/sum_week_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 次"
+                    android:text="@string/count_placeholder"
                     android:textColor="#FF5F6570"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -193,7 +193,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="0分钟"
+                    android:text="@string/dur_min_placeholder"
                     android:textColor="#FF157A4C"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -202,7 +202,7 @@
                     android:id="@+id/sum_all_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 次"
+                    android:text="@string/count_placeholder"
                     android:textColor="#FF5F6570"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -379,7 +379,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="第 1 / 1 页"
+                    android:text="@string/pager_placeholder"
                     android:textColor="#FF8A9099"
                     android:textSize="12sp" />
 

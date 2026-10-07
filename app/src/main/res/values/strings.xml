@@ -252,6 +252,13 @@
 
     <!-- v3.5 精灵图鉴与streak -->
     <string name="gallery_title">精灵图鉴</string>
+    <string name="count_placeholder">0 次</string>
+    <string name="dur_min_placeholder">0分钟</string>
+    <string name="dur_placeholder">0秒</string>
+    <string name="update_placeholder">当前 v—</string>
+    <string name="version_placeholder">版本 —</string>
+    <string name="pager_placeholder">1 / 1</string>
+    <string name="gallery_btn">🎨 图鉴</string>
     <string name="streak_fmt">🔥 连续听剧 %1$d 天</string>
     <string name="streak_best_fmt">最长 %1$d 天</string>
     <string name="toast_rare_energy">⚡ 稀有雷暴能量 +%1$d！</string>

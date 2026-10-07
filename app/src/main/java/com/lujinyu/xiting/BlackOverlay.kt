@@ -113,7 +113,15 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         if (isShowing) return
 
         val density = context.resources.displayMetrics.density
-        val f = FrameLayout(context)
+        // 覆写 performClick（lint ClickableViewAccessibility）：黑幕全屏铺满，它本身
+        // 确实可点（轻点解锁/切夜钟），所以无障碍服务应当能读到这个点击，
+        // 不能因为点击逻辑写在 GestureDetector 里就让 TalkBack 把它当成死区。
+        val f = object : FrameLayout(context) {
+            override fun performClick(): Boolean {
+                super.performClick()
+                return true
+            }
+        }
         f.setBackgroundColor(Color.BLACK)
 
         val hint = TextView(context).apply {
@@ -292,8 +300,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
                 return true
             }
         })
-        f.setOnTouchListener { _, e ->
+        f.setOnTouchListener { v, e ->
             gd.onTouchEvent(e)
+            // 走标准点击入口，让无障碍服务能识别到这次交互（lint ClickableViewAccessibility）
+            if (e.actionMasked == MotionEvent.ACTION_UP) v.performClick()
             true // 吞掉所有触摸，防止误触底下的视频App
         }
 

@@ -30,6 +30,11 @@ class BarChartView(context: Context, attrs: AttributeSet?) : View(context, attrs
         textAlign = Paint.Align.CENTER
     }
 
+    // 预分配的柱子矩形：onDraw 里每次 new RectF 会在每帧、每根柱子都分配一次
+    // （7 根柱子 = 每帧 7 个对象），切标签页反复 invalidate 时会持续给 GC 添活。
+    // 绘制是只读操作，一个复用实例足够。
+    private val barRect = RectF()
+
     fun setData(d: List<Pair<String, Long>>) {
         data = d
         invalidate()
@@ -38,7 +43,7 @@ class BarChartView(context: Context, attrs: AttributeSet?) : View(context, attrs
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (data.isEmpty()) {
-            canvas.drawText("暂无数据", width / 2f, height / 2f, labelPaint)
+            canvas.drawText(context.getString(R.string.chart_no_data), width / 2f, height / 2f, labelPaint)
             return
         }
         val maxV = (data.maxOfOrNull { it.second } ?: 1L).coerceAtLeast(1L)
@@ -53,18 +58,14 @@ class BarChartView(context: Context, attrs: AttributeSet?) : View(context, attrs
             val cx = slot * i + slot / 2
             canvas.drawText(label, cx, height - 16f, labelPaint)
             if (v <= 0) {
-                canvas.drawRoundRect(
-                    RectF(cx - barW / 2, baseline - 6f, cx + barW / 2, baseline),
-                    6f, 6f, stubPaint
-                )
+                barRect.set(cx - barW / 2, baseline - 6f, cx + barW / 2, baseline)
+                canvas.drawRoundRect(barRect, 6f, 6f, stubPaint)
                 return@forEachIndexed
             }
             val barH = (v.toFloat() / maxV) * usable
             val top = baseline - barH
-            canvas.drawRoundRect(
-                RectF(cx - barW / 2, top, cx + barW / 2, baseline),
-                10f, 10f, barPaint
-            )
+            barRect.set(cx - barW / 2, top, cx + barW / 2, baseline)
+            canvas.drawRoundRect(barRect, 10f, 10f, barPaint)
             canvas.drawText(fmtDur(v), cx, top - 10f, valuePaint)
         }
     }

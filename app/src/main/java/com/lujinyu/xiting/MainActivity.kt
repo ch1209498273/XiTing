@@ -99,7 +99,9 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         bindHome()
         bindStats()
         bindSettings()
-        switchTab(TAB_HOME)
+        // 切语言时 recreate() 会重建 Activity，这里把 tab 位置恢复回去
+        val lastTab = prefs().getInt(Prefs.LAST_TAB, TAB_HOME)
+        switchTab(if (lastTab in 0..2) lastTab else TAB_HOME)
         // 卸载重装恢复：启动后检查本机备份（设备ID匹配且本地为空）
         window.decorView.postDelayed({ checkRestore() }, 600)
     }
@@ -108,6 +110,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     private fun switchTab(target: Int) {
         tab = target
+        prefs().edit().putInt(Prefs.LAST_TAB, target).apply()
         pageHome.visibility = if (target == TAB_HOME) View.VISIBLE else View.GONE
         pageStats.visibility = if (target == TAB_STATS) View.VISIBLE else View.GONE
         pageSettings.visibility = if (target == TAB_SETTINGS) View.VISIBLE else View.GONE
@@ -126,7 +129,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         // 以前只有统计页在切回时重绘，设置页完全不管，于是用户在图鉴里换了形态、
         // 切到设置页看到的还是 App 启动时的旧值（用户反馈「悬浮球样式显示的和我选的不一样」）。
         // 与 renderStats() 对称：切过去就重绘。
-        if (target == TAB_SETTINGS) refreshBubbleStyleValue()
+        if (target == TAB_SETTINGS) {
+            refreshBubbleStyleValue()
+            refreshLangValue()
+        }
     }
 
     private fun tintNav(icon: ImageView, label: TextView, selected: Boolean, sel: Int, unsel: Int) {
@@ -174,26 +180,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             }
         }
 
-        rowBattery.setOnClickListener {
-            val pm = getSystemService(POWER_SERVICE) as PowerManager
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                try {
-                    startActivity(
-                        Intent(
-                            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                            Uri.parse("package:$packageName")
-                        )
-                    )
-                } catch (e: Exception) {
-                    try {
-                        startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-                    } catch (_: Exception) {
-                    }
-                }
-            } else {
-                Toast.makeText(this, getString(R.string.toast_battery_ok), Toast.LENGTH_SHORT).show()
-            }
-        }
+        rowBattery.setOnClickListener { openBatterySettings() }
 
         rowNotify.setOnClickListener {
             if (Build.VERSION.SDK_INT >= 33 &&
@@ -430,6 +417,38 @@ private fun checkRestore() {
     }
 
     /** 防杀保活指南：ColorOS后台限制的分步设置引导 */
+    /**
+     * 打开电池/后台权限设置。
+     *
+     * 以前这里直接用 [Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS]：
+     * 1. 该 intent 违反 Play 商店内容政策（lint BatteryLife），无正当理由不能申请白名单；
+     * 2. 在 ColorOS / MIUI 这类国产 ROM 上它经常直接无效或跳转空白页，
+     *    用户真正要改的是应用详情里的「允许后台运行 / 不限制后台活动」。
+     *
+     * 所以改成三级回退：应用详情页 → 电池优化列表 → 降级（已在白名单则提示）。
+     * 对用户而言路径更短，命中率更高，也不再需要白名单权限。
+     */
+    private fun openBatterySettings() {
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        if (pm.isIgnoringBatteryOptimizations(packageName)) {
+            Toast.makeText(this, getString(R.string.toast_battery_ok), Toast.LENGTH_SHORT).show()
+            return
+        }
+        val attempts = listOf(
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")),
+            Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        )
+        for (i in attempts) {
+            try {
+                startActivity(i)
+                return
+            } catch (_: Exception) {
+                // 试下一个
+            }
+        }
+        Toast.makeText(this, getString(R.string.toast_battery_fail), Toast.LENGTH_SHORT).show()
+    }
+
     private fun showKeepAliveGuide() {
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         val batteryOk = pm.isIgnoringBatteryOptimizations(packageName)
@@ -441,19 +460,8 @@ private fun checkRestore() {
                     if (batteryOk) getString(R.string.state_done) else getString(R.string.state_todo)
                 )
             )
-            .setPositiveButton(getString(R.string.keepalive_btn_battery)) { _, _ ->
-                try {
-                    startActivity(
-                        Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$packageName"))
-                    )
-                } catch (e: Exception) {
-                    try {
-                        startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-                    } catch (_: Exception) {
-                    }
-                }
-            }
-            .setNeutralButton("去应用详情") { _, _ ->
+            .setPositiveButton(getString(R.string.keepalive_btn_battery)) { _, _ -> openBatterySettings() }
+            .setNeutralButton(getString(R.string.keepalive_btn_appdetail)) { _, _ ->
                 try {
                     startActivity(
                         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
@@ -1315,6 +1323,10 @@ private fun showSkinGallery() {
         // 悬浮球样式：默认「息屏」文字，可换为已解锁的精灵形态
         page.findViewById<View>(R.id.row_bubble_style).setOnClickListener { showBubbleStyleDialog() }
 
+        // 界面语言
+        page.findViewById<View>(R.id.row_lang).setOnClickListener { showLangDialog() }
+        refreshLangValue()
+
         // 耳机拔出自动返回视频（默认开）
         val switchHeadset = page.findViewById<android.widget.Switch>(R.id.switch_headset)
         switchHeadset.isChecked = prefs.getBoolean(Prefs.SWITCH_HEADSET, true)
@@ -1379,8 +1391,7 @@ private fun showSkinGallery() {
      * 就是两套状态各说各话 —— 早期正因如此：在设置里选了形态，主页精灵纹丝不动。
      * 所以这里只留二选一，形态跟着图鉴走。
      */
-    private fun showBubbleStyleDialog() {
-        val usesPet = PetForm.bubbleUsesPet(this)
+    private fun showBubbleStyleDialog() {        val usesPet = PetForm.bubbleUsesPet(this)
         val labels = arrayOf(
             getString(R.string.bubble_default),
             getString(R.string.gallery_form_label) + " · " + PetView.stageName(this, PetForm.selected(this))
@@ -1395,6 +1406,52 @@ private fun showSkinGallery() {
             }
             .setNegativeButton(getString(R.string.dlg_cancel), null)
             .show()
+    }
+
+    /**
+     * 语言选择。
+     *
+     * 选中后调用 recreate()：因为本项目不用 AppCompat（零依赖），
+     * 框架没有内置的「配置变更后自动刷新文案」机制。与其手动重建整棵视图树
+     * （很容易漏掉某个已经 setText 过的地方），不如让系统重建一次 ——
+     * attachBaseContext 会重新走 AppLocales.wrap()，新的配置从头到尾生效。
+     *
+     * 重建会丢掉当前 tab 位置，所以先记住、onCreate 后恢复。
+     */
+    private fun showLangDialog() {
+        val tags = AppLocales.SUPPORTED.toTypedArray()
+        val labels = arrayOf(
+            getString(R.string.lang_system),
+            getString(R.string.lang_zh),
+            getString(R.string.lang_en),
+            getString(R.string.lang_ja)
+        )
+        val cur = AppLocales.current(this)
+        val checked = tags.indexOf(cur).let { if (it < 0) 0 else it }
+        android.app.AlertDialog.Builder(this)
+            .setTitle(getString(R.string.lang_title))
+            .setSingleChoiceItems(labels, checked) { d, which ->
+                if (tags[which] != cur) {
+                    AppLocales.set(this, tags[which])
+                    // 记住当前 tab，recreate() 后回到原处
+                    prefs().edit().putInt(Prefs.LAST_TAB, tab).apply()
+                    recreate()
+                }
+                d.dismiss()
+            }
+            .setNegativeButton(getString(R.string.dlg_cancel), null)
+            .show()
+    }
+
+    /** 设置页「语言」行右侧的当前值 */
+    private fun refreshLangValue() {
+        val tv = pageSettings.findViewById<TextView>(R.id.lang_value) ?: return
+        tv.text = when (AppLocales.current(this)) {
+            "zh" -> getString(R.string.lang_zh)
+            "en" -> getString(R.string.lang_en)
+            "ja" -> getString(R.string.lang_ja)
+            else -> getString(R.string.lang_system)
+        }
     }
 
 

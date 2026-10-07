@@ -46,6 +46,15 @@ import android.widget.Toast
 class OverlayService : Service() {
 
     companion object {
+        /**
+         * 唤醒锁兜底超时：10 小时。
+         *
+         * 正常情况下锁会在用户「退出助手」时立即释放，所以这个值只在服务挂死时生效。
+         * 取 10 小时是因为它要足够大 —— 比任何一次正常的连续听剧（连着一整夜也就
+         * 8 小时上下）都长，所以绝不会误杀；又足够小，能在服务真的挂死时把手机救回来。
+         */
+        const val WAKE_LOCK_TIMEOUT_MS = 10L * 60L * 60L * 1000L
+
         private const val TAG = "XiTing"
         private const val CHANNEL_ID = "xiiting_service"
         private const val NOTIF_ID = 1
@@ -255,10 +264,18 @@ class OverlayService : Service() {
         // 常驻部分唤醒锁：服务运行期间保持CPU唤醒、防止ColorOS冻结进程
         // （「熄屏挂机」类工具的标准做法；退出助手即释放，不白白耗电）
         // 部分ROM会剥离WAKE_LOCK权限：拿不到时降级运行，绝不能拖垮服务
+        //
+        // 必须带超时（lint WakelockTimeout）：如果服务没走到 onDestroy（被系统强杀、
+        // 进程崩溃、异常退出），无超时的 PARTIAL_WAKE_LOCK 会让 CPU 一直醒着，
+        // 手机发烫掉电而用户完全无感。WAKE_TIMEOUT 是兜底：远大于任何一次正常
+        // 听剧时长，又能保证挂死时自动释放。
         wakeLock = try {
             (getSystemService(POWER_SERVICE) as android.os.PowerManager)
                 .newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "XiTing:service")
-                .apply { setReferenceCounted(false); acquire() }
+                .apply {
+                    setReferenceCounted(false)
+                    acquire(WAKE_LOCK_TIMEOUT_MS)
+                }
         } catch (e: Exception) {
             Log.w(TAG, "唤醒锁获取失败，降级为无锁运行: $e")
             null
@@ -477,7 +494,12 @@ class OverlayService : Service() {
                             wm.updateViewLayout(tv, lp)
                             prefs.edit().putInt(Prefs.BUBBLE_X, lp.x).putInt(Prefs.BUBBLE_Y, lp.y).apply()
                         }
-                        else -> toggleOverlay()
+                        else -> {
+                            // 走标准点击入口，让无障碍服务能识别悬浮球是可点的
+                            // （lint ClickableViewAccessibility）
+                            v.performClick()
+                            toggleOverlay()
+                        }
                     }
                     true
                 }
@@ -549,7 +571,18 @@ class OverlayService : Service() {
     private fun showExitConfirm() {
         if (exitConfirm != null) return
         val d = resources.displayMetrics.density
-        val pill = LinearLayout(this).apply {
+        val pill = object : LinearLayout(this) {
+            /**
+             * 覆写标准点击入口（lint ClickableViewAccessibility）。
+             * 容器本身不处理点击（只处理 ACTION_OUTSIDE），但因为它装了
+             * setOnTouchListener，无障碍服务需要能读到 performClick 已被处理，
+             * 否则 TalkBack 会把它当成一个读不出名字的可点击控件。
+             */
+            override fun performClick(): Boolean {
+                super.performClick()
+                return true
+            }
+        }.apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setBackgroundResource(R.drawable.exit_pill_bg)
@@ -604,6 +637,7 @@ class OverlayService : Service() {
         try {
             wm.addView(pill, lp)
             exitConfirm = pill
+            // pill 本身的点击已由子 View 的 OnClickListener 处理，这里只负责「点外面就收起」
             pill.setOnTouchListener { _, e ->
                 if (e.actionMasked == MotionEvent.ACTION_OUTSIDE) { hideExitConfirm(); true } else false
             }

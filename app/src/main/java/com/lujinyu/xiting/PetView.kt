@@ -280,7 +280,10 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             MotionEvent.ACTION_UP -> {
                 val moved = Math.abs(event.x - downX) > 30 || Math.abs(event.y - downY) > 30
                 if (!moved) {
-                    // ? 说明图标命中
+                    // 走标准点击入口：让无障碍服务（TalkBack）能识别到这个点击，
+                    // 也能触发 registered OnClickListener（lint ClickableViewAccessibility）。
+                    performClick()
+                    // 说明图标命中
                     val (hx, hy) = helpCenter()
                     val hdx = event.x - hx
                     val hdy = event.y - hy
@@ -307,6 +310,19 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             MotionEvent.ACTION_MOVE -> return true // 交给外层 ScrollView 拦截滚动
         }
         return super.onTouchEvent(event)
+    }
+
+    /**
+     * 标准点击入口（lint ClickableViewAccessibility）。
+     *
+     * 本 View 自己在 onTouchEvent 里处理点击，所以必须显式覆盖它：
+     * 不覆盖的话无障碍服务读不到这个控件是可点击的，
+     * 而且 super.performClick() 会顺带发一个 ACTION_CLICK 事件出去。
+     * 这里不做任何事 —— 真正的点击逻辑已经在 onTouchEvent 里执行过了。
+     */
+    override fun performClick(): Boolean {
+        super.performClick()
+        return true
     }
 
     /**

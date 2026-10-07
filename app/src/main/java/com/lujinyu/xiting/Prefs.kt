@@ -71,6 +71,12 @@ object Prefs {
     // ---- 分享 ----
     const val LAST_SHARE_DATE = "last_share_date"
 
+    // ---- 界面语言 ----
+    /** per-app 语言 tag（""=跟随系统），读取见 AppLocales */
+    const val LANG = "lang"
+    /** 上次停留的 tab（切语言 recreate() 后恢复现场用） */
+    const val LAST_TAB = "ui_last_tab"
+
     // ---- 省电校准（PowerCalib 使用）----
     const val PWR_SAMP_UA_SUM = "pwr_samp_ua_sum"
     const val PWR_SAMP_COUNT = "pwr_samp_count"

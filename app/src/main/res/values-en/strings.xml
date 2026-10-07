@@ -276,4 +276,16 @@
     <string name="gallery_form_next">Bank %1$d more growth for the next form</string>
     <string name="gallery_form_maxed">All forms unlocked</string>
     <string name="bubble_style_title">Bubble style</string>
+    <string name="toast_battery_fail">Could not open system settings. Please set it manually in App info.</string>
+    <string name="keepalive_btn_appdetail">App info</string>
+    <string name="chart_no_data">No data yet</string>
+
+    <!-- Language -->
+    <string name="lang_title">Language</string>
+    <string name="lang_sub">Interface language</string>
+    <string name="lang_system">Follow system</string>
+    <string name="lang_zh">简体中文</string>
+    <string name="lang_en">English</string>
+    <string name="lang_ja">日本語</string>
+    <string name="lang_restart_note">Takes effect immediately, no restart needed</string>
 </resources>

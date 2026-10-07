@@ -189,6 +189,6 @@
             android:gravity="center"
             android:text="@string/footer_offline"
             android:textColor="#FFC3C8CF"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 </ScrollView>

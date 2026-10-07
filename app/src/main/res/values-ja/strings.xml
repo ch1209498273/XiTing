@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 日语。由 tools/mk_ja.py 从 values/strings.xml 的键顺序生成，勿手改。 -->
+<resources>
+    <string name="app_name">画面オフ再生</string>
+    <string name="tile_label">画面オフ再生</string>
+    <string name="nav_home">ホーム</string>
+    <string name="nav_stats">統計</string>
+    <string name="nav_settings">設定</string>
+    <string name="footer_offline">完全オフライン · データ収集なし</string>
+    <string name="title_stats">省エネ統計</string>
+    <string name="title_settings">設定</string>
+    <string name="status_running">実行中</string>
+    <string name="status_idle">停止中</string>
+    <string name="pill_on">オン</string>
+    <string name="pill_off">オンにする</string>
+    <string name="pill_battery_on">登録済み</string>
+    <string name="pill_battery_off">登録する</string>
+    <string name="pill_abnormal">異常 · 修復</string>
+    <string name="hero_title_start">画面オフ再生を開始</string>
+    <string name="hero_title_stop">画面オフ再生 実行中</string>
+    <string name="hero_sub_start">起動後は映像を見ながらバブルをタップするだけでOK</string>
+    <string name="hero_sub_stop">映像中にバブルをタップすると画面が消え、音は再生し続けます · タップで停止</string>
+    <string name="timer_title">自動終了</string>
+    <string name="keepalive_title">自動終了防止</string>
+    <string name="keepalive_sub">設定ガイド</string>
+    <string name="stats_section">省エネ統計</string>
+    <string name="view_details">詳細を見る ›</string>
+    <string name="label_today">今日</string>
+    <string name="label_week">直近7日</string>
+    <string name="label_total">累計</string>
+    <string name="perm_section">サービスと権限</string>
+    <string name="perm_overlay">オーバーレイ権限</string>
+    <string name="perm_battery">バッテリーの白リスト登録</string>
+    <string name="perm_notify">通知権限</string>
+    <string name="stats_hint">画面オフ再生の視聴時間と省エネの推定（端末内に保存）</string>
+    <string name="chart_title">直近7日間の1日あたりの画面オフ時間</string>
+    <string name="ach_sub_empty">視聴の積み重ねで，逐步点灯</string>
+    <string name="ach_sub_latest">最新解禁：%1$s</string>
+    <string name="ach_progress">精霊の実績</string>
+    <string name="pet_subtitle">電能精霊 · あなたの実視聴時間で育成</string>
+    <string name="sum_mah_default">累計推定節約 ≈ 0 mAh</string>
+    <string name="sum_extra_default">最長1回 — · 画面オフ 0回</string>
+    <string name="timer_none">未設定</string>
+    <string name="recent_records">最近のセッション記録 · 最近30日分のみ保持</string>
+    <string name="pager_prev">‹ 前へ</string>
+    <string name="pager_next">次へ ›</string>
+    <string name="settings_personal">パーソナライズ</string>
+    <string name="switch_direct">画面を軽くタップで解除</string>
+    <string name="switch_info">画面オフ中に時刻とバッテリーを表示</string>
+    <string name="switch_media">画面オフ中に再生コントロールを表示</string>
+    <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
+    <string name="bubble_style">バブル表示</string>
+    <string name="settings_data">データ</string>
+    <string name="row_export">データのバックアップを書き出す</string>
+    <string name="row_export_sub">任意の場所に保存</string>
+    <string name="row_restore">バックアップから復元</string>
+    <string name="row_restore_sub">成長値と統計</string>
+    <string name="settings_about">このアプリについて</string>
+    <string name="row_update">更新を確認</string>
+    <string name="row_share">友達に共有</string>
+    <string name="share_sub">1日1回 · +5 成長値獲得予定</string>
+    <string name="row_about">画面オフ再生について</string>
+    <string name="row_about_sub">使い方 / プライバシー / オープンソース</string>
+    <string name="widget_black">画面オフ</string>
+    <string name="widget_active">実行中</string>
+    <string name="widget_idle">停止中</string>
+    <string name="widget_today_fmt">今日 %1$s</string>
+    <string name="widget_growth_next">成長値 %1$d · 次の形態まで %2$d</string>
+    <string name="widget_growth_max">成長値 %1$d · 最高到達</string>
+    <string name="black_hint">画面オフ再生中 · 軽くタップするとロック解除</string>
+    <string name="black_return">🔒 タップで動画へ戻る</string>
+    <string name="channel_name">画面オフ再生アシスタント</string>
+    <string name="notif_title">画面オフ再生アシスタント 実行中</string>
+    <string name="notif_text">バブルをタップすると画面が消え音は再生し続けます%1$s</string>
+    <string name="notif_action_listen">画面オフ再生</string>
+    <string name="notif_action_restore">画面を戻す</string>
+    <string name="notif_action_stop">アシスタントを終了</string>
+    <string name="exit_confirm_title">画面オフ再生を終了しますか？</string>
+    <string name="exit_confirm_yes">終了</string>
+    <string name="exit_notif_title">画面オフ再生を終了しました</string>
+    <string name="exit_notif_text">「元に戻す」でバブルと画面オフ機能を復帰できます</string>
+    <string name="exit_notif_undo">元に戻す</string>
+    <string name="notif_action_bubble_hide">バブルを隠す</string>
+    <string name="notif_action_bubble_show">バブルを表示</string>
+    <string name="switch_bubble">バブルを表示</string>
+    <string name="pet_spark">電火花</string>
+    <string name="pet_ball">電球</string>
+    <string name="pet_cloud">雷雲精霊</string>
+    <string name="pet_storm">嵐の精霊</string>
+    <string name="pet_king">雷王</string>
+    <string name="perm_fix_hint">システム画面で「オーバーレイ」をオフにしてから再度オンにすると修復します</string>
+    <string name="perm_need_overlay">オーバーレイ権限を許可してください</string>
+    <string name="toast_overlay_granted">オーバーレイ権限を許可しました</string>
+    <string name="toast_battery_ok">すでにバッテリー最適化の対象外です</string>
+    <string name="toast_notify_granted">通知権限を許可しました</string>
+    <string name="toast_assistant_stopped">アシスタントを停止しました</string>
+    <string name="toast_assistant_started">アシスタントを起動しました。映像中にバブルをタップしてください</string>
+    <string name="toast_call">着信があるため画面オフを解除しました</string>
+    <string name="toast_headset">イヤホンが外れたため動画に戻りました</string>
+    <string name="timer_item_episode">🎧 この話まで聴く</string>
+    <string name="timer_15">15分</string>
+    <string name="timer_30">30分</string>
+    <string name="timer_60">60分</string>
+    <string name="timer_cancel">タイマーを解除</string>
+    <string name="toast_timer_set">自動終了：%1$d分後</string>
+    <string name="toast_timer_episode">この話の終了時に自動で画面を消します</string>
+    <string name="toast_timer_expired">タイマーが終了しました</string>
+    <string name="toast_timer_done">タイマー終了、画面オフを解除しました</string>
+    <string name="toast_timer_cancelled">自動終了を解除しました</string>
+    <string name="toast_episode_done">この話の終了後に自動で画面を消します（現在 %1$d分%2$d秒 後）</string>
+    <string name="timer_remain_fmt">残り %1$d 分</string>
+    <string name="restore_title">履歴データを復元</string>
+    <string name="restore_msg">以前「画面オフ再生」を使用していて削除した場合：バックアップはダウンロードの XiTing フォルダ（XiTing-backup.json）にあります。ここから成長値と統計をワンタップで復元できます。
+
+初めて使う場合は「不要」をタップしてください。</string>
+    <string name="restore_pick">バックアップファイルを選択</string>
+    <string name="restore_no">不要</string>
+    <string name="toast_invalid_backup">有効なバックアップファイルではありません</string>
+    <string name="restore_other_title">バックアップは別の端末からのものです</string>
+    <string name="restore_other_msg">このバックアップの成長値は %1$d です。端末ID が本機と一致しません（機種変更、または旧署名の版からの移行）。復元しますか？</string>
+    <string name="restore_ok_btn">復元</string>
+    <string name="dlg_cancel">キャンセル</string>
+    <string name="toast_restore_done">データを復元しました ✓（成長値 %1$d）</string>
+    <string name="toast_restore_fail">復元に失敗しました</string>
+    <string name="toast_picker_fail">ファイル選択を開けませんでした</string>
+    <string name="toast_export_ok">書き出しました ✓</string>
+    <string name="toast_export_fail">書き出しに失敗しました</string>
+    <string name="keepalive_dlg_title">自動終了防止の設定</string>
+    <string name="keepalive_msg">システムがバックグラウンドのアプリを整理するとバブルが消えます。以下の3ステップで設定すると安定します：
+
+1. バッテリーの白リスト（%1$s）——下の「バッテリー設定へ」をタップ
+
+2. 自動起動：「アプリ情報へ」→ バッテリー使用量 → 自動起動／完全バックグラウンド動作を許可
+
+3. 最近のタスクでロック：最近のタスクを pullsown し、画面オフ再生のカードでロックをタップ</string>
+    <string name="state_done">完了 ✓</string>
+    <string name="state_todo">未完了</string>
+    <string name="keepalive_btn_battery">バッテリー設定へ</string>
+    <string name="keepalive_btn_ok">了解</string>
+    <string name="locale_dlg_title">「通知の読み取り権限」が必要です</string>
+    <string name="locale_dlg_msg">「この話まで聴く」は再生中の話数を読み取る必要があります。
+システム設定で画面オフ再生の「通知の読み取り権限」を許可してください（再生位置の読み取りのみに使用し、他の目的には使いません）。
+
+権限を付与しない場合も通常のカウントダウンタイマーで利用できます。</string>
+    <string name="locale_dlg_go">権限を付与</string>
+    <string name="locale_dlg_fallback">タイマーを使う</string>
+    <string name="toast_no_progress">再生位置を読み取れませんでした：先に1話再生してから選ぶか、タイマーを使ってください</string>
+    <string name="ach_toast_fmt">🏆 実績解除：%1$s %2$s</string>
+    <string name="ach_dlg_title_fmt">精霊の実績 %1$d/%2$d</string>
+    <string name="ach_dlg_hint">バッジは精霊の左に、下から難易度順に点灯します</string>
+    <string name="ach_row_unlocked">点灯済み</string>
+    <string name="ach_row_locked">未解除</string>
+    <string name="dlg_ok">OK</string>
+    <string name="toast_charge">成長値 +%1$d を回収 ✓</string>
+    <string name="pet_caption_sleepy">%1$s はお眠り中 · 1話聴くと起きます</string>
+    <string name="pet_caption_max">%1$s · 最高到達 · 成長値 %2$d 蓄積中</string>
+    <string name="pet_caption_progress">%1$s · 成長値 %2$d / %3$d</string>
+    <string name="ach_c100_t">百回の習慣</string>
+    <string name="ach_c100_d">画面オフを累計100回</string>
+    <string name="ach_marathon_t">マラソン</string>
+    <string name="ach_marathon_d">1回の連続視聴で1時間</string>
+    <string name="ach_week_t">継続</string>
+    <string name="ach_week_d">7日間にわたって画面オフ記録あり</string>
+    <string name="ach_king_t">雷王の戴冠式</string>
+    <string name="ach_king_d">精霊が雷王に進化</string>
+    <string name="calib_title">省エネ実測</string>
+    <string name="calib_msg_calibrated">本機の実測で校正済み（%1$s）
+実測の節約レート ≈ %2$.0f mAh/時</string>
+    <string name="calib_msg_uncalibrated">まだ実測校正していません（現在はOLEDの汎用モデルで推定）</string>
+    <string name="calib_msg_ambient">
+
+画面オフ中の端末消費電力の実測 ≈ %1$.0f mA（%2$d 回サンプル）</string>
+    <string name="calib_msg_flow">
+
+校正手順（約6分）：
+① 画面をオンにしたまま任意の動画を3分再生
+② アプリが自動的に画面を消し、3分待機
+
+充電しないでください。バッテリーは15%〜95%に保ってください。</string>
+    <string name="calib_btn_restart">再校正</string>
+    <string name="calib_btn_start">校正を開始</string>
+    <string name="calib_btn_close">閉じる</string>
+    <string name="calib_step1_title">校正 1/2 · 画面をオンで再生</string>
+    <string name="calib_step1_init">直ちに任意の動画を再生し、画面をオンにしたままにしてください…</string>
+    <string name="toast_calib_too_few">有効なサンプルが不足しています（充電中ではありませんか？）。校正を中止しました</string>
+    <string name="toast_calib_need_service">先に画面オフ再生アシスタントを起動してください</string>
+    <string name="toast_calib_step2">校正手順 2/2：画面を消したまま3分待機、操作は不要です</string>
+    <string name="toast_calib_ok">校正完了 ✓（有効サンプル %1$d）</string>
+    <string name="toast_calib_invalid">校正サンプルが無効です（充電中ではありませんか？）。再試行してください</string>
+    <string name="toast_calib_done">校正完了：本機の実測節約 ≈ %1$.0f mAh/時</string>
+    <string name="toast_calib_timeout">校正がタイムアウトしました。再試行してください</string>
+    <string name="saved_basis_measured">本機の実測に基づく</string>
+    <string name="saved_basis_model">OLED画面の消費電力で推定</string>
+    <string name="sum_saved_fmt">%1$s節約 ≈ %2$d mAh（%3$s）</string>
+    <string name="fmt_sessions">%1$d 回</string>
+    <string name="sum_extra_fmt">最長1回 %1$s · 画面オフ %2$d 回</string>
+    <string name="list_empty">記録はまだありません——画面オフ再生を1回行うとここに明細が表示されます</string>
+    <string name="pager_info_fmt">%1$d / %2$d ページ · 全 %3$d 件</string>
+    <string name="day_today">今日</string>
+    <string name="day_yesterday">昨日</string>
+    <string name="share_chooser">共有先</string>
+    <string name="share_text">⚡ 私は「画面オフ再生」で画面を消して %1$s 聴き、推定節約 %2$d mAh でした
+電能精霊は「%3$s」まで進化しました
+完全無料・広告なしの画面オフ再生ツール（0.6MB・オフライン動作）
+https://github.com/ch1209498273/XiTing</string>
+    <string name="toast_share_done">共有完了 · +%1$d 成長値獲得予定（統計ページの左のバーで回収）</string>
+    <string name="toast_share_claimed">本日の共有報酬は受取済みです。また明日（1日1回）</string>
+    <string name="share_sub_claimed">本日受取済み ✓ · また明日</string>
+    <string name="share_sub_avail">今日は +%1$d 獲得できます · 未回収</string>
+    <string name="help_title">成長値について</string>
+    <string name="help_msg">・視聴1分につき成長値1点（まず未回収に入ります）
+・1日目の初回共有で成長値5点（まず未回収に入ります）
+・未回収の上限は200点。到達後は蓄積されません——先に回収してから視聴してください
+・未回収の成長値は3日間有効です。期限が近い分はバー上で赤く表示されます
+・左のバーをタップすると回収され、精霊のレベルに反映されます</string>
+    <string name="toast_media_on">オンにしました：画面オフ解除後に ⏮ ⏸ ⏭ キーを表示します</string>
+    <string name="toast_browser_fail">ブラウザを開けませんでした</string>
+    <string name="update_value_fmt">現在 v%1$s</string>
+    <string name="bubble_default">画面オフ（デフォルト）</string>
+    <string name="bubble_label_off">画面オフ</string>
+    <string name="bubble_dlg_title">バブル表示（リアルタイムプレビュー）</string>
+    <string name="toast_bubble_locked">「%1$s」は未解禁 · 成長値 %2$d が必要</string>
+    <string name="bubble_value_default">デフォルト</string>
+    <string name="unit_h">時</string>
+    <string name="unit_m">分</string>
+    <string name="unit_m_full">分</string>
+    <string name="unit_s">秒</string>
+    <string name="about_title">画面オフ再生について</string>
+    <string name="about_section_app">このアプリについて</string>
+    <string name="about_intro">映像を見ながら目を閉じてSimply聴きたい？ バブルを1タップするだけで画面が完全に消えます：バックライトが物理的に消え、タッチも遮断され、音はそのまま再生されます——あらゆる動画アプリで使えます。
+
+暗い表示の時計とバッテリー表示を選択できます（再ロック後も最低輝度で常時表示し、内容を定期的にわずかに動かしてOLEDパネルを保護）；着信時は自動的に画面オフを解除するので電話を逃しません；自動終了と「この話まで聴く」スマートタイマーに対応；イヤホン抜去で自動的に動画へ戻ります。
+
+画面オフの解除後は話送り：前へ / 再生一時停止 / 次へ（設定で有効化できます）。
+
+電能精霊：視聴で得た成長値を蓄積し、5形態の精霊を育てます（電火花 → 電球 → 雷雲精霊 → 嵐の精霊 → 雷王）。バブルのアバターとしても使えます。最高到達後も成長値は蓄積。実績システムが視聴マイルストーンを記録します。
+
+ホーム画面ウィジェット：3サイズで、精霊・視聴データ・ワンタップ画面オフを常設。バブルは長押しで素早く終了できます。
+
+データバックアップ：ダウンロードの XiTing フォルダに自動バックアップ（端末内のみ）、再インストール後もワンタップで復元。全データは端末内にのみ保存され、ネットワーク権限はありません。</string>
+    <string name="about_section_privacy">プライバシーと安全</string>
+    <string name="about_privacy">・INTERNET 権限なし：物理的にネットワークに接続できません
+・画面の内容は一切読み取りません
+・全データは端末内のみに保存（システムのクラウドバックアップと機種変更時の自動移行は明示的にオフ）
+・バックアップはあなたが明示的に書き出しをタップした時のみ「ダウンロード/XiTing」ディレクトリに保存され、管理は自分で行います
+・「通知の読み取り権限」を明示的に付与した場合に限り、画面オフのバッジ用に通知件数をカウントします。通知のタイトルや内容は読み取らず、権限がなければ機能全体が動作しません
+・アプリにはビルド識別子（ビルドIDとチャネル）を含みます（不正複製の追跡専用で、端末情報は一切含みません）
+・広告なし、トラッキングなし、計測なし</string>
+    <string name="about_section_open">オープンソースと連絡先</string>
+    <string name="about_github">GitHub：github.com/ch1209498273/XiTing
+（タップでプロジェクトページを開く）</string>
+    <string name="about_feedback">フィードバック：1209498273@qq.com</string>
+    <string name="about_section_license">ライセンス</string>
+    <string name="about_license">非商用ライセンス（「LICENSE」参照）：個人の学習・交流目的での自由な使用と共有は可能（出典の明記が必要）。いかなる商用利用も禁止。出典および追跡識別子の削除・改変は禁止。
+
+本プロジェクトは YouTube、Google およびあらゆる動画プラットフォームとは一切関係ありません。学習・交流目的のみを指了指し、正版の支援をお願いします。</string>
+    <string name="about_version_fmt">バージョン %1$s · ビルドID %2$s</string>
+    <string name="gallery_title">精霊図鑑</string>
+    <string name="streak_fmt">🔥 連続視聴 %1$d 日</string>
+    <string name="streak_best_fmt">最長 %1$d 日</string>
+    <string name="toast_rare_energy">⚡ レアな雷嵐エネルギー +%1$d！</string>
+    <string name="toast_skin_unlock">🎨 新スキン解禁：%1$s</string>
+    <string name="skin_default_n">クラシック配色</string>
+    <string name="skin_cond_default">デフォルト形態</string>
+    <string name="skin_star_n">星夜の魂</string>
+    <string name="skin_cond_star">累計節約 1000 mAh</string>
+    <string name="skin_aurora_n">オーロラの精霊</string>
+    <string name="skin_cond_aurora">1回の連続視聴 2時間</string>
+    <string name="skin_sakura_n">桜雨精霊</string>
+    <string name="skin_cond_sakura">連続視聴 14日</string>
+    <string name="skin_magma_n">マグマの暴君</string>
+    <string name="skin_cond_magma">最高到達後にさらに2000成長値</string>
+    <string name="skin_jade_n">翡翠の雷公</string>
+    <string name="skin_cond_jade">連続視聴 60日</string>
+    <string name="gallery_locked">🔒 %1$s（%2$s）</string>
+    <string name="gallery_worn">「%1$s」に着せ替えました</string>
+    <string name="gallery_form_label">形態</string>
+    <string name="gallery_skin_label">配色</string>
+    <string name="gallery_locked_short">🔒%1$s</string>
+    <string name="gallery_form_locked_toast">成長値 %1$d に達するとこの形態が解禁されます</string>
+    <string name="gallery_form_next">さらに %1$d 成長値たまると次の形態が解禁されます</string>
+    <string name="gallery_form_maxed">全形態を解禁しました</string>
+    <string name="bubble_style_title">バブル表示</string>
+    <string name="toast_battery_fail">システム設定を開けませんでした。アプリ情報から手動で設定してください</string>
+    <string name="keepalive_btn_appdetail">アプリ情報へ</string>
+    <string name="chart_no_data">データがありません</string>
+    <string name="lang_title">言語 / Language</string>
+    <string name="lang_sub">表示言語</string>
+    <string name="lang_system">システムに従う</string>
+    <string name="lang_zh">简体中文</string>
+    <string name="lang_en">English</string>
+    <string name="lang_ja">日本語</string>
+    <string name="lang_restart_note">変更は即座に反映されます</string>
+</resources>

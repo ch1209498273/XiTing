@@ -47,6 +47,14 @@ object Achievements {
         return (p.getStringSet(Prefs.ACH_UNLOCKED, emptySet()) ?: emptySet()).toMutableSet()
     }
 
+    /**
+     * 已解锁成就 id（只读快照）。
+     *
+     * 供 [BackupManager] 备份用：之前 [unlocked] 是 private，备份里就存不到它，
+     * 换手机后徽章全清零。它返回副本，外部改不动内部状态。
+     */
+    fun unlockedIds(ctx: Context): Set<String> = unlocked(ctx).toSet()
+
     /** 依据统计评估并持久化，返回本次新解锁的成就（可能为空） */
     fun evaluate(ctx: Context, count: Int, maxMs: Long, days: Int, stage: Int): List<A> {
         val cond = mapOf(

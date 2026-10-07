@@ -24,6 +24,18 @@ object BackupManager {
     private const val TAG = "XiTing"
     private const val FILE_NAME = "XiTing-backup.json"
 
+    /**
+     * 备份格式版本。
+     *
+     * v1 = 只有 gp / 会话 / 分享日期
+     * v2 = 加上养成进度（形态、皮肤、已解锁集合、悬浮球样式、成就）
+     *
+     * **读的时候永远不要用版本号做分支**：v1 的备份合法地缺这些字段，
+     * 用 `optXxx(key, 默认值)` 自然回落；只有将来真要**含义变更**时才需要
+     * 区分版本。加版本号是为了将来能改语义，不是为了现在这层。
+     */
+    const val CURRENT_VERSION = 2
+
     /** 导入会话条数上限，与 SessionLog.MAX 对齐：超出的部分不恢复 */
     private const val MAX_IMPORT_SESSIONS = 500
     private val REL_DIR = Environment.DIRECTORY_DOWNLOADS + "/XiTing"
@@ -38,12 +50,20 @@ object BackupManager {
         return JSONObject()
             // 注意：下面是备份文件的 JSON 键，属于对外数据格式，改名会让旧备份失效。
             // 它们与 prefs 键「碰巧同名字符串」不是一回事，勿与 Prefs 常量混用。
-            .put("v", 1)
+            .put("v", CURRENT_VERSION)
             .put("device", androidId(ctx))
             .put("gp", EnergyStore.collectedTotal(ctx))
             .put("last_share_date", prefs.getString(Prefs.LAST_SHARE_DATE, "") ?: "")
             .put("sessions", JSONArray(sessText))
             .put("ts", System.currentTimeMillis())
+            // ↓ v2 新增：养成进度。之前只备份了「积累了多少」，没备份「用积累换了什么」——
+            // 用户换手机后成长值还在，但精灵退回默认形态、皮肤全丢、徽章清零。
+            // 攒了半年的东西因为换了台手机就没了，这个断裂是设计上的漏洞。
+            .put("pet_form", PetForm.selected(ctx))
+            .put("pet_skin", PetSkins.active(ctx).id)
+            .put("skins_unlocked", JSONArray(PetSkins.unlockedIds(ctx).toList()))
+            .put("bubble_uses_pet", PetForm.bubbleUsesPet(ctx))
+            .put("ach_unlocked", JSONArray(Achievements.unlockedIds(ctx).toList()))
     }
 
     /** 导出到用户所选位置（SAF 手动备份） */
@@ -211,7 +231,7 @@ object BackupManager {
     fun isSameDevice(ctx: Context, obj: JSONObject): Boolean =
         obj.optString("device") == androidId(ctx)
 
-    /** 把备份数据恢复到本地（成长值/会话/分享状态） */
+    /** 把备份数据恢复到本地（成长值/会话/分享状态/养成进度） */
     fun restore(ctx: Context, obj: JSONObject): Boolean {
         return try {
             // gp 来自外部文件，不能直接写进 prefs：负数会让精灵进度异常，
@@ -219,11 +239,14 @@ object BackupManager {
             val gp = obj.optInt("gp", 0).coerceIn(0, Int.MAX_VALUE)
             val prefs = ctx.prefs()
             // 迁移标记置位，避免旧值再迁移覆盖
-            prefs.edit()
+            val ed = prefs.edit()
                 .putInt(Prefs.ENERGY_COLLECTED, gp)
                 .putBoolean(Prefs.ENERGY_MIGRATED, true)
                 .putString(Prefs.LAST_SHARE_DATE, obj.optString("last_share_date", ""))
-                .apply()
+            // ↓ v2：养成进度。v1 备份没有这些字段，optXxx 全返回 null →
+            // 保持现状不动（绝不能因为「备份是旧的」就把用户现有数据清空）。
+            applyProgress(ctx, obj, ed)
+            ed.apply()
             obj.optJSONArray("sessions")?.let { arr ->
                 // 导入数据不可信：原来整段 arr.toString() 原样落盘，
                 // 一个超大或畸形的数组会在之后的 SessionLog.sessions() 里
@@ -241,6 +264,43 @@ object BackupManager {
             false
         }
     }
+
+    /**
+     * 从备份恢复养成进度（形态 / 皮肤 / 已解锁集合 / 悬浮球样式 / 成就）。
+     *
+     * 两条硬规则：
+     * 1. **v1 备份没有这些字段**（optInt 返回 -1、optJSONArray 返回 null），此时
+     *    **完全不动**现有设置。不能因为「备份里没这项」就把用户当前状态清掉。
+     * 2. **导入数据不可信**：形态夹到合法区间，皮肤/成就 id 过白名单。
+     *    否则一个手改的 JSON 就能写入不存在的 id，渲染时崩溃。
+     */
+    private fun applyProgress(ctx: Context, obj: JSONObject, ed: android.content.SharedPreferences.Editor) {
+        obj.optInt("pet_form", -1).takeIf { it >= 0 }?.let { stage ->
+            ed.putInt(Prefs.PET_FORM, stage.coerceIn(PetView.STAGE_SPARK, PetView.STAGE_KING))
+        }
+        obj.optString("pet_skin", "").takeIf { it.isNotEmpty() }?.let { id ->
+            if (PetSkins.ALL.any { it.id == id }) ed.putString(Prefs.PET_SKIN, id)
+        }
+        obj.optJSONArray("skins_unlocked")?.let { arr ->
+            val ids = arr.toStringSet().filter { cand -> PetSkins.ALL.any { it.id == cand } }
+            // 经典配色永远解锁：它是所有其他皮肤的前提
+            if (ids.isNotEmpty()) ed.putStringSet(Prefs.SKINS_UNLOCKED, (ids + DEFAULT_SKIN_ID).toSet())
+        }
+        // boolean 必须用 has() 区分「false」与「字段不存在」——v1 里就没有
+        if (obj.has("bubble_uses_pet")) {
+            ed.putString(
+                Prefs.BUBBLE_STYLE,
+                if (obj.optBoolean("bubble_uses_pet", false)) "pet" else "text"
+            )
+        }
+        obj.optJSONArray("ach_unlocked")?.let { arr ->
+            val ids = arr.toStringSet().filter { cand -> Achievements.ALL.any { it.id == cand } }
+            if (ids.isNotEmpty()) ed.putStringSet(Prefs.ACH_UNLOCKED, ids.toSet())
+        }
+    }
+
+    /** 经典配色 id，写死而不是读 [PetSkins.ALL] 0 号：列表顺序变了这里也不会错 */
+    private const val DEFAULT_SKIN_ID = "default"
 }
 
 /**
@@ -250,6 +310,22 @@ object BackupManager {
  * SessionLog 解析路径里被逐条跳过，白白占用配额；超大数组则直接导致
  * 主线程全量解析时 ANR/OOM。
  */
+/**
+ * JSONArray → Set<String>（纯函数，可单测）。
+ *
+ * ⚠ 必须判 `is String` 而不能直接用 `optString`：org.json 的 `optString`
+ * 对非字符串会做**宽松转换**（数字 42 会变成 "42"），于是一个畸形的备份里
+ * 只要混进一个数字，就会凭空多出一个不存在的 id 写进 prefs。
+ */
+internal fun JSONArray.toStringSet(): Set<String> {
+    val out = LinkedHashSet<String>()
+    for (i in 0 until length()) {
+        val v = opt(i)
+        if (v is String && v.isNotEmpty()) out.add(v)
+    }
+    return out
+}
+
 internal fun filterImportSessions(arr: JSONArray, max: Int): JSONArray {
     val kept = JSONArray()
     val limit = minOf(arr.length(), max)

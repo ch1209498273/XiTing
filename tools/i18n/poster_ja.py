@@ -20,4 +20,8 @@ PS = {
     "fmt_days_sessions": "%1$d 日 / %2$d 回",
     "poster_hint_all": "画面オフ再生の累計視聴時間",
     "poster_hint_week": "今週の画面オフ視聴時間",
+    "poster_preview_save": "保存",
+    "poster_saved": "「Pictures/XiTing」に保存しました",
+    "poster_save_fail": "保存に失敗しました。権限や空き容量を確認してください",
+    "poster_badge_streak": "連続 %1$d 日",
 }

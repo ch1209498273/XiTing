@@ -317,7 +317,10 @@
     <string name="toast_calib_fail_reversed">实测：亮屏 %1$d μA，黑屏 %2$d μA —— 黑屏段反而更耗电，不能用于估算省电。请将手机平放后重试。</string>
     <!-- 本周小结。上面三张卡是绝对值（今日/近7天/累计），看不出习惯；
          这里给的是有对比的信息：比上周增减、连续天数、精灵是否进化。 -->
-    <!-- 分享海报。纯 Canvas 绘制，版式见 SharePoster.render -->    <!-- 分享前预览 -->
+    <!-- 分享海报。纯 Canvas 绘制，版式见 SharePoster.render -->    <!-- 分享前预览 -->    <string name="poster_preview_save">保存</string>
+    <string name="poster_saved">已保存到相册 Pictures/XiTing</string>
+    <string name="poster_save_fail">保存失败，请检查相册权限或存储空间</string>
+    <string name="poster_badge_streak">连续 %1$d 天</string>
     <string name="poster_preview_title">分享海报</string>
     <string name="poster_preview_share">分享</string>
     <string name="poster_brand">息屏听剧</string>

@@ -269,6 +269,10 @@ Remaining %1$d:%2$02d (%3$d samples)</string>
     <string name="toast_calib_fail_few">Only %1$d valid samples (need 4). Keep the screen on and playing the whole time, and don\'t charge the phone.</string>
     <string name="toast_calib_fail_zerocurrent">The phone reported a current of 0, so it can\'t be measured here. This happens on some devices when they aren\'t charging.</string>
     <string name="toast_calib_fail_reversed">Measured: screen on %1$d microamps, screen off %2$d microamps — the screen-off phase used MORE power, so it can\'t be used to estimate savings. Keep the phone face-up and try again.</string>
+    <string name="poster_preview_save">Save</string>
+    <string name="poster_saved">Saved to Pictures/XiTing</string>
+    <string name="poster_save_fail">Save failed. Check gallery permission or storage space.</string>
+    <string name="poster_badge_streak">%1$d-day streak</string>
     <string name="poster_preview_title">Share poster</string>
     <string name="poster_preview_share">Share</string>
     <string name="poster_brand">XiTing</string>

@@ -311,6 +311,10 @@ Noch %1$d:%2$02d (%3$d Messungen)</string>
     <string name="toast_calib_fail_few">Nur %1$d gültige Messungen (4 benötigt). Bildschirm die ganze Zeit eingeschaltet lassen und abspielen, nicht laden.</string>
     <string name="toast_calib_fail_zerocurrent">Das Handy meldet 0, lässt sich hier also nicht messen. Passiert bei manchen Geräten im nicht geladenen Zustand.</string>
     <string name="toast_calib_fail_reversed">Gemessen: Bildschirm an %1$d, aus %2$d Mikroampere — die Schwarzphase verbrauchte mehr, damit lässt sich nichts schätzen. Handy flach hinlegen und erneut versuchen.</string>
+    <string name="poster_preview_save">Speichern</string>
+    <string name="poster_saved">Unter Pictures/XiTing gespeichert</string>
+    <string name="poster_save_fail">Speichern fehlgeschlagen. Berechtigung oder Speicherplatz prüfen</string>
+    <string name="poster_badge_streak">%1$d Tage in Folge</string>
     <string name="poster_preview_title">Plakat teilen</string>
     <string name="poster_preview_share">Teilen</string>
     <string name="poster_brand">Bildschirm-aus-Zuhören</string>

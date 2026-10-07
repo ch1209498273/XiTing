@@ -998,7 +998,9 @@ private fun showSkinGallery() {
                 getString(R.string.poster_row_streak) to getString(R.string.fmt_days, best)
             ),
             footer = getString(R.string.poster_footer_all),
-            shareText = getString(R.string.share_text, fmtDur(allMs), mah, PetView.stageName(this, stage))
+            shareText = getString(R.string.share_text, fmtDur(allMs), mah, PetView.stageName(this, stage)),
+            // 连续天数是这类 App 最值得炫耀的指标，给它一个角标位
+            badge = if (best >= 2) getString(R.string.poster_badge_streak, best) else null
         )
         sharePoster(d, "all")
         settleDailyShare()
@@ -1025,7 +1027,8 @@ private fun showSkinGallery() {
             shareText = getString(
                 R.string.week_share_text, fmtDur(s.weekMs), s.listenDays, s.mahSaved,
                 PetView.stageName(this, stage)
-            )
+            ),
+            badge = null
         )
         sharePoster(d, "week")
         settleDailyShare()
@@ -1079,7 +1082,12 @@ private fun showSkinGallery() {
             .setTitle(getString(R.string.poster_preview_title))
             .setView(scroll)
             .setPositiveButton(getString(R.string.poster_preview_share)) { _, _ ->
-                sendPoster(bmp, d.shareText, tag)
+                sendPoster(bmp, d.shareText, tag, share = true)
+            }
+            // 保存：不想分享、只想把这张图留在相册的场合。
+            // 海报本来就是写进公共 Pictures 的，所以「保存」只是不拉起分享面板。
+            .setNeutralButton(getString(R.string.poster_preview_save)) { _, _ ->
+                sendPoster(bmp, d.shareText, tag, share = false)
             }
             .setNegativeButton(getString(R.string.dlg_cancel)) { _, _ -> bmp.recycle() }
             .create()
@@ -1087,11 +1095,12 @@ private fun showSkinGallery() {
         dlg.show()
     }
 
-    /** 把预览里那张图存盘并拉起系统分享（后台做 IO） */
+    /** 把预览里那张图存盘并拉起系统分享（后台做 IO）。share=false 时只存不发。 */
     private fun sendPoster(
         bmp: android.graphics.Bitmap,
         text: String,
-        tag: String
+        tag: String,
+        share: Boolean
     ) {
         Thread {
             val uri = try {
@@ -1101,22 +1110,28 @@ private fun showSkinGallery() {
                 null
             }
             Handler(Looper.getMainLooper()).post {
-                if (uri == null) shareTextFallback(text)
-                else {
-                    try {
-                        startActivity(Intent.createChooser(
-                            Intent(Intent.ACTION_SEND).apply {
-                                type = "image/png"
-                                putExtra(Intent.EXTRA_STREAM, uri)
-                                // 部分 App 只认纯文本，两个都给
-                                putExtra(Intent.EXTRA_TEXT, text)
-                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            },
-                            getString(R.string.share_chooser)
-                        ))
-                    } catch (_: Exception) {
-                        Toast.makeText(this, getString(R.string.toast_browser_fail), Toast.LENGTH_SHORT).show()
-                    }
+                if (uri == null) {
+                    if (share) shareTextFallback(text)
+                    else Toast.makeText(this, getString(R.string.poster_save_fail), Toast.LENGTH_SHORT).show()
+                    return@post
+                }
+                if (!share) {
+                    Toast.makeText(this, getString(R.string.poster_saved), Toast.LENGTH_SHORT).show()
+                    return@post
+                }
+                try {
+                    startActivity(Intent.createChooser(
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "image/png"
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            // 部分 App 只认纯文本，两个都给
+                            putExtra(Intent.EXTRA_TEXT, text)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        },
+                        getString(R.string.share_chooser)
+                    ))
+                } catch (_: Exception) {
+                    Toast.makeText(this, getString(R.string.toast_browser_fail), Toast.LENGTH_SHORT).show()
                 }
             }
         }.start()

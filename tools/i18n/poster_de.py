@@ -20,4 +20,8 @@ PS = {
     "fmt_days_sessions": "%1$d Tage / %2$d Sitzungen",
     "poster_hint_all": "Zuhören mit ausgeschaltetem Bildschirm, gesamt",
     "poster_hint_week": "Zuhören mit ausgeschaltetem Bildschirm, diese Woche",
+    "poster_preview_save": "Speichern",
+    "poster_saved": "Unter Pictures/XiTing gespeichert",
+    "poster_save_fail": "Speichern fehlgeschlagen. Berechtigung oder Speicherplatz prüfen",
+    "poster_badge_streak": "%1$d Tage in Folge",
 }

@@ -311,6 +311,10 @@ Restant %1$d:%2$02d (%3$d échantillons)</string>
     <string name="toast_calib_fail_few">Seulement %1$d échantillons valides (4 nécessaires). Laissez l\'écran allumé et la lecture continuer, sans charger.</string>
     <string name="toast_calib_fail_zerocurrent">Le téléphone indique 0, la mesure est donc impossible ici. Certains appareils font cela hors charge.</string>
     <string name="toast_calib_fail_reversed">Mesuré : écran allumé %1$d, écran noir %2$d microampères — la phase écran noir a consommé davantage, impossible d\'en déduire une économie. Posez le téléphone à plat et réessayez.</string>
+    <string name="poster_preview_save">Enregistrer</string>
+    <string name="poster_saved">Enregistré dans Pictures/XiTing</string>
+    <string name="poster_save_fail">Échec de l\'enregistrement. Vérifiez l\'autorisation ou l\'espace libre</string>
+    <string name="poster_badge_streak">%1$d jours d\'affilée</string>
     <string name="poster_preview_title">Partager l\'affiche</string>
     <string name="poster_preview_share">Partager</string>
     <string name="poster_brand">Écoute écran off</string>

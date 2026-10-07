@@ -20,4 +20,8 @@ PS = {
     "fmt_days_sessions": "%1$d jours / %2$d sessions",
     "poster_hint_all": "Écoute écran off, au total",
     "poster_hint_week": "Écoute écran off, cette semaine",
+    "poster_preview_save": "Enregistrer",
+    "poster_saved": "Enregistré dans Pictures/XiTing",
+    "poster_save_fail": "Échec de l'enregistrement. Vérifiez l'autorisation ou l'espace libre",
+    "poster_badge_streak": "%1$d jours d'affilée",
 }

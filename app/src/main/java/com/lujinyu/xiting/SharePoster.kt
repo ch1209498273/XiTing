@@ -46,54 +46,71 @@ object SharePoster {
         val stage: Int,
         val skin: PetSkins.Skin,
         val stageName: String,
-        val headline: String,       // 主数字，如「12 小时」
+        val headline: String,       // 主数字，如「20 时 3 分」
         val headlineUnit: String,   // 主数字的单位
         val hint: String,           // 主数字下方的小字说明（必须与口径一致）
         val lines: List<Pair<String, String>>,  // (标签, 数值)
         val footer: String,
-        val shareText: String       // 随图附带的纯文本（部分 App 只会用这个）
+        val shareText: String,      // 随图附带的纯文本（部分 App 只会用这个）
+        val badge: String? = null    // 右上角可选角标，如「连续 12 天」
     )
 
     /**
      * 生成海报位图。纯计算，不碰磁盘，可单测。
      *
-     * 版式（自上而下）：
-     *   顶部  品牌行 + 精灵（居中，尺寸约为宽度的 42%）
-     *   中部  主数字（超大号）
-     *   下方  明细行（标签 · 数值）
-     *   底部  脚注 + 仓库地址
+     * 版式（自上而下，1080×1440）：
+     *   顶栏  品牌名 + 形态名（+ 可选角标）
+     *   主角  精灵（宽度的 58%）+ 背后径向光晕
+     *   数字  与单位同行，按可用宽度自动缩放
+     *   卡片  明细收在半透明圆角卡里
+     *   页脚  脚注 + 仓库地址
+     *
+     * ## 为什么背景不用皮肤色相铺底
+     * 第一版直接用皮肤色相铺满，结果翡翠皮肤配深绿底 —— 宠物和背景同色系，
+     * 对比度掉下去，整张图发闷。改成**深色中性底 + 皮肤色只做背后光晕**：
+     * 无论什么皮肤宠物都能跳出来，同时又保持了「图和宠物是一套配色」。
      */
     fun render(ctx: Context, d: Data): Bitmap {
         val bmp = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
-
         val p = Paint(Paint.ANTI_ALIAS_FLAG)
-
-        // ---- 背景：垂直渐变，用精灵当前配色的主色系，让图和宠物是一套的 ----
         val hue = d.skin.hue
-        val top = hsv(hue, 0.30f, 0.34f)
-        val bottom = hsv(hue, 0.42f, 0.16f)
-        p.shader = LinearGradient(0f, 0f, 0f, H.toFloat(), top, bottom, Shader.TileMode.CLAMP)
+
+        // ---- 背景：深色中性渐变（不用皮肤色，理由见 KDoc）----
+        p.shader = LinearGradient(
+            0f, 0f, 0f, H.toFloat(),
+            0xFF161A21.toInt(), 0xFF0B0E13.toInt(), Shader.TileMode.CLAMP
+        )
         c.drawRect(0f, 0f, W.toFloat(), H.toFloat(), p)
         p.shader = null
 
-        // ---- 顶部：品牌 ----
-        p.color = 0xFFFFFFFF.toInt()
-        p.textSize = 46f
+        // ---- 顶栏 ----
         p.typeface = android.graphics.Typeface.DEFAULT_BOLD
+        p.textSize = 40f
+        p.color = 0xFFFFFFFF.toInt()
         p.textAlign = Paint.Align.LEFT
-        c.drawText(ctx.getString(R.string.poster_brand), 72f, 128f, p)
+        c.drawText(ctx.getString(R.string.poster_brand), PAD.toFloat(), 116f, p)
         p.typeface = android.graphics.Typeface.DEFAULT
-        p.textSize = 34f
+        p.textSize = 36f
         p.color = 0xCCFFFFFF.toInt()
         p.textAlign = Paint.Align.RIGHT
-        c.drawText(d.stageName, (W - 72).toFloat(), 128f, p)
+        c.drawText(d.stageName, (W - PAD).toFloat(), 116f, p)
 
-        // ---- 精灵：复用图鉴/小组件同款离屏渲染 ----
-        val petSize = (W * 0.46f).toInt()
+        // ---- 主角：精灵 + 背后径向光晕 ----
+        val glowCx = W / 2f
+        val glowCy = PET_TOP + petSize * 0.46f
+        p.shader = android.graphics.RadialGradient(
+            glowCx, glowCy, petSize * 0.85f,
+            hsv(hue, 0.55f, 0.52f), 0x00000000, Shader.TileMode.CLAMP
+        )
+        c.drawCircle(glowCx, glowCy, petSize * 0.85f, p)
+        p.shader = null
+
+        d.badge?.let { drawBadge(c, p, it, PET_TOP + 6f, hue) }
+
         try {
             val pet = PetSkins.snapshot(ctx, d.stage, d.skin, petSize, withBar = false, pct = 0)
-            c.drawBitmap(pet, (W - petSize) / 2f, 190f, null)
+            c.drawBitmap(pet, (W - petSize) / 2f, PET_TOP, null)
             pet.recycle()
         } catch (e: Exception) {
             // 精灵画不出来不该让整张海报失败：留白继续，用户仍能分享数字
@@ -101,62 +118,117 @@ object SharePoster {
         }
 
         // ---- 主数字 ----
-        val headY = 190f + petSize + 190f
-        p.textAlign = Paint.Align.CENTER
+        val headY = PET_TOP + petSize + 172f
         p.typeface = android.graphics.Typeface.DEFAULT_BOLD
-        p.textSize = 168f
         p.color = 0xFFFFFFFF.toInt()
-        // 单位单独画小一号跟在后面，所以这里要量出数字宽度再排版
-        val numW = p.measureText(d.headline)
-        p.textSize = 60f
-        val unitW = p.measureText(d.headlineUnit)
-        val totalW = numW + unitW + 18f
-        val startX = (W - totalW) / 2f
+        val sizes = fitHeadline(p, d.headline, d.headlineUnit)
+        val startX = (W - (sizes.numW + sizes.unitW + GAP)) / 2f
         p.textAlign = Paint.Align.LEFT
-        p.textSize = 168f
+        p.textSize = sizes.num
         c.drawText(d.headline, startX, headY, p)
-        p.textSize = 60f
+        p.textSize = sizes.unit
         p.color = 0xCCFFFFFF.toInt()
-        c.drawText(d.headlineUnit, startX + numW + 18f, headY, p)
+        c.drawText(d.headlineUnit, startX + sizes.numW + GAP, headY, p)
 
         p.textAlign = Paint.Align.CENTER
         p.typeface = android.graphics.Typeface.DEFAULT
-        p.textSize = 38f
+        p.textSize = 34f
         p.color = 0xB3FFFFFF.toInt()
-        c.drawText(d.hint, (W / 2f), headY + 62f, p)
+        c.drawText(d.hint, (W / 2f), headY + 58f, p)
 
-        // ---- 明细行 ----
-        var y = headY + 168f
-        p.textSize = 40f
+        // ---- 明细卡片：收进半透明圆角矩形，视觉上才是一个「组」----
+        val cardTop = headY + 112f
+        val cardH = ROW_H * d.lines.size + 52f
+        p.color = 0x14FFFFFF
+        c.drawRoundRect(
+            PAD.toFloat(), cardTop, (W - PAD).toFloat(), cardTop + cardH,
+            36f, 36f, p
+        )
+
+        var y = cardTop + 72f
+        p.textSize = 38f
         d.lines.forEach { (k, v) ->
             p.textAlign = Paint.Align.LEFT
-            p.color = 0xB3FFFFFF.toInt()
-            c.drawText(k, 140f, y, p)
+            p.color = 0x99FFFFFF.toInt()
+            c.drawText(k, PAD + 48f, y, p)
             p.textAlign = Paint.Align.RIGHT
             p.color = 0xFFFFFFFF.toInt()
             p.typeface = android.graphics.Typeface.DEFAULT_BOLD
-            c.drawText(v, (W - 140).toFloat(), y, p)
+            c.drawText(v, (W - PAD - 48f).toFloat(), y, p)
             p.typeface = android.graphics.Typeface.DEFAULT
-            // 分隔线
-            p.color = 0x26FFFFFF
-            p.strokeWidth = 2f
-            c.drawLine(140f, y + 26f, (W - 140).toFloat(), y + 26f, p)
-            y += 92f
+            y += ROW_H
         }
 
-        // ---- 底部 ----
+        // ---- 页脚 ----
         p.textAlign = Paint.Align.CENTER
-        p.textSize = 34f
+        p.textSize = 36f
         p.color = 0x99FFFFFF.toInt()
-        c.drawText(d.footer, (W / 2f), (H - 148f), p)
-        p.textSize = 28f
-        p.color = 0x66FFFFFF.toInt()
-        c.drawText(REPO, (W / 2f), (H - 96f), p)
+        c.drawText(d.footer, (W / 2f), (H - 128f), p)
+        p.textSize = 30f
+        p.color = 0x80FFFFFF.toInt()
+        c.drawText(REPO, (W / 2f), (H - 74f), p)
 
         return bmp
     }
 
     private const val REPO = "github.com/ch1209498273/XiTing"
+
+    // ---- 版式常量。集中在这里，改版式不用翻绘制逻辑 ----
+    /** 页面左右留白 */
+    private const val PAD = 72
+    /** 精灵边长 = W * 0.58 */
+    private val petSize = (W * 0.58f).toInt()
+    /** 精灵顶部 y */
+    private const val PET_TOP = 196f
+    /** 明细每行高 */
+    private const val ROW_H = 84f
+    /** 数字与单位之间的间距 */
+    private const val GAP = 16f
+
+    private class HeadSizes(val num: Float, val unit: Float, val numW: Float, val unitW: Float)
+
+    /**
+     * 把「数字 + 单位」缩到可用宽度内。
+     *
+     * ⚠ 必须缩放而不是固定字号：7 种语言里同一个时长写出来长度差异极大
+     * （「20时3分」是 5 个全角字，"20 h 3 min" 是 9 个半角字符），
+     * 固定 176px 在英文/俄文下会直接溢出画面。
+     * 数字与单位的比例锁死为 2.4，整体一起缩，排版才不会走形。
+     */
+    private fun fitHeadline(p: Paint, num: String, unit: String): HeadSizes {
+        val maxW = (W - PAD * 2).toFloat()
+        var n = 176f
+        while (n > 48f) {
+            p.textSize = n
+            val nw = p.measureText(num)
+            p.textSize = n / 2.4f
+            val uw = p.measureText(unit)
+            if (nw + uw + GAP <= maxW) return HeadSizes(n, n / 2.4f, nw, uw)
+            n -= 6f
+        }
+        p.textSize = 48f
+        val nw = p.measureText(num)
+        p.textSize = 48f / 2.4f
+        return HeadSizes(48f, 48f / 2.4f, nw, p.measureText(unit))
+    }
+
+    /** 角标胶囊：底色用皮肤色相，文字用深色，任何皮肤下都读得清 */
+    private fun drawBadge(c: Canvas, p: Paint, text: String, top: Float, hue: Float) {
+        p.textSize = 34f
+        p.typeface = android.graphics.Typeface.DEFAULT_BOLD
+        val tw = p.measureText(text)
+        val padH = 34f
+        val h = 66f
+        val w = tw + padH * 2
+        val left = (W - w) / 2f
+        p.color = hsv(hue, 0.55f, 0.92f)
+        c.drawRoundRect(left, top, left + w, top + h, h / 2f, h / 2f, p)
+        p.color = 0xFF10131A.toInt()
+        p.textAlign = Paint.Align.CENTER
+        c.drawText(text, W / 2f, top + h * 0.70f, p)
+        p.textAlign = Paint.Align.LEFT
+        p.typeface = android.graphics.Typeface.DEFAULT
+    }
 
     private fun hsv(h: Float, s: Float, v: Float): Int =
         Color.HSVToColor(floatArrayOf(h, s, v))

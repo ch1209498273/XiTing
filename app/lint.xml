@@ -58,6 +58,10 @@
   4 处是英文的「1-600 minutes」——数字范围的分隔符。换成 en dash 纯属排版偏好，
   在 UI 上没有任何信息量差异。
 
+  ── Typos ──
+  1 处是德语「%d Tage in Folge」。in Folge 是**正确的分写**（复合名词前置定语
+  在现代德语里分开写），连写反而是旧式/错误。lint 的拼写词典不理解这个。
+
   ── HardcodedText ──
   21 处全是符号（— › ← 🔥 🏆），不含任何中文；语言中性，不影响 i18n。
   真正的中文硬编码已在上一个提交里全部搬进 strings.xml。
@@ -103,4 +107,7 @@
 
     <!-- 21 处全是 — › ← 之类的符号，不含中文，不影响 i18n -->
     <issue id="HardcodedText" severity="ignore" />
+
+    <!-- 德语「in Folge」是正确分写，连写才是错的 -->
+    <issue id="Typos" severity="ignore" />
 </lint>

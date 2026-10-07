@@ -20,4 +20,8 @@ PS = {
     "fmt_days_sessions": "%1$d일 / %2$d회",
     "poster_hint_all": "화면 끄기 누적 시청 시간",
     "poster_hint_week": "이번 주 화면 끄기 시청 시간",
+    "poster_preview_save": "저장",
+    "poster_saved": "Pictures/XiTing에 저장했습니다",
+    "poster_save_fail": "저장 실패. 갤러리 권한이나 저장 공간을 확인하세요",
+    "poster_badge_streak": "연속 %1$d일",
 }

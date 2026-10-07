@@ -20,4 +20,8 @@ PS = {
     "fmt_days_sessions": "%1$d days / %2$d sessions",
     "poster_hint_all": "Total screen-off listening",
     "poster_hint_week": "Screen-off listening this week",
+    "poster_preview_save": "Save",
+    "poster_saved": "Saved to Pictures/XiTing",
+    "poster_save_fail": "Save failed. Check gallery permission or storage space.",
+    "poster_badge_streak": "%1$d-day streak",
 }

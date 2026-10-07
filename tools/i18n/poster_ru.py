@@ -20,4 +20,8 @@ PS = {
     "fmt_days_sessions": "%1$d дн. / %2$d сессий",
     "poster_hint_all": "Прослушивание с выключенным экраном, всего",
     "poster_hint_week": "Прослушивание с выключенным экраном за неделю",
+    "poster_preview_save": "Сохранить",
+    "poster_saved": "Сохранено в Pictures/XiTing",
+    "poster_save_fail": "Не удалось сохранить. Проверьте разрешение или свободное место",
+    "poster_badge_streak": "%1$d дн. подряд",
 }

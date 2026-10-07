@@ -20,4 +20,8 @@ PS = {
     "fmt_days_sessions": "%1$d días / %2$d sesiones",
     "poster_hint_all": "Escucha con pantalla apagada, total",
     "poster_hint_week": "Escucha con pantalla apagada, esta semana",
+    "poster_preview_save": "Guardar",
+    "poster_saved": "Guardado en Pictures/XiTing",
+    "poster_save_fail": "Error al guardar. Revisa el permiso o el espacio",
+    "poster_badge_streak": "%1$d días seguidos",
 }

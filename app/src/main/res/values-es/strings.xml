@@ -311,6 +311,10 @@ Quedan %1$d:%2$02d (%3$d muestras)</string>
     <string name="toast_calib_fail_few">Solo %1$d muestras válidas (hacen falta 4). Deja la pantalla encendida y reproduciendo todo el tiempo, sin cargar.</string>
     <string name="toast_calib_fail_zerocurrent">El móvil indica 0, así que no se puede medir aquí. Pasa en algunos dispositivos sin estar cargando.</string>
     <string name="toast_calib_fail_reversed">Medido: pantalla encendida %1$d, apagada %2$d microamperios — la fase apagada consumió más, así que no sirve para estimar el ahorro. Deja el móvil boca arriba e inténtalo de nuevo.</string>
+    <string name="poster_preview_save">Guardar</string>
+    <string name="poster_saved">Guardado en Pictures/XiTing</string>
+    <string name="poster_save_fail">Error al guardar. Revisa el permiso o el espacio</string>
+    <string name="poster_badge_streak">%1$d días seguidos</string>
     <string name="poster_preview_title">Compartir el póster</string>
     <string name="poster_preview_share">Compartir</string>
     <string name="poster_brand">Escucha con pantalla apagada</string>

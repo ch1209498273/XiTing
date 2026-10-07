@@ -2,6 +2,13 @@
 """蒲公英自动上传（apiv2）：python tools/upload_pgyer.py <apk路径> [更新说明]"""
 import sys, json, urllib.request, urllib.error, uuid, os
 
+# Windows 控制台默认 GBK，打印「✓」会 UnicodeEncodeError ——
+# 坑在于它发生在**上传成功之后**，于是「成功」被报成「失败」，很容易误判。
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
 API_KEY = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '物料', '发布', 'pgyer_api_key.txt')).read().strip()
 SHORT_URL = 'xipingtingju'
 URL = 'https://www.pgyer.com/apiv2/app/upload'
@@ -28,7 +35,7 @@ def upload(apk, desc):
         print('HTTP', e.code, e.read().decode()[:300]); sys.exit(1)
     if d.get('code') == 0:
         b = d['data']
-        print('上传成功 ✓')
+        print('[OK] 上传成功')
         print('  版本:', b.get('buildVersion'), '(', b.get('buildBuildVersion'), ')')
         print('  短链: https://www.pgyer.com/', b.get('buildShortcutUrl'))
         print('  更新时间:', b.get('buildUpdated'))

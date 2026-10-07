@@ -12,6 +12,7 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -928,27 +929,6 @@ private fun showSkinGallery() {
         pageStats.findViewById<TextView>(R.id.week_report_body).text = lines.joinToString("\n")
     }
 
-    /** 本周分享：复用现成的分享入口，文案独立（周报比累计值更适合传播） */
-    private fun shareWeekReport() {
-        val s = weekSummary ?: return
-        val txt = getString(
-            R.string.week_share_text,
-            fmtDur(s.weekMs), s.listenDays, s.mahSaved,
-            PetView.stageName(this, s.stageNow)
-        )
-        try {
-            startActivity(Intent.createChooser(
-                android.content.Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(android.content.Intent.EXTRA_TEXT, txt)
-                },
-                getString(R.string.share_chooser)
-            ))
-        } catch (_: Exception) {
-            Toast.makeText(this, getString(R.string.toast_browser_fail), Toast.LENGTH_SHORT).show()
-        }
-    }
-
     /** 定时 Intent（抽出来给预设与自定义两处共用） */
     private fun setTimerIntent(minutes: Long): Intent =
         Intent(this, OverlayService::class.java)
@@ -990,6 +970,190 @@ private fun showSkinGallery() {
             .show()
     }
 
+    /**
+     * 分享海报（累计口径）。
+     *
+     * 海报生成失败（低版本、无媒体库权限等）时**退回纯文本**，
+     * 不能因为「发不出图」就把分享功能整个堵死。
+     */
+    private fun shareAllTime() {
+        val sessions = SessionLog.sessions(this)
+        val allMs = sessions.sumOf { it.durationMs }
+        val mah = Stats.estimatedMah(allMs)
+        val stage = PetForm.selected(this)
+        val skin = PetSkins.active(this)
+        val days = Streaks.distinctListenDays(sessions)
+        val best = Streaks.compute(sessions).best
+
+        val d = SharePoster.Data(
+            stage = stage,
+            skin = skin,
+            stageName = PetView.stageName(this, stage),
+            headline = fmtDur(allMs),
+            headlineUnit = getString(R.string.poster_unit_listen),
+            hint = getString(R.string.poster_hint_all),
+            lines = listOf(
+                getString(R.string.poster_row_days) to days.toString(),
+                getString(R.string.poster_row_mah) to getString(R.string.fmt_mah, mah),
+                getString(R.string.poster_row_streak) to getString(R.string.fmt_days, best)
+            ),
+            footer = getString(R.string.poster_footer_all),
+            shareText = getString(R.string.share_text, fmtDur(allMs), mah, PetView.stageName(this, stage))
+        )
+        sharePoster(d, "all")
+        settleDailyShare()
+    }
+
+    /** 周报口径的海报 */
+    private fun shareWeekPoster() {
+        val s = weekSummary ?: return
+        val stage = s.stageNow
+        val d = SharePoster.Data(
+            stage = stage,
+            skin = PetSkins.active(this),
+            stageName = PetView.stageName(this, stage),
+            headline = fmtDur(s.weekMs),
+            headlineUnit = getString(R.string.poster_unit_week),
+            hint = getString(R.string.poster_hint_week),
+            lines = listOf(
+                getString(R.string.poster_row_days_week) to
+                    getString(R.string.fmt_days_sessions, s.listenDays, s.sessionCount),
+                getString(R.string.poster_row_mah) to getString(R.string.fmt_mah, s.mahSaved),
+                getString(R.string.poster_row_gp) to s.weekGp.toString()
+            ),
+            footer = getString(R.string.poster_footer_week),
+            shareText = getString(
+                R.string.week_share_text, fmtDur(s.weekMs), s.listenDays, s.mahSaved,
+                PetView.stageName(this, stage)
+            )
+        )
+        sharePoster(d, "week")
+        settleDailyShare()
+    }
+
+    /**
+     * 分享海报：后台生成 → 预览 → 确认后才拉起系统分享。
+     *
+     * 为什么要预览：
+     * 1. 海报有渲染失败的可能（精灵离屏渲染、字体缺失），发出去一张坏图比不发更糟；
+     * 2. 排版（数字过长、明细行溢出）用户自己一眼能看出来，能直接取消重来；
+     * 3. 主流 App 都是「先看图再发」，一步到位反而像在赌。
+     */
+    private fun sharePoster(d: SharePoster.Data, tag: String) {
+        // 1080×1440 的 Canvas 绘制 + 一次 View 的 measure/layout/draw 约几十到上百毫秒，
+        // 放主线程会掉一帧。放到后台线程，回主线程弹预览。
+        Thread {
+            val bmp = try {
+                SharePoster.render(this, d)
+            } catch (e: Exception) {
+                Log.w("XiTing", "海报生成失败: $e")
+                null
+            }
+            Handler(Looper.getMainLooper()).post {
+                if (bmp == null) shareTextFallback(d.shareText)
+                else showPosterPreview(bmp, d, tag)
+            }
+        }.start()
+    }
+
+    /** 预览对话框：看图 → 分享 / 取消 */
+    private fun showPosterPreview(bmp: android.graphics.Bitmap, d: SharePoster.Data, tag: String) {
+        val density = resources.displayMetrics.density
+        val pad = (20 * density).toInt()
+
+        val image = android.widget.ImageView(this).apply {
+            setImageBitmap(bmp)
+            scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+            adjustViewBounds = true
+        }
+        val scroll = android.widget.ScrollView(this).apply {
+            setBackgroundColor(0xFF15171B.toInt())
+            setPadding(pad, pad, pad, pad)
+            addView(image, android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            ))
+        }
+
+        val dlg = android.app.AlertDialog.Builder(this)
+            .setTitle(getString(R.string.poster_preview_title))
+            .setView(scroll)
+            .setPositiveButton(getString(R.string.poster_preview_share)) { _, _ ->
+                sendPoster(bmp, d.shareText, tag)
+            }
+            .setNegativeButton(getString(R.string.dlg_cancel)) { _, _ -> bmp.recycle() }
+            .create()
+        dlg.setOnDismissListener { if (!bmp.isRecycled) bmp.recycle() }
+        dlg.show()
+    }
+
+    /** 把预览里那张图存盘并拉起系统分享（后台做 IO） */
+    private fun sendPoster(
+        bmp: android.graphics.Bitmap,
+        text: String,
+        tag: String
+    ) {
+        Thread {
+            val uri = try {
+                SharePoster.save(this, bmp, tag)
+            } catch (e: Exception) {
+                Log.w("XiTing", "海报保存失败: $e")
+                null
+            }
+            Handler(Looper.getMainLooper()).post {
+                if (uri == null) shareTextFallback(text)
+                else {
+                    try {
+                        startActivity(Intent.createChooser(
+                            Intent(Intent.ACTION_SEND).apply {
+                                type = "image/png"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                // 部分 App 只认纯文本，两个都给
+                                putExtra(Intent.EXTRA_TEXT, text)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            },
+                            getString(R.string.share_chooser)
+                        ))
+                    } catch (_: Exception) {
+                        Toast.makeText(this, getString(R.string.toast_browser_fail), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }.start()
+    }
+
+    /** 海报出不来时的退路：纯文本也得能发出去 */
+    private fun shareTextFallback(text: String) {
+        try {
+            startActivity(Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, text)
+                },
+                getString(R.string.share_chooser)
+            ))
+        } catch (_: Exception) {
+            Toast.makeText(this, getString(R.string.toast_browser_fail), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /** 每日分享奖励结算（两个分享入口共用） */
+    private fun settleDailyShare() {
+        val prefs = prefs()
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        val last = prefs.getString(Prefs.LAST_SHARE_DATE, "")
+        if (last != today) {
+            prefs.edit().putString(Prefs.LAST_SHARE_DATE, today).apply()
+            EnergyStore.add(this, SHARE_GP_PER_DAY)
+            Toast.makeText(
+                this, getString(R.string.toast_share_done, SHARE_GP_PER_DAY), Toast.LENGTH_LONG
+            ).show()
+        } else {
+            Toast.makeText(this, getString(R.string.toast_share_claimed), Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun refreshHomeStats() {
         val sessions = SessionLog.sessions(this)
         val cal = Calendar.getInstance().apply {
@@ -1022,7 +1186,7 @@ private fun showSkinGallery() {
         pageStats.findViewById<View>(R.id.card_ach).setOnClickListener { showAchievements() }
         pageStats.findViewById<View>(R.id.card_mah).setOnClickListener { onMahCardClick() }
         pageStats.findViewById<View>(R.id.btn_gallery).setOnClickListener { showSkinGallery() }
-        pageStats.findViewById<View>(R.id.btn_week_share).setOnClickListener { shareWeekReport() }
+        pageStats.findViewById<View>(R.id.btn_week_share).setOnClickListener { shareWeekPoster() }
         pageStats.findViewById<View>(R.id.btn_prev).setOnClickListener {
             if (listPage > 0) {
                 listPage--
@@ -1033,42 +1197,6 @@ private fun showSkinGallery() {
             listPage++
             renderList()
         }
-
-    }
-
-    /** 每日分享任务：每天首次分享 +30 成长值（精灵成长值 = 听剧分钟 + 分享奖励） */
-    private fun sharePetStats() {
-        val sessions = SessionLog.sessions(this)
-        val allMs = sessions.sumOf { it.durationMs }
-        val mah = Stats.estimatedMah(allMs)
-        val pet = pageStats.findViewById<PetView>(R.id.pet_view)
-        val text = getString(R.string.share_text, fmtDur(allMs), mah, PetView.stageName(this, pet.stage))
-        startActivity(
-            Intent.createChooser(
-                Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, text)
-                },
-                getString(R.string.share_chooser)
-            )
-        )
-        // 每日任务结算：每天仅一次
-        val prefs = prefs()
-        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-            .format(java.util.Date())
-        val last = prefs.getString(Prefs.LAST_SHARE_DATE, "")
-        if (last != today) {
-            prefs.edit().putString(Prefs.LAST_SHARE_DATE, today).apply()
-            EnergyStore.add(this, SHARE_GP_PER_DAY) // 分享产生待收成长值
-            Toast.makeText(
-                this,
-                getString(R.string.toast_share_done, SHARE_GP_PER_DAY),
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            Toast.makeText(this, getString(R.string.toast_share_claimed), Toast.LENGTH_SHORT).show()
-        }
-        renderStats()
     }
 
     /** 成长值体系：成长值=已收集能量；听剧/分享产生能量球待收集（3天过期） */
@@ -1499,7 +1627,7 @@ private fun showSkinGallery() {
         page.findViewById<TextView>(R.id.update_value).text = getString(R.string.update_value_fmt, BuildConfig.VERSION_NAME)
 
         // 分享给朋友（计入每日分享任务）
-        page.findViewById<View>(R.id.row_share).setOnClickListener { sharePetStats() }
+        page.findViewById<View>(R.id.row_share).setOnClickListener { shareAllTime() }
 
         // 关于（二级页面：介绍/隐私/开源/许可）
         page.findViewById<View>(R.id.row_about).setOnClickListener {

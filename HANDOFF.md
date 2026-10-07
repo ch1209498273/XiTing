@@ -2,7 +2,7 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-07 · 对应提交 `见 git log（成就徽章化一轮）`
+> 最后更新：2026-10-07 · 对应提交 `v3.6.0`（tag / GitHub Release / 蒲公英）
 
 ---
 
@@ -11,9 +11,9 @@
 `D:\AI任务\zcode\息屏听剧` —— OPPO/ColorOS 的「息屏听剧」App。
 
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**背光物理关闭**）而声音继续。
-纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 655 KB。
+纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 294 KB。
 
-- 包名 `com.lujinyu.xiting`，versionCode 73 / versionName 3.5.0
+- 包名 `com.lujinyu.xiting`，versionCode 74 / versionName 3.6.0
 - `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节）**
 - 源码约 5200 行 Kotlin，单模块
 

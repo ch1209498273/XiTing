@@ -2,7 +2,8 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-07 · 对应提交 `v3.6.0`（tag / GitHub Release / 蒲公英）
+> 最后更新：2026-10-08 · v3.6.0 已发布（tag / GitHub Release / 蒲公英）；
+> 其后又修了悬浮球形状随语言变形、海报头部重叠等，见 git log。
 
 ---
 
@@ -452,33 +453,36 @@ OPPO PME110 / Android 16（API 36）实测确认：
 
 ## 七、其它待办（按优先级）
 
+> 2026-10-08 核对过：lint 已降到 **3 警告 / 0 错误**；下方数字均已更新。
+
 **高**
 
-- `PetView`(857行) 与 `BubblePetView`(321行) **各写一遍同一套 5 形态 + `drawFace`**。
-  改剪影就得手动同步两处——今晚已经吃过一次亏（图鉴大图不跟随选择、以及改形态要改两处）。
-  应抽出公共渲染器（形如 `PetRenderer.draw(canvas, stage, cx, cy, r, pal, t, …)`，
-  两个 View 只管尺寸与动画）。本轮的复用对象（shaderCache / scratchRect）也是各存一份。
+- `PetView`(947行) 与 `BubblePetView`(370行) **各写一遍同一套 5 形态 + `drawFace`**。
+  改剪影必须手动同步两处（2026-10-07 吃过一次亏：图鉴大图不跟随选择）。
+  ⚠️ 但「抽公共渲染器」**评估后决定暂不做**（2026-10-08）：两者动画参数是刻意分开的
+  （火花自转 0.3 vs 0.5、呼吸频率 3 vs 2.2，悬浮球另做了尺寸简化），合并会改变观感。
+  若将来要做，先设计好「哪些参数随尺寸缩放、哪些保持各自风格」。
 - 成就弹窗已改成徽章卡片，但**从未在真机上看过**（只改未验）。
   弹窗里点某个成功能不能也高亮精灵身上对应那一格（当前只展示、不联动）。
-- 「持之以恒」口径：实现用的是**累计不同日期数 ≥ 7**，与设计表的「连续 7 天」
-  以及界面上的连续天数是两套口径。代码与文案自洽（非 bug），但待用户拍板。
-  ⚠️ `ach_unlocked` 是只增不减的持久化集合，改口径不会让已点亮的消失。
+- 「持之以恒」口径：实现用**累计不同日期数 ≥ 7**，设计表写的是「连续 7 天」，
+  与界面上另有的一套连续天数统计并不一致。代码与文案自洽（非 bug），待用户拍板。
+  ⚠️ `ach_unlocked` 只增不减，改口径不会让已点亮的消失。
+- 省电实测（被动差值版）**还没有真实数据**：需要不插电正常使用几天
+  （期间做几次息屏听剧）才能验证采样真的在积累。入口：统计页「省电估算」卡片。
 
 **中**
 
-- `MainActivity` 1255 行 / 36 个函数，三个页面的 UI 挤在一个类里。
-  `showSkinGallery` 里还有三层嵌套局部函数（`rebuildRows` / `refreshPreview` …）。
+- `MainActivity` 1614 行。拆 class 评估过（2026-10-08）：涉及大量 lateinit 视图
+  引用与跨页调用（`refreshStates` 刷三页、`bindHome` 调设置区函数），
+  收益低于回归风险，暂缓。
 - `gradle test` 的根治：项目路径含中文，每次测试要镜像到 temp（30s+）。
   把项目移到纯 ASCII 路径即可根治（用户尚未决定）。
-- `PetView` 各形态弧线处约 15 处每帧 `RectF` 分配（收益递减，未动）。
+- 分享海报升级（已调研，见 `docs/分享功能升级方案.md`）：多比例（1:1 / 9:16）、
+  二维码、版式声明化、内置字体。均待用户拍板后实施。
 
 **低**
 
 - VIBRATE 权限已加，但**触觉反馈是否真的被系统接受未在真机验证**
-- 剩余死代码清理（lint `UnusedResources` 仍有条目）
-- `BackupManager.findBackup` 已接通；`Stats.totals` / `xiiting_stats` 已随 `addDelta` 一并移除
-- 项目根目录有个遗留的目录联接 `D:\xt_projectsym`（指向本项目，诊断实验产物），
-  需手动 `rmdir D:\xt_projectsym`（PowerShell 直接删会报错）
-- lint 剩下的 104 个 warning 里 `HardcodedText` 34 个、`PluralsCandidate` 13 个，
-  优先级低；`BatteryLife`(REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) 对 Play 政策有风险，
-  但当前渠道是酷安/应用宝/GitHub，不受影响
+- `D:\xt_projectsym` junction（诊断实验产物）：**用户已拒绝删除**，不再处理。
+- lint 3 条警告全是 `build_stamp` 的 UnusedResources 误报（Gradle 注入的溯源字段，
+  lint 看不到引用），已在 `lint.xml` 写明理由。

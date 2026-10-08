@@ -308,7 +308,7 @@ Achievements.evaluate(this, sessions.size, maxMs, listenDays, stageNow)
 
 ---
 
-## 五、十个会绊倒人的坑
+## 五、十二个会绊倒人的坑
 
 ### 1. `gradle test` 在这个路径下跑不了（必须用脚本）
 
@@ -412,6 +412,28 @@ Get-ChildItem app\src\main\res -Directory | ForEach-Object { Remove-Item $_.Full
 而本项目零第三方依赖，编译直接报 `Unresolved reference`。
 框架只提供 `@SuppressLint` / `@TargetApi` / `@IntDef` 等少数几个。
 需要「声明版本要求 + 消 lint」时用 `@SuppressLint("NewApi")`。
+
+### 11. 固定尺寸控件 + 变长译文 = 形状漂移（2026-10-08 踩过）
+
+悬浮球用 `minWidth=48dp` + `OvalShape` 背景 + `WRAP_CONTENT` 文字。
+`OvalShape` 会**填满视图边界**，而文字宽度随语言变化：
+
+    中文「息屏」             26dp -> minWidth 撑到 48dp -> 正圆
+    俄语「Выключенный экран」 115dp -> 扁胶囊
+
+**加语言时要逐个检查固定尺寸控件**，不能只在中文下看：悬浮球、
+图标旁的标签、小部件格子、按钮。修法是把尺寸写死（`layoutParams(size, size)`），
+并把译文压进容量内（本例 48dp / 13sp ≈ 3 个全角字）。
+
+### 12. 画布上两个文本分列左右时必须互相让位
+
+分享海报顶栏左边品牌名、右边形态名。中文下「息屏听剧」才 4 字，看着很宽敞；
+西语品牌名「Escucha con pantalla apagada」40f 约 650px + 形态名
+「Espíritu de tempestad」36f 约 393px = 1043px，而可用宽只有 936px —— **重叠**。
+
+画布上的固定坐标排版**不能假定文本长度**。要么先量宽度再逐档缩小，
+要么两行堆叠。另：截断别用 `TextUtils.ellipsize`（要 `TextPaint`，
+传普通 `Paint` 直接编译不过），用 `Paint.breakText` 按宽度算字符数。
 
 ## 六、已做过的真机验证结论（别重复劳动）
 

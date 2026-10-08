@@ -664,7 +664,8 @@ private fun showSkinGallery() {
             preview.setImageBitmap(
                 PetSkins.snapshot(this, curForm, curSkin, (110 * d).toInt(), withBar = false, pct = 0)
             )
-            previewLabel.text = "${PetView.stageName(this, curForm)} · ${PetSkins.name(this, curSkin)}"
+            previewLabel.text =
+                getString(R.string.name_pair_fmt, PetView.stageName(this, curForm), PetSkins.name(this, curSkin))
             val maxed = curForm >= PetForm.unlockedStage(this)
             growthHint.text = if (maxed) getString(R.string.gallery_form_maxed)
             else getString(R.string.gallery_form_next, PetForm.requiredFor(curForm + 1))

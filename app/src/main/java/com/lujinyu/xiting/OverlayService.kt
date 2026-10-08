@@ -420,8 +420,15 @@ class OverlayService : Service() {
                 textSize = 13f
                 setTextColor(Color.WHITE)
                 gravity = Gravity.CENTER
-                minWidth = size
-                minHeight = size
+                // ⚠ 必须是**固定正方**，不能用 minWidth/minHeight：
+                // 背景是 OvalShape，它会填满视图边界 —— 而文字是 WRAP_CONTENT，
+                // 于是球的形状会随文案长度变形：中文「息屏」是正圆，
+                // 英语「Screen off」成椭圆，俄语「Выключенный экран」直接拉成扁胶囊。
+                // 悬浮球是全天在屏的元件，形状漂移很显眼。
+                // 配套约束：各语言的 bubble_label_plain 必须短（≤ 3 个全角字 / 6 个半角字符）。
+                layoutParams = android.view.ViewGroup.LayoutParams(size, size)
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
                 val bg = ShapeDrawable(OvalShape())
                 bg.paint.color = 0xB3000000.toInt()
                 background = bg

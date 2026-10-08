@@ -296,7 +296,9 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="cd_prev_episode">前の話</string>
     <string name="cd_play_pause">再生 / 一時停止</string>
     <string name="cd_next_episode">次の話</string>
-    <string name="bubble_label_plain">画面オフ</string>
+    <string name="notif_badge_fmt">🔔 %1$d</string>
+    <string name="name_pair_fmt">%1$s · %2$s</string>
+    <string name="bubble_label_plain">消灯</string>
     <string name="notif_timer_fmt">· %1$d分後に終了</string>
     <string name="dlg_got_it">了解</string>
     <string name="poster_preview_save">保存</string>

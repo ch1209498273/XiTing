@@ -85,16 +85,45 @@ object SharePoster {
         p.shader = null
 
         // ---- 顶栏 ----
+        // ⚠ 两个文本分列左右，**必须互相让位**。
+        // 西班牙语的品牌名「Escucha con pantalla apagada」（原 40f）配上
+        // 形态名「Espíritu de tempestad」（原 36f）合计约 1043px，
+        // 而画布可用宽度只有 936px（1080 减左右各 72）—— 会直接在中间重叠。
+        // 中文下看不到（品牌名「息屏听剧」才 4 字），纯中文验证时漏掉的就是这类。
         p.typeface = android.graphics.Typeface.DEFAULT_BOLD
-        p.textSize = 40f
+        p.textSize = BRAND_SIZE
         p.color = 0xFFFFFFFF.toInt()
         p.textAlign = Paint.Align.LEFT
-        c.drawText(ctx.getString(R.string.poster_brand), PAD.toFloat(), 116f, p)
+        val brand = ctx.getString(R.string.poster_brand)
+        val brandW = p.measureText(brand)
+        c.drawText(brand, PAD.toFloat(), 116f, p)
+
         p.typeface = android.graphics.Typeface.DEFAULT
-        p.textSize = 36f
         p.color = 0xCCFFFFFF.toInt()
         p.textAlign = Paint.Align.RIGHT
-        c.drawText(d.stageName, (W - PAD).toFloat(), 116f, p)
+        // 品牌优先保留，形态名用剩余宽度：先逐档缩小，仍放不下再截断。
+        val availStage = (W - PAD * 2) - brandW - HEADER_GAP
+        var stageSize = STAGE_SIZE
+        while (stageSize > STAGE_MIN_SIZE) {
+            p.textSize = stageSize
+            if (p.measureText(d.stageName) <= availStage) break
+            stageSize -= 2f
+        }
+        p.textSize = stageSize
+        val stageText = if (p.measureText(d.stageName) <= availStage) {
+            d.stageName
+        } else {
+            // 缩到下限还放不下（极端长词）：按可用宽度截断并加省略号。
+            // ⚠ 不用 TextUtils.ellipsize —— 它要求第二个参数是 TextPaint，
+            // 而这里只有一个普通 Paint（用它会直接编译不过）。
+            // Paint.breakText 能算出「多少字符恰好塞进 maxWidth」，不必新建画具、
+            // 也就不会引入两套度量差异。
+            val ell = "…"
+            val budget = (availStage - p.measureText(ell)).coerceAtLeast(10f)
+            val n = p.breakText(d.stageName, true, budget, null)
+            d.stageName.substring(0, n.coerceIn(1, d.stageName.length)) + ell
+        }
+        c.drawText(stageText, (W - PAD).toFloat(), 116f, p)
 
         // ---- 主角：精灵 + 背后径向光晕 ----
         val glowCx = W / 2f
@@ -196,6 +225,14 @@ object SharePoster {
     private const val ROW_H = 76f
     /** 数字与单位之间的间距 */
     private const val GAP = 16f
+    /** 顶栏：品牌名字号 */
+    private const val BRAND_SIZE = 40f
+    /** 顶栏：形态名字号（放不下时会逐档缩到 STAGE_MIN_SIZE） */
+    private const val STAGE_SIZE = 36f
+    /** 顶栏：形态名的下限字号，再小就不读了，改用截断 */
+    private const val STAGE_MIN_SIZE = 22f
+    /** 顶栏：品牌名与形态名之间至少留出的空白 */
+    private const val HEADER_GAP = 24f
 
     private class HeadSizes(val num: Float, val unit: Float, val numW: Float, val unitW: Float)
 

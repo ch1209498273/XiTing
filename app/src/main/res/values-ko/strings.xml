@@ -296,7 +296,9 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="cd_prev_episode">이전 편</string>
     <string name="cd_play_pause">재생 / 일시정지</string>
     <string name="cd_next_episode">다음 편</string>
-    <string name="bubble_label_plain">화면 끄기</string>
+    <string name="notif_badge_fmt">🔔 %1$d</string>
+    <string name="name_pair_fmt">%1$s · %2$s</string>
+    <string name="bubble_label_plain">끄기</string>
     <string name="notif_timer_fmt">· %1$d분 후 종료</string>
     <string name="dlg_got_it">확인</string>
     <string name="poster_preview_save">저장</string>

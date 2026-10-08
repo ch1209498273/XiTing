@@ -302,7 +302,10 @@
     <string name="battery_fmt">电量 %1$d%%</string>
     <string name="cd_prev_episode">上一集</string>
     <string name="cd_play_pause">播放/暂停</string>
-    <string name="cd_next_episode">下一集</string>
+    <string name="cd_next_episode">下一集</string>    <!-- 格式化串，避免在代码里拼字符串（lint SetTextI18n）。
+         name_pair 的分隔符「·」是语言中性的，各语言保持一致。 -->
+    <string name="notif_badge_fmt">🔔 %1$d</string>
+    <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">息屏</string>
     <string name="notif_timer_fmt"> · 定时%1$d分钟后关闭</string>
     <string name="dlg_got_it">知道了</string>

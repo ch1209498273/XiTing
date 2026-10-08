@@ -237,7 +237,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         badgeListener = { n ->
             main.post {
                 if (n > 0) {
-                    badge.text = "🔔 $n"
+                    // 用格式串而不是字符串模板：lint SetTextI18n，也与其它文案一致
+                    badge.text = context.getString(R.string.notif_badge_fmt, n)
                     badge.visibility = View.VISIBLE
                 } else {
                     badge.visibility = View.GONE

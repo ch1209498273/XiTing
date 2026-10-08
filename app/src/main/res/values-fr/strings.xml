@@ -296,7 +296,9 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="cd_prev_episode">Épisode précédent</string>
     <string name="cd_play_pause">Lecture / pause</string>
     <string name="cd_next_episode">Épisode suivant</string>
-    <string name="bubble_label_plain">Écran off</string>
+    <string name="notif_badge_fmt">🔔 %1$d</string>
+    <string name="name_pair_fmt">%1$s · %2$s</string>
+    <string name="bubble_label_plain">Off</string>
     <string name="notif_timer_fmt">· extinction dans %1$d min</string>
     <string name="dlg_got_it">J\'ai compris</string>
     <string name="poster_preview_save">Enregistrer</string>

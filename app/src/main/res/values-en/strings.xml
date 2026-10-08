@@ -259,7 +259,9 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="cd_prev_episode">Previous episode</string>
     <string name="cd_play_pause">Play / pause</string>
     <string name="cd_next_episode">Next episode</string>
-    <string name="bubble_label_plain">Screen off</string>
+    <string name="notif_badge_fmt">🔔 %1$d</string>
+    <string name="name_pair_fmt">%1$s · %2$s</string>
+    <string name="bubble_label_plain">Off</string>
     <string name="notif_timer_fmt">· turns off in %1$d min</string>
     <string name="dlg_got_it">Got it</string>
     <string name="poster_preview_save">Save</string>

@@ -1704,7 +1704,7 @@ private fun showSkinGallery() {
                 }
             )
             pageSettings.findViewById<TextView>(R.id.bubble_style_value).text =
-                "${PetView.stageName(this, stage)} · ${PetSkins.name(this, skin)}"
+                getString(R.string.name_pair_fmt, PetView.stageName(this, stage), PetSkins.name(this, skin))
         } else {
             box.addView(
                 TextView(this).apply {

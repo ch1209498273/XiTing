@@ -9,6 +9,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.res.Configuration
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
@@ -116,7 +117,7 @@ class OverlayService : Service() {
                     cancelLongPress()
                     refreshNotification()
                     try {
-                        Toast.makeText(this, getString(R.string.toast_call), Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, lstr(R.string.toast_call), Toast.LENGTH_LONG).show()
                     } catch (_: Exception) {}
                 }
             }
@@ -233,7 +234,7 @@ class OverlayService : Service() {
                 // hideAllBlack() 内部已经 refreshNotification()（修小组件漏刷新那次加的），
                 // 不要再调一次
                 hideAllBlack()
-                Toast.makeText(this@OverlayService, getString(R.string.toast_headset), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@OverlayService, lstr(R.string.toast_headset), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -264,6 +265,39 @@ class OverlayService : Service() {
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLocales.wrap(newBase))
+    }
+
+    // ---------- 语言随切随新 ----------
+    //
+    // 服务是长生命周期组件：attachBaseContext 只在进程创建时跑一次。用户之后切
+    // 语言（per-app locale 变化）时，已经建好的球/通知不会自己更新 —— 文案在
+    // 创建那一刻 getString 出来就定死了。对策两件套：
+    // 1. 面向用户的文案一律走 lstr()：调用点当场 wrap 一次，永远取当前语言；
+    // 2. 语言切换会回调 onConfigurationChanged，就地重建球/通知/渠道名。
+    // （AppLocales.wrap 在 API 33+ 直接读系统 LocaleManager、低版本读 pref，
+    //   两种路径都能拿到最新值。）
+
+    /** 最近一次见到的语言列表；只认语言变化，不因深色模式/字体缩放重建 UI */
+    private var lastLocales: String? = null
+
+    /** 取文案（实时语言）。服务内面向用户的字符串都从这里走。 */
+    private fun lstr(id: Int, vararg args: Any?): String =
+        AppLocales.wrap(this).getString(id, *args)
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val now = newConfig.locales.toLanguageTags()
+        if (lastLocales != null && lastLocales != now) {
+            refreshLocale()
+        }
+        lastLocales = now
+    }
+
+    /** 语言切换后调用：把常驻的系统级文案（球/通知/渠道名）换成当前语言 */
+    fun refreshLocale() {
+        createChannel()
+        rebuildBubble()
+        refreshNotification()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -302,6 +336,7 @@ class OverlayService : Service() {
     main.removeCallbacks(powerTick)
     main.postDelayed(powerTick, 60_000)
         prefs = prefs()
+        lastLocales = resources.configuration.locales.toLanguageTags()
         prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, true).apply()
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
@@ -416,17 +451,14 @@ class OverlayService : Service() {
             }
         } else {
             TextView(this).apply {
-                text = getString(R.string.bubble_label_plain)
+                text = lstr(R.string.bubble_label_plain)
                 textSize = 13f
                 setTextColor(Color.WHITE)
                 gravity = Gravity.CENTER
-                // ⚠ 必须是**固定正方**，不能用 minWidth/minHeight：
-                // 背景是 OvalShape，它会填满视图边界 —— 而文字是 WRAP_CONTENT，
-                // 于是球的形状会随文案长度变形：中文「息屏」是正圆，
-                // 英语「Screen off」成椭圆，俄语「Выключенный экран」直接拉成扁胶囊。
-                // 悬浮球是全天在屏的元件，形状漂移很显眼。
+                // 形状由窗口的固定正方尺寸保证（见下方 lp 的创建处）：
+                // 窗口 48dp 见方 + OvalShape 背景 = 正圆，不随译文长度变形。
+                // 这里只负责单行显示，超长译文截断而不是把圆撑成椭圆。
                 // 配套约束：各语言的 bubble_label_plain 必须短（≤ 3 个全角字 / 6 个半角字符）。
-                layoutParams = android.view.ViewGroup.LayoutParams(size, size)
                 maxLines = 1
                 ellipsize = android.text.TextUtils.TruncateAt.END
                 val bg = ShapeDrawable(OvalShape())
@@ -436,8 +468,14 @@ class OverlayService : Service() {
         }
 
         val lp = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
+            // ⚠️ 窗口必须是**固定正方（size×size）**，不能用 WRAP_CONTENT：
+            // 背景是 OvalShape（椭圆填满视图边界），WRAP_CONTENT 下窗口尺寸会随译文长度变化，
+            // 实测俄语「Выкл」得到 93x53px 扁椭圆，而非应有的 48dp 正方形（本机 144x144px）。
+            // ⚠️ 固定尺寸必须设在**这里（窗口参数）**，不能设在 view.layoutParams ——
+            // `wm.addView(tv, lp)` 会用 lp 覆盖掉 view 自己的 layoutParams，设了也是白设。
+            // 精灵模式 BubblePetView.onMeasure 自测量到 48dp，与此值一致。
+            size,
+            size,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
@@ -608,13 +646,13 @@ class OverlayService : Service() {
             setPadding((14 * d).toInt(), (10 * d).toInt(), (10 * d).toInt(), (10 * d).toInt())
         }
         pill.addView(TextView(this).apply {
-            text = getString(R.string.exit_confirm_title)
+            text = lstr(R.string.exit_confirm_title)
             setTextColor(android.graphics.Color.WHITE)
             textSize = 13f
             setPadding(0, 0, (14 * d).toInt(), 0)
         })
         pill.addView(TextView(this).apply {
-            text = getString(R.string.exit_confirm_yes)
+            text = lstr(R.string.exit_confirm_yes)
             setTextColor(android.graphics.Color.rgb(255, 120, 110))
             textSize = 14f
             typeface = android.graphics.Typeface.DEFAULT_BOLD
@@ -622,7 +660,7 @@ class OverlayService : Service() {
             setOnClickListener { hideExitConfirm(); exitAssistant() }
         })
         pill.addView(TextView(this).apply {
-            text = getString(R.string.dlg_cancel)
+            text = lstr(R.string.dlg_cancel)
             setTextColor(android.graphics.Color.parseColor("#9FB0D0"))
             textSize = 13f
             setPadding((6 * d).toInt(), (6 * d).toInt(), (6 * d).toInt(), (6 * d).toInt())
@@ -693,10 +731,10 @@ class OverlayService : Service() {
         )
         val n = Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
-            .setContentTitle(getString(R.string.exit_notif_title))
-            .setContentText(getString(R.string.exit_notif_text))
+            .setContentTitle(lstr(R.string.exit_notif_title))
+            .setContentText(lstr(R.string.exit_notif_text))
             .setContentIntent(undoPi)
-            .addAction(0, getString(R.string.exit_notif_undo), undoPi)
+            .addAction(0, lstr(R.string.exit_notif_undo), undoPi)
             .setAutoCancel(true)
             .build()
         try {
@@ -719,9 +757,9 @@ class OverlayService : Service() {
             timerEndAt = 0
             if (isAnyBlackShowing()) {
                 hideAllBlack()
-                Toast.makeText(this, getString(R.string.toast_timer_done), Toast.LENGTH_LONG).show()
+                Toast.makeText(this, lstr(R.string.toast_timer_done), Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(this, getString(R.string.toast_timer_expired), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, lstr(R.string.toast_timer_expired), Toast.LENGTH_SHORT).show()
             }
             refreshNotification()
         } else {
@@ -740,12 +778,12 @@ class OverlayService : Service() {
         if (timerEndAt > 0) {
             main.postDelayed(timerTick, 15_000)
             if (endAtMs > 0) {
-                Toast.makeText(this, getString(R.string.toast_timer_episode), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, lstr(R.string.toast_timer_episode), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, getString(R.string.toast_timer_set, minutes), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, lstr(R.string.toast_timer_set, minutes), Toast.LENGTH_SHORT).show()
             }
         } else {
-            Toast.makeText(this, getString(R.string.toast_timer_cancelled), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, lstr(R.string.toast_timer_cancelled), Toast.LENGTH_SHORT).show()
         }
         refreshNotification()
     }
@@ -781,7 +819,7 @@ class OverlayService : Service() {
     private fun createChannel() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, getString(R.string.channel_name), NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(CHANNEL_ID, lstr(R.string.channel_name), NotificationManager.IMPORTANCE_LOW)
         )
     }
 
@@ -803,15 +841,15 @@ class OverlayService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val remainMin = timerRemainingMs() / 60000
-        val timerText = if (timerEndAt > 0) getString(R.string.notif_timer_fmt, remainMin + 1) else ""
+        val timerText = if (timerEndAt > 0) lstr(R.string.notif_timer_fmt, remainMin + 1) else ""
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
-            .setContentTitle(getString(R.string.notif_title))
-            .setContentText(getString(R.string.notif_text, timerText))
+            .setContentTitle(lstr(R.string.notif_title))
+            .setContentText(lstr(R.string.notif_text, timerText))
             .setContentIntent(openPi)
-            .addAction(0, getString(R.string.notif_action_stop), exitPi)
-            .addAction(0, getString(if (isAnyBlackShowing()) R.string.notif_action_restore else R.string.notif_action_listen), togglePi)
-            .addAction(0, getString(if (prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false)) R.string.notif_action_bubble_show else R.string.notif_action_bubble_hide), bubblePi)
+            .addAction(0, lstr(R.string.notif_action_stop), exitPi)
+            .addAction(0, lstr(if (isAnyBlackShowing()) R.string.notif_action_restore else R.string.notif_action_listen), togglePi)
+            .addAction(0, lstr(if (prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false)) R.string.notif_action_bubble_show else R.string.notif_action_bubble_hide), bubblePi)
             .setOngoing(true)
             .build()
     }

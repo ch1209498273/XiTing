@@ -165,18 +165,21 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:text="@string/bubble_style"
                     android:textColor="#FF111418"
                     android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/bubble_style_value"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginEnd="10dp"
+                    android:gravity="end|center_vertical"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:text="@string/bubble_value_default"
                     android:textColor="#FF8A9099"
                     android:textSize="13sp" />

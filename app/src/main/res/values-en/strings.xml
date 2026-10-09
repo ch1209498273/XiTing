@@ -188,7 +188,6 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="toast_browser_fail">Cannot open the browser</string>
     <string name="update_value_fmt">Now v%1$s</string>
     <string name="bubble_default">Screen-off (default)</string>
-    <string name="bubble_label_off">Screen-off</string>
     <string name="bubble_value_default">Default</string>
     <string name="unit_h">h</string>
     <string name="unit_m">m</string>

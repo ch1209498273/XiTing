@@ -206,7 +206,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="toast_browser_fail">Не удалось открыть браузер</string>
     <string name="update_value_fmt">v%1$s</string>
     <string name="bubble_default">Выключенный экран (по умолчанию)</string>
-    <string name="bubble_label_off">Выкл. экран</string>
     <string name="bubble_value_default">По умолчанию</string>
     <string name="unit_h">ч</string>
     <string name="unit_m">мин</string>

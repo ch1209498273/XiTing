@@ -206,7 +206,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="toast_browser_fail">No se pudo abrir el navegador</string>
     <string name="update_value_fmt">v%1$s</string>
     <string name="bubble_default">Pantalla apagada (por defecto)</string>
-    <string name="bubble_label_off">Pantalla apagada</string>
     <string name="bubble_value_default">Por defecto</string>
     <string name="unit_h">h</string>
     <string name="unit_m">min</string>

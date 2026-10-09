@@ -206,7 +206,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="toast_browser_fail">브라우저를 열 수 없습니다</string>
     <string name="update_value_fmt">현재 v%1$s</string>
     <string name="bubble_default">화면 끄기(기본)</string>
-    <string name="bubble_label_off">화면 끄기</string>
     <string name="bubble_value_default">기본</string>
     <string name="unit_h">시</string>
     <string name="unit_m">분</string>

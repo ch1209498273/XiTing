@@ -206,7 +206,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="toast_browser_fail">ブラウザを開けませんでした</string>
     <string name="update_value_fmt">現在 v%1$s</string>
     <string name="bubble_default">画面オフ（デフォルト）</string>
-    <string name="bubble_label_off">画面オフ</string>
     <string name="bubble_value_default">デフォルト</string>
     <string name="unit_h">時</string>
     <string name="unit_m">分</string>

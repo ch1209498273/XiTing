@@ -1667,6 +1667,9 @@ private fun showSkinGallery() {
             .setSingleChoiceItems(labels, checked) { d, which ->
                 if (tags[which] != cur) {
                     AppLocales.set(this, tags[which])
+                    // 悬浮球/通知等常驻文案住在服务里，不会自己跟着语言变；
+                    // 主动请服务重建一次系统级文案（配置变更回调之外的双保险）。
+                    OverlayService.instance?.refreshLocale()
                     // 记住当前 tab，recreate() 后回到原处
                     prefs().edit().putInt(Prefs.LAST_TAB, tab).apply()
                     recreate()
@@ -1709,10 +1712,15 @@ private fun showSkinGallery() {
         } else {
             box.addView(
                 TextView(this).apply {
-                    text = getString(R.string.bubble_label_off)
+                    // 预览必须用和真实悬浮球**同一个字符串**：之前用的是 bubble_label_off
+                    // （「Выкл. экран」），而真球用 bubble_label_plain（「Выкл」），
+                    // 于是设置页里看到的是两行字的小椭圆，跟真球对不上。
+                    text = getString(R.string.bubble_label_plain)
                     textSize = 12f
                     setTextColor(0xFFFFFFFF.toInt())
                     gravity = android.view.Gravity.CENTER
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.END
                     val bg = android.graphics.drawable.GradientDrawable().apply {
                         shape = android.graphics.drawable.GradientDrawable.OVAL
                         setColor(0xB3000000.toInt())

@@ -206,7 +206,6 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="toast_browser_fail">Browser nicht zu öffnen</string>
     <string name="update_value_fmt">v%1$s</string>
     <string name="bubble_default">Bildschirm aus (Standard)</string>
-    <string name="bubble_label_off">Bildschirm aus</string>
     <string name="bubble_value_default">Standard</string>
     <string name="unit_h">Std.</string>
     <string name="unit_m">Min.</string>

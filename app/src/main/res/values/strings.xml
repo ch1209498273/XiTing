@@ -222,7 +222,6 @@
     <string name="toast_browser_fail">无法打开浏览器</string>
     <string name="update_value_fmt">当前 v%1$s</string>
     <string name="bubble_default">息屏（默认）</string>
-    <string name="bubble_label_off">息屏</string>
     <string name="bubble_value_default">默认</string>
 
     <!-- 时长单位 -->

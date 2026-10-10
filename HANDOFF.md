@@ -2,9 +2,10 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-10 · v3.6.1 已发布（tag / GitHub Release / 蒲公英）：
-> 多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
-> CI 与一键发版/巡检脚本；当晚 7 语言真机巡检通过。详见 git log。
+> 最后更新：2026-10-10（深夜）· v3.6.1 已发布（tag / GitHub Release / 蒲公英）。
+> v3.6.1 内容：多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
+> CI 与一键发版/巡检脚本；当晚 7 语言真机巡检通过。
+> 其后新增：**深色模式（跟随系统）+ 成就弹窗联动高亮**（已提交 `979ea3e`，未发版）。
 
 ---
 
@@ -314,6 +315,17 @@ Achievements.evaluate(this, sessions.size, maxMs, listenDays, stageNow)
 老用户 prefs 里仍有值，**必须保留读取**，否则他们迁移加成静默归零。
 
 ---
+
+### 深色模式（2026-10-10 新增）
+
+- 颜色全部走语义 token：`values/colors.xml` + `values-night/colors.xml`。
+  **新增任何颜色必须同时补两处**，否则该处夜间会拿日间色（多半刺眼）。
+- 布局里不要再写 `#FFxxxxxx`；绘制代码用 `context.getColor(R.color.x)`。
+- 夜间主题（`values-night/themes.xml`）父主题是 Material 深色 →
+  系统弹窗（AlertDialog 等）自动整套随动。
+- 刻意不随主题：悬浮遮罩 / 桌面小部件 / 分享海报 / 品牌绿卡 ——
+  它们各自成套配色（理由在各自文件注释）。
+- 验证开关：`adb shell cmd uimode night yes|no`（切换后 Activity 会重建）。
 
 ## 五、十三个会绊倒人的坑
 

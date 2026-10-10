@@ -1,0 +1,44 @@
+name: CI
+
+# 每次 push / PR：跑全部单测 + 构建 release APK。
+# 说明：CI 在 ASCII 路径下运行，`gradlew test` 可以直接用（本地中文路径的
+# 镜像脚本只服务于本机）；无 keystore.properties 时 release 自动回落
+# debug 签名（见 app/build.gradle.kts），所以公开仓库 fork 也能构建。
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Unit tests
+        run: ./gradlew test --no-daemon
+
+      - name: Build release APK
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error

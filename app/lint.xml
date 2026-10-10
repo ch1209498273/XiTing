@@ -13,6 +13,13 @@
   而它会占掉一条常驻 error，淹没真正的告警。本项目没有 .properties 源文件，
   屏蔽它没有任何副作用。
 
+  ── UnusedResources（仅 build_stamp）──
+  build_stamp 是 Gradle 注入的**溯源水印**（app/build.gradle.kts 的 resValue）。
+  它刻意与隐藏资产（.trace）、界面页脚（BuildConfig 字段）三处冗余并存 ——
+  设计上就**无任何代码引用**，收到疑似抄袭包时用 tools/trace.py 读它定位来源。
+  lint 对 Gradle 注入资源的引用分析看不到它，属确定性误报。
+  这里只放行 build_stamp 一条（regexp 精准匹配），其他 UnusedResources 照常报告。
+
   ── UnusedAttribute ──
   11 处全来自 widget_info*.xml 的 targetCellWidth / previewLayout /
   widgetFeatures —— 这些属性只在 API 28/31+ 生效，而 minSdk=26。
@@ -68,6 +75,11 @@
 -->
 <lint>
     <issue id="PropertyEscape" severity="ignore" />
+
+    <!-- 溯源水印：设计上就无代码引用（资源表冗余，见顶部说明）；只放行 build_stamp -->
+    <issue id="UnusedResources">
+        <ignore regexp="build_stamp" />
+    </issue>
 
     <!-- 误报：minSdk 26 下系统自动忽略，不是缺陷 -->
     <issue id="UnusedAttribute" severity="ignore" />

@@ -2,8 +2,9 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-08 · v3.6.0 已发布（tag / GitHub Release / 蒲公英）；
-> 其后又修了悬浮球形状随语言变形、海报头部重叠等，见 git log。
+> 最后更新：2026-10-10 · v3.6.0 已发布（tag / GitHub Release / 蒲公英）；
+> 其后：多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
+> CI 与一键发版/巡检脚本，详见 git log。
 
 ---
 
@@ -39,11 +40,16 @@
 | `a37569f` / `9d0be03` / `18369b6` | PetView 分配 / WidgetData 渲染门禁 / 移除只写不读的 xiiting_stats |
 | `46fb465` | 首次纳入版本控制 |
 
-**测试基建**：`app/src/test`，**60 个 JVM 单测**（JUnit4 + org.json），覆盖存档与能量的逐条容错、
-整数溢出饱和、成就残留 id 过滤、备份导入限量、徽章映射与徽章列布局、换肤取色规则、
+**测试基建**：`app/src/test`，**109 个 JVM 单测**（JUnit4 + org.json），覆盖存档与能量的逐条容错、
+整数溢出饱和、成就残留 id 过滤与阈值、备份导入限量、徽章映射与徽章列布局、换肤取色规则、
 光晕渐变不变量，以及把 26 个持久化键名钉死。
 
-**APK 体积 159 KB**（2026-10-07 从 660 KB 降下来）。
+**工具链（2026-10-10 起）**：`.github/workflows/ci.yml`（push 自动跑测试 + 构建）、
+`tools/release.ps1`（一键发版：bump → 测试 → 构建 → Release → 蒲公英）、
+`tools/i18n_shot.ps1`（7 语言 × 3 页面截图巡检，cmd locale 免前台切换）、
+`tools/i18n.py`（多语言同步 / 校验）。
+
+**APK 体积约 294 KB**（3.6.x；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
@@ -309,7 +315,7 @@ Achievements.evaluate(this, sessions.size, maxMs, listenDays, stageNow)
 
 ---
 
-## 五、十二个会绊倒人的坑
+## 五、十三个会绊倒人的坑
 
 ### 1. `gradle test` 在这个路径下跑不了（必须用脚本）
 
@@ -414,7 +420,7 @@ Get-ChildItem app\src\main\res -Directory | ForEach-Object { Remove-Item $_.Full
 框架只提供 `@SuppressLint` / `@TargetApi` / `@IntDef` 等少数几个。
 需要「声明版本要求 + 消 lint」时用 `@SuppressLint("NewApi")`。
 
-### 11. 固定尺寸控件 + 变长译文 = 形状漂移（2026-10-08 踩过）
+### 11. 固定尺寸控件 + 变长译文 = 形状漂移（2026-10-08 踩过；10-09 二次修正）
 
 悬浮球用 `minWidth=48dp` + `OvalShape` 背景 + `WRAP_CONTENT` 文字。
 `OvalShape` 会**填满视图边界**，而文字宽度随语言变化：
@@ -423,8 +429,13 @@ Get-ChildItem app\src\main\res -Directory | ForEach-Object { Remove-Item $_.Full
     俄语「Выключенный экран」 115dp -> 扁胶囊
 
 **加语言时要逐个检查固定尺寸控件**，不能只在中文下看：悬浮球、
-图标旁的标签、小部件格子、按钮。修法是把尺寸写死（`layoutParams(size, size)`），
-并把译文压进容量内（本例 48dp / 13sp ≈ 3 个全角字）。
+图标旁的标签、小部件格子、按钮。并把译文压进容量内（本例 48dp / 13sp ≈ 3 个全角字）。
+
+⚠ **修对地方：在窗口参数上，不在 view 上**（2026-10-09 二次修正）。
+第一版把 `view.layoutParams` 设成 `size×size`，真机实测仍是 93×53 扁椭圆 ——
+`wm.addView(tv, lp)` 会用**窗口的 LayoutParams 覆盖掉** view 自己的
+layoutParams，设了也是白设。正确做法是把 `WindowManager.LayoutParams`
+的宽高写成固定 `size, size`（悬浮球实测 48dp × 3.0 密度 = 144×144px 正圆）。
 
 ### 12. 画布上两个文本分列左右时必须互相让位
 
@@ -435,6 +446,16 @@ Get-ChildItem app\src\main\res -Directory | ForEach-Object { Remove-Item $_.Full
 画布上的固定坐标排版**不能假定文本长度**。要么先量宽度再逐档缩小，
 要么两行堆叠。另：截断别用 `TextUtils.ellipsize`（要 `TextPaint`，
 传普通 `Paint` 直接编译不过），用 `Paint.breakText` 按宽度算字符数。
+
+### 13. 服务里的系统级文案不会自己跟着语言变（2026-10-10 踩过）
+
+悬浮球/通知由常驻服务持有，而服务的 `attachBaseContext` 只在进程创建时跑**一次**，
+`getString` 出来的文案在创建那刻就定死了。用户切语言后，Activity 全对、球还是旧语言。
+
+两个对策一起上（`OverlayService`）：
+- 面向用户的字符串统一走 `lstr()`（调用点现包一次 `AppLocales.wrap`，永远取当前语言）；
+- 覆写 `onConfigurationChanged`，语言一变就 `refreshLocale()`（重建球/通知/渠道名）。
+里程碑：语言切换不再需要重启服务，ru↔zh 实测同进程热切。
 
 ## 六、已做过的真机验证结论（别重复劳动）
 
@@ -453,7 +474,7 @@ OPPO PME110 / Android 16（API 36）实测确认：
 
 ## 七、其它待办（按优先级）
 
-> 2026-10-08 核对过：lint 已降到 **3 警告 / 0 错误**；下方数字均已更新。
+> 2026-10-10 核对过：lint **0 警告 / 0 错误**（build_stamp 精准放行）；测试 109；下方数字均已更新。
 
 **高**
 
@@ -464,8 +485,10 @@ OPPO PME110 / Android 16（API 36）实测确认：
   若将来要做，先设计好「哪些参数随尺寸缩放、哪些保持各自风格」。
 - 成就弹窗已改成徽章卡片，但**从未在真机上看过**（只改未验）。
   弹窗里点某个成功能不能也高亮精灵身上对应那一格（当前只展示、不联动）。
-- 「持之以恒」口径：实现用**累计不同日期数 ≥ 7**，设计表写的是「连续 7 天」，
-  与界面上另有的一套连续天数统计并不一致。代码与文案自洽（非 bug），待用户拍板。
+- 真机验证批次（等手机连接，一次性跑）：西语海报头部 · 设置页挤压 · 标题裁切 ·
+  悬浮球还原精灵 · 成就弹窗首验 · 长按振动确认。
+- ✔（2026-10-10 拍板并实现）「持之以恒」= **连续 7 天**：条件用历史最长连续 `best ≥ 7`
+  （`Achievements.shouldUnlock`，达成即追溯解锁；current 会随断签归零）。
   ⚠️ `ach_unlocked` 只增不减，改口径不会让已点亮的消失。
 - 省电实测（被动差值版）**还没有真实数据**：需要不插电正常使用几天
   （期间做几次息屏听剧）才能验证采样真的在积累。入口：统计页「省电估算」卡片。
@@ -479,10 +502,12 @@ OPPO PME110 / Android 16（API 36）实测确认：
   把项目移到纯 ASCII 路径即可根治（用户尚未决定）。
 - 分享海报升级（已调研，见 `docs/分享功能升级方案.md`）：多比例（1:1 / 9:16）、
   二维码、版式声明化、内置字体。均待用户拍板后实施。
+- 深色模式：目前纯浅色（`Theme.Material.Light`、无 values-night）。跟随系统需要
+  过一遍全部布局配色，工程量中等；用户 2026-10-10 表示「都可以做」，待排期。
 
 **低**
 
 - VIBRATE 权限已加，但**触觉反馈是否真的被系统接受未在真机验证**
 - `D:\xt_projectsym` junction（诊断实验产物）：**用户已拒绝删除**，不再处理。
-- lint 3 条警告全是 `build_stamp` 的 UnusedResources 误报（Gradle 注入的溯源字段，
-  lint 看不到引用），已在 `lint.xml` 写明理由。
+- ✔（2026-10-10）lint 归零：`build_stamp` 的 3 条 UnusedResources 在 `lint.xml`
+  里精准放行（regexp 只匹配 build_stamp，其他 UnusedResources 照常报告）。

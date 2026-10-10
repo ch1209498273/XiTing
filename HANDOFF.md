@@ -2,9 +2,9 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-10 · v3.6.0 已发布（tag / GitHub Release / 蒲公英）；
-> 其后：多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
-> CI 与一键发版/巡检脚本，详见 git log。
+> 最后更新：2026-10-10 · v3.6.1 已发布（tag / GitHub Release / 蒲公英）：
+> 多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
+> CI 与一键发版/巡检脚本；当晚 7 语言真机巡检通过。详见 git log。
 
 ---
 
@@ -13,9 +13,9 @@
 `D:\AI任务\zcode\息屏听剧` —— OPPO/ColorOS 的「息屏听剧」App。
 
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**背光物理关闭**）而声音继续。
-纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 294 KB。
+纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 297 KB。
 
-- 包名 `com.lujinyu.xiting`，versionCode 74 / versionName 3.6.0
+- 包名 `com.lujinyu.xiting`，versionCode 75 / versionName 3.6.1
 - `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节）**
 - 源码约 5200 行 Kotlin，单模块
 
@@ -49,7 +49,7 @@
 `tools/i18n_shot.ps1`（7 语言 × 3 页面截图巡检，cmd locale 免前台切换）、
 `tools/i18n.py`（多语言同步 / 校验）。
 
-**APK 体积约 294 KB**（3.6.x；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
+**APK 体积约 297 KB**（3.6.x；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
@@ -485,8 +485,8 @@ OPPO PME110 / Android 16（API 36）实测确认：
   若将来要做，先设计好「哪些参数随尺寸缩放、哪些保持各自风格」。
 - 成就弹窗已改成徽章卡片，但**从未在真机上看过**（只改未验）。
   弹窗里点某个成功能不能也高亮精灵身上对应那一格（当前只展示、不联动）。
-- 真机验证批次（等手机连接，一次性跑）：西语海报头部 · 设置页挤压 · 标题裁切 ·
-  悬浮球还原精灵 · 成就弹窗首验 · 长按振动确认。
+- ✔（2026-10-10 晚）真机验证完成：7 语言 × 3 页截图巡检（i18n_shot 实战）、
+  西语海报（头部+角标）、成就弹窗首验、长按振动（logcat 实证 40ms）、德语统计复验。
 - ✔（2026-10-10 拍板并实现）「持之以恒」= **连续 7 天**：条件用历史最长连续 `best ≥ 7`
   （`Achievements.shouldUnlock`，达成即追溯解锁；current 会随断签归零）。
   ⚠️ `ach_unlocked` 只增不减，改口径不会让已点亮的消失。

@@ -5,7 +5,7 @@
 - **无 INTERNET 权限**：技术上无法联网，不收集、不上传任何信息
 - **零第三方依赖**：纯 Android SDK + Kotlin，无广告、无追踪、无埋点
 - **8 种界面语言**：简中 / English / 日本語 / 한국어 / Deutsch / Français / Español / Русский
-- **安装包 294 KB**（release，已开启 R8 压缩），安装即用
+- **安装包 297 KB**（release，已开启 R8 压缩），安装即用
 
 ---
 

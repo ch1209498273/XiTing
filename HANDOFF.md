@@ -2,10 +2,10 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-10（深夜）· v3.6.1 已发布（tag / GitHub Release / 蒲公英）。
-> v3.6.1 内容：多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
-> CI 与一键发版/巡检脚本；当晚 7 语言真机巡检通过。
-> 其后新增：**深色模式（跟随系统）+ 成就弹窗联动高亮**（已提交 `979ea3e`，未发版）。
+> 最后更新：2026-10-10（深夜）· v3.6.2 已发布（tag / GitHub Release / 蒲公英）。
+> v3.6.2：深色模式（跟随系统）+ 成就弹窗联动高亮。
+> v3.6.1：多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
+> CI 与一键发版/巡检脚本；当晚 7 语言真机巡检通过。详见 git log。
 
 ---
 
@@ -16,7 +16,7 @@
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**背光物理关闭**）而声音继续。
 纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 297 KB。
 
-- 包名 `com.lujinyu.xiting`，versionCode 75 / versionName 3.6.1
+- 包名 `com.lujinyu.xiting`，versionCode 76 / versionName 3.6.2
 - `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节）**
 - 源码约 5200 行 Kotlin，单模块
 
@@ -50,7 +50,7 @@
 `tools/i18n_shot.ps1`（7 语言 × 3 页面截图巡检，cmd locale 免前台切换）、
 `tools/i18n.py`（多语言同步 / 校验）。
 
-**APK 体积约 297 KB**（3.6.x；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
+**APK 体积约 299 KB**（3.6.x；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1

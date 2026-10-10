@@ -160,7 +160,7 @@ Sans autorisation, le compte à rebours normal fonctionne aussi.</string>
     <string name="ach_marathon_t">Marathon</string>
     <string name="ach_marathon_d">1 heure d\'écoute d\'affilée</string>
     <string name="ach_week_t">Régularité</string>
-    <string name="ach_week_d">Écoute sur 7 jours différents</string>
+    <string name="ach_week_d">Écoute sur 7 jours consécutifs</string>
     <string name="ach_king_t">Couronnement</string>
     <string name="ach_king_d">L\'esprit atteint le Roi du tonnerre</string>
     <string name="meas_title">Mesure d\'économie</string>

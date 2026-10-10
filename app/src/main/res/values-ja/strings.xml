@@ -160,7 +160,7 @@
     <string name="ach_marathon_t">マラソン</string>
     <string name="ach_marathon_d">1回の連続視聴で1時間</string>
     <string name="ach_week_t">継続</string>
-    <string name="ach_week_d">7日間にわたって画面オフ記録あり</string>
+    <string name="ach_week_d">7日連続で画面オフ記録あり</string>
     <string name="ach_king_t">雷王の戴冠式</string>
     <string name="ach_king_d">精霊が雷王に進化</string>
     <string name="meas_title">省エネの実測</string>

@@ -94,7 +94,7 @@ ES = {
     "pet_caption_progress": "%1$s · Progreso %2$d / %3$d",
     "ach_c100_t": "Cien veces", "ach_c100_d": "100 pantallas apagadas acumuladas",
     "ach_marathon_t": "Maratón", "ach_marathon_d": "1 hora de escucha seguida",
-    "ach_week_t": "Constancia", "ach_week_d": "Escucha en 7 días distintos",
+    "ach_week_t": "Constancia", "ach_week_d": "Escucha en 7 días consecutivos",
     "ach_king_t": "Coronación", "ach_king_d": "El espíritu alcanza al Rey del Trueno",
     "calib_title": "Medir el ahorro", "calib_btn_restart": "Recalibrar",
     "calib_btn_start": "Iniciar calibración", "calib_btn_close": "Cerrar",

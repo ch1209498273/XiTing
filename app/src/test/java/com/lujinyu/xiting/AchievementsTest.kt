@@ -1,6 +1,7 @@
 package com.lujinyu.xiting
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -90,5 +91,22 @@ class AchievementsTest {
     fun `badgeList 全解锁时全部点亮`() {
         val all = Achievements.ALL.map { it.id }.toSet()
         assertTrue(badgeList(all).all { it.unlocked })
+    }
+
+    // ───────── 2026-10-10 口径拍板：「持之以恒」= 连续 7 天（不再用累计日期数） ─────────
+
+    @Test
+    fun `持之以恒按历史最长连续解锁 边界在 7 天`() {
+        assertFalse("6 天不该亮", Achievements.shouldUnlock(0, 0L, 6, 0).contains("week"))
+        assertTrue("7 天必须亮", Achievements.shouldUnlock(0, 0L, 7, 0).contains("week"))
+        assertTrue("更长的连续也必须亮", Achievements.shouldUnlock(0, 0L, 30, 0).contains("week"))
+    }
+
+    @Test
+    fun `其余三条阈值锚定 马拉松1小时 百次 王者阶段4`() {
+        assertTrue("每项都差一点时一条都不该亮", Achievements.shouldUnlock(99, 3_599_999L, 6, 3).isEmpty())
+        assertTrue("马拉松", "marathon" in Achievements.shouldUnlock(0, 3_600_000L, 0, 0))
+        assertTrue("百次", "c100" in Achievements.shouldUnlock(100, 0L, 0, 0))
+        assertTrue("王者", "king" in Achievements.shouldUnlock(0, 0L, 0, 4))
     }
 }

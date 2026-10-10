@@ -91,7 +91,7 @@ FR = {
     "pet_caption_progress": "%1$s · Progression %2$d / %3$d",
     "ach_c100_t": "Cent fois", "ach_c100_d": "100 écrans off cumulés",
     "ach_marathon_t": "Marathon", "ach_marathon_d": "1 heure d'écoute d'affilée",
-    "ach_week_t": "Régularité", "ach_week_d": "Écoute sur 7 jours différents",
+    "ach_week_t": "Régularité", "ach_week_d": "Écoute sur 7 jours consécutifs",
     "ach_king_t": "Couronnement", "ach_king_d": "L'esprit atteint le Roi du tonnerre",
     "calib_title": "Mesure d'économie", "calib_btn_restart": "Recalibrer",
     "calib_btn_start": "Lancer le calibrage", "calib_btn_close": "Fermer",

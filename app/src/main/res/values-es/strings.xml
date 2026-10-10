@@ -160,7 +160,7 @@ Sin permiso, el temporizador normal también sirve.</string>
     <string name="ach_marathon_t">Maratón</string>
     <string name="ach_marathon_d">1 hora de escucha seguida</string>
     <string name="ach_week_t">Constancia</string>
-    <string name="ach_week_d">Escucha en 7 días distintos</string>
+    <string name="ach_week_d">Escucha en 7 días consecutivos</string>
     <string name="ach_king_t">Coronación</string>
     <string name="ach_king_d">El espíritu alcanza al Rey del Trueno</string>
     <string name="meas_title">Medición de ahorro</string>

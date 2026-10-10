@@ -177,7 +177,7 @@ JA = {
     "ach_marathon_t": "マラソン",
     "ach_marathon_d": "1回の連続視聴で1時間",
     "ach_week_t": "継続",
-    "ach_week_d": "7日間にわたって画面オフ記録あり",
+    "ach_week_d": "7日連続で画面オフ記録あり",
     "ach_king_t": "雷王の戴冠式",
     "ach_king_d": "精霊が雷王に進化",
     "calib_title": "省エネ実測",

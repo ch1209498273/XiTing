@@ -55,16 +55,28 @@ object Achievements {
      */
     fun unlockedIds(ctx: Context): Set<String> = unlocked(ctx).toSet()
 
+    /**
+     * 解锁条件（纯函数，可单测）：依据统计算出「此刻应当点亮」的 id 集合。
+     *
+     * 「持之以恒」= **连续** 7 天（2026-10-10 用户拍板；此前实现误用了「累计不同日期数」，
+     * 与设计意图和文案都不一致）。
+     * 用历史最长连续（best）而不是当前连续（current）：达成那一刻未必有人在开 App 刷统计，
+     * 而 current 会随断签归零；best 让「曾经达成」可追溯解锁（ach_unlocked 本身只增不减）。
+     */
+    internal fun shouldUnlock(count: Int, maxMs: Long, streakBest: Int, stage: Int): Set<String> {
+        val out = HashSet<String>()
+        if (maxMs >= 3_600_000L) out.add("marathon")
+        if (streakBest >= 7) out.add("week")
+        if (count >= 100) out.add("c100")
+        if (stage >= 4) out.add("king")
+        return out
+    }
+
     /** 依据统计评估并持久化，返回本次新解锁的成就（可能为空） */
-    fun evaluate(ctx: Context, count: Int, maxMs: Long, days: Int, stage: Int): List<A> {
-        val cond = mapOf(
-            "marathon" to (maxMs >= 3_600_000L),
-            "week" to (days >= 7),
-            "c100" to (count >= 100),
-            "king" to (stage >= 4)
-        )
+    fun evaluate(ctx: Context, count: Int, maxMs: Long, streakBest: Int, stage: Int): List<A> {
+        val should = shouldUnlock(count, maxMs, streakBest, stage)
         val got = unlocked(ctx)
-        val fresh = ALL.filter { it.id !in got && cond[it.id] == true }
+        val fresh = ALL.filter { it.id in should && it.id !in got }
         if (fresh.isNotEmpty()) {
             got.addAll(fresh.map { it.id })
             ctx.prefs()

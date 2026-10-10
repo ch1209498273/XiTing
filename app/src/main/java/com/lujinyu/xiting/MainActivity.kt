@@ -1394,15 +1394,15 @@ private fun showSkinGallery() {
         // 精灵成就（精灵二期·一期）：依据统计评估解锁并渲染
         val gpNow = EnergyStore.collectedTotal(this)
         val stageNow = PetView.stageOf(gpNow.toLong())
-        // ⚠ 两种「天数」是两回事，别混用：
-        //   · listenDays = **累计**不同日期数 → 「持之以恒」成就
-        //   · streakDays = **连续**天数（Streaks.current）→ 皮肤解锁、首页展示
-        // 两者文案各自描述的是对的，但改一处忘另一处就会不一致。
-        // 这里是「累计」口径，所以用 distinctListenDays 而不是 Streaks.current。
-        val listenDays = Streaks.distinctListenDays(sessions)
+        // streak 先算（成就与皮肤评估都要用）：
+        //   · best    = **历史最长连续**天数 → 「持之以恒」成就（2026-10-10 拍板：真·连续口径）
+        //   · current = **当前连续**天数 → 皮肤解锁、首页展示
+        // ⚠ 成就用 best 而不是 current：达成 7 天那一刻未必有人在刷统计（evaluate 只在刷统计时跑），
+        //   而 current 会随断签归零；best 让「曾经达成」可追溯解锁（ach_unlocked 本身只增不减）。
+        val streakInfo = Streaks.compute(sessions)
         val freshAch = Achievements.evaluate(
             this, sessions.size,
-            sessions.maxOfOrNull { it.durationMs } ?: 0L, listenDays, stageNow
+            sessions.maxOfOrNull { it.durationMs } ?: 0L, streakInfo.best, stageNow
         )
         freshAch.take(2).forEach {
             Toast.makeText(this, getString(R.string.ach_toast_fmt, it.icon, Achievements.title(this, it)), Toast.LENGTH_LONG).show()
@@ -1410,9 +1410,6 @@ private fun showSkinGallery() {
         val (gotCount, achSub) = Achievements.summary(this)
         pageStats.findViewById<TextView>(R.id.ach_title).text = getString(R.string.ach_dlg_title_fmt, gotCount, Achievements.ALL.size)
         pageStats.findViewById<TextView>(R.id.ach_sub).text = achSub
-        // streak（先于皮肤评估：皮肤条件依赖连续天数）
-        val streakInfo = Streaks.compute(sessions)
-
         // 精灵皮肤：应用所穿皮肤的色相
         val petView = pageStats.findViewById<PetView>(R.id.pet_view)
         val activeSkin = PetSkins.active(this)

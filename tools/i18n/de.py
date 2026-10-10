@@ -91,7 +91,7 @@ DE = {
     "pet_caption_progress": "%1$s · Fortschritt %2$d / %3$d",
     "ach_c100_t": "Hundertmal", "ach_c100_d": "100 Mal Bildschirm aus",
     "ach_marathon_t": "Marathon", "ach_marathon_d": "1 Stunde am Stück",
-    "ach_week_t": "Beständig", "ach_week_d": "An 7 verschiedenen Tagen",
+    "ach_week_t": "Beständig", "ach_week_d": "An 7 Tagen in Folge",
     "ach_king_t": "Königskrönung", "ach_king_d": "Wesen wird zum Donnerkönig",
     "calib_title": "Ersparnis messen", "calib_btn_restart": "Neu kalibrieren",
     "calib_btn_start": "Kalibrieren", "calib_btn_close": "Schließen",

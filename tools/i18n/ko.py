@@ -104,7 +104,7 @@ KO = {
     "pet_caption_progress": "%1$s · 성장값 %2$d / %3$d",
     "ach_c100_t": "백 번의 습관", "ach_c100_d": "스크린 오프 누적 100회",
     "ach_marathon_t": "마라톤", "ach_marathon_d": "1회에 1시간 연속 듣기",
-    "ach_week_t": "꾸준히", "ach_week_d": "7일 동안 서로 다른 날짜에 스크린 오프 기록",
+    "ach_week_t": "꾸준히", "ach_week_d": "7일 연속 스크린 오프 기록",
     "ach_king_t": "천왕의 대관식", "ach_king_d": "정령이 천왕으로 진화",
     "calib_title": "절전 실측", "calib_btn_restart": "재보정", "calib_btn_start": "보정 시작",
     "calib_btn_close": "닫기", "calib_step1_title": "보정 1/2 · 화면 켜고 재생",

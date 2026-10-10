@@ -93,7 +93,7 @@ RU = {
     "pet_caption_progress": "%1$s · Прогресс %2$d / %3$d",
     "ach_c100_t": "Сто раз", "ach_c100_d": "100 выключений экрана",
     "ach_marathon_t": "Марафон", "ach_marathon_d": "1 час подряд",
-    "ach_week_t": "Постоянство", "ach_week_d": "Прослушивание в 7 разных дней",
+    "ach_week_t": "Постоянство", "ach_week_d": "Прослушивание 7 дней подряд",
     "ach_king_t": "Коронация", "ach_king_d": "Дух достиг Короля Грома",
     "calib_title": "Измерение экономии", "calib_btn_restart": "Перекалибровать",
     "calib_btn_start": "Начать калибровку", "calib_btn_close": "Закрыть",

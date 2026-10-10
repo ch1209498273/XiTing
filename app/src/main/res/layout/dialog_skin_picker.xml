@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:textSize="15sp"
-            android:textColor="#1E8E5A" />
+            android:textColor="@color/brand" />
 
         <TextView
             android:id="@+id/growth_hint"
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textSize="12sp"
-            android:textColor="#6B7280" />
+            android:textColor="@color/text_secondary" />
     </LinearLayout>
 
     <TextView
@@ -48,7 +48,7 @@
         android:text="@string/gallery_form_label"
         android:textSize="13sp"
         android:textStyle="bold"
-        android:textColor="#6B7280"
+        android:textColor="@color/text_secondary"
         android:paddingBottom="4dp" />
 
     <HorizontalScrollView
@@ -70,7 +70,7 @@
         android:text="@string/gallery_skin_label"
         android:textSize="13sp"
         android:textStyle="bold"
-        android:textColor="#6B7280"
+        android:textColor="@color/text_secondary"
         android:paddingBottom="4dp" />
 
     <HorizontalScrollView

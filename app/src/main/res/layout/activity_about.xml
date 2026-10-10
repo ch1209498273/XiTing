@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF7F8FA"
+    android:background="@color/bg_page"
     android:scrollbars="none">
 
     <LinearLayout
@@ -25,7 +25,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:padding="8dp"
                 android:text="←"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/about_title"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/version_placeholder"
-                android:textColor="#FF5F6570"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/about_section_app"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -86,7 +86,7 @@
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
                 android:text="@string/about_intro"
-                android:textColor="#FF444B54"
+                android:textColor="@color/text_body"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -103,7 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/about_section_privacy"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -113,7 +113,7 @@
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
                 android:text="@string/about_privacy"
-                android:textColor="#FF444B54"
+                android:textColor="@color/text_body"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -130,7 +130,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/about_section_open"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -141,7 +141,7 @@
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
                 android:text="@string/about_github"
-                android:textColor="#FF157A4C"
+                android:textColor="@color/brand_dark"
                 android:textSize="13sp" />
 
             <TextView
@@ -150,7 +150,7 @@
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
                 android:text="@string/about_feedback"
-                android:textColor="#FF5F6570"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
             <TextView
@@ -161,7 +161,7 @@
                 android:lineSpacingExtra="4dp"
                 android:visibility="gone"
                 android:text="@string/about_crash"
-                android:textColor="#FFB4552D"
+                android:textColor="@color/crash_row"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -179,7 +179,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/about_section_license"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -189,7 +189,7 @@
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
                 android:text="@string/about_license"
-                android:textColor="#FF444B54"
+                android:textColor="@color/text_body"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -199,7 +199,7 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="@string/footer_offline"
-            android:textColor="#FFC3C8CF"
+            android:textColor="@color/text_faint"
             android:textSize="12sp" />
     </LinearLayout>
 </ScrollView>

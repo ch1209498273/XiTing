@@ -1,4 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  语义色板（深色模式改造，2026-10-10）。
+
+  规则：
+  1. 日间值在本文件，夜间值在 values-night/colors.xml（名字一一对应）。
+  2. 新增界面颜色时**必须**同时补夜间的值，否则深色模式会拿日间色（多半刺眼/看不清）。
+  3. 布局/绘制代码不要再写死色值，一律从这里取。
+  4. 悬浮遮罩、小部件、海报等「自成一套配色」的表面不在此列（见各自文件的理由）。
+-->
 <resources>
     <color name="ic_launcher_background">#FF12213E</color>
+
+    <!-- 表面 -->
+    <color name="bg_page">#FFF7F8FA</color>
+    <color name="bg_surface">#FFFFFFFF</color>
+    <color name="bg_stats_root">#FFFFFFFF</color>
+
+    <!-- 文本 -->
+    <color name="text_primary">#FF111418</color>
+    <color name="text_secondary">#FF5F6570</color>
+    <color name="text_hint">#FF8A9099</color>
+    <color name="text_body">#FF444B54</color>
+    <color name="text_faint">#FFC3C8CF</color>
+    <color name="text_disabled">#FFB0B5BD</color>
+
+    <!-- 分隔线 -->
+    <color name="divider">#FFECEEF1</color>
+    <color name="divider_soft">#FFF2F4F6</color>
+
+    <!-- 品牌 -->
+    <color name="brand">#FF1E8E5A</color>
+    <color name="brand_dark">#FF157A4C</color>
+
+    <!-- 状态 -->
+    <color name="warn_red">#FFD84315</color>
+    <color name="crash_row">#FFB4552D</color>
+
+    <!-- 胶囊 / 圆底 -->
+    <color name="pill_off_bg">#FFF1F2F4</color>
+    <color name="pill_on_bg">#FFE7F5EE</color>
+    <color name="icon_blue_bg">#FFEAF1FF</color>
+    <color name="icon_green_bg">#FFE6F5EE</color>
+    <color name="icon_orange_bg">#FFFFF3E0</color>
+    <color name="card_selected">#FFF0F9F4</color>
+    <color name="thumb_sel_bg">#FFEAF7F0</color>
+    <color name="thumb_sel_ring">#FF1E8E5A</color>
+
+    <!-- 图表 / 精灵卡片上的绘制元素 -->
+    <color name="chart_stub">#FFE3E6EA</color>
+    <color name="bar_track">#FFECEEF1</color>
+    <color name="pet_warn">#FFE64A19</color>
+    <color name="gold_text">#FFB8860B</color>
+    <color name="pet_help_circle">#FFDDE1E6</color>
 </resources>

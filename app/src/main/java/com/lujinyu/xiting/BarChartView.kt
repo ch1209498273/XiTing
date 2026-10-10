@@ -14,18 +14,18 @@ class BarChartView(context: Context, attrs: AttributeSet?) : View(context, attrs
     private var data: List<Pair<String, Long>> = emptyList() // 标签, 毫秒
 
     private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF1E8E5A.toInt()
+        color = context.getColor(R.color.brand)
     }
     private val stubPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFFE3E6EA.toInt()
+        color = context.getColor(R.color.chart_stub)
     }
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF5F6570.toInt()
+        color = context.getColor(R.color.text_secondary)
         textSize = 26f
         textAlign = Paint.Align.CENTER
     }
     private val valuePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF111418.toInt()
+        color = context.getColor(R.color.text_primary)
         textSize = 24f
         textAlign = Paint.Align.CENTER
     }

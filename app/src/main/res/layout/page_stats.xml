@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFFFF"
+    android:background="@color/bg_stats_root"
     android:scrollbars="none">
 
     <LinearLayout
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="@string/pet_subtitle"
-                android:textColor="#FF5F6570"
+                android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
             <LinearLayout
@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="🔥 —"
-                    android:textColor="#FF1E8E5A"
+                    android:textColor="@color/brand"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -70,7 +70,7 @@
                     android:background="?android:attr/selectableItemBackground"
                     android:padding="6dp"
                     android:text="@string/gallery_btn"
-                    android:textColor="#FF5F6570"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -81,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/stats_hint"
-            android:textColor="#FF5F6570"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp" />
 
         <!-- 三个汇总卡 -->
@@ -108,7 +108,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_today"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="12sp" />
 
                 <TextView
@@ -122,7 +122,7 @@
                     android:autoSizeMinTextSize="12sp"
                     android:autoSizeMaxTextSize="17sp"
                     android:text="@string/dur_min_placeholder"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="17sp"
                     android:textStyle="bold" />
 
@@ -131,7 +131,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/count_placeholder"
-                    android:textColor="#FF5F6570"
+                    android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
 
@@ -152,7 +152,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_week"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="12sp" />
 
                 <TextView
@@ -166,7 +166,7 @@
                     android:autoSizeMinTextSize="12sp"
                     android:autoSizeMaxTextSize="17sp"
                     android:text="@string/dur_min_placeholder"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="17sp"
                     android:textStyle="bold" />
 
@@ -175,7 +175,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/count_placeholder"
-                    android:textColor="#FF5F6570"
+                    android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
 
@@ -195,7 +195,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_total"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="12sp" />
 
                 <TextView
@@ -209,7 +209,7 @@
                     android:autoSizeMinTextSize="12sp"
                     android:autoSizeMaxTextSize="17sp"
                     android:text="@string/dur_min_placeholder"
-                    android:textColor="#FF157A4C"
+                    android:textColor="@color/brand_dark"
                     android:textSize="17sp"
                     android:textStyle="bold" />
 
@@ -218,7 +218,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/count_placeholder"
-                    android:textColor="#FF5F6570"
+                    android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
@@ -253,7 +253,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/sum_mah_default"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -263,7 +263,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:text="@string/sum_extra_default"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
@@ -289,7 +289,7 @@
                     android:id="@+id/week_report_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -299,7 +299,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:lineSpacingExtra="2dp"
-                    android:textColor="#FF5F6570"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -311,7 +311,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:padding="8dp"
                 android:text="@string/week_report_share"
-                android:textColor="#FF1E8E5A"
+                android:textColor="@color/brand"
                 android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -346,7 +346,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ach_progress"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -356,7 +356,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:text="@string/ach_sub_empty"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="11sp" />
             </LinearLayout>
 
@@ -364,7 +364,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="›"
-                android:textColor="#FF8A9099"
+                android:textColor="@color/text_hint"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -381,7 +381,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/chart_title"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -406,7 +406,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/recent_records"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -433,7 +433,7 @@
                     android:background="?android:attr/selectableItemBackground"
                     android:padding="10dp"
                     android:text="@string/pager_prev"
-                    android:textColor="#FF1E8E5A"
+                    android:textColor="@color/brand"
                     android:textSize="13sp" />
 
                 <TextView
@@ -443,7 +443,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="@string/pager_placeholder"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="12sp" />
 
                 <TextView
@@ -453,7 +453,7 @@
                     android:background="?android:attr/selectableItemBackground"
                     android:padding="10dp"
                     android:text="@string/pager_next"
-                    android:textColor="#FF1E8E5A"
+                    android:textColor="@color/brand"
                     android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>

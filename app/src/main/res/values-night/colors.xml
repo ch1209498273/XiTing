@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  深色模式（跟随系统）。与 values/colors.xml 一一对应；
+  新增/修改日间色时**必须**同步这里，否则该处夜间会拿日间色。
+  ic_launcher_background 刻意不在此重定义（图标不随深色模式变）。
+-->
+<resources>
+    <!-- 表面 -->
+    <color name="bg_page">#FF101216</color>
+    <color name="bg_surface">#FF171A1F</color>
+    <color name="bg_stats_root">#FF101216</color>
+
+    <!-- 文本 -->
+    <color name="text_primary">#FFE6E8EB</color>
+    <color name="text_secondary">#FFA8AEB8</color>
+    <color name="text_hint">#FF868D97</color>
+    <color name="text_body">#FFB9BFC8</color>
+    <color name="text_faint">#FF6B7178</color>
+    <color name="text_disabled">#FF5F656D</color>
+
+    <!-- 分隔线 -->
+    <color name="divider">#FF262A31</color>
+    <color name="divider_soft">#FF20242A</color>
+
+    <!-- 品牌（深底上需要更亮一档才立得住） -->
+    <color name="brand">#FF4EB489</color>
+    <color name="brand_dark">#FF3EA579</color>
+
+    <!-- 状态 -->
+    <color name="warn_red">#FFFF8A65</color>
+    <color name="crash_row">#FFE0A080</color>
+
+    <!-- 胶囊 / 圆底 -->
+    <color name="pill_off_bg">#FF262A31</color>
+    <color name="pill_on_bg">#FF1F3A2E</color>
+    <color name="icon_blue_bg">#FF1C2940</color>
+    <color name="icon_green_bg">#FF18342A</color>
+    <color name="icon_orange_bg">#FF3A2E18</color>
+    <color name="card_selected">#FF1D3A2D</color>
+    <color name="thumb_sel_bg">#FF1D3A2D</color>
+    <color name="thumb_sel_ring">#FF4EB489</color>
+
+    <!-- 图表 / 精灵卡片上的绘制元素 -->
+    <color name="chart_stub">#FF2A2F37</color>
+    <color name="bar_track">#FF2A2F37</color>
+    <color name="pet_warn">#FFFF8A65</color>
+    <color name="gold_text">#FFD9A441</color>
+    <color name="pet_help_circle">#FF33383F</color>
+</resources>

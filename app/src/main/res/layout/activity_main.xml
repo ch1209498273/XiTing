@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF7F8FA"
+    android:background="@color/bg_page"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
@@ -10,7 +10,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#FFFFFFFF">
+        android:background="@color/bg_surface">
 
         <TextView
             android:id="@+id/appbar_title"
@@ -24,7 +24,7 @@
             android:autoSizeMinTextSize="12sp"
             android:autoSizeMaxTextSize="18sp"
             android:text="@string/app_name"
-            android:textColor="#FF111418"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -40,14 +40,14 @@
             android:paddingEnd="10dp"
             android:paddingBottom="4dp"
             android:text="@string/status_idle"
-            android:textColor="#FF5F6570"
+            android:textColor="@color/text_secondary"
             android:textSize="11sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_gravity="bottom"
-            android:background="#FFECEEF1" />
+            android:background="@color/divider" />
     </FrameLayout>
 
     <!-- 内容区：三个页签 -->
@@ -74,13 +74,13 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#FFECEEF1" />
+        android:background="@color/divider" />
 
     <!-- 底部导航栏 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:background="#FFFFFFFF"
+        android:background="@color/bg_surface"
         android:orientation="horizontal">
 
         <LinearLayout

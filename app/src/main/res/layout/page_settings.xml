@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF7F8FA"
+    android:background="@color/bg_page"
     android:scrollbars="none">
 
     <LinearLayout
@@ -18,7 +18,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginBottom="8dp"
             android:text="@string/settings_personal"
-            android:textColor="#FF8A9099"
+            android:textColor="@color/text_hint"
             android:textSize="13sp" />
 
         <LinearLayout
@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/switch_direct"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <Switch
@@ -53,7 +53,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
+                android:background="@color/divider_soft" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -66,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/switch_info"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <Switch
@@ -78,7 +78,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
+                android:background="@color/divider_soft" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/switch_media"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <Switch
@@ -103,7 +103,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
+                android:background="@color/divider_soft" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -116,7 +116,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/switch_headset"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <Switch
@@ -128,7 +128,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
+                android:background="@color/divider_soft" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -141,7 +141,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/switch_bubble"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <Switch
@@ -153,7 +153,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
+                android:background="@color/divider_soft" />
 
             <LinearLayout
                 android:id="@+id/row_bubble_style"
@@ -168,7 +168,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/bubble_style"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <TextView
@@ -181,7 +181,7 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:text="@string/bubble_value_default"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="13sp" />
 
                 <LinearLayout
@@ -195,14 +195,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="›"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="16sp" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
+                android:background="@color/divider_soft" />
 
             <LinearLayout
                 android:id="@+id/row_lang"
@@ -223,14 +223,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/lang_title"
-                        android:textColor="#FF111418"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/lang_sub"
-                        android:textColor="#FF8A9099"
+                        android:textColor="@color/text_hint"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -239,14 +239,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="13sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="›"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
@@ -259,7 +259,7 @@
             android:layout_marginTop="18dp"
             android:layout_marginBottom="8dp"
             android:text="@string/settings_data"
-            android:textColor="#FF8A9099"
+            android:textColor="@color/text_hint"
             android:textSize="13sp" />
 
         <LinearLayout
@@ -284,21 +284,21 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/row_export"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/row_export_sub"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="13sp" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
+                android:background="@color/divider_soft" />
 
             <LinearLayout
                 android:id="@+id/row_restore"
@@ -313,14 +313,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/row_restore"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/row_restore_sub"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
@@ -333,7 +333,7 @@
             android:layout_marginTop="18dp"
             android:layout_marginBottom="8dp"
             android:text="@string/settings_about"
-            android:textColor="#FF8A9099"
+            android:textColor="@color/text_hint"
             android:textSize="13sp" />
 
         <LinearLayout
@@ -358,7 +358,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/row_update"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <TextView
@@ -367,21 +367,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:text="@string/update_placeholder"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="13sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="›"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="16sp" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFF2F4F6" />
+                android:background="@color/divider_soft" />
 
             <LinearLayout
                 android:id="@+id/row_share"
@@ -396,7 +396,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/row_share"
-                    android:textColor="#FF111418"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <TextView
@@ -404,7 +404,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/share_sub"
-                    android:textColor="#FF8A9099"
+                    android:textColor="@color/text_hint"
                     android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
@@ -428,14 +428,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/row_about"
-                android:textColor="#FF111418"
+                android:textColor="@color/text_primary"
                 android:textSize="15sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/row_about_sub"
-                android:textColor="#FF8A9099"
+                android:textColor="@color/text_hint"
                 android:textSize="13sp" />
 
             <TextView
@@ -443,7 +443,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:text="›"
-                android:textColor="#FF8A9099"
+                android:textColor="@color/text_hint"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -453,7 +453,7 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="@string/footer_offline"
-            android:textColor="#FFC3C8CF"
+            android:textColor="@color/text_faint"
             android:textSize="12sp" />
     </LinearLayout>
 </ScrollView>

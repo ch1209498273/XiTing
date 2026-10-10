@@ -125,8 +125,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             TAB_STATS -> getString(R.string.title_stats)
             else -> getString(R.string.title_settings)
         }
-        val sel = 0xFF1E8E5A.toInt()
-        val unsel = 0xFF8A9099.toInt()
+        val sel = getColor(R.color.brand)
+        val unsel = getColor(R.color.text_hint)
         tintNav(findViewById(R.id.nav_icon_home), findViewById(R.id.nav_label_home), target == TAB_HOME, sel, unsel)
         tintNav(findViewById(R.id.nav_icon_stats), findViewById(R.id.nav_label_stats), target == TAB_STATS, sel, unsel)
         tintNav(findViewById(R.id.nav_icon_settings), findViewById(R.id.nav_label_settings), target == TAB_SETTINGS, sel, unsel)
@@ -375,11 +375,11 @@ private fun checkRestore() {
         val running = OverlayService.isRunning
         if (running) {
             pillStatus.setBackgroundResource(R.drawable.bg_pill_on)
-            pillStatus.setTextColor(0xFF157A4C.toInt())
+            pillStatus.setTextColor(getColor(R.color.brand_dark))
             pillStatus.text = getString(R.string.status_running)
         } else {
             pillStatus.setBackgroundResource(R.drawable.bg_pill_off)
-            pillStatus.setTextColor(0xFF5F6570.toInt())
+            pillStatus.setTextColor(getColor(R.color.text_secondary))
             pillStatus.text = getString(R.string.status_idle)
         }
         // 主按钮=助手控制：文案随运行状态变化
@@ -412,7 +412,7 @@ private fun checkRestore() {
         if (permError) {
             // 权限表征与实际不一致（重装后 ColorOS）：引导关闭再重新开启悬浮窗
             setPill(pageHome.findViewById(R.id.pill_overlay), false, "", getString(R.string.pill_abnormal))
-            pageHome.findViewById<TextView>(R.id.pill_overlay).setTextColor(0xFFD84315.toInt())
+            pageHome.findViewById<TextView>(R.id.pill_overlay).setTextColor(getColor(R.color.warn_red))
         } else {
             setPill(pageHome.findViewById(R.id.pill_overlay), overlayOk, getString(R.string.pill_on), getString(R.string.pill_off))
         }
@@ -484,7 +484,7 @@ private fun checkRestore() {
     private fun setPill(pill: TextView, on: Boolean, onText: String, offText: String) {
         pill.text = if (on) onText else offText
         pill.setBackgroundResource(if (on) R.drawable.bg_pill_on else R.drawable.bg_pill_off)
-        pill.setTextColor(if (on) 0xFF157A4C.toInt() else 0xFF5F6570.toInt())
+        pill.setTextColor(if (on) getColor(R.color.brand_dark) else getColor(R.color.text_secondary))
     }
 
     /** 听完这集再关：读取正在播放会话的进度，定时到本集片尾（个性化·定时关闭选项） */
@@ -559,7 +559,8 @@ private fun checkRestore() {
         val rows = view.findViewById<LinearLayout>(R.id.ach_rows)
         val d = resources.displayMetrics.density
 
-        for (a in Achievements.ALL) {
+        var dlgRef: android.app.AlertDialog? = null
+        for ((idx, a) in Achievements.ALL.withIndex()) {
             val got = a.id in gotIds
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -579,28 +580,42 @@ private fun checkRestore() {
             }
             textCol.addView(TextView(this).apply {
                 text = Achievements.title(this@MainActivity, a)
-                setTextColor(if (got) 0xFF111418.toInt() else 0xFF8A9099.toInt())
+                setTextColor(if (got) getColor(R.color.text_primary) else getColor(R.color.text_hint))
                 textSize = 15f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
             })
             textCol.addView(TextView(this).apply {
                 text = Achievements.desc(this@MainActivity, a)
-                setTextColor(0xFF8A9099.toInt())
+                setTextColor(getColor(R.color.text_hint))
                 textSize = 12f
             })
             textCol.addView(TextView(this).apply {
                 text = getString(if (got) R.string.ach_row_unlocked else R.string.ach_row_locked)
-                setTextColor(if (got) 0xFF1E8E5A.toInt() else 0xFFB0B5BD.toInt())
+                setTextColor(if (got) getColor(R.color.brand) else getColor(R.color.text_disabled))
                 textSize = 11f
             })
             row.addView(textCol)
+            // 点某条成就 → 关弹窗、回到「精灵可见」处、对应格脉冲一下（1.4s）
+            row.isClickable = true
+            val tv = android.util.TypedValue()
+            if (theme.resolveAttribute(android.R.attr.selectableItemBackground, tv, true)) {
+                row.setBackgroundResource(tv.resourceId)
+            }
+            row.setOnClickListener {
+                dlgRef?.dismiss()
+                (pageStats as? android.widget.ScrollView)?.smoothScrollTo(0, 0)
+                val pet = pageStats.findViewById<PetView>(R.id.pet_view)
+                pet?.postDelayed({ pet.pulseBadge(idx) }, 400)
+            }
             rows.addView(row)
         }
 
-        android.app.AlertDialog.Builder(this)
+        val dlg = android.app.AlertDialog.Builder(this)
             .setView(view)
             .setPositiveButton(getString(R.string.dlg_ok), null)
-            .show()
+            .create()
+        dlgRef = dlg
+        dlg.show()
     }
 
 
@@ -705,7 +720,7 @@ private fun showSkinGallery() {
                     text = if (unlocked) PetView.stageName(this@MainActivity, i)
                            else getString(R.string.gallery_locked_short, PetView.stageName(this@MainActivity, i))
                     textSize = 11f
-                    setTextColor(0xFF6B7280.toInt())
+                    setTextColor(getColor(R.color.text_secondary))
                 })
                 box.setOnClickListener {
                     if (!PetForm.select(this, i)) {
@@ -744,7 +759,7 @@ private fun showSkinGallery() {
                 box.addView(TextView(this).apply {
                     text = if (unlocked) PetSkins.name(this@MainActivity, skin) else "🔒"
                     textSize = 11f
-                    setTextColor(0xFF6B7280.toInt())
+                    setTextColor(getColor(R.color.text_secondary))
                 })
                 box.setOnClickListener {
                     if (!unlocked) {
@@ -1472,7 +1487,7 @@ private fun showSkinGallery() {
         if (visible.isEmpty()) {
             val tv = TextView(this).apply {
                 text = getString(R.string.list_empty)
-                setTextColor(0xFF8A9099.toInt())
+                setTextColor(getColor(R.color.text_hint))
                 textSize = 13f
             }
             sessionList.addView(tv)
@@ -1489,13 +1504,13 @@ private fun showSkinGallery() {
             }
             val left = TextView(this).apply {
                 text = df.format(Date(s.start))
-                setTextColor(0xFF444B54.toInt())
+                setTextColor(getColor(R.color.text_body))
                 textSize = 13f
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
             val right = TextView(this).apply {
                 text = fmtDur(s.durationMs)
-                setTextColor(0xFF111418.toInt())
+                setTextColor(getColor(R.color.text_primary))
                 textSize = 13f
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,

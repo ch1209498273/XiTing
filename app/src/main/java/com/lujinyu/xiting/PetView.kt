@@ -104,6 +104,14 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private var badgeGlowIndex = -1
     private var badgeGlowAt = 0L
 
+    /** 交互高亮：让指定格徽章脉冲一下（成就弹窗点某条时调用，复用新解锁的 glow 通道） */
+    fun pulseBadge(index: Int) {
+        if (index !in badges.indices) return
+        badgeGlowIndex = index
+        badgeGlowAt = System.currentTimeMillis()
+        invalidate()
+    }
+
     // 收集动画内部状态
     private data class FlyBall(val value: Int, val sx: Float, val sy: Float, val startAt: Long)
     private data class Popup(val text: String, val startAt: Long)
@@ -131,17 +139,17 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private val eyePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF2E3B47.toInt() }
     private val starPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFE082.toInt() }
     private val popPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF1E8E5A.toInt()
+        color = context.getColor(R.color.brand)
         textSize = 30f
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
     private val zzzPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF8A9099.toInt()
+        color = context.getColor(R.color.text_hint)
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
-    private val barTrackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFECEEF1.toInt() }
+    private val barTrackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.bar_track) }
     private val barFillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     // ---- onDraw 热路径复用对象 ----
@@ -564,7 +572,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
                 .sumOf { it.value }.coerceAtMost(total)
             val rr = bar.width() / 2f
             // 轨道（常驻显示）
-            barTrackPaint.color = 0xFFECEEF1.toInt()
+            barTrackPaint.color = context.getColor(R.color.bar_track)
             canvas.drawRoundRect(bar, rr, rr, barTrackPaint)
             // 填充（从底部向上，按 200 容量比例）
             val fillH = bar.height() * total / EnergyStore.MAX_PENDING.toFloat()
@@ -589,11 +597,11 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             val w1 = popPaint.measureText(numStr)
             val w2 = popPaint.measureText(maxStr)
             val startX = bar.centerX() - (w1 + w2) / 2f
-            popPaint.color = if (nearing > 0) 0xFFE64A19.toInt() else 0xFFB8860B.toInt()
+            popPaint.color = if (nearing > 0) context.getColor(R.color.pet_warn) else context.getColor(R.color.gold_text)
             canvas.drawText(numStr, startX + w1 / 2f, bar.top - 16f, popPaint)
             popPaint.color = 0xFF9AA1AA.toInt()
             canvas.drawText(maxStr, startX + w1 + w2 / 2f, bar.top - 16f, popPaint)
-            popPaint.color = 0xFF1E8E5A.toInt()
+            popPaint.color = context.getColor(R.color.brand)
             popPaint.textSize = 30f
             // ? 说明图标
             // ⚠️ helpCenter() 内部会调 energyBar()，而 energyBar() 返回的是共享的
@@ -601,13 +609,13 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             // （上一次是上面 maxStr 那行 drawText），所以顺序安全。
             // 以后若在下面新增用到 `bar` 的代码，必须先把它拷进另一个 RectF。
             val (hx, hy) = helpCenter()
-            bodyPaint.color = 0xFFDDE1E6.toInt()
+            bodyPaint.color = context.getColor(R.color.pet_help_circle)
             canvas.drawCircle(hx, hy, 24f, bodyPaint)
-            popPaint.color = 0xFF5F6570.toInt()
+            popPaint.color = context.getColor(R.color.text_secondary)
             popPaint.textSize = 30f
             popPaint.isFakeBoldText = true
             canvas.drawText("?", hx, hy + 10f, popPaint)
-            popPaint.color = 0xFF1E8E5A.toInt()
+            popPaint.color = context.getColor(R.color.brand)
 
             // 飞入动画：从能量条飞向精灵中心
             flyBalls.removeAll { now - it.startAt > 320 }

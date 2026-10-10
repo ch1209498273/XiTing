@@ -113,9 +113,14 @@
 
                 <TextView
                     android:id="@+id/sum_today"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="12sp"
+                    android:autoSizeMaxTextSize="17sp"
                     android:text="@string/dur_min_placeholder"
                     android:textColor="#FF111418"
                     android:textSize="17sp"
@@ -152,9 +157,14 @@
 
                 <TextView
                     android:id="@+id/sum_week"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="12sp"
+                    android:autoSizeMaxTextSize="17sp"
                     android:text="@string/dur_min_placeholder"
                     android:textColor="#FF111418"
                     android:textSize="17sp"
@@ -190,9 +200,14 @@
 
                 <TextView
                     android:id="@+id/sum_all"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="12sp"
+                    android:autoSizeMaxTextSize="17sp"
                     android:text="@string/dur_min_placeholder"
                     android:textColor="#FF157A4C"
                     android:textSize="17sp"

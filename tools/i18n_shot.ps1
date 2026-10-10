@@ -41,7 +41,7 @@ $h = [int]$m.Groups[2].Value
 $tabHome = [int]($w / 6)
 $tabStats = [int]($w / 2)
 $tabSettings = [int]($w * 5 / 6)
-$tabY = $h - 110
+$tabY = $h - 200   # 本机实测：底部选项卡中心 ≈ h-200；h-110 处是三键导航栏（会误触系统键）
 
 Write-Host "先把 App 拉到前台（请确认此刻无人用机）…"
 & $Adb shell "am start -n $pkg/.MainActivity" | Out-Null

@@ -135,8 +135,6 @@ object SharePoster {
         c.drawCircle(glowCx, glowCy, petSize * 0.85f, p)
         p.shader = null
 
-        d.badge?.let { drawBadge(c, p, it, PET_TOP + 6f, hue) }
-
         try {
             val pet = PetSkins.snapshot(ctx, d.stage, d.skin, petSize, withBar = false, pct = 0)
             c.drawBitmap(pet, (W - petSize) / 2f, PET_TOP, null)
@@ -145,6 +143,11 @@ object SharePoster {
             // 精灵画不出来不该让整张海报失败：留白继续，用户仍能分享数字
             Log.w(TAG, "精灵渲染失败，海报留白: $e")
         }
+
+        // 角标必须在精灵**之后**画：精灵头顶的星芒（雷霆之王形态）会伸到角标位置，
+        // 先画角标的话星芒会压在文字上 —— 西语实测「seguidos」被星芒穿成两半。
+        // 放最后 = 胶囊实底盖住星芒，只留星尖从胶囊上缘露出一点（像徽章挂在冠上）。
+        d.badge?.let { drawBadge(c, p, it, PET_TOP + 6f, hue) }
 
         // ---- 主数字 ----
         val headY = PET_TOP + petSize + 172f

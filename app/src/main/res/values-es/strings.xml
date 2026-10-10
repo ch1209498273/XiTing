@@ -241,6 +241,8 @@ Copia de seguridad: automática en la carpeta XiTing de Descargas (solo en el di
 
 Este proyecto no tiene relación con YouTube, Google ni ninguna plataforma de vídeo. Solo para aprender e intercambiar: apoya lo original.</string>
     <string name="about_version_fmt">Versión %1$s · ID de compilación %2$s</string>
+    <string name="about_crash">Registro del último fallo (toca para copiar, mantén pulsado para borrar)</string>
+    <string name="toast_copied">Copiado al portapapeles</string>
     <string name="gallery_title">Bestiario</string>
     <string name="count_placeholder">0 veces</string>
     <string name="dur_min_placeholder">0 min</string>

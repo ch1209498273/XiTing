@@ -241,6 +241,8 @@ https://github.com/ch1209498273/XiTing</string>
 
 본 프로젝트는 YouTube, Google 및 모든 영상 플랫폼과 관련이 없습니다. 학습과 교환만을 위한 것으로, 정품을 지지해 주시기 바랍니다.</string>
     <string name="about_version_fmt">버전 %1$s · 빌드 ID %2$s</string>
+    <string name="about_crash">지난 크래시 로그(탭하여 복사, 길게 눌러 지우기)</string>
+    <string name="toast_copied">클립보드에 복사됨</string>
     <string name="gallery_title">정령 도감</string>
     <string name="count_placeholder">0회</string>
     <string name="dur_min_placeholder">0분</string>

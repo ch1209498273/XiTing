@@ -241,6 +241,8 @@ https://github.com/ch1209498273/XiTing</string>
 
 本プロジェクトは YouTube、Google およびあらゆる動画プラットフォームとは一切関係ありません。学習・交流目的のみを指了指し、正版の支援をお願いします。</string>
     <string name="about_version_fmt">バージョン %1$s · ビルドID %2$s</string>
+    <string name="about_crash">前回のクラッシュログ（タップでコピー、長押しで消去）</string>
+    <string name="toast_copied">クリップボードにコピーしました</string>
     <string name="gallery_title">精霊図鑑</string>
     <string name="count_placeholder">0 回</string>
     <string name="dur_min_placeholder">0分</string>

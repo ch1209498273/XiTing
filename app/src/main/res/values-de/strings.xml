@@ -241,6 +241,8 @@ Backup: automatisch im Ordner XiTing unter Downloads (nur Gerät), nach Neuinsta
 
 Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Plattform. Nur zum Lernen und Austreiben — bitte unterstützt Originale.</string>
     <string name="about_version_fmt">Version %1$s · Build-ID %2$s</string>
+    <string name="about_crash">Letztes Absturzprotokoll (tippen zum Kopieren, lange drücken zum Löschen)</string>
+    <string name="toast_copied">In die Zwischenablage kopiert</string>
     <string name="gallery_title">Wesen-Lexikon</string>
     <string name="count_placeholder">0 Mal</string>
     <string name="dur_min_placeholder">0 Min.</string>

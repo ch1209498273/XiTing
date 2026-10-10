@@ -26,4 +26,6 @@ ES2 = {
     "about_privacy": "· Sin permiso INTERNET: físicamente no puede conectarse\n· No lee el contenido de la pantalla\n· Todos los datos se quedan en el dispositivo (copia en la nube y transferencia automática desactivadas)\n· La copia solo se escribe al pulsar Exportar, en Descargas/XiTing, y la gestionas tú\n· Solo se cuentan las notificaciones (para el indicador de la pantalla negra) tras tu permiso explícito; nunca se lee el título ni el contenido, y sin permiso la función no se activa\n· La app incluye una identificación de compilación (ID y canal), solo para rastrear copias piratas, sin información del dispositivo\n· Sin anuncios, sin rastreo, sin telemetría",
     "about_github": "GitHub: github.com/ch1209498273/XiTing\n(pulsa para abrir la página del proyecto)",
     "about_license": "Licencia no comercial (ver LICENSE): uso y compartición libres para aprendizaje e intercambio, conservando la autoría; se prohíbe cualquier uso comercial; no se permite eliminar ni alterar la autoría ni la marca de rastreo.\n\nEste proyecto no tiene relación con YouTube, Google ni ninguna plataforma de vídeo. Solo para aprender e intercambiar: apoya lo original.",
+    "about_crash": "Registro del último fallo (toca para copiar, mantén pulsado para borrar)",
+    "toast_copied": "Copiado al portapapeles",
 }

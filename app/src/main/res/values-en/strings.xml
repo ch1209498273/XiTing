@@ -204,6 +204,8 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="about_section_license">License</string>
     <string name="about_license">Non-commercial license (see LICENSE): free to use and share for personal learning with attribution; any commercial use prohibited; removing or altering attribution/tracing marks forbidden.\n\nThis project is not affiliated with YouTube, Google or any video platform. For study only — please support official releases.</string>
     <string name="about_version_fmt">Version %1$s · Build %2$s</string>
+    <string name="about_crash">Last crash log (tap to copy, long-press to clear)</string>
+    <string name="toast_copied">Copied to clipboard</string>
     <string name="gallery_title">Skin Gallery</string>
     <string name="count_placeholder">0 times</string>
     <string name="dur_min_placeholder">0 min</string>

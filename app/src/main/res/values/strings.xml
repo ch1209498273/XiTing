@@ -242,6 +242,8 @@
     <string name="about_section_license">许可</string>
     <string name="about_license">非商业许可（详见LICENSE）：个人学习交流可自由使用与分享（需保留署名）；任何商业用途均被禁止；禁止移除或篡改署名与溯源标识。\n\n本项目与 YouTube、Google 及任何视频平台无关联。仅供学习交流，请支持正版。</string>
     <string name="about_version_fmt">版本 %1$s · 构建ID %2$s</string>
+    <string name="about_crash">上次崩溃日志（点按复制，长按清除）</string>
+    <string name="toast_copied">已复制到剪贴板</string>
 
     <!-- v3.5 精灵图鉴与streak -->
     <string name="gallery_title">精灵图鉴</string>

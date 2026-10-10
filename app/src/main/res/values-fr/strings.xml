@@ -241,6 +241,8 @@ Sauvegarde : automatique dans le dossier XiTing de Téléchargements (appareil u
 
 Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vidéo. Usage éducatif uniquement, merci de soutenir les œuvres originales.</string>
     <string name="about_version_fmt">Version %1$s · Build ID %2$s</string>
+    <string name="about_crash">Journal du dernier plantage (appuyer pour copier, maintenir pour effacer)</string>
+    <string name="toast_copied">Copié dans le presse-papiers</string>
     <string name="gallery_title">Bestiaire</string>
     <string name="count_placeholder">0 fois</string>
     <string name="dur_min_placeholder">0 min</string>

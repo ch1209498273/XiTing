@@ -2,7 +2,11 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-10（深夜）· v3.6.2 已发布（tag / GitHub Release / 蒲公英）。
+> 最后更新：2026-10-11 · v3.6.2 之后的一轮（未发版，工作区已提交到 master）。
+> 本轮：**GitHub 仓库优化**（默认分支切 master、删除旧 main 分支、加 topics）、
+> **MainActivity 三步瘦身**（1760 → 1099 行，弹窗/图鉴/海报链路出走）、
+> **海报版式声明化 + 1:1 比例**（PosterLayout 纯函数 + 预览内切换）、
+> 顺手修掉 v3.6.2 深色模式遗留的一枚 NewApi lint error。
 > v3.6.2：深色模式（跟随系统）+ 成就弹窗联动高亮。
 > v3.6.1：多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
 > CI 与一键发版/巡检脚本；当晚 7 语言真机巡检通过。详见 git log。
@@ -14,11 +18,13 @@
 `D:\AI任务\zcode\息屏听剧` —— OPPO/ColorOS 的「息屏听剧」App。
 
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**背光物理关闭**）而声音继续。
-纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 297 KB。
+纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 302 KB。
 
-- 包名 `com.lujinyu.xiting`，versionCode 76 / versionName 3.6.2
+- 包名 `com.lujinyu.xiting`，versionCode 76 / versionName 3.6.2（本轮改动未 bump 版本）
 - `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节）**
-- 源码约 5200 行 Kotlin，单模块
+- 源码约 5900 行 Kotlin，单模块
+- **路径含中文是既定事实**：用户 2026-10-11 明确拍板**不迁移**纯 ASCII 路径，
+  测试继续走 `tools/run_tests.ps1` 镜像方案，别再提搬迁
 
 ---
 
@@ -41,16 +47,16 @@
 | `a37569f` / `9d0be03` / `18369b6` | PetView 分配 / WidgetData 渲染门禁 / 移除只写不读的 xiiting_stats |
 | `46fb465` | 首次纳入版本控制 |
 
-**测试基建**：`app/src/test`，**109 个 JVM 单测**（JUnit4 + org.json），覆盖存档与能量的逐条容错、
+**测试基建**：`app/src/test`，**114 个 JVM 单测**（JUnit4 + org.json），覆盖存档与能量的逐条容错、
 整数溢出饱和、成就残留 id 过滤与阈值、备份导入限量、徽章映射与徽章列布局、换肤取色规则、
-光晕渐变不变量，以及把 26 个持久化键名钉死。
+光晕渐变不变量、**海报版式（PosterLayoutTest）**，以及把 26 个持久化键名钉死。
 
 **工具链（2026-10-10 起）**：`.github/workflows/ci.yml`（push 自动跑测试 + 构建）、
 `tools/release.ps1`（一键发版：bump → 测试 → 构建 → Release → 蒲公英）、
 `tools/i18n_shot.ps1`（7 语言 × 3 页面截图巡检，cmd locale 免前台切换）、
 `tools/i18n.py`（多语言同步 / 校验）。
 
-**APK 体积约 299 KB**（3.6.x；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
+**APK 体积约 302 KB**（3.6.2 + 本轮；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
@@ -60,7 +66,66 @@ powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
 
 ---
 
-## 三、本轮完成：成就改为「解锁精灵身上的徽章」
+## 三、本轮完成（2026-10-11）：MainActivity 三步瘦身 + 海报 1:1 + GitHub 仓库优化
+
+### GitHub 仓库（用户拍板：删 main、默认分支切 master）
+
+- 仓库此前有**两条互不相关的历史**：旧 `main`（默认分支，停在 v3.5.0，与 master 无共同祖先）
+  和开发线 `master`——访客落地页一直显示的是旧 README（还写着 159KB/60 单测）。
+- 已切默认分支到 master、**删除 main**（旧历史仍可由 v1.9.0~v3.5.0 那批 tag 追溯）、
+  topics = android / coloros / kotlin / oppo / screen-off、README 顶部加 CI 徽章。
+- CI 只挂 master（ci.yml `branches: [master]`），与现状一致。
+- 顺手核对过：keystore / local.properties 在两条历史里都未入库，无泄漏。
+
+### MainActivity 三步瘦身（全部完成，1760 → 1099 行）
+
+手法：**同包顶层扩展函数**（`internal fun MainActivity.xxx()`）——调用点零改动、同包免 import；
+代价是被跨文件访问的成员放宽为 internal（单模块内 = 模块私有，暴露面可控）。
+
+| 新文件 | 出走内容 |
+|---|---|
+| `MainSupport.kt` | `overlapMs` / `fmtDur` / `dayLabel` / `setTimerIntent`（纯计算 + 格式化） |
+| `MainDialogs.kt` | 成就 / 自定义定时 / 悬浮球样式 / 语言四个弹窗 + 语言与球样式两个设置页动态值刷新 |
+| `SkinGallery.kt` | `showSkinGallery` + `applySkinEverywhere` |
+| `PosterFlow.kt` | 海报链路七个函数（组装 → 渲染 → 预览 → 存盘/分享）+ `SHARE_GP_PER_DAY` |
+
+- internal 化清单：`pageStats` / `pageSettings` / `tab` / `postRefresh` /
+  `refreshHomeStats` / `renderStats` / `weekSummary`。
+- 顺手清理：图鉴弹窗的 `dlg` 成员字段改局部 val（点击回调从未引用它，字段纯多余）；
+  出走代码里的 `this@MainActivity` 全部改为扩展接收者标签（如 `this@showSkinGallery`）。
+- **页面绑定层（bindHome / bindStats / bindSettings / renderStats）刻意留在类内**——
+  refreshStates 刷三页、lateinit 视图互相咬着，那是回归风险中心，不动。
+- ⚠ `BarChartView` 有自己的 private `fmtDur` 成员，与 `MainSupport.fmtDur` 扩展同名**不冲突**
+  （成员优先于扩展），不要"帮忙"统一。
+
+### 海报版式声明化 + 1:1（用户拍板：只做 1:1；二维码缓做；相册策略维持现状）
+
+- 新增 `PosterLayout.kt`：**无 Android 依赖的纯函数**。每种比例一组旋钮（KNOBS），
+  帧内所有 y 从旋钮推导；纵向放不下时**先收缩精灵**（下限 0.28×W，连下限都放不下直接抛
+  IllegalArgumentException，渲染线程 catch 后走纯文本退路）。字号不随比例缩放
+  （两种比例宽都是 1080，缩字号会改变信息层级）。
+- `PosterLayoutTest` 5 个测试：**3:4 × 3 行回归锚**（与旧手写坐标逐项一致：
+  196 / 561 / 929 / 1029 / 1309 / 1355 / 1407——重构不改既有观感）、
+  两比例 × 四行无重叠不变量、弹性收缩方向。
+- 预览对话框顶部新增「3:4 / 1:1」切换 chips（比例记号各语言通用，不进 strings.xml；
+  海报区刻意不随主题，色值就地写死——与黑背景 0xFF15171B 同一套）。
+- ⚠ 位图回收三纪律（0 字节 `.pending-` 竞态真机必现过，详见 PosterFlow 注释）：
+  取消才在 onDismiss 回收 / 交接给 sendPoster 的由它存盘后回收 /
+  迟到的渲染结果自己回收自己——**谁也不碰 current 的所有权**。
+- **真机未验证（本轮唯一只改未验的 UI）**：预览内切 1:1、1:1 成品观感、
+  西语长品牌名下两种比例的顶栏让位。装 release 包后按巡检流程看一眼再发版。
+
+### 顺手修的既有问题
+
+- `values/themes.xml` 的 `android:forceDarkAllowed` 是 v3.6.2 深色模式引入的
+  **NewApi lint error**（要求 API 29，minSdk 26）——上次全量 lint 跑在深色模式提交
+  **之前**，所以一直没暴露。属性在 26-28 上被框架忽略、无害，就地 `tools:ignore` 放行
+  并写明理由（与第五节 MediaStore/AudioManager 同一处理惯例）。
+  **教训：lintVital 只查 fatal；每个发版前应跑一次全量 `gradle lint`。**
+
+---
+
+## 上一轮存档（2026-10-10 深夜）：成就改为「解锁精灵身上的徽章」
 
 ### 做了什么
 
@@ -490,32 +555,36 @@ OPPO PME110 / Android 16（API 36）实测确认：
 
 **高**
 
-- `PetView`(947行) 与 `BubblePetView`(370行) **各写一遍同一套 5 形态 + `drawFace`**。
+- **海报 1:1 / 预览切换真机未验**（2026-10-11 只改未验）：预览里切 3:4 ↔ 1:1、
+  1:1 成品观感、西语长品牌名下两种比例的顶栏让位。验完再发版。
+- `PetView`(1048行) 与 `BubblePetView`(389行) **各写一遍同一套 5 形态 + `drawFace`**。
   改剪影必须手动同步两处（2026-10-07 吃过一次亏：图鉴大图不跟随选择）。
-  ⚠️ 但「抽公共渲染器」**评估后决定暂不做**（2026-10-08）：两者动画参数是刻意分开的
+  ⚠ 但「抽公共渲染器」**评估后决定暂不做**（2026-10-08）：两者动画参数是刻意分开的
   （火花自转 0.3 vs 0.5、呼吸频率 3 vs 2.2，悬浮球另做了尺寸简化），合并会改变观感。
   若将来要做，先设计好「哪些参数随尺寸缩放、哪些保持各自风格」。
-- 成就弹窗已改成徽章卡片，但**从未在真机上看过**（只改未验）。
-  弹窗里点某个成功能不能也高亮精灵身上对应那一格（当前只展示、不联动）。
+- ✔（2026-10-10 晚）成就弹窗（含徽章卡片）真机首验通过；弹窗点某条成就
+  → 精灵对应格脉冲高亮已在 v3.6.2 实现并发布。
 - ✔（2026-10-10 晚）真机验证完成：7 语言 × 3 页截图巡检（i18n_shot 实战）、
   西语海报（头部+角标）、成就弹窗首验、长按振动（logcat 实证 40ms）、德语统计复验。
 - ✔（2026-10-10 拍板并实现）「持之以恒」= **连续 7 天**：条件用历史最长连续 `best ≥ 7`
   （`Achievements.shouldUnlock`，达成即追溯解锁；current 会随断签归零）。
-  ⚠️ `ach_unlocked` 只增不减，改口径不会让已点亮的消失。
+  ⚠ `ach_unlocked` 只增不减，改口径不会让已点亮的消失。
 - 省电实测（被动差值版）**还没有真实数据**：需要不插电正常使用几天
   （期间做几次息屏听剧）才能验证采样真的在积累。入口：统计页「省电估算」卡片。
 
 **中**
 
-- `MainActivity` 1614 行。拆 class 评估过（2026-10-08）：涉及大量 lateinit 视图
-  引用与跨页调用（`refreshStates` 刷三页、`bindHome` 调设置区函数），
-  收益低于回归风险，暂缓。
-- `gradle test` 的根治：项目路径含中文，每次测试要镜像到 temp（30s+）。
-  把项目移到纯 ASCII 路径即可根治（用户尚未决定）。
-- 分享海报升级（已调研，见 `docs/分享功能升级方案.md`）：多比例（1:1 / 9:16）、
-  二维码、版式声明化、内置字体。均待用户拍板后实施。
-- 深色模式：目前纯浅色（`Theme.Material.Light`、无 values-night）。跟随系统需要
-  过一遍全部布局配色，工程量中等；用户 2026-10-10 表示「都可以做」，待排期。
+- ✔（2026-10-11）MainActivity 三步瘦身完成（1760 → 1099 行，见第三节）；
+  **页面绑定层刻意未拆**（回归风险中心），新增功能代码一律进独立文件。
+- `gradle test` 只能走镜像脚本（路径含中文）：**用户 2026-10-11 拍板不迁移路径**，
+  此项永久关闭，别再提。
+- ✔（2026-10-11）分享海报：1:1 比例 + 版式声明化已实施（PosterLayout）；
+  **二维码缓做**（自实现路线，等 1:1 跑通后作为独立小任务）、
+  **9:16 不做**（无抖音渠道需求）、相册策略维持现状（MediaStore 是零依赖下最顺路径）、
+  内置字体仍待需求出现再议。原始调研见 `docs/分享功能升级方案.md`。
+- ✔（2026-10-10 深夜）深色模式已发布（语义 token + values-night 全套，见第四节）。
+  遗留一条：发版前跑一次全量 `gradle lint`（lintVital 只查 fatal，
+  forceDarkAllowed 的 NewApi 就是这么漏进 v3.6.2 的，本轮已修）。
 
 **低**
 

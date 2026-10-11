@@ -1,12 +1,14 @@
 # 息屏听剧（OPPO/ColorOS 通用版）
 
+[![CI](https://github.com/ch1209498273/XiTing/actions/workflows/ci.yml/badge.svg)](https://github.com/ch1209498273/XiTing/actions/workflows/ci.yml)
+
 看剧时想闭眼听？点一下悬浮球，屏幕全黑：**背光物理关闭、触摸屏蔽、声音照常播放**——任意视频 App 都能用。
 
 - **无 INTERNET 权限**：技术上无法联网，不收集、不上传任何信息
 - **零第三方依赖**：纯 Android SDK + Kotlin，无广告、无追踪、无埋点
 - **8 种界面语言**：简中 / English / 日本語 / 한국어 / Deutsch / Français / Español / Русский
 - **深色模式**：跟随系统深色自动切换，全界面适配（2026-10 新增）
-- **安装包 299 KB**（release，已开启 R8 压缩），安装即用
+- **安装包 302 KB**（release，已开启 R8 压缩），安装即用
 
 ---
 
@@ -95,8 +97,13 @@
 
 ### ⑨ 分享海报
 
-统计页可生成 1080×1440 的分享图：带上**你自己的精灵**（当前形态 + 当前配色）、
-本周数据与省电量，背景跟随皮肤色相。**发送前可预览**，可选择分享或保存到相册。
+统计页可生成分享图：带上**你自己的精灵**（当前形态 + 当前配色）、
+本周数据与省电量，背景跟随皮肤色相。**发送前可预览**，预览顶部可一键切换
+**3:4（朋友圈/微博）与 1:1（小红书）**两种版式（2026-10-11 新增 1:1），
+可选择分享或保存到相册。
+
+两种版式的纵向坐标由 `PosterLayout`（纯函数 + 单测）统一推演：
+放不下时先收缩精灵，页脚永不裁边；3:4 的每个坐标与旧版逐像素一致（回归锚测试钉死）。
 
 ### ⑩ 多语言
 
@@ -194,7 +201,7 @@ powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
 ClassNotFoundException**。已用对照实验确认：同一份代码复制到纯 ASCII 路径后
 全部测试绿。`assembleDebug` / `assembleRelease` 不受影响，只有单测任务受影响。
 
-覆盖范围（当前 **107** 个）：
+覆盖范围（当前 **114** 个）：
 
 - **日期与连续天数**：同一天去重、时区日界线、DST 干扰、周一边界
   （`StreaksTest`）——「持之以恒」成就与皮肤解锁都依赖它
@@ -208,6 +215,8 @@ ClassNotFoundException**。已用对照实验确认：同一份代码复制到�
   必须有人会注意到
 - 精灵光晕几何（`PetGlowTest`）、配色派生（`PetPaletteTest`）、
   成就徽章（`BadgesTest`）
+- 海报版式：3:4 回归锚（与旧手写坐标逐像素一致）+ 两比例×四行的不变量 +
+  弹性收缩方向（`PosterLayoutTest`）
 
 参数：`-Variant release` 跑 release 变体，`-KeepMirror` 保留镜像目录便于排查。
 

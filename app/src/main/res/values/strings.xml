@@ -380,6 +380,5 @@
     <string name="timer_custom">自定义分钟</string>
     <string name="timer_custom_hint">1–600 分钟</string>
     <string name="timer_custom_bad">请输入 1 以上的分钟数</string>
-    <string name="mah_saved_fmt">⚡ 已储存 %1$d mAh</string>
     <string name="evolve_fmt">🎉 进化！%1$s → %2$s</string>
 </resources>

@@ -370,6 +370,5 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">분 직접 입력</string>
     <string name="timer_custom_hint">1~600분</string>
     <string name="timer_custom_bad">1분 이상 입력하세요</string>
-    <string name="mah_saved_fmt">⚡ %1$d mAh 저장됨</string>
     <string name="evolve_fmt">🎉 진화! %1$s → %2$s</string>
 </resources>

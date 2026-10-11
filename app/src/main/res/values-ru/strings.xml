@@ -370,6 +370,5 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Свои минуты</string>
     <string name="timer_custom_hint">1-600 минут</string>
     <string name="timer_custom_bad">Введите хотя бы 1 минуту</string>
-    <string name="mah_saved_fmt">⚡ Сэкономлено %1$d мА·ч</string>
     <string name="evolve_fmt">🎉 Эволюция! %1$s → %2$s</string>
 </resources>

@@ -370,6 +370,5 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Minutos a medida</string>
     <string name="timer_custom_hint">1-600 minutos</string>
     <string name="timer_custom_bad">Introduce al menos 1 minuto</string>
-    <string name="mah_saved_fmt">⚡ %1$d mAh ahorrados</string>
     <string name="evolve_fmt">🎉 ¡Evolución! %1$s → %2$s</string>
 </resources>

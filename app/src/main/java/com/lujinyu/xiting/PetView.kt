@@ -125,8 +125,13 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private var bornAt = System.currentTimeMillis()
     private var blinkUntil = 0L
     private var nextBlinkAt = System.currentTimeMillis() + 2500
-    private var dischargeUntil = 0L
-    private var energyPopUntil = 0L
+    // 摸头互动（v4.0 取代放电电弧——用户反馈「点击特效太丑」）：眯眼笑 + 爱心上浮
+    private var pokeUntil = 0L
+    private var pokeStart = 0L
+    private val pokeHearts = ArrayList<PokeHeart>()
+    private val heartPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFF6E8C.toInt() }
+
+    private data class PokeHeart(val dx: Float, val startAt: Long)
 
     private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val bodyPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -196,13 +201,24 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private var barGradientKey = 0L
 
     init {
-        setOnClickListener {
-            dischargeUntil = System.currentTimeMillis() + 500
-            energyPopUntil = System.currentTimeMillis() + 1600
-        }
+        setOnClickListener { poke() }
     }
 
     fun startAnimating() = postInvalidateDelayed(33)
+
+    /**
+     * 摸头（v4.0）：点击精灵本体的开心反馈——眯眼笑 + 三颗爱心错峰上浮。
+     * 动画循环沿用常驻 30fps 重绘；thumbMode（图鉴缩略图）不可点所以恒不触发。
+     */
+    fun poke() {
+        pokeStart = System.currentTimeMillis()
+        pokeUntil = pokeStart + 1200
+        pokeHearts.clear()
+        pokeHearts.add(PokeHeart(-0.4f, pokeStart))
+        pokeHearts.add(PokeHeart(0.0f, pokeStart + 170))
+        pokeHearts.add(PokeHeart(0.45f, pokeStart + 340))
+        postInvalidateDelayed(33)
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -451,88 +467,15 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             starPaint.alpha = 255
         }
 
-        // 放电动画（每个形态互动不同）
-        if (!thumbMode && now < dischargeUntil) {
-            val k = (now % 500) / 500f
-            when (stage) {
-                STAGE_SPARK -> {
-                    // 星芒爆闪：放射短刺延长+整体旋转
-                    linePaint.color = 0xFFFFE082.toInt()
-                    linePaint.strokeWidth = 5f
-                    for (i in 0 until 8) {
-                        val ang = (6.2831855f * i / 8) + k * 3.5f
-                        val len = r * (0.4f + 0.9f * k)
-                        canvas.drawLine(
-                            cx + cos(ang) * r * 1.1f, cy + sin(ang) * r * 1.1f,
-                            cx + cos(ang) * (r * 1.1f + len), cy + sin(ang) * (r * 1.1f + len), linePaint
-                        )
-                    }
-                }
-                STAGE_BALL -> {
-                    // 等离子爆裂：锯齿电弧四射
-                    linePaint.color = 0xFF00E5FF.toInt()
-                    linePaint.strokeWidth = 4f
-                    val arcPath = pathA
-                    for (i in 0 until 6) {
-                        val ang = (6.2831855f * i / 6) + k * 2f
-                        arcPath.reset()
-                        arcPath.moveTo(cx + cos(ang) * r * 1.0f, cy + sin(ang) * r * 1.0f)
-                        arcPath.lineTo(cx + cos(ang + 0.2f) * r * (1.25f + 0.5f * k), cy + sin(ang + 0.2f) * r * (1.25f + 0.5f * k))
-                        arcPath.lineTo(cx + cos(ang - 0.15f) * r * (1.5f + 0.7f * k), cy + sin(ang - 0.15f) * r * (1.5f + 0.7f * k))
-                        canvas.drawPath(arcPath, linePaint)
-                    }
-                    // 扩散电环
-                    linePaint.color = 0xFF80DEEA.toInt()
-                    canvas.drawCircle(cx, cy, r * (1.1f + 0.9f * k), linePaint)
-                }
-                STAGE_CLOUD -> {
-                    // 雷阵雨：云下三重闪电快速闪 + 扩散圈
-                    boltPaint.color = 0xFF7FC4FF.toInt()
-                    val big = r * (0.5f + 0.5f * k)
-                    drawBolt(canvas, cx, cy + r * 0.5f, big)
-                    if ((now / 100) % 2 == 0L) {
-                        drawBolt(canvas, cx - r * 0.55f, cy + r * 0.55f, big * 0.7f)
-                    } else {
-                        drawBolt(canvas, cx + r * 0.55f, cy + r * 0.55f, big * 0.7f)
-                    }
-                    linePaint.color = 0x88A8C8FF.toInt()
-                    linePaint.strokeWidth = 4f
-                    canvas.drawCircle(cx, cy, r * (1.1f + 1.1f * k), linePaint)
-                }
-                STAGE_STORM -> {
-                    // 龙卷加速：螺旋速度线狂转 + 双闪电
-                    linePaint.color = 0xFFB0C4E8.toInt()
-                    linePaint.strokeWidth = 3.5f
-                    for (i in 0 until 4) {
-                        val pk = 0.15f + i * 0.2f
-                        val w = r * (1.3f - 0.95f * pk)
-                        val y = cy - r * 0.85f + pk * r * 1.6f
-                        scratchRect.set(cx - w, y - r * 0.14f, cx + w, y + r * 0.14f)
-                        canvas.drawArc(scratchRect, k * 720f, 110f, false, linePaint)
-                    }
-                    boltPaint.color = 0xFF8FD0FF.toInt()
-                    drawBolt(canvas, cx + r * 0.95f, cy - r * 0.1f, r * (0.3f + 0.3f * k))
-                    drawBolt(canvas, cx - r * 0.98f, cy + r * 0.25f, r * (0.25f + 0.25f * k))
-                }
-                else -> {
-                    // 王者之怒：12 道金闪电环射 + 双层金环扩散 + 翼展甩动
-                    linePaint.color = 0xFFFFC94D.toInt()
-                    linePaint.strokeWidth = 4.5f
-                    for (i in 0 until 12) {
-                        val ang = (6.2831855f * i / 12) + k * 1.2f
-                        val ray = pathA
-                        ray.reset()
-                        ray.moveTo(cx + cos(ang) * r * 0.9f, cy + sin(ang) * r * 0.9f)
-                        ray.lineTo(cx + cos(ang + 0.12f) * r * (1.3f + 0.4f * k), cy + sin(ang + 0.12f) * r * (1.3f + 0.4f * k))
-                        ray.lineTo(cx + cos(ang) * r * (1.7f + 0.8f * k), cy + sin(ang) * r * (1.7f + 0.8f * k))
-                        canvas.drawPath(ray, linePaint)
-                    }
-                    linePaint.color = 0xAAFFC94D.toInt()
-                    canvas.drawCircle(cx, cy, r * (1.2f + 0.7f * k), linePaint)
-                    linePaint.color = 0x66B388FF.toInt()
-                    canvas.drawCircle(cx, cy, r * (1.5f + 1.0f * k), linePaint)
-                }
+        // 摸头爱心（v4.0 取代放电电弧）：错峰上浮 + 渐隐，只在 poke 期间绘制
+        if (!thumbMode && now < pokeUntil) {
+            for (h in pokeHearts) {
+                val k = (now - h.startAt) / 1100f
+                if (k !in 0f..1f) continue
+                heartPaint.alpha = ((1f - k) * 255).toInt().coerceIn(0, 255)
+                drawHeart(canvas, cx + h.dx * r, cy - r * 1.15f - k * r * 0.9f, r * 0.16f)
             }
+            heartPaint.alpha = 255
         }
 
         // 雷霆之王的两层旋转光环已移入 drawKing（要画在核心之前才能被遮挡一部分）
@@ -554,13 +497,6 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             canvas.drawText("z", cx + r * 0.8f + zt * 14f, cy - r - 8f - zt * 16f, zzzPaint)
             canvas.drawText("Z", cx + r * 1.0f + zt * 22f, cy - r - 30f - zt * 20f, zzzPaint)
             zzzPaint.alpha = 255
-        }
-
-        // 点击储能弹字
-        if (now < energyPopUntil) {
-            popPaint.alpha = ((energyPopUntil - now).coerceAtMost(1000) / 10).toInt().coerceIn(0, 255)
-            canvas.drawText(context.getString(R.string.mah_saved_fmt, totalMah), cx, cy - r * 1.5f - 26f, popPaint)
-            popPaint.alpha = 255
         }
 
         // ───────── 能量系统：左侧常驻电池条（容量200）+ 充能动画 ─────────
@@ -1000,7 +936,19 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             canvas.drawLine(cx - off - er * 0.6f, cy - er * 1.7f, cx - off + er * 0.5f, cy - er * 1.15f, linePaint)
             canvas.drawLine(cx + off + er * 0.6f, cy - er * 1.7f, cx + off - er * 0.5f, cy - er * 1.15f, linePaint)
         }
-        if (sleepy || blinking) {
+        val happy = !thumbMode && System.currentTimeMillis() < pokeUntil
+        if (happy) {
+            // ^ 弧眼（开心眯眼）
+            linePaint.color = 0xFF2E3B47.toInt()
+            linePaint.strokeWidth = er * 0.3f
+            val hp = pathC
+            hp.reset()
+            hp.moveTo(cx - off - er * 0.55f, cy + er * 0.2f)
+            hp.quadTo(cx - off, cy - er * 0.6f, cx - off + er * 0.55f, cy + er * 0.2f)
+            hp.moveTo(cx + off - er * 0.55f, cy + er * 0.2f)
+            hp.quadTo(cx + off, cy - er * 0.6f, cx + off + er * 0.55f, cy + er * 0.2f)
+            canvas.drawPath(hp, linePaint)
+        } else if (sleepy || blinking) {
             linePaint.color = 0xFF2E3B47.toInt()
             linePaint.strokeWidth = er * 0.3f
             canvas.drawLine(cx - off - er * 0.55f, cy, cx - off + er * 0.55f, cy, linePaint)
@@ -1022,15 +970,33 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         linePaint.color = 0xFF2E3B47.toInt()
         linePaint.strokeWidth = er * 0.26f
         val my = cy + er * 1.35f
-        if (sleepy) {
+        if (happy) {
+            // 开心：笑容加深
+            val mp = pathC
+            mp.reset()
+            mp.moveTo(cx - er * 0.9f, my - er * 0.2f)
+            mp.quadTo(cx, my + er * 1.3f, cx + er * 0.9f, my - er * 0.2f)
+            canvas.drawPath(mp, linePaint)
+        } else if (sleepy) {
             canvas.drawLine(cx, my, cx + er * 0.9f, my, linePaint)
         } else {
-            val p = pathC
-            p.reset()
-            p.moveTo(cx - er * 0.75f, my)
-            p.quadTo(cx, my + er * 0.85f, cx + er * 0.75f, my)
-            canvas.drawPath(p, linePaint)
+            val mp = pathC
+            mp.reset()
+            mp.moveTo(cx - er * 0.75f, my)
+            mp.quadTo(cx, my + er * 0.85f, cx + er * 0.75f, my)
+            canvas.drawPath(mp, linePaint)
         }
+    }
+
+    /** 小爱心（摸头互动）：双圆弧贝塞尔，caller 控制位置/尺寸/透明度 */
+    private fun drawHeart(canvas: Canvas, cx: Float, cy: Float, s: Float) {
+        val hp = pathC
+        hp.reset()
+        hp.moveTo(cx, cy + s)
+        hp.cubicTo(cx - s * 1.5f, cy - s * 0.1f, cx - s * 0.75f, cy - s * 1.2f, cx, cy - s * 0.35f)
+        hp.cubicTo(cx + s * 0.75f, cy - s * 1.2f, cx + s * 1.5f, cy - s * 0.1f, cx, cy + s)
+        hp.close()
+        canvas.drawPath(hp, heartPaint)
     }
 
     private fun drawBolt(canvas: Canvas, x: Float, y: Float, s: Float) {

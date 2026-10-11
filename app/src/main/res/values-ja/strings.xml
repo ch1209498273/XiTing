@@ -370,6 +370,5 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">分数を指定</string>
     <string name="timer_custom_hint">1〜600 分</string>
     <string name="timer_custom_bad">1 分以上を入力してください</string>
-    <string name="mah_saved_fmt">⚡ %1$d mAh 蓄積</string>
     <string name="evolve_fmt">🎉 進化！%1$s → %2$s</string>
 </resources>

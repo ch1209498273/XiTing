@@ -63,6 +63,7 @@ class PrefsKeysTest {
     @Test
     fun `分享与校准键名不变`() {
         assertEquals("last_share_date", Prefs.LAST_SHARE_DATE)
+        assertEquals("report_last_month", Prefs.REPORT_LAST_MONTH)
         assertEquals("pwr_samp_ua_sum", Prefs.PWR_SAMP_UA_SUM)
         assertEquals("pwr_samp_count", Prefs.PWR_SAMP_COUNT)
         assertEquals("calib_on_ua", Prefs.CALIB_ON_UA)

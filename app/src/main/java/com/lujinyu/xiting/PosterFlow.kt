@@ -299,8 +299,24 @@ internal fun MainActivity.settleDailyShare() {
         }
     }
 
-/** 预览对话框顶部的比例切换 chip：胶囊底，选中态由 [styleChip] 上色 */
-private fun posterChip(ctx: Context, label: String, density: Float): android.widget.TextView =
+/** 分享入口菜单：统计页一个按钮，周报/月报二选（年报等聚合架构落地后加入） */
+internal fun MainActivity.showShareMenu() {
+    val items = arrayOf(
+        getString(R.string.share_menu_week),
+        getString(R.string.share_menu_month)
+    )
+    android.app.AlertDialog.Builder(this)
+        .setTitle(getString(R.string.share_menu_title))
+        .setItems(items) { _, which ->
+            when (which) {
+                0 -> shareWeekPoster()
+                1 -> ReportPoster.shareMonthReport(this)
+            }
+        }
+        .show()
+}
+
+/** 预览对话框顶部的比例切换 chip：胶囊底，选中态由 [styleChip] 上色 */private fun posterChip(ctx: Context, label: String, density: Float): android.widget.TextView =
     android.widget.TextView(ctx).apply {
         text = label
         textSize = 14f

@@ -87,6 +87,10 @@ object Prefs {
      */
     const val LAST_SHARE_DATE = "last_share_date"
 
+    // ---- 月报推送 ----
+    /** 上次提示过月报的月份（yyyy-MM，US locale 内部比较）。跨月首次打开时发本地通知 */
+    const val REPORT_LAST_MONTH = "report_last_month"
+
     // ---- 界面语言 ----
     /** per-app 语言 tag（""=跟随系统），读取见 AppLocales */
     const val LANG = "lang"

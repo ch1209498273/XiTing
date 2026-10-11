@@ -107,6 +107,10 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         switchTab(if (lastTab in 0..2) lastTab else TAB_HOME)
         // 卸载重装恢复：启动后检查本机备份（设备ID匹配且本地为空）
         window.decorView.postDelayed({ checkRestore() }, 600)
+        // 月报通知点击进来：直接弹上月月报海报预览
+        if (intent?.getStringExtra(ReportPoster.EXTRA_SHOW_REPORT) == ReportPoster.SHOW_MONTH) {
+            ReportPoster.shareMonthReport(this)
+        }
     }
 
     // ───────────────────────── 导航 ─────────────────────────
@@ -254,6 +258,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         }
         refreshStates()
         refreshHomeStats()
+        ReportPoster.maybeNotifyMonthly(this) // 跨月首次回到前台：上月月报本地推送
         if (tab == TAB_STATS) renderStats()
     }
 
@@ -662,7 +667,7 @@ private fun checkRestore() {
         pageStats.findViewById<View>(R.id.card_ach).setOnClickListener { showAchievements() }
         pageStats.findViewById<View>(R.id.card_mah).setOnClickListener { onMahCardClick() }
         pageStats.findViewById<View>(R.id.btn_gallery).setOnClickListener { showSkinGallery() }
-        pageStats.findViewById<View>(R.id.btn_week_share).setOnClickListener { shareWeekPoster() }
+        pageStats.findViewById<View>(R.id.btn_week_share).setOnClickListener { showShareMenu() }
         pageStats.findViewById<View>(R.id.btn_prev).setOnClickListener {
             if (listPage > 0) {
                 listPage--

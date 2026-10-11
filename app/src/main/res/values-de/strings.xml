@@ -48,6 +48,7 @@
     <string name="switch_direct">Durch Antippen direkt entsperren</string>
     <string name="switch_info">Uhrzeit und Akku im schwarzen Bildschirm anzeigen</string>
     <string name="switch_media">Wiedergabesteuerung im schwarzen Bildschirm</string>
+    <string name="switch_media_sub">Titel und ±30 s benötigen Benachrichtigungszugriff</string>
     <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
     <string name="bubble_style">Blasen-Stil</string>
     <string name="settings_data">Daten</string>

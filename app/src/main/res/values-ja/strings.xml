@@ -48,6 +48,7 @@
     <string name="switch_direct">画面を軽くタップで解除</string>
     <string name="switch_info">画面オフ中に時刻とバッテリーを表示</string>
     <string name="switch_media">画面オフ中に再生コントロールを表示</string>
+    <string name="switch_media_sub">タイトルと±30秒には通知アクセス権が必要です</string>
     <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
     <string name="bubble_style">バブル表示</string>
     <string name="settings_data">データ</string>

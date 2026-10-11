@@ -255,12 +255,14 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
 
         // 剧名（唤醒态，媒体控制行上方）：只读 MediaSession metadata，零打扰；
-        // 无通知使用权或会话无标题时整个隐藏（降级见 NowPlaying KDoc）
+        // 无通知使用权或会话无标题时整个隐藏（降级见 NowPlaying KDoc）。
+        // 两行 + 省略号（用户拍板）：一行截断对 B站带货长标题几乎读不出内容。
+        // 两行向上生长，底边仍锚在媒体行上方，不与下方 hint 重叠。
         val title = TextView(context).apply {
             textSize = 14f
             setTextColor(0xB3FFFFFF.toInt())
             gravity = Gravity.CENTER
-            maxLines = 1
+            maxLines = 2
             ellipsize = android.text.TextUtils.TruncateAt.END
             visibility = View.INVISIBLE
             alpha = 0f

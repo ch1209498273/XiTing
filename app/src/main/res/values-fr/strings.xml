@@ -48,6 +48,7 @@
     <string name="switch_direct">Déverrouiller d\'un toucher</string>
     <string name="switch_info">Afficher heure et batterie sur l\'écran noir</string>
     <string name="switch_media">Commandes de lecture sur l\'écran noir</string>
+    <string name="switch_media_sub">Titre et ±30 s : accès notifications requis</string>
     <string name="switch_headset">Retour vidéo au débranchement</string>
     <string name="bubble_style">Style de bulle</string>
     <string name="settings_data">Données</string>

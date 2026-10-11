@@ -48,6 +48,7 @@
     <string name="switch_direct">화면을 가볍게 눌러 바로 해제</string>
     <string name="switch_info">화면 꺼짐 상태에 시간·배터리 표시</string>
     <string name="switch_media">화면 꺼짐 상태에 재생 컨트롤</string>
+    <string name="switch_media_sub">제목·±30초는 알림 접근 권한이 필요합니다</string>
     <string name="switch_headset">이어폰 뽑으면 자동으로 영상으로</string>
     <string name="bubble_style">버블 표시</string>
     <string name="settings_data">데이터</string>

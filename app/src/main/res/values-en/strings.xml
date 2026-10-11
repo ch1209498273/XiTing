@@ -48,6 +48,7 @@
     <string name="switch_direct">Single-tap unlock</string>
     <string name="switch_info">Show clock &amp; battery on black screen</string>
     <string name="switch_media">Media controls on black screen</string>
+    <string name="switch_media_sub">Title and ±30s need notification access</string>
     <string name="switch_headset">Return to video when headphones unplug</string>
     <string name="bubble_style">Bubble style</string>
     <string name="settings_data">Data</string>

@@ -48,6 +48,7 @@
     <string name="switch_direct">Desbloquear con un toque</string>
     <string name="switch_info">Mostrar hora y batería en la pantalla negra</string>
     <string name="switch_media">Controles de reproducción en pantalla negra</string>
+    <string name="switch_media_sub">El título y ±30 s requieren acceso a notificaciones</string>
     <string name="switch_headset">Volver al vídeo al quitar los auriculares</string>
     <string name="bubble_style">Estilo de burbuja</string>
     <string name="settings_data">Datos</string>

@@ -57,6 +57,7 @@
     <string name="switch_direct">黑幕轻点直接解锁</string>
     <string name="switch_info">黑幕显示时间与电量</string>
     <string name="switch_media">黑幕播放控制</string>
+    <string name="switch_media_sub">剧名与±30秒需开启「通知使用权」</string>
     <string name="switch_headset">耳机拔出自动返回视频</string>
     <string name="bubble_style">悬浮球样式</string>
     <string name="settings_data">数据</string>

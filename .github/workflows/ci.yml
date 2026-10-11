@@ -1,9 +1,11 @@
 name: CI
 
-# 每次 push / PR：跑全部单测 + 构建 release APK。
+# 每次 push / PR：跑全部单测 + 全量 lint + 构建 release APK。
 # 说明：CI 在 ASCII 路径下运行，`gradlew test` 可以直接用（本地中文路径的
 # 镜像脚本只服务于本机）；无 keystore.properties 时 release 自动回落
 # debug 签名（见 app/build.gradle.kts），所以公开仓库 fork 也能构建。
+# lint 门禁是 forceDarkAllowed 溜进 v3.6.2 的教训（lintVital 只查 fatal，
+# assembleRelease 拦不住 NewApi/翻译缺失这类问题，必须全量 lint）。
 
 on:
   push:
@@ -32,6 +34,12 @@ jobs:
 
       - name: Unit tests
         run: ./gradlew test --no-daemon
+
+      - name: Lint (full, gating)
+        run: ./gradlew lint --no-daemon
+
+      - name: i18n completeness
+        run: python3 tools/i18n.py check
 
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon

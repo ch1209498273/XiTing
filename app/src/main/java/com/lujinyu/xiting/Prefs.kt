@@ -91,6 +91,19 @@ object Prefs {
     /** 上次提示过月报的月份（yyyy-MM，US locale 内部比较）。跨月首次打开时发本地通知 */
     const val REPORT_LAST_MONTH = "report_last_month"
 
+    // ---- 全量历史聚合（HistoryStore，v4.0）----
+    // 明细 sessions.json 只保留 60 天；累计/最长/连续天数/月口径全部在这里。
+    // 聚合是 sessions 的派生数据：重装迁移与备份恢复都走 rebuildFromSessions 重算。
+    const val STATS_TOTAL_MS = "stats_total_ms"
+    const val STATS_TOTAL_COUNT = "stats_total_count"
+    const val STATS_MAX_SINGLE = "stats_max_single_ms"
+    /** 听过剧的 epoch day 集合（Long.toString），连续天数从这里算 */
+    const val LISTEN_DAYS = "listen_days"
+    /** 月聚合条目 "yyyy-MM:ms:count"，年报/月环比用 */
+    const val MONTH_STATS = "month_stats"
+    /** 一次性迁移标记：老 sessions.json 的全部历史算进聚合 */
+    const val STATS_MIGRATED = "stats_agg_migrated"
+
     // ---- 界面语言 ----
     /** per-app 语言 tag（""=跟随系统），读取见 AppLocales */
     const val LANG = "lang"

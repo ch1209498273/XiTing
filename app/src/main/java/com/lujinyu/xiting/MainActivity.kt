@@ -646,10 +646,10 @@ private fun checkRestore() {
         val weekStart = todayStart - 7L * 24 * 3600 * 1000
         var todayMs = 0L
         var weekMs = 0L
-        var allMs = 0L
+        // 累计口径 = 全量聚合（明细只有 60 天，v4.0 起「累计」不再从明细求和）
+        val allMs = HistoryStore.totalMs(this)
         val nowMs = System.currentTimeMillis()
         sessions.forEach { s ->
-            allMs += s.durationMs
             todayMs += overlapMs(s, todayStart, todayStart + 24L * 3600 * 1000)
             weekMs += overlapMs(s, weekStart, nowMs)
         }
@@ -864,15 +864,16 @@ private fun checkRestore() {
 
         todayMs = 0L; var todayCount = 0
         weekMs = 0L; var weekCount = 0
-        allMs = 0L
         sessions.forEach { s ->
-            allMs += s.durationMs
             val tv = overlapMs(s, todayStart, todayStart + 24L * 3600 * 1000)
             if (tv > 0) { todayMs += tv; todayCount++ }
             val wv = overlapMs(s, weekStart, now)
             if (wv > 0) { weekMs += wv; weekCount++ }
         }
-        val allCount = sessions.size
+        // 累计口径 = 全量聚合（v4.0：明细 60 天，全量在 HistoryStore）
+        allMs = HistoryStore.totalMs(this)
+        val allCount = HistoryStore.totalCount(this).toInt()
+        val maxSingle = HistoryStore.maxSingleMs(this)
 
         pageStats.findViewById<TextView>(R.id.sum_today).text = fmtDur(todayMs)
         pageStats.findViewById<TextView>(R.id.sum_today_count).text = getString(R.string.fmt_sessions, todayCount)
@@ -881,7 +882,7 @@ private fun checkRestore() {
         pageStats.findViewById<TextView>(R.id.sum_all).text = fmtDur(allMs)
         pageStats.findViewById<TextView>(R.id.sum_all_count).text = getString(R.string.fmt_sessions, allCount)
         pageStats.findViewById<TextView>(R.id.sum_extra).text =
-            getString(R.string.sum_extra_fmt, fmtDur(sessions.maxOfOrNull { it.durationMs } ?: 0L), allCount)
+            getString(R.string.sum_extra_fmt, fmtDur(maxSingle), allCount)
         updateMah()
         renderWeekReport(sessions)
 
@@ -893,10 +894,11 @@ private fun checkRestore() {
         //   · current = **当前连续**天数 → 皮肤解锁、首页展示
         // ⚠ 成就用 best 而不是 current：达成 7 天那一刻未必有人在刷统计（evaluate 只在刷统计时跑），
         //   而 current 会随断签归零；best 让「曾经达成」可追溯解锁（ach_unlocked 本身只增不减）。
-        val streakInfo = Streaks.compute(sessions)
+        // v4.0：连续天数从全量「听剧日集合」算（明细只有 60 天，current/best 都会失真）
+        val streakInfo = Streaks.computeFromDays(HistoryStore.listenDays(this))
         val freshAch = Achievements.evaluate(
-            this, sessions.size,
-            sessions.maxOfOrNull { it.durationMs } ?: 0L, streakInfo.best, stageNow
+            this, HistoryStore.totalCount(this).toInt(),
+            maxSingle, streakInfo.best, stageNow
         )
         freshAch.take(2).forEach {
             Toast.makeText(this, getString(R.string.ach_toast_fmt, it.icon, Achievements.title(this, it)), Toast.LENGTH_LONG).show()
@@ -911,7 +913,7 @@ private fun checkRestore() {
         val mahSaved = Stats.estimatedMah(allMs)
         val skinProgress = PetSkins.SkinProgress(
             totalMs = allMs,
-            maxSingleMs = sessions.maxOfOrNull { it.durationMs } ?: 0L,
+            maxSingleMs = maxSingle,
             streakDays = streakInfo.current,
             mah = mahSaved,
             gp = gpNow.toLong()

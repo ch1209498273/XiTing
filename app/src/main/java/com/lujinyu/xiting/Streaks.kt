@@ -33,13 +33,15 @@ object Streaks {
     fun distinctListenDays(sessions: List<ListenSession>): Int =
         sessions.mapTo(HashSet()) { epochDayOf(it.start) }.size
 
-    fun compute(sessions: List<ListenSession>): Info {
-        val days = HashSet<Long>()
-        for (s in sessions) {
-            days.add(epochDayOf(s.start))
-        }
-        val today = epochDayOf(System.currentTimeMillis())
+    fun compute(sessions: List<ListenSession>): Info =
+        computeFromDays(sessions.mapTo(HashSet()) { epochDayOf(it.start) })
 
+    /**
+     * 从「听剧日集合」算连续天数（v4.0：明细只留 60 天，全量口径走
+     * HistoryStore.listenDays，必须用这个入口）。
+     * today 参数默认取当前时刻；单测传固定值钉死边界。
+     */
+    fun computeFromDays(days: Set<Long>, today: Long = epochDayOf(System.currentTimeMillis())): Info {
         var current = 0
         var cursor = today
         if (cursor !in days) cursor -= 1 // 今天还没听：从昨天往前数，今天听了会补上

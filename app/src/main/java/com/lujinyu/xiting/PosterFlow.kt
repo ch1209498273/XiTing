@@ -26,13 +26,13 @@ internal const val SHARE_GP_PER_DAY = 5
  * 不能因为「发不出图」就把分享功能整个堵死。
  */
 internal fun MainActivity.shareAllTime() {
-        val sessions = SessionLog.sessions(this)
-        val allMs = sessions.sumOf { it.durationMs }
+        // 累计口径 = 全量聚合（v4.0：明细只有 60 天，全量在 HistoryStore）
+        val allMs = HistoryStore.totalMs(this)
         val mah = Stats.estimatedMah(allMs)
         val stage = PetForm.selected(this)
         val skin = PetSkins.active(this)
-        val days = Streaks.distinctListenDays(sessions)
-        val best = Streaks.compute(sessions).best
+        val days = HistoryStore.listenDays(this).size
+        val best = Streaks.computeFromDays(HistoryStore.listenDays(this)).best
 
         val d = SharePoster.Data(
             stage = stage,

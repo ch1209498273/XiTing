@@ -43,12 +43,19 @@ if (-not (Test-Path "keystore.properties")) {
     if ((Read-Host "继续？(y/N)") -ne "y") { throw "已取消" }
 }
 
-# ---- 2. 测试 ----
+# ---- 2. 测试 + 门禁 ----
 if (-not $SkipTests) {
     Write-Host "== 单测 =="
     powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1 *> .cowork-temp\release_tests.txt
     if ($LASTEXITCODE -ne 0) { throw "测试失败，见 .cowork-temp\release_tests.txt" }
     Get-Content .cowork-temp\release_tests.txt -Encoding UTF8 | Select-String "合计" | Select-Object -First 1
+
+    # lint 门禁：lintVital 只查 fatal，forceDarkAllowed 那个 NewApi 就是这么漏进 v3.6.2 的
+    Write-Host "== lint 门禁 =="
+    & $GradlePath lint --console=plain *> .cowork-temp\release_lint.txt
+    if ($LASTEXITCODE -ne 0) { throw "lint 失败，见 .cowork-temp\release_lint.txt" }
+    python tools\i18n.py check
+    if ($LASTEXITCODE -ne 0) { throw "多语言不完整（i18n check），见上方输出" }
 }
 
 # ---- 3. 构建 ----

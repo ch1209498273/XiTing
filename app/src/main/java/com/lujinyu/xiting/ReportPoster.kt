@@ -34,15 +34,17 @@ object ReportPoster {
         if (st.totalMs <= 0L) return null
         val stage = PetForm.selected(ctx)
         val skin = PetSkins.active(ctx)
-        val best = Streaks.compute(sessions).best
+        val best = Streaks.computeFromDays(HistoryStore.listenDays(ctx)).best
+        // 上月环比走全量聚合（明细 60 天在月初边界会裁掉上月底——聚合是精确值）
+        val lastMonthMs = HistoryStore.thisAndLastMonth(ctx, System.currentTimeMillis()).second
         val lines = buildList {
             add(
                 ctx.getString(R.string.poster_row_days_week) to
                     ctx.getString(R.string.fmt_days_sessions, st.listenDays, st.count)
             )
             add(ctx.getString(R.string.poster_row_max) to ctx.fmtDur(st.maxSingleMs))
-            if (st.prevTotalMs > 0L) {
-                val pct = ((st.totalMs - st.prevTotalMs) * 100 / st.prevTotalMs).toInt()
+            if (lastMonthMs > 0L) {
+                val pct = ((st.totalMs - lastMonthMs) * 100 / lastMonthMs).toInt()
                 add(ctx.getString(R.string.poster_row_vs_last) to if (pct >= 0) "+$pct%" else "$pct%")
             }
             add(ctx.getString(R.string.poster_row_streak) to ctx.getString(R.string.fmt_days, best))

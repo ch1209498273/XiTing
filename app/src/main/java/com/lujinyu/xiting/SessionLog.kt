@@ -73,7 +73,12 @@ object SessionLog {
     const val MODE_BLACK = 0
     const val MODE_SCREEN_OFF = 1
 
-    fun sessions(context: Context): List<ListenSession> = synchronized(lock) { read(context) }
+    fun sessions(context: Context): List<ListenSession> = synchronized(lock) {
+        val list = read(context)
+        // 一次性迁移：老版本没有全量聚合，从现存明细算基线（幂等，一个 boolean 读）
+        HistoryStore.ensureMigrated(context, list)
+        list
+    }
 
     /**
      * 解析存档文件。语法级损坏（整个 JSON 非法）走留底；元素级损坏逐条跳过。
@@ -107,6 +112,8 @@ object SessionLog {
             val list = read(context).toMutableList()
             list.add(0, session)
             write(context, list)
+            // 聚合同步累加（明细与聚合一致性的唯一写入点）
+            HistoryStore.record(context, session)
         }
     }
 
@@ -140,8 +147,12 @@ object SessionLog {
      * rename 在同一目录内是原子操作，读者要么看到旧的完整文件，要么看到新的完整文件。
      */
     private fun write(context: Context, list: List<ListenSession>) {
+        // v4.0：明细只保留 60 天（列表/周报/月报本月够用），全量口径在 HistoryStore 聚合。
+        // MAX=500 保留作条数兜底。聚合是派生数据，降级到 v3.x 会看到累计缩水（已知取舍）。
+        val cutoff = System.currentTimeMillis() - 60L * 24 * 3600 * 1000
         val arr = JSONArray()
         list.take(MAX).forEach {
+            if (it.start < cutoff) return@forEach
             arr.put(
                 JSONObject()
                     .put("s", it.start)

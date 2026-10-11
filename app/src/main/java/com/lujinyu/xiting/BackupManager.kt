@@ -257,6 +257,9 @@ object BackupManager {
                 }
                 Log.i(TAG, "导入会话 ${kept.length()} 条（原文件 ${arr.length()} 条，超限或结构不合法者已丢弃）")
             }
+            // v4.0：聚合是明细的派生数据（累计/最长/连续天数/月口径），恢复后必须重算，
+            // 否则聚合还停留在恢复前的值。备份文件本身不带聚合（派生数据不进备份）。
+            HistoryStore.rebuildFromSessions(ctx, SessionLog.sessions(ctx))
             Log.i(TAG, "备份已恢复（gp=$gp）")
             true
         } catch (e: Exception) {

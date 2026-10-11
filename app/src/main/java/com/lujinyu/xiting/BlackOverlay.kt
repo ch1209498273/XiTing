@@ -58,6 +58,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var mediaRow: LinearLayout? = null
     private var playPauseBtn: android.widget.ImageView? = null
     private var titleText: TextView? = null        // 唤醒态剧名（需通知使用权，无则不显示）
+    private var captionText: TextView? = null      // 黑幕字幕（实验性，无障碍采集，居中大字）
     private var seekBackBtn: TextView? = null      // ±30s（会话声明 ACTION_SEEK_TO 才显示）
     private var seekFwdBtn: TextView? = null
     /** ±30s 连点防抖基准：-1 = 窗口外（下一次点按从真实位置起算） */
@@ -154,6 +155,28 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
                 Gravity.CENTER_HORIZONTAL or Gravity.TOP
             ).apply { topMargin = (60 * density).toInt() }
         )
+
+        // 黑幕字幕（v4.1 实验性）：无障碍采集的字幕文本镜像到屏幕中央，
+        // 大字可读——「闭眼听 + 睁眼读字」的阅读模式。仅唤醒态显示。
+        val caption = TextView(context).apply {
+            textSize = 20f
+            setTextColor(0xE6FFFFFF.toInt())
+            gravity = Gravity.CENTER
+            maxLines = 3
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            setLineSpacing(6f * density, 1f)
+            visibility = View.INVISIBLE
+            alpha = 0f
+        }
+        f.addView(
+            caption,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER
+            ).apply { marginStart = (48 * density).toInt(); marginEnd = (48 * density).toInt() }
+        )
+        captionText = caption
 
         val pill = TextView(context).apply {
             text = context.getString(R.string.black_return)
@@ -520,6 +543,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         main.removeCallbacks(burnInTick)
         main.removeCallbacks(nowPlayingTick)
         main.removeCallbacks(seekReset)
+        captionListener?.let { CaptionBus.unregister(it) }
+        captionListener = null
+        captionText = null
         infoCol = null
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }
         frame = null
@@ -549,6 +575,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         refreshNowPlaying()
         main.removeCallbacks(nowPlayingTick)
         main.postDelayed(nowPlayingTick, 2_000)
+        // 字幕总线：唤醒期间镜像无障碍采集的文本；字幕到达即显示
+        captionListener = { text -> main.post { showCaption(text) } }
+        CaptionBus.register(captionListener!!)
         main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
         Log.i(TAG, "awake: 解除锁定，背光恢复")
     }
@@ -570,6 +599,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             ?.withEndAction { mediaRow?.visibility = View.INVISIBLE }?.start()
         titleText?.animate()?.alpha(0f)?.setDuration(200)
             ?.withEndAction { titleText?.visibility = View.INVISIBLE }?.start()
+        hideCaption()
+        captionListener?.let { CaptionBus.unregister(it) }
+        captionListener = null
         main.removeCallbacks(nowPlayingTick)
         Log.i(TAG, "sleep: 重新锁定")
     }
@@ -589,6 +621,29 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         // 媒体键生效后刷新播放/暂停图标（音频状态更新有延迟）
         main.postDelayed({ refreshNowPlaying() }, 400)
+    }
+
+    private var captionListener: ((String) -> Unit)? = null
+
+    /** 字幕到达：唤醒态显示（空文本 = 字幕间隙，隐藏）；锁定态绝不显示 */
+    private fun showCaption(text: String) {
+        val c = captionText ?: return
+        if (!awake) return
+        if (text.isBlank()) {
+            hideCaption()
+            return
+        }
+        c.text = text
+        if (c.visibility != View.VISIBLE) {
+            c.visibility = View.VISIBLE
+            c.animate().alpha(1f).setDuration(150).start()
+        }
+    }
+
+    private fun hideCaption() {
+        val c = captionText ?: return
+        c.animate().alpha(0f).setDuration(150)
+            .withEndAction { c.visibility = View.INVISIBLE }?.start()
     }
 
     /**

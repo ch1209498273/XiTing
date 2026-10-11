@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  黑幕字幕采集服务配置（v4.1 实验性）。
+  只监听文本类事件 + 可读窗口内容；packageNames 不设 = 所有 App（字幕在视频 App 里）。
+  feedbackGeneric = 不做任何无障碍反馈（纯读）。
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowContentChanged|typeViewTextChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagRetrieveInteractiveWindows"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="250"
+    android:description="@string/caption_service_desc" />

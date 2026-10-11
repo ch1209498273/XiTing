@@ -2,6 +2,7 @@
 package com.lujinyu.xiting
 
 import android.content.Context
+import android.content.Intent
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -223,6 +224,33 @@ internal fun MainActivity.showIconStyleDialog() {
                 Toast.makeText(this, getString(R.string.toast_icon_changed), Toast.LENGTH_SHORT).show()
             }
             d.dismiss()
+        }
+        .setNegativeButton(getString(R.string.dlg_cancel), null)
+        .show()
+}
+
+/** 设置页「黑幕字幕」行的当前状态（无障碍服务开关是唯一事实源） */
+internal fun MainActivity.refreshCaptionValue() {
+    val tv = pageSettings.findViewById<TextView>(R.id.caption_value) ?: return
+    tv.text = getString(if (CaptionService.isEnabled(this)) R.string.caption_on else R.string.caption_off)
+}
+
+/**
+ * 黑幕字幕（实验性）：说明 + 跳系统无障碍设置。
+ * 「实验性」标注是刻意的：软字幕覆盖率有限（硬字幕读不到），先把预期压对。
+ */
+internal fun MainActivity.showCaptionDialog() {
+    val enabled = CaptionService.isEnabled(this)
+    android.app.AlertDialog.Builder(this)
+        .setTitle(getString(R.string.caption_row_title))
+        .setMessage(getString(R.string.caption_guide))
+        .setPositiveButton(
+            getString(if (enabled) R.string.caption_settings_btn else R.string.caption_go)
+        ) { _, _ ->
+            try {
+                startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            } catch (_: Exception) {
+            }
         }
         .setNegativeButton(getString(R.string.dlg_cancel), null)
         .show()

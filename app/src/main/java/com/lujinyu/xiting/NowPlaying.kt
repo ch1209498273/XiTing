@@ -22,6 +22,7 @@ import android.media.session.PlaybackState
 data class NowPlaying(
     val title: String?,       // 会话标题（剧名/集名）；缺或空为 null
     val appLabel: String?,    // 播放来源 App 的展示名（如「哔哩哔哩」）；读不到为 null
+    val pkg: String,          // 会话所属包名（字幕采集的前台过滤用）
     val positionMs: Long,     // 当前进度（playbackState.position 已按 lastUpdateTime 折算到当前）
     val durationMs: Long,     // 总时长；读不到为 0
     val canSeek: Boolean,     // 会话是否声明支持 seekTo（±30s 按钮的兼容性探测依据）
@@ -86,6 +87,7 @@ fun Context.queryNowPlaying(): NowPlaying? {
     return NowPlaying(
         title = title,
         appLabel = appLabel,
+        pkg = pick.packageName,
         positionMs = ps.position.coerceAtLeast(0),
         durationMs = md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L,
         canSeek = ps.actions and PlaybackState.ACTION_SEEK_TO != 0L,

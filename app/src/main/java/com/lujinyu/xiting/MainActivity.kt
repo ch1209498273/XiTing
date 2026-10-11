@@ -140,6 +140,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             refreshBubbleStyleValue()
             refreshLangValue()
             refreshIconStyleValue()
+            refreshCaptionValue()
         }
     }
 
@@ -1054,6 +1055,9 @@ private fun checkRestore() {
 
         // 图标样式：成就解锁的启动图标（activity-alias 切换）
         page.findViewById<View>(R.id.row_icon_style).setOnClickListener { showIconStyleDialog() }
+
+        // 黑幕字幕（实验性）：状态展示 + 跳无障碍设置
+        page.findViewById<View>(R.id.row_caption).setOnClickListener { showCaptionDialog() }
 
         // 界面语言
         page.findViewById<View>(R.id.row_lang).setOnClickListener { showLangDialog() }

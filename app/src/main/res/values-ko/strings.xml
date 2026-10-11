@@ -77,6 +77,13 @@
     <string name="notif_suggest_title">보고 계신가요?</string>
     <string name="notif_suggest_msg">탭하여 화면 끄고 소리만</string>
     <string name="channel_suggest">화면 끄기 제안</string>
+    <string name="caption_row_title">검은 화면 자막(실험적)</string>
+    <string name="caption_on">켜짐</string>
+    <string name="caption_off">꺼짐</string>
+    <string name="caption_guide">검은 화면에 재생 중인 영상 자막을 표시합니다(빌리빌리 CC·YouTube 자막 등 텍스트 형식만 가능, 화면에 삽입된 자막은 읽을 수 없음). 접근성 권한이 필요합니다. 자막 텍스트는 검은 화면에 실시간 표시될 뿐 저장·업로드되지 않습니다.</string>
+    <string name="caption_go">켜기</string>
+    <string name="caption_settings_btn">설정 열기</string>
+    <string name="caption_service_desc">재생 중인 영상의 자막 텍스트를 읽어 息屏听劇 검은 화면에 실시간 표시합니다. 저장·업로드하지 않습니다.</string>
     <string name="switch_headset">이어폰 뽑으면 자동으로 영상으로</string>
     <string name="bubble_style">버블 표시</string>
     <string name="settings_data">데이터</string>

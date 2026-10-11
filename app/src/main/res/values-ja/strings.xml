@@ -77,6 +77,13 @@
     <string name="notif_suggest_title">何か見てます？</string>
     <string name="notif_suggest_msg">タップで息屏、音声はそのまま</string>
     <string name="channel_suggest">息屏の提案</string>
+    <string name="caption_row_title">黒幕字幕（実験的）</string>
+    <string name="caption_on">オン</string>
+    <string name="caption_off">オフ</string>
+    <string name="caption_guide">黒幕上で再生中の動画の字幕を表示します（B站CC字幕やYouTube字幕などテキスト形式のみ。焼き込み字幕は読めません）。ユーザー補助権限が必要です。字幕テキストは黒幕にリアルタイム表示されるだけで、保存もアップロードもされません。</string>
+    <string name="caption_go">オンにする</string>
+    <string name="caption_settings_btn">設定へ開く</string>
+    <string name="caption_service_desc">再生中の動画の字幕テキストを読み取り、息屏听劇の黒幕にリアルタイム表示します。保存・アップロードは一切行いません。</string>
     <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
     <string name="bubble_style">バブル表示</string>
     <string name="settings_data">データ</string>

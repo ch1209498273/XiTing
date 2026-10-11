@@ -86,6 +86,13 @@
     <string name="notif_suggest_title">正在看剧？</string>
     <string name="notif_suggest_msg">点此息屏，声音继续</string>
     <string name="channel_suggest">息屏建议</string>
+    <string name="caption_row_title">黑幕字幕（实验性）</string>
+    <string name="caption_on">已开启</string>
+    <string name="caption_off">未开启</string>
+    <string name="caption_guide">黑幕上显示正在播放视频的字幕（仅限字幕以文字形式存在的视频，如B站CC字幕、YouTube字幕；画面内嵌的硬字幕无法读取）。需要开启无障碍权限；字幕文本仅实时显示在黑幕上，不存储不上传。</string>
+    <string name="caption_go">去开启</string>
+    <string name="caption_settings_btn">前往设置</string>
+    <string name="caption_service_desc">采集正在播放视频的字幕文本，仅实时显示在息屏听剧的黑幕上。不存储、不上传、不用于其他用途。</string>
     <string name="switch_headset">耳机拔出自动返回视频</string>
     <string name="bubble_style">悬浮球样式</string>
     <string name="settings_data">数据</string>

@@ -57,6 +57,16 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
     private var unlockPill: TextView? = null
     private var mediaRow: LinearLayout? = null
     private var playPauseBtn: android.widget.ImageView? = null
+    private var titleText: TextView? = null        // 唤醒态剧名（需通知使用权，无则不显示）
+    private var seekBackBtn: TextView? = null      // ±30s（会话声明 ACTION_SEEK_TO 才显示）
+    private var seekFwdBtn: TextView? = null
+    /** ±30s 连点防抖基准：-1 = 窗口外（下一次点按从真实位置起算） */
+    private var lastSeekTarget = -1L
+    private val seekReset = Runnable { lastSeekTarget = -1 }
+    private val nowPlayingTick: Runnable = Runnable {   // 唤醒态轻轮询（2s；锁定态不跑）
+        refreshNowPlaying()
+        main.postDelayed(nowPlayingTick, 2_000)
+    }
     private val am by lazy {
         context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
     }
@@ -170,7 +180,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         )
 
         // 媒体控制行（唤醒态显示）：黑幕下切集/暂停——通知栏被黑幕遮住，
-        // 这里是媒体键唯一可达的位置。默认关闭（防误触），可在设置中选择开启
+        // 这里是媒体键唯一可达的位置。默认关闭（防误触），可在设置中选择开启。
+        // ⚠ 五键一行的总宽按最窄 320dp 屏算过：主键 50dp×3 + seek 44dp×2 + 间距，
+        // 再大的按钮或间距都会溢出（布局版的坑 11）。
         val showMedia = context.prefs()
             .getBoolean(Prefs.BLACK_MEDIA_CONTROLS, false)
         val media = LinearLayout(context).apply {
@@ -179,30 +191,58 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             visibility = View.INVISIBLE
             alpha = 0f
         }
-        val mkBtn = { resId: Int, code: Int, desc: String ->
+        val mkBtn = { resId: Int, desc: String, onClick: () -> Unit ->
             android.widget.ImageView(context).apply {
                 setImageResource(resId)
                 setColorFilter(Color.WHITE)
                 contentDescription = desc
-                val size = (52 * density).toInt()
+                val size = (50 * density).toInt()
                 val bg = android.graphics.drawable.GradientDrawable().apply {
                     shape = android.graphics.drawable.GradientDrawable.OVAL
                     setColor(0x66000000)
                 }
                 background = bg
-                setPadding((14 * density).toInt(), (14 * density).toInt(), (14 * density).toInt(), (14 * density).toInt())
+                setPadding((13 * density).toInt(), (13 * density).toInt(), (13 * density).toInt(), (13 * density).toInt())
                 layoutParams = LinearLayout.LayoutParams(size, size).apply {
-                    marginStart = (14 * density).toInt()
-                    marginEnd = (14 * density).toInt()
+                    marginStart = (8 * density).toInt()
+                    marginEnd = (8 * density).toInt()
                 }
-                setOnClickListener { sendMediaKey(code) }
+                setOnClickListener { onClick() }
             }
         }
-        media.addView(mkBtn(R.drawable.ic_media_prev, KeyEvent.KEYCODE_MEDIA_PREVIOUS, context.getString(R.string.cd_prev_episode)))
-        val ppBtn = mkBtn(R.drawable.ic_media_pause, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, context.getString(R.string.cd_play_pause))
+        // ±30s：seekTo 走 MediaSession（需通知使用权），键注入的 FAST_FORWARD 各家
+        // 视频App行为不一（±10s/±30s/忽略）。默认隐藏，快照说支持才显示。
+        val mkSeek = { label: String, desc: String, delta: Long ->
+            TextView(context).apply {
+                text = label
+                textSize = 12f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                setTextColor(Color.WHITE)
+                gravity = Gravity.CENTER
+                contentDescription = desc
+                val size = (44 * density).toInt()
+                background = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.OVAL
+                    setColor(0x66000000)
+                }
+                layoutParams = LinearLayout.LayoutParams(size, size).apply {
+                    marginStart = (6 * density).toInt()
+                    marginEnd = (6 * density).toInt()
+                }
+                setOnClickListener { nudgeSeek(delta) }
+            }
+        }
+        val seekBack = mkSeek("-30", context.getString(R.string.cd_seek_back), -30_000L).apply { visibility = View.GONE }
+        val seekFwd = mkSeek("+30", context.getString(R.string.cd_seek_forward), 30_000L).apply { visibility = View.GONE }
+        seekBackBtn = seekBack
+        seekFwdBtn = seekFwd
+        media.addView(mkBtn(R.drawable.ic_media_prev, context.getString(R.string.cd_prev_episode)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS) })
+        media.addView(seekBack)
+        val ppBtn = mkBtn(R.drawable.ic_media_pause, context.getString(R.string.cd_play_pause)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) }
         playPauseBtn = ppBtn
         media.addView(ppBtn)
-        media.addView(mkBtn(R.drawable.ic_media_next, KeyEvent.KEYCODE_MEDIA_NEXT, context.getString(R.string.cd_next_episode)))
+        media.addView(seekFwd)
+        media.addView(mkBtn(R.drawable.ic_media_next, context.getString(R.string.cd_next_episode)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT) })
         if (showMedia) {
             f.addView(
                 media,
@@ -213,6 +253,31 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
                 ).apply { bottomMargin = (185 * density).toInt() }
             )
         }
+
+        // 剧名（唤醒态，媒体控制行上方）：只读 MediaSession metadata，零打扰；
+        // 无通知使用权或会话无标题时整个隐藏（降级见 NowPlaying KDoc）
+        val title = TextView(context).apply {
+            textSize = 14f
+            setTextColor(0xB3FFFFFF.toInt())
+            gravity = Gravity.CENTER
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            visibility = View.INVISIBLE
+            alpha = 0f
+        }
+        f.addView(
+            title,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
+            ).apply {
+                bottomMargin = (252 * density).toInt()
+                marginStart = (56 * density).toInt()
+                marginEnd = (56 * density).toInt()
+            }
+        )
+        titleText = title
 
         // 未读通知角标（需用户授予「通知使用权」，未授权时不显示）
         val badge = TextView(context).apply {
@@ -449,6 +514,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         main.removeCallbacks(clockTick)
         main.removeCallbacks(burnInTick)
+        main.removeCallbacks(nowPlayingTick)
+        main.removeCallbacks(seekReset)
         infoCol = null
         frame?.let { f -> try { wm.removeView(f) } catch (_: Exception) {} }
         frame = null
@@ -456,6 +523,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         unlockPill = null
         mediaRow = null
         playPauseBtn = null
+        titleText = null
+        seekBackBtn = null
+        seekFwdBtn = null
+        lastSeekTarget = -1
         isShowing = false
     }
 
@@ -471,7 +542,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         unlockPill?.animate()?.alpha(1f)?.setDuration(200)?.start()
         mediaRow?.visibility = View.VISIBLE
         mediaRow?.animate()?.alpha(1f)?.setDuration(200)?.start()
-        updatePlayIcon()
+        refreshNowPlaying()
+        main.removeCallbacks(nowPlayingTick)
+        main.postDelayed(nowPlayingTick, 2_000)
         main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
         Log.i(TAG, "awake: 解除锁定，背光恢复")
     }
@@ -491,6 +564,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             ?.withEndAction { unlockPill?.visibility = View.INVISIBLE }?.start()
         mediaRow?.animate()?.alpha(0f)?.setDuration(200)
             ?.withEndAction { mediaRow?.visibility = View.INVISIBLE }?.start()
+        titleText?.animate()?.alpha(0f)?.setDuration(200)
+            ?.withEndAction { titleText?.visibility = View.INVISIBLE }?.start()
+        main.removeCallbacks(nowPlayingTick)
         Log.i(TAG, "sleep: 重新锁定")
     }
 
@@ -508,14 +584,62 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
         }
         // 媒体键生效后刷新播放/暂停图标（音频状态更新有延迟）
-        main.postDelayed({ updatePlayIcon() }, 400)
+        main.postDelayed({ refreshNowPlaying() }, 400)
     }
 
-    /** 播放状态→显示暂停键；暂停状态→显示播放键 */
-    private fun updatePlayIcon() {
-        val btn = playPauseBtn ?: return
-        val playing = try { am.isMusicActive } catch (_: Exception) { false }
-        btn.setImageResource(if (playing) R.drawable.ic_media_pause else R.drawable.ic_media_play)
+    /**
+     * 播放键图标 + 剧名 + ±30s 可见性：三个刷新点收拢在这一个入口
+     * （图鉴大图不跟随选择的教训：刷新散落在各回调里必漏一处）。
+     * 无通知使用权时 np 为 null —— 标题/±30s 整体隐藏，
+     * 播放键退回 isMusicActive 旧逻辑（媒体键注入不需要权限，照常可用）。
+     */
+    private fun refreshNowPlaying() {
+        val np = context.queryNowPlaying()
+        val btn = playPauseBtn
+        if (btn != null) {
+            val playing = np?.playing ?: try { am.isMusicActive } catch (_: Exception) { false }
+            btn.setImageResource(if (playing) R.drawable.ic_media_pause else R.drawable.ic_media_play)
+        }
+        val t = titleText
+        if (t != null) {
+            val s = np?.title
+            if (s != null) {
+                t.text = s
+                if (awake && t.visibility != View.VISIBLE) {
+                    t.visibility = View.VISIBLE
+                    t.animate().alpha(1f).setDuration(200).start()
+                }
+            } else if (t.visibility != View.INVISIBLE) {
+                t.visibility = View.INVISIBLE
+                t.alpha = 0f
+            }
+        }
+        val on = np?.canSeek == true
+        seekBackBtn?.visibility = if (on) View.VISIBLE else View.GONE
+        seekFwdBtn?.visibility = if (on) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * ±30s。800ms 窗口内连点在「已应用的目标」上累加，而不是每次读实时位置——
+     * playbackState.position 异步更新，读实时位置会让第 2、3 次点按算重复步。
+     * 窗口过后冷启动，重新从真实位置起算。一次点按=用户醒着：
+     * 重置重锁计时（与媒体键一致），并按媒体键同款 400ms 节奏刷状态。
+     */
+    private fun nudgeSeek(deltaMs: Long) {
+        val np = context.queryNowPlaying() ?: return
+        val base = if (lastSeekTarget < 0) np.positionMs else lastSeekTarget
+        val target = clampSeekTarget(base + deltaMs, np.durationMs)
+        try {
+            np.seekTo(target)
+        } catch (_: Exception) {
+            return
+        }
+        lastSeekTarget = target
+        main.removeCallbacks(seekReset)
+        main.postDelayed(seekReset, 800)
+        main.removeCallbacks(relockRunnable)
+        main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
+        main.postDelayed({ refreshNowPlaying() }, 400)
     }
 
     private fun unlockPillBg(context: Context) = android.graphics.drawable.GradientDrawable().apply {

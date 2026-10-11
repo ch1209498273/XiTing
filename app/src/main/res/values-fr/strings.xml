@@ -297,6 +297,8 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="cd_prev_episode">Épisode précédent</string>
     <string name="cd_play_pause">Lecture / pause</string>
     <string name="cd_next_episode">Épisode suivant</string>
+    <string name="cd_seek_back">Reculer de 30 secondes</string>
+    <string name="cd_seek_forward">Avancer de 30 secondes</string>
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">Off</string>

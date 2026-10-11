@@ -260,6 +260,8 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="cd_prev_episode">Previous episode</string>
     <string name="cd_play_pause">Play / pause</string>
     <string name="cd_next_episode">Next episode</string>
+    <string name="cd_seek_back">Rewind 30 seconds</string>
+    <string name="cd_seek_forward">Forward 30 seconds</string>
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">Off</string>

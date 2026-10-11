@@ -303,7 +303,9 @@
     <string name="battery_fmt">电量 %1$d%%</string>
     <string name="cd_prev_episode">上一集</string>
     <string name="cd_play_pause">播放/暂停</string>
-    <string name="cd_next_episode">下一集</string>    <!-- 格式化串，避免在代码里拼字符串（lint SetTextI18n）。
+    <string name="cd_next_episode">下一集</string>
+    <string name="cd_seek_back">快退 30 秒</string>
+    <string name="cd_seek_forward">快进 30 秒</string>    <!-- 格式化串，避免在代码里拼字符串（lint SetTextI18n）。
          name_pair 的分隔符「·」是语言中性的，各语言保持一致。 -->
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>

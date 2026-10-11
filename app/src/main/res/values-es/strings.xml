@@ -297,6 +297,8 @@ Este proyecto no tiene relación con YouTube, Google ni ninguna plataforma de v�
     <string name="cd_prev_episode">Capítulo anterior</string>
     <string name="cd_play_pause">Reproducir / pausar</string>
     <string name="cd_next_episode">Capítulo siguiente</string>
+    <string name="cd_seek_back">Retroceder 30 segundos</string>
+    <string name="cd_seek_forward">Avanzar 30 segundos</string>
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">Off</string>

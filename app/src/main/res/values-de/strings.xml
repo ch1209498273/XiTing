@@ -297,6 +297,8 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="cd_prev_episode">Vorherige Folge</string>
     <string name="cd_play_pause">Abspielen / Pause</string>
     <string name="cd_next_episode">Nächste Folge</string>
+    <string name="cd_seek_back">30 Sekunden zurück</string>
+    <string name="cd_seek_forward">30 Sekunden vor</string>
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">Aus</string>

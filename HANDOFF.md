@@ -2,11 +2,14 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-11 · v3.6.2 之后的一轮（未发版，工作区已提交到 master）。
-> 本轮：**GitHub 仓库优化**（默认分支切 master、删除旧 main 分支、加 topics）、
+> 最后更新：2026-10-11 · v3.6.2 之后的两轮（未发版，已提交 master）。
+> 本轮二：**黑幕播控升级**——唤醒态剧名显示（MediaSession metadata）+ ±30 秒快进快退
+> （`ACTION_SEEK_TO` 按应用探测 + 连点防抖）。见第三节「黑幕播控」小节。
+> 本轮一：**GitHub 仓库优化**（默认分支切 master、删除旧 main 分支、加 topics）、
 > **MainActivity 三步瘦身**（1760 → 1099 行，弹窗/图鉴/海报链路出走）、
 > **海报版式声明化 + 1:1 比例**（PosterLayout 纯函数 + 预览内切换）、
 > 顺手修掉 v3.6.2 深色模式遗留的一枚 NewApi lint error。
+> 另：**「暂停检测/播放中断提醒」已拍板不做**（主场景听到睡着，无声是正常收尾），见第七节。
 > v3.6.2：深色模式（跟随系统）+ 成就弹窗联动高亮。
 > v3.6.1：多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
 > CI 与一键发版/巡检脚本；当晚 7 语言真机巡检通过。详见 git log。
@@ -47,16 +50,17 @@
 | `a37569f` / `9d0be03` / `18369b6` | PetView 分配 / WidgetData 渲染门禁 / 移除只写不读的 xiiting_stats |
 | `46fb465` | 首次纳入版本控制 |
 
-**测试基建**：`app/src/test`，**114 个 JVM 单测**（JUnit4 + org.json），覆盖存档与能量的逐条容错、
+**测试基建**：`app/src/test`，**118 个 JVM 单测**（JUnit4 + org.json），覆盖存档与能量的逐条容错、
 整数溢出饱和、成就残留 id 过滤与阈值、备份导入限量、徽章映射与徽章列布局、换肤取色规则、
-光晕渐变不变量、**海报版式（PosterLayoutTest）**，以及把 26 个持久化键名钉死。
+光晕渐变不变量、**海报版式（PosterLayoutTest）**、**±30s 边界（SeekMathTest）**，
+以及把 26 个持久化键名钉死。
 
 **工具链（2026-10-10 起）**：`.github/workflows/ci.yml`（push 自动跑测试 + 构建）、
 `tools/release.ps1`（一键发版：bump → 测试 → 构建 → Release → 蒲公英）、
 `tools/i18n_shot.ps1`（7 语言 × 3 页面截图巡检，cmd locale 免前台切换）、
 `tools/i18n.py`（多语言同步 / 校验）。
 
-**APK 体积约 302 KB**（3.6.2 + 本轮；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
+**APK 体积约 304 KB**（3.6.2 + 本轮两波；2026-10-07 图标矢量化一役曾降到 159 KB，后续功能增加有所回升）。
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
@@ -114,6 +118,34 @@ powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
   迟到的渲染结果自己回收自己——**谁也不碰 current 的所有权**。
 - **真机未验证（本轮唯一只改未验的 UI）**：预览内切 1:1、1:1 成品观感、
   西语长品牌名下两种比例的顶栏让位。装 release 包后按巡检流程看一眼再发版。
+
+### 黑幕播控升级：唤醒态剧名 + ±30 秒（同日第二轮）
+
+**权限不对称是设计地基**：媒体键注入（切集/播放暂停，dispatchMediaKeyEvent）不需要任何
+权限；剧名与 seekTo 必须走 MediaSession API，依赖**可选**的「通知使用权」。
+未授权时 `queryNowPlaying()` 返回 null → 剧名/±30s 整体隐藏，媒体键照常可用——
+与通知角标同一套可选契约，PRIVACY.md 无需改动。
+
+- 新文件 `NowPlaying.kt`：会话快照 + 纯函数 `clampSeekTarget`。选会话口径 =
+  优先在播、其次 `lastPositionUpdateTime` 最新（⚠ 与 finishThisEpisode 的
+  「剩余最短」口径不同，两个场景，别合并）；每次查询现查现用，不缓存
+  MediaController（会话更替后失效）。
+- `BlackOverlay`：唤醒态剧名一行（媒体行上方 252dp，14sp / 0xB3FFFFFF /
+  单行 ellipsize，两侧各留 56dp ≈ 70% 屏宽）；±30s 是两个 44dp **文本**按钮
+  （"-30"/"+30"，数字语言中性，不进 strings.xml，也免了手绘矢量的形体验证），
+  塞进 mediaRow 跟随「黑幕内媒体控制」开关。**五键总宽按最窄 320dp 屏算过**
+  （50×3 + 44×2 + 间距 = 310dp），主键从 52 加回去就溢出——布局版的坑 11。
+- **±30s 走 seekTo 不走媒体键**：KEYCODE_FAST_FORWARD/REWIND 各家视频 App
+  行为不一（±10s / ±30s / 忽略），seekTo 确定性；可用性探测 =
+  `actions and ACTION_SEEK_TO`，不支持整个按钮隐藏（不是置灰）。
+- **连点防抖**：playbackState.position 异步更新，800ms 窗口内连点在「已应用目标」
+  上累加（`lastSeekTarget`），窗口外冷启动从真实位置起算——逐点读实时位置会把
+  第 2、3 下算重复。越片尾/片头由 clampSeekTarget 兜住。
+- **刷新收拢**：播放键图标 + 剧名 + seek 可见性统一走 `refreshNowPlaying()` 唯一入口
+  （wake / 2s 唤醒期轮询 / 媒体键与 seek 后 400ms 都调它）——坑 7 的教训原样复用。
+  seek 与媒体键都会重置重锁计时（一次点按 = 用户醒着）。
+- i18n：仅 2 条 contentDescription × 8 语言（cd_seek_back / cd_seek_forward），
+  i18n check 300/300；单测 SeekMathTest 4 个（连点累加是 UI 状态，JVM 测不了，靠真机）。
 
 ### 顺手修的既有问题
 
@@ -555,6 +587,10 @@ OPPO PME110 / Android 16（API 36）实测确认：
 
 **高**
 
+- **黑幕播控真机未验**（2026-10-11 只改未验）：B站/爱奇艺/YouTube 三家的
+  剧名显示与 ±30s 出现/隐藏是否符合各家 seek 支持度；连点 +30 三次 = +90s
+  （防抖）；不授通知使用权时剧名/±30s 消失、切集/暂停照常；俄语长标题截断；
+  横屏（B站全屏）五键一行不溢出。
 - **海报 1:1 / 预览切换真机未验**（2026-10-11 只改未验）：预览里切 3:4 ↔ 1:1、
   1:1 成品观感、西语长品牌名下两种比例的顶栏让位。验完再发版。
 - `PetView`(1048行) 与 `BubblePetView`(389行) **各写一遍同一套 5 形态 + `drawFace`**。

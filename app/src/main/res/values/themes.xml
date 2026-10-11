@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- 日间主题；深色版在 values-night/themes.xml（跟随系统） -->
     <style name="Theme.XiTing" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/bg_page</item>
@@ -8,7 +8,8 @@
         <item name="android:colorAccent">@color/brand</item>
         <item name="android:colorPrimary">@color/brand</item>
         <item name="android:colorPrimaryDark">@color/brand_dark</item>
-        <!-- 深色是 values-night 正经做的，禁止系统 Force Dark 再叠一层色彩变换 -->
-        <item name="android:forceDarkAllowed">false</item>
+        <!-- 深色是 values-night 正经做的，禁止系统 Force Dark 再叠一层色彩变换。
+             该属性 API 29+ 才存在，26-28 上框架直接忽略、无害（设计内误报，就地放行） -->
+        <item name="android:forceDarkAllowed" tools:ignore="NewApi">false</item>
     </style>
 </resources>

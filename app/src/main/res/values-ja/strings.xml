@@ -49,6 +49,10 @@
     <string name="switch_info">画面オフ中に時刻とバッテリーを表示</string>
     <string name="switch_media">画面オフ中に再生コントロールを表示</string>
     <string name="switch_media_sub">タイトルと±30秒には通知アクセス権が必要です</string>
+    <string name="icon_style_title">アイコン</string>
+    <string name="icon_locked_fmt">実績 %1$s で解放されます</string>
+    <string name="icon_locked_toast">まず対応する実績を解放しよう</string>
+    <string name="toast_icon_changed">アイコンを変更しました（反映に時間がかかることがあります）</string>
     <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
     <string name="bubble_style">バブル表示</string>
     <string name="settings_data">データ</string>

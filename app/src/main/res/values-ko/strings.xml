@@ -49,6 +49,10 @@
     <string name="switch_info">화면 꺼짐 상태에 시간·배터리 표시</string>
     <string name="switch_media">화면 꺼짐 상태에 재생 컨트롤</string>
     <string name="switch_media_sub">제목·±30초는 알림 접근 권한이 필요합니다</string>
+    <string name="icon_style_title">아이콘</string>
+    <string name="icon_locked_fmt">%1$s 업적 달성 시 사용 가능</string>
+    <string name="icon_locked_toast">먼저 해당 업적을 달성해 보세요</string>
+    <string name="toast_icon_changed">아이콘이 변경되었습니다(반영에 시간이 걸릴 수 있음)</string>
     <string name="switch_headset">이어폰 뽑으면 자동으로 영상으로</string>
     <string name="bubble_style">버블 표시</string>
     <string name="settings_data">데이터</string>

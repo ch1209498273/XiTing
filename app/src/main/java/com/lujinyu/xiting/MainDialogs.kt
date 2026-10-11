@@ -189,6 +189,45 @@ internal fun MainActivity.showLangDialog() {
         .show()
 }
 
+/** 设置页「图标样式」行的当前值（PackageManager 是事实源，见 IconStyle） */
+internal fun MainActivity.refreshIconStyleValue() {
+    val tv = pageSettings.findViewById<TextView>(R.id.icon_style_value) ?: return
+    val cur = IconStyle.OPTIONS.firstOrNull { it.id == IconStyle.currentId(this) }
+    tv.text = cur?.title(this) ?: getString(R.string.app_name)
+}
+
+/**
+ * 图标样式：成就解锁的启动图标（activity-alias 切换，机制见 IconStyle）。
+ * 未解锁的选项照常列出但点击会被拦下——与图鉴「置灰可见」同一套交互习惯。
+ */
+internal fun MainActivity.showIconStyleDialog() {
+    val opts = IconStyle.OPTIONS
+    val labels = opts.map { o ->
+        val t = o.title(this)
+        if (IconStyle.isUnlocked(this, o.id)) t
+        else getString(R.string.icon_locked_fmt, t)
+    }.toTypedArray()
+    val cur = IconStyle.currentId(this)
+    val checked = opts.indexOfFirst { it.id == cur }.let { if (it < 0) 0 else it }
+    android.app.AlertDialog.Builder(this)
+        .setTitle(getString(R.string.icon_style_title))
+        .setSingleChoiceItems(labels, checked) { d, which ->
+            val o = opts[which]
+            if (!IconStyle.isUnlocked(this, o.id)) {
+                Toast.makeText(this, getString(R.string.icon_locked_toast), Toast.LENGTH_SHORT).show()
+                return@setSingleChoiceItems
+            }
+            if (o.id != cur) {
+                IconStyle.apply(this, o.id)
+                refreshIconStyleValue()
+                Toast.makeText(this, getString(R.string.toast_icon_changed), Toast.LENGTH_SHORT).show()
+            }
+            d.dismiss()
+        }
+        .setNegativeButton(getString(R.string.dlg_cancel), null)
+        .show()
+}
+
 /** 设置页「语言」行右侧的当前值 */
 internal fun MainActivity.refreshLangValue() {
     val tv = pageSettings.findViewById<TextView>(R.id.lang_value) ?: return

@@ -49,6 +49,10 @@
     <string name="switch_info">Afficher heure et batterie sur l\'écran noir</string>
     <string name="switch_media">Commandes de lecture sur l\'écran noir</string>
     <string name="switch_media_sub">Titre et ±30 s : accès notifications requis</string>
+    <string name="icon_style_title">Icône applicative</string>
+    <string name="icon_locked_fmt">Se débloque avec le succès %1$s</string>
+    <string name="icon_locked_toast">Débloquez le succès correspondant</string>
+    <string name="toast_icon_changed">Icône modifiée (le lanceur peut mettre une seconde à jour)</string>
     <string name="switch_headset">Retour vidéo au débranchement</string>
     <string name="bubble_style">Style de bulle</string>
     <string name="settings_data">Données</string>

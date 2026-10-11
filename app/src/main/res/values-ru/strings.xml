@@ -49,6 +49,10 @@
     <string name="switch_info">Показывать время и заряд на чёрном экране</string>
     <string name="switch_media">Управление воспроизведением на чёрном экране</string>
     <string name="switch_media_sub">Название и ±30 с требуют доступ к уведомлениям</string>
+    <string name="icon_style_title">Значок приложения</string>
+    <string name="icon_locked_fmt">Откроется с достижением %1$s</string>
+    <string name="icon_locked_toast">Сначала откройте соответствующее достижение</string>
+    <string name="toast_icon_changed">Значок изменён (лаунчер может обновиться с задержкой)</string>
     <string name="switch_headset">Возврат к видео при отключении наушников</string>
     <string name="bubble_style">Вид пузырька</string>
     <string name="settings_data">Данные</string>

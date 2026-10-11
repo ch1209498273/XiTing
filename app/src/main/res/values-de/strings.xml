@@ -49,6 +49,10 @@
     <string name="switch_info">Uhrzeit und Akku im schwarzen Bildschirm anzeigen</string>
     <string name="switch_media">Wiedergabesteuerung im schwarzen Bildschirm</string>
     <string name="switch_media_sub">Titel und ±30 s benötigen Benachrichtigungszugriff</string>
+    <string name="icon_style_title">App-Symbol</string>
+    <string name="icon_locked_fmt">Wird mit dem Erfolg %1$s freigeschaltet</string>
+    <string name="icon_locked_toast">Schalte zuerst den passenden Erfolg frei</string>
+    <string name="toast_icon_changed">Symbol geändert (der Launcher braucht evtl. einen Moment)</string>
     <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
     <string name="bubble_style">Blasen-Stil</string>
     <string name="settings_data">Daten</string>

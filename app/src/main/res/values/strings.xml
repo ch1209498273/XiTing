@@ -58,6 +58,10 @@
     <string name="switch_info">黑幕显示时间与电量</string>
     <string name="switch_media">黑幕播放控制</string>
     <string name="switch_media_sub">剧名与±30秒需开启「通知使用权」</string>
+    <string name="icon_style_title">图标样式</string>
+    <string name="icon_locked_fmt">解锁「%1$s」成就后可用</string>
+    <string name="icon_locked_toast">先解锁对应成就再来换吧</string>
+    <string name="toast_icon_changed">图标已更换，桌面刷新可能要一两秒</string>
     <string name="switch_headset">耳机拔出自动返回视频</string>
     <string name="bubble_style">悬浮球样式</string>
     <string name="settings_data">数据</string>

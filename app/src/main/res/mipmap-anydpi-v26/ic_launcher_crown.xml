@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  「雷霆加冕」成就图标（原型）：暗金底 + 金色皇冠。
+  皇冠路径在自适应图标安全区内（中心半径 33px，x 34-74 / y 36-73），
+  真实图标绘制走 badge_preview 同款预览纪律——此版为先验证切换机制的原型。
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_crown_background" />
+    <foreground android:drawable="@drawable/ic_crown_foreground" />
+    <monochrome android:drawable="@drawable/ic_crown_foreground" />
+</adaptive-icon>

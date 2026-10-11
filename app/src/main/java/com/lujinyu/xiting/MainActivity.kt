@@ -135,6 +135,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         if (target == TAB_SETTINGS) {
             refreshBubbleStyleValue()
             refreshLangValue()
+            refreshIconStyleValue()
         }
     }
 
@@ -1036,6 +1037,9 @@ private fun checkRestore() {
 
         // 悬浮球样式：默认「息屏」文字，可换为已解锁的精灵形态
         page.findViewById<View>(R.id.row_bubble_style).setOnClickListener { showBubbleStyleDialog() }
+
+        // 图标样式：成就解锁的启动图标（activity-alias 切换）
+        page.findViewById<View>(R.id.row_icon_style).setOnClickListener { showIconStyleDialog() }
 
         // 界面语言
         page.findViewById<View>(R.id.row_lang).setOnClickListener { showLangDialog() }

@@ -626,12 +626,16 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
      * 重置重锁计时（与媒体键一致），并按媒体键同款 400ms 节奏刷状态。
      */
     private fun nudgeSeek(deltaMs: Long) {
-        val np = context.queryNowPlaying() ?: return
+        val np = context.queryNowPlaying()
+        Log.i(TAG, "nudgeSeek delta=$deltaMs np=${np != null} pos=${np?.positionMs} canSeek=${np?.canSeek}")
+        if (np == null) return
         val base = if (lastSeekTarget < 0) np.positionMs else lastSeekTarget
         val target = clampSeekTarget(base + deltaMs, np.durationMs)
         try {
             np.seekTo(target)
-        } catch (_: Exception) {
+            Log.i(TAG, "nudgeSeek -> seekTo($target) ok")
+        } catch (e: Exception) {
+            Log.w(TAG, "nudgeSeek seekTo($target) fail: $e")
             return
         }
         lastSeekTarget = target

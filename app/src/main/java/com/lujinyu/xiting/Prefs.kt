@@ -104,6 +104,11 @@ object Prefs {
     /** 一次性迁移标记：老 sessions.json 的全部历史算进聚合 */
     const val STATS_MIGRATED = "stats_agg_migrated"
 
+    // ---- 息屏建议通知（v4.0，双路径：服务内 tick / JobScheduler 周期兜底）----
+    const val SUGGEST_NOTIFY = "suggest_notify"
+    /** 同一天最多提示一次（epoch day 字符串去重） */
+    const val SUGGEST_LAST_DAY = "suggest_last_day"
+
     // ---- 界面语言 ----
     /** per-app 语言 tag（""=跟随系统），读取见 AppLocales */
     const val LANG = "lang"

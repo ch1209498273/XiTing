@@ -144,13 +144,15 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             setTextColor(0x66FFFFFF.toInt())
             gravity = Gravity.CENTER
         }
+        // v4.0：hint 移到顶部居中——底部已被 剧名/媒体行/返回按钮 占满（剧名两行后更挤）；
+        // 顶部空旷，锁定/唤醒两态都可读，与 8 秒淡出逻辑兼容
         f.addView(
             hint,
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER
-            ).apply { topMargin = (150 * density).toInt() } // 下移避让时钟
+                Gravity.CENTER_HORIZONTAL or Gravity.TOP
+            ).apply { topMargin = (60 * density).toInt() }
         )
 
         val pill = TextView(context).apply {
@@ -604,7 +606,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         }
         val t = titleText
         if (t != null) {
-            val s = np?.title
+            val s = np?.displayTitle()
             if (s != null) {
                 t.text = s
                 if (awake && t.visibility != View.VISIBLE) {

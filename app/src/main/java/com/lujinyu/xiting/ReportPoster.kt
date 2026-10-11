@@ -78,6 +78,55 @@ object ReportPoster {
         activity.sharePoster(d, "month")
     }
 
+    /** 年报海报数据；今年无听剧记录时返回 null */
+    fun yearData(ctx: Context): SharePoster.Data? {
+        val year = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+        val ys = HistoryStore.yearStats(ctx, year)
+        if (ys.totalMs <= 0L) return null
+        val stage = PetForm.selected(ctx)
+        val skin = PetSkins.active(ctx)
+        val best = Streaks.computeFromDays(HistoryStore.listenDays(ctx)).best
+        val lines = buildList {
+            add(
+                ctx.getString(R.string.poster_row_days_week) to
+                    ctx.getString(R.string.fmt_days_sessions, ys.listenDays, ys.count)
+            )
+            add(ctx.getString(R.string.poster_row_max) to ctx.fmtDur(ys.maxSingleMs))
+            add(
+                ctx.getString(R.string.poster_row_months_active) to
+                    ctx.getString(R.string.fmt_months_active, ys.monthsActive)
+            )
+            add(ctx.getString(R.string.poster_row_streak) to ctx.getString(R.string.fmt_days, best))
+        }
+        return SharePoster.Data(
+            stage = stage,
+            skin = skin,
+            stageName = PetView.stageName(ctx, stage),
+            headline = ctx.fmtDur(ys.totalMs),
+            headlineUnit = ctx.getString(R.string.poster_unit_year),
+            hint = ctx.getString(R.string.poster_hint_year),
+            lines = lines,
+            footer = ctx.getString(R.string.poster_footer_year),
+            shareText = ctx.getString(
+                R.string.share_text, ctx.fmtDur(ys.totalMs),
+                Stats.estimatedMah(ys.totalMs), PetView.stageName(ctx, stage)
+            ),
+            badge = if (best >= 2) ctx.getString(R.string.poster_badge_streak, best) else null
+        )
+    }
+
+    /** 弹出年报海报预览 */
+    fun shareYearReport(activity: MainActivity) {
+        val d = yearData(activity)
+        if (d == null) {
+            android.widget.Toast.makeText(
+                activity, activity.getString(R.string.report_empty_toast), android.widget.Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        activity.sharePoster(d, "year")
+    }
+
     /**
      * 跨月检测 + 本地通知。onResume 调用：每次回到前台都会跑，但一个自然月
      * 只发一次（REPORT_LAST_MONTH 记录的是「本月已经处理过」）。

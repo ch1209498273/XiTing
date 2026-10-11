@@ -153,6 +153,17 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
+            <!-- v4.0 诊断反馈：版本/机型/权限/崩溃 打包复制，远程支持零来回 -->
+            <TextView
+                android:id="@+id/about_diag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp"
+                android:text="@string/about_diag"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
             <TextView
                 android:id="@+id/about_crash"
                 android:layout_width="match_parent"

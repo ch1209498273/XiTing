@@ -31,14 +31,14 @@ object HistoryStore {
         (ctx.prefs().getStringSet(Prefs.LISTEN_DAYS, emptySet()) ?: emptySet())
             .mapTo(HashSet()) { it.toLong() }
 
-    /** 月聚合："yyyy-MM" → (ms, count)。读时容错：条目损坏的月份直接跳过 */
-    fun months(ctx: Context): Map<String, Pair<Long, Int>> {
-        val out = HashMap<String, Pair<Long, Int>>()
+    /** 月聚合："yyyy-MM" → (ms, count, max)。读时容错：条目损坏/旧 3 段格式直接跳过 */
+    fun months(ctx: Context): Map<String, Triple<Long, Int, Long>> {
+        val out = HashMap<String, Triple<Long, Int, Long>>()
         for (entry in ctx.prefs().getStringSet(Prefs.MONTH_STATS, emptySet()) ?: emptySet()) {
             val p = entry.split(":")
-            if (p.size != 3) continue
+            if (p.size != 4) continue
             try {
-                out[p[0]] = p[1].toLong() to p[2].toInt()
+                out[p[0]] = Triple(p[1].toLong(), p[2].toInt(), p[3].toLong())
             } catch (_: Exception) {
             }
         }
@@ -64,9 +64,15 @@ object HistoryStore {
 
         val key = monthKey(session.start)
         val months = months(ctx).toMutableMap()
-        val old = months[key] ?: (0L to 0)
-        months[key] = (old.first + session.durationMs) to (old.second + 1)
-        p.putStringSet(Prefs.MONTH_STATS, months.mapTo(HashSet()) { "${it.key}:${it.value.first}:${it.value.second}" })
+        val old = months[key] ?: Triple(0L, 0, 0L)
+        months[key] = Triple(
+            old.first + session.durationMs,
+            old.second + 1,
+            maxOf(old.third, session.durationMs)
+        )
+        p.putStringSet(Prefs.MONTH_STATS, months.mapTo(HashSet()) {
+            "${it.key}:${it.value.first}:${it.value.second}:${it.value.third}"
+        })
         p.apply()
     }
 
@@ -83,21 +89,27 @@ object HistoryStore {
         var count = 0L
         var max = 0L
         val days = HashSet<String>()
-        val months = HashMap<String, Pair<Long, Int>>()
+        val months = HashMap<String, Triple<Long, Int, Long>>()
         for (s in sessions) {
             total += s.durationMs
             count++
             if (s.durationMs > max) max = s.durationMs
             days.add(Streaks.epochDayOf(s.start).toString())
             val key = monthKey(s.start)
-            val old = months[key] ?: (0L to 0)
-            months[key] = (old.first + s.durationMs) to (old.second + 1)
+            val old = months[key] ?: Triple(0L, 0, 0L)
+            months[key] = Triple(
+                old.first + s.durationMs,
+                old.second + 1,
+                maxOf(old.third, s.durationMs)
+            )
         }
         p.putLong(Prefs.STATS_TOTAL_MS, total)
         p.putLong(Prefs.STATS_TOTAL_COUNT, count)
         p.putLong(Prefs.STATS_MAX_SINGLE, max)
         p.putStringSet(Prefs.LISTEN_DAYS, days)
-        p.putStringSet(Prefs.MONTH_STATS, months.mapTo(HashSet()) { "${it.key}:${it.value.first}:${it.value.second}" })
+        p.putStringSet(Prefs.MONTH_STATS, months.mapTo(HashSet()) {
+            "${it.key}:${it.value.first}:${it.value.second}:${it.value.third}"
+        })
         p.putBoolean(Prefs.STATS_MIGRATED, true)
         p.apply()
     }
@@ -116,16 +128,45 @@ object HistoryStore {
     fun detailCutoff(ctx: Context): Long =
         System.currentTimeMillis() - DETAIL_DAYS * 24 * 3600 * 1000
 
-    /** 本月与上月的聚合（月报用）；无记录的月为 0 */
+    /** 本月与上月的聚合时长（月报环比用）；无记录的月为 0 */
     fun thisAndLastMonth(ctx: Context, now: Long): Pair<Long, Long> {
         val months = months(ctx)
-        val cal = Calendar.getInstance().apply { timeInMillis = now }
-        val thisKey = monthKey(now)
         val lastCal = Calendar.getInstance().apply {
             timeInMillis = now
             add(Calendar.MONTH, -1)
         }
-        val lastKey = monthKey(lastCal.timeInMillis)
-        return (months[thisKey]?.first ?: 0L) to (months[lastKey]?.first ?: 0L)
+        return (months[monthKey(now)]?.first ?: 0L) to (months[monthKey(lastCal.timeInMillis)]?.first ?: 0L)
+    }
+
+    data class YearStats(
+        val totalMs: Long,
+        val count: Int,
+        val maxSingleMs: Long,
+        val listenDays: Int,
+        val monthsActive: Int
+    )
+
+    /**
+     * 年度聚合：从月聚合表 + 听剧日集合汇总（明细 60 天覆盖不到的部分也在内）。
+     * listenDays 的年归属用「本地年」边界（与写入时的本地日归属同一套偏移计算）。
+     */
+    fun yearStats(ctx: Context, year: Int): YearStats {
+        val months = months(ctx).filterKeys { it.startsWith("$year-") }
+        var total = 0L
+        var count = 0
+        var max = 0L
+        var active = 0
+        for ((_, v) in months) {
+            total += v.first
+            count += v.second
+            if (v.first > 0) active++
+            if (v.third > max) max = v.third
+        }
+        val cal = Calendar.getInstance().apply { clear(); set(year, 0, 1, 12, 0, 0) }
+        val startDay = Streaks.epochDayOf(cal.timeInMillis)
+        cal.add(Calendar.YEAR, 1)
+        val endDay = Streaks.epochDayOf(cal.timeInMillis) - 1
+        val days = listenDays(ctx).count { it in startDay..endDay }
+        return YearStats(total, count, max, days, active)
     }
 }

@@ -1042,6 +1042,13 @@ private fun checkRestore() {
             OverlayService.instance?.reapplyBlack()
         }
 
+        // 息屏建议通知（双路径：服务内精确 / JobScheduler 兜底；默认关，不越界）
+        val switchSuggest = page.findViewById<android.widget.Switch>(R.id.switch_suggest)
+        switchSuggest.isChecked = prefs.getBoolean(Prefs.SUGGEST_NOTIFY, false)
+        switchSuggest.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean(Prefs.SUGGEST_NOTIFY, checked).apply()
+        }
+
         // 悬浮球样式：默认「息屏」文字，可换为已解锁的精灵形态
         page.findViewById<View>(R.id.row_bubble_style).setOnClickListener { showBubbleStyleDialog() }
 

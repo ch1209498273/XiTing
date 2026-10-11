@@ -61,6 +61,8 @@ class OverlayService : Service() {
         private const val NOTIF_ID = 1
         private const val NOTIF_EXIT_ID = 2
         const val ACTION_TOGGLE = "com.lujinyu.xiting.TOGGLE"
+        /** 建议通知：媒体连续播放多久后提示一次（每天最多一条，节流在 SuggestNotify） */
+        private const val SUGGEST_AFTER_MS = 10L * 60_000
         const val ACTION_BUBBLE = "com.lujinyu.xiting.BUBBLE_TOGGLE"
         const val ACTION_EXIT = "com.lujinyu.xiting.EXIT"
         const val ACTION_SET_TIMER = "com.lujinyu.xiting.SET_TIMER"
@@ -307,6 +309,9 @@ class OverlayService : Service() {
         instance = this
         wm = getSystemService(WINDOW_SERVICE) as WindowManager
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        // v4.0 建议通知（精确路径）：黑幕未开 + 有媒体在播 → 连续 10 分钟后提示。
+        // 开关关着 / 黑幕开着 / 没有媒体 → 直接跳过。兜底路径（服务没跑）在 SuggestJobService。
+        main.postDelayed(suggestTick, 30_000)
         // 常驻部分唤醒锁：服务运行期间保持CPU唤醒、防止ColorOS冻结进程
         // （「熄屏挂机」类工具的标准做法；退出助手即释放，不白白耗电）
         // 部分ROM会剥离WAKE_LOCK权限：拿不到时降级运行，绝不能拖垮服务
@@ -398,6 +403,23 @@ class OverlayService : Service() {
         return START_STICKY
     }
 
+    /** 建议通知计时起点（elapsedRealtime）；0 = 当前不在播放或黑幕开着 */
+    private var suggestSince = 0L
+    private val suggestTick = object : Runnable {
+        override fun run() {
+            main.postDelayed(this, 30_000)
+            if (!prefs().getBoolean(Prefs.SUGGEST_NOTIFY, false)) return
+            if (black?.isShowing == true) { suggestSince = 0L; return }
+            val playing = try { audioManager.isMusicActive } catch (_: Exception) { false }
+            if (!playing) { suggestSince = 0L; return }
+            val now = SystemClock.elapsedRealtime()
+            if (suggestSince == 0L) { suggestSince = now; return }
+            if (now - suggestSince < SUGGEST_AFTER_MS) return
+            suggestSince = 0L
+            SuggestNotify.fire(applicationContext)
+        }
+    }
+
     override fun onDestroy() {
         instance = null
         try { unregisterReceiver(screenOffReceiver) } catch (_: Exception) {}
@@ -410,6 +432,7 @@ class OverlayService : Service() {
         try { audioManager.unregisterAudioDeviceCallback(headsetCb) } catch (_: Exception) {}
         main.removeCallbacksAndMessages(null)
         hideAllBlack()
+        suggestSince = 0L
         bubble?.let { b -> try { wm.removeView(b) } catch (_: Exception) {} }
         bubble = null
         // 必须释放：PARTIAL_WAKE_LOCK 跨 onDestroy 存活会让 CPU 永不休眠。

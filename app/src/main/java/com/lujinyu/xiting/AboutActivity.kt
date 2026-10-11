@@ -53,5 +53,29 @@ class AboutActivity : Activity() {
                 true
             }
         }
+
+        // 诊断反馈（v4.0）：版本/机型/权限/崩溃 打包成一段可复制文本——
+        // 用户来找开发者时不再需要逐项描述环境。剪贴板路径，零网络。
+        findViewById<TextView>(R.id.about_diag).setOnClickListener {
+            val cm = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            cm.setPrimaryClip(ClipData.newPlainText("XiTing", buildDiagText()))
+            Toast.makeText(this, getString(R.string.toast_copied), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun buildDiagText(): String {
+        val overlay = android.provider.Settings.canDrawOverlays(this)
+        val listener = android.provider.Settings.Secure.getString(
+            contentResolver, "enabled_notification_listeners"
+        )?.contains(packageName) == true
+        val pm = getSystemService(POWER_SERVICE) as android.os.PowerManager
+        val battery = pm.isIgnoringBatteryOptimizations(packageName)
+        val crash = CrashLog.last(this) != null
+        return buildString {
+            appendLine("XiTing ${BuildConfig.VERSION_NAME} (${BuildConfig.BUILD_ID})")
+            appendLine("Android ${android.os.Build.VERSION.RELEASE} / ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
+            appendLine("[diag_perms] overlay=$overlay listener=$listener battery=$battery crash=$crash")
+            CrashLog.last(this@AboutActivity)?.let { appendLine(it.take(2000)) }
+        }.trimEnd()
     }
 }

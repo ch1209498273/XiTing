@@ -299,11 +299,12 @@ internal fun MainActivity.settleDailyShare() {
         }
     }
 
-/** 分享入口菜单：统计页一个按钮，周报/月报二选（年报等聚合架构落地后加入） */
+/** 分享入口菜单：统计页一个按钮，周报/月报/年报三选 */
 internal fun MainActivity.showShareMenu() {
     val items = arrayOf(
         getString(R.string.share_menu_week),
-        getString(R.string.share_menu_month)
+        getString(R.string.share_menu_month),
+        getString(R.string.share_menu_year)
     )
     android.app.AlertDialog.Builder(this)
         .setTitle(getString(R.string.share_menu_title))
@@ -311,6 +312,7 @@ internal fun MainActivity.showShareMenu() {
             when (which) {
                 0 -> shareWeekPoster()
                 1 -> ReportPoster.shareMonthReport(this)
+                2 -> ReportPoster.shareYearReport(this)
             }
         }
         .show()

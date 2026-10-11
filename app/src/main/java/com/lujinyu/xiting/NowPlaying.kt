@@ -21,12 +21,22 @@ import android.media.session.PlaybackState
  */
 data class NowPlaying(
     val title: String?,       // 会话标题（剧名/集名）；缺或空为 null
+    val appLabel: String?,    // 播放来源 App 的展示名（如「哔哩哔哩」）；读不到为 null
     val positionMs: Long,     // 当前进度（playbackState.position 已按 lastUpdateTime 折算到当前）
     val durationMs: Long,     // 总时长；读不到为 0
     val canSeek: Boolean,     // 会话是否声明支持 seekTo（±30s 按钮的兼容性探测依据）
     val playing: Boolean,
     private val controller: android.media.session.MediaController
 ) {
+    /**
+     * 剧名行的展示文案：「App名 · 剧名」。App 名在前（短、稳定），
+     * 剧名在后随宽度截断——整行仍是一行 ellipsize，调用方无需拼串。
+     */
+    fun displayTitle(): String = when {
+        title == null -> appLabel ?: ""
+        appLabel == null || appLabel == title -> title
+        else -> "$appLabel · $title"
+    }
     /** seek 到绝对位置。内部先过 [clampSeekTarget]，不会越出片头片尾。 */
     fun seekTo(targetMs: Long) {
         controller.transportControls.seekTo(clampSeekTarget(targetMs, durationMs))
@@ -65,8 +75,17 @@ fun Context.queryNowPlaying(): NowPlaying? {
     val ps = pick.playbackState ?: return null
     val md = pick.metadata
     val title = md?.getString(MediaMetadata.METADATA_KEY_TITLE)?.takeIf { it.isNotBlank() }
+    // 播放来源 App 的展示名（「B站 · 剧名」前缀）；极少数 App label 读不到则降级
+    val appLabel = try {
+        packageManager.getApplicationLabel(
+            packageManager.getApplicationInfo(pick.packageName, 0)
+        ).toString().takeIf { it.isNotBlank() }
+    } catch (_: Exception) {
+        null
+    }
     return NowPlaying(
         title = title,
+        appLabel = appLabel,
         positionMs = ps.position.coerceAtLeast(0),
         durationMs = md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L,
         canSeek = ps.actions and PlaybackState.ACTION_SEEK_TO != 0L,

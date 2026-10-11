@@ -170,7 +170,10 @@ object SharePoster {
             36f, 36f, p
         )
 
-        var y = f.cardTextTop
+        // ⚠ cardTextTop 是「卡片顶 → 首行基线」的**偏移**，不是画布坐标——
+        // 首版重构漏加 cardTop，三行明细直接画在海报顶端、品牌名被夹在中间
+        //（单测只钉 Frame 数值、不验消费侧，这个 bug 真机才暴露）。
+        var y = f.cardTop + f.cardTextTop
         p.textSize = 38f
         d.lines.forEach { (k, v) ->
             p.textAlign = Paint.Align.LEFT

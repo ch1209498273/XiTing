@@ -41,7 +41,7 @@ object PosterLayout {
         val cardTop: Float,    // 明细卡片顶边
         val cardH: Float,      // 明细卡片高
         val cardBottom: Float, // 卡片底边 = cardTop + cardH
-        val cardTextTop: Float,// 卡片顶 → 第一行明细基线
+        val cardTextTop: Float,// 卡片顶 → 首行明细基线的**偏移**（⚠ 非画布坐标，用时要 + cardTop）
         val footer1Y: Float,   // 脚注基线
         val footer2Y: Float    // 仓库地址基线
     )

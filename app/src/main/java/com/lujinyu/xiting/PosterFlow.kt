@@ -159,7 +159,10 @@ internal fun MainActivity.sharePoster(d: SharePoster.Data, tag: String) {
         val chip11 = posterChip(this, "1:1", density)
         chipRow.addView(chip34)
         chipRow.addView(chip11)
+        // chips 落在 AlertDialog 的标题区（日间白/夜间黑，跟随系统主题），
+        // 未选中态必须用主题文字色——首版按海报深色区写死白色，白底上直接隐形
         styleChip(chip34, true, density)
+        styleChip(chip11, false, density)
 
         fun switchRatio(r: PosterLayout.Ratio) {
             if (r == selRatio || handedOff || dismissed) return
@@ -308,11 +311,21 @@ private fun posterChip(ctx: Context, label: String, density: Float): android.wid
         ).apply { marginEnd = (10 * density).toInt() }
     }
 
-/** chip 选中态：亮底深字；未选中：透明底浅字（海报区刻意不随主题，色值就地定） */
+/** chip 选中态：亮底深字（两种主题下都与对话框底色强对比）；未选中：透明底 + 主题文字色 */
 private fun styleChip(chip: android.widget.TextView, selected: Boolean, density: Float) {
-    chip.background = android.graphics.drawable.GradientDrawable().apply {
+    chip.background = if (selected) android.graphics.drawable.GradientDrawable().apply {
         cornerRadius = 20 * density
-        setColor(if (selected) 0xFFE8EAED.toInt() else 0x22FFFFFF)
+        setColor(0xFFE8EAED.toInt())
+    } else null
+    if (selected) {
+        chip.setTextColor(0xFF10131A.toInt())
+    } else {
+        // 跟随对话框主题（日间深灰 / 夜间浅灰）。⚠ 不能用 resolveAttribute(textColorSecondary)：
+        // 主题里它是 @color 引用，tv.data 是资源 ID，被当 ARGB 用会得到 alpha≈01 的隐形色
+        //（真机已踩）。按 uiMode 直接选色最稳。
+        val night = (chip.context.resources.configuration.uiMode and
+            android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+        chip.setTextColor(if (night) 0xB3FFFFFF.toInt() else 0xFF666668.toInt())
     }
-    chip.setTextColor(if (selected) 0xFF10131A.toInt() else 0xCCFFFFFF.toInt())
 }

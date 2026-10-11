@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 马拉松前景：Badges.hourglass 1:1 翻译（框架加粗 / 沙饱满为图标定稿参数） -->
+<!-- 马拉松：奖章化前景（VectorDrawable；全部内容在自适应图标安全区 r33 内） -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path
-        android:fillColor="#FFE65100"
-        android:pathData="M44.0,45.4 L64.0,45.4 L54,54 Z" />
-    <path
-        android:fillColor="#FFE65100"
-        android:pathData="M43.9,74.9 L64.1,74.9 L60.0,55.0 L48.0,55.0 Z" />
-    <path
-        android:fillColor="#00FFFFFF"
-        android:strokeColor="#FF6D4C41"
-        android:strokeWidth="4.4"
-        android:strokeLineJoin="round"
-        android:pathData="M36.9,30.6 L71.1,30.6 L54,54 Z M36.9,77.4 L71.1,77.4 L54,54 Z" />
-    <path
-        android:fillColor="#FF5D4037"
-        android:pathData="M30.4,26.6 L77.6,26.6 L77.6,32.6 L30.4,32.6 Z" />
-    <path
-        android:fillColor="#FF5D4037"
-        android:pathData="M30.4,76.4 L77.6,76.4 L77.6,82.4 L30.4,82.4 Z" />
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:pathData="M54,54 m-29,0 a29,29 0 1,1 58,0 a29,29 0 1,1 -58,0"
+    android:strokeWidth="2.4">
+    <aapt:attr name="android:strokeColor">
+      <gradient android:type="linear" android:startX="54" android:startY="25" android:endX="54" android:endY="83">
+        <item android:offset="0" android:color="#FFFFE082"/>
+        <item android:offset="0.5" android:color="#FFFFA000"/>
+        <item android:offset="1" android:color="#FFFF8F00"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path
+    android:pathData="M54,54 m-27.6,0 a27.6,27.6 0 1,1 55.2,0 a27.6,27.6 0 1,1 -55.2,0"
+    android:strokeColor="#33000000"
+    android:strokeWidth="1.2"/>
+  <group>
+    <path android:pathData="M36,30 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0" android:fillColor="#80FFFFFF"/>
+    <path android:pathData="M72,38 m-0.8,0 a0.8,0.8 0 1,1 1.6,0 a0.8,0.8 0 1,1 -1.6,0" android:fillColor="#80FFFFFF"/>
+  </group>
+  <path android:pathData="M46.2,45.1 L61.8,45.1 L54,54 Z">
+    <aapt:attr name="android:fillColor">
+      <gradient android:type="radial" android:centerX="54" android:centerY="66" android:gradientRadius="22"
+        android:startColor="#FFFFD54F" android:endColor="#FFFF8F00"/>
+    </aapt:attr>
+  </path>
+  <path android:pathData="M45.2,70.2 L62.8,70.2 L58.6,55.6 L49.4,55.6 Z">
+    <aapt:attr name="android:fillColor">
+      <gradient android:type="radial" android:centerX="54" android:centerY="66" android:gradientRadius="22"
+        android:startColor="#FFFFD54F" android:endColor="#FFFF8F00"/>
+    </aapt:attr>
+  </path>
+  <path
+    android:pathData="M40.6,33.9 L67.4,33.9 L54,54 Z M40.6,74.1 L67.4,74.1 L54,54 Z"
+    android:strokeColor="#FFD7CCC8" android:strokeWidth="3" android:strokeLineJoin="round"/>
+  <path android:pathData="M36.4,30 L71.6,30 L71.6,34.6 L36.4,34.6 Z" android:fillColor="#FF8D6E63"/>
+  <path android:pathData="M36.4,70.4 L71.6,70.4 L71.6,75 L36.4,75 Z" android:fillColor="#FF8D6E63"/>
 </vector>

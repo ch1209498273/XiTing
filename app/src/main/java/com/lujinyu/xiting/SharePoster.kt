@@ -33,10 +33,6 @@ import android.util.Log
  */
 object SharePoster {
 
-    /** 3:4 竖版。1080 宽是主流分享图宽度，1440 = 1080 × 4/3。 */
-    const val W = 1080
-    const val H = 1440
-
     private const val TAG = "XiTing"
     /** 不能是 const：Environment.DIRECTORY_PICTURES 是另一个类的 const，跨类拼接不编译 */
     private val REL_DIR = Environment.DIRECTORY_PICTURES + "/XiTing"
@@ -58,30 +54,30 @@ object SharePoster {
     /**
      * 生成海报位图。纯计算，不碰磁盘，可单测。
      *
-     * 版式（自上而下，1080×1440）：
-     *   顶栏  品牌名 + 形态名（+ 可选角标）
-     *   主角  精灵（宽度的 58%）+ 背后径向光晕
-     *   数字  与单位同行，按可用宽度自动缩放
-     *   卡片  明细收在半透明圆角卡里
-     *   页脚  脚注 + 仓库地址
+     * 版式（自上而下）：顶栏 → 精灵+光晕 → 主数字 → 明细卡片 → 页脚。
+     * 比例（3:4 / 1:1）与全部纵向坐标由 [PosterLayout.compute] 推出 ——
+     * 这里只负责「照帧绘制」，不再持有任何 y 坐标常量。
      *
      * ## 为什么背景不用皮肤色相铺底
      * 第一版直接用皮肤色相铺满，结果翡翠皮肤配深绿底 —— 宠物和背景同色系，
      * 对比度掉下去，整张图发闷。改成**深色中性底 + 皮肤色只做背后光晕**：
      * 无论什么皮肤宠物都能跳出来，同时又保持了「图和宠物是一套配色」。
      */
-    fun render(ctx: Context, d: Data): Bitmap {
-        val bmp = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888)
+    fun render(ctx: Context, d: Data, ratio: PosterLayout.Ratio = PosterLayout.Ratio.PORTRAIT_3_4): Bitmap {
+        val f = PosterLayout.compute(ratio, d.lines.size)
+        val w = ratio.w
+        val h = ratio.h
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
         val p = Paint(Paint.ANTI_ALIAS_FLAG)
         val hue = d.skin.hue
 
         // ---- 背景：深色中性渐变（不用皮肤色，理由见 KDoc）----
         p.shader = LinearGradient(
-            0f, 0f, 0f, H.toFloat(),
+            0f, 0f, 0f, h.toFloat(),
             0xFF161A21.toInt(), 0xFF0B0E13.toInt(), Shader.TileMode.CLAMP
         )
-        c.drawRect(0f, 0f, W.toFloat(), H.toFloat(), p)
+        c.drawRect(0f, 0f, w.toFloat(), h.toFloat(), p)
         p.shader = null
 
         // ---- 顶栏 ----
@@ -96,13 +92,13 @@ object SharePoster {
         p.textAlign = Paint.Align.LEFT
         val brand = ctx.getString(R.string.poster_brand)
         val brandW = p.measureText(brand)
-        c.drawText(brand, PAD.toFloat(), 116f, p)
+        c.drawText(brand, PAD.toFloat(), f.headerY, p)
 
         p.typeface = android.graphics.Typeface.DEFAULT
         p.color = 0xCCFFFFFF.toInt()
         p.textAlign = Paint.Align.RIGHT
         // 品牌优先保留，形态名用剩余宽度：先逐档缩小，仍放不下再截断。
-        val availStage = (W - PAD * 2) - brandW - HEADER_GAP
+        val availStage = (w - PAD * 2) - brandW - HEADER_GAP
         var stageSize = STAGE_SIZE
         while (stageSize > STAGE_MIN_SIZE) {
             p.textSize = stageSize
@@ -123,21 +119,21 @@ object SharePoster {
             val n = p.breakText(d.stageName, true, budget, null)
             d.stageName.substring(0, n.coerceIn(1, d.stageName.length)) + ell
         }
-        c.drawText(stageText, (W - PAD).toFloat(), 116f, p)
+        c.drawText(stageText, (w - PAD).toFloat(), f.headerY, p)
 
         // ---- 主角：精灵 + 背后径向光晕 ----
-        val glowCx = W / 2f
-        val glowCy = PET_TOP + petSize * 0.46f
+        val glowCx = w / 2f
+        val glowCy = f.petTop + f.petSize * 0.46f
         p.shader = android.graphics.RadialGradient(
-            glowCx, glowCy, petSize * 0.85f,
+            glowCx, glowCy, f.petSize * 0.85f,
             hsv(hue, 0.55f, 0.52f), 0x00000000, Shader.TileMode.CLAMP
         )
-        c.drawCircle(glowCx, glowCy, petSize * 0.85f, p)
+        c.drawCircle(glowCx, glowCy, f.petSize * 0.85f, p)
         p.shader = null
 
         try {
-            val pet = PetSkins.snapshot(ctx, d.stage, d.skin, petSize, withBar = false, pct = 0)
-            c.drawBitmap(pet, (W - petSize) / 2f, PET_TOP, null)
+            val pet = PetSkins.snapshot(ctx, d.stage, d.skin, f.petSize, withBar = false, pct = 0)
+            c.drawBitmap(pet, (w - f.petSize) / 2f, f.petTop, null)
             pet.recycle()
         } catch (e: Exception) {
             // 精灵画不出来不该让整张海报失败：留白继续，用户仍能分享数字
@@ -147,37 +143,34 @@ object SharePoster {
         // 角标必须在精灵**之后**画：精灵头顶的星芒（雷霆之王形态）会伸到角标位置，
         // 先画角标的话星芒会压在文字上 —— 西语实测「seguidos」被星芒穿成两半。
         // 放最后 = 胶囊实底盖住星芒，只留星尖从胶囊上缘露出一点（像徽章挂在冠上）。
-        d.badge?.let { drawBadge(c, p, it, PET_TOP + 6f, hue) }
+        d.badge?.let { drawBadge(c, p, it, f.petTop + 6f, hue, w.toFloat()) }
 
         // ---- 主数字 ----
-        val headY = PET_TOP + petSize + 172f
         p.typeface = android.graphics.Typeface.DEFAULT_BOLD
         p.color = 0xFFFFFFFF.toInt()
-        val sizes = fitHeadline(p, d.headline, d.headlineUnit)
-        val startX = (W - (sizes.numW + sizes.unitW + GAP)) / 2f
+        val sizes = fitHeadline(p, d.headline, d.headlineUnit, (w - PAD * 2).toFloat())
+        val startX = (w - (sizes.numW + sizes.unitW + GAP)) / 2f
         p.textAlign = Paint.Align.LEFT
         p.textSize = sizes.num
-        c.drawText(d.headline, startX, headY, p)
+        c.drawText(d.headline, startX, f.headY, p)
         p.textSize = sizes.unit
         p.color = 0xCCFFFFFF.toInt()
-        c.drawText(d.headlineUnit, startX + sizes.numW + GAP, headY, p)
+        c.drawText(d.headlineUnit, startX + sizes.numW + GAP, f.headY, p)
 
         p.textAlign = Paint.Align.CENTER
         p.typeface = android.graphics.Typeface.DEFAULT
         p.textSize = 34f
         p.color = 0xB3FFFFFF.toInt()
-        c.drawText(d.hint, (W / 2f), headY + 58f, p)
+        c.drawText(d.hint, (w / 2f), f.hintY, p)
 
         // ---- 明细卡片：收进半透明圆角矩形，视觉上才是一个「组」----
-        val cardTop = headY + 100f
-        val cardH = ROW_H * d.lines.size + 52f
         p.color = 0x14FFFFFF
         c.drawRoundRect(
-            PAD.toFloat(), cardTop, (W - PAD).toFloat(), cardTop + cardH,
+            PAD.toFloat(), f.cardTop, (w - PAD).toFloat(), f.cardBottom,
             36f, 36f, p
         )
 
-        var y = cardTop + 68f
+        var y = f.cardTextTop
         p.textSize = 38f
         d.lines.forEach { (k, v) ->
             p.textAlign = Paint.Align.LEFT
@@ -186,45 +179,29 @@ object SharePoster {
             p.textAlign = Paint.Align.RIGHT
             p.color = 0xFFFFFFFF.toInt()
             p.typeface = android.graphics.Typeface.DEFAULT_BOLD
-            c.drawText(v, (W - PAD - 48f).toFloat(), y, p)
+            c.drawText(v, (w - PAD - 48f).toFloat(), y, p)
             p.typeface = android.graphics.Typeface.DEFAULT
             y += ROW_H
         }
 
-        // ---- 页脚：基线在卡片底之下，行间距 52px（36px 字体行高约 43px）----
-        // 坐标是**推演**出来的，不是估的：卡片底 = cardTop + cardH，
-        // 页脚两行必须落在它与 H 之间。
-        val cardBottom = cardTop + cardH
+        // ---- 页脚：两行基线由版式给出（推演纪律见 PosterLayout）----
         p.textAlign = Paint.Align.CENTER
         p.textSize = 34f
         p.color = 0x99FFFFFF.toInt()
-        c.drawText(d.footer, (W / 2f), cardBottom + 46f, p)
+        c.drawText(d.footer, (w / 2f), f.footer1Y, p)
         p.textSize = 28f
         p.color = 0x80FFFFFF.toInt()
-        c.drawText(REPO, (W / 2f), cardBottom + 98f, p)
+        c.drawText(REPO, (w / 2f), f.footer2Y, p)
 
         return bmp
     }
 
     private const val REPO = "github.com/ch1209498273/XiTing"
 
-    // ---- 版式常量。集中在这里，改版式不用翻绘制逻辑 ----
-    //
-    // ⚠ 这些数字是**互相约束**的：H=1440 要同时装下 顶栏(116) + 宠物 + 主数字 +
-    // 卡片 + 两行页脚。改任何一个都要重新推演总高，否则就会出现「页脚压在卡片上」。
-    //   116 顶栏基线
-    // + 200 (PET_TOP 196 + 宠物 598)  ->  宠物底 794
-    // + 172                        ->  主数字基线 966
-    // + 100                        ->  卡片顶 1066
-    // + 76*3+52 = 280               ->  卡片底 1346
-    // + 46 / 98                    ->  页脚两行基线 1392 / 1444（H 之内）
+    // ---- 绘制常量（纵向坐标全部住在 PosterLayout；这里只留与比例无关的项）----
     /** 页面左右留白 */
     private const val PAD = 72
-    /** 精灵边长 = W * 0.52（0.58 时卡片底到 1410，页脚两行只剩 30px 放不下） */
-    private val petSize = (W * 0.52f).toInt()
-    /** 精灵顶部 y */
-    private const val PET_TOP = 196f
-    /** 明细每行高 */
+    /** 明细每行行高（与 PosterLayout 旋钮 rowH 一致） */
     private const val ROW_H = 76f
     /** 数字与单位之间的间距 */
     private const val GAP = 16f
@@ -247,8 +224,7 @@ object SharePoster {
      * 固定 176px 在英文/俄文下会直接溢出画面。
      * 数字与单位的比例锁死为 2.4，整体一起缩，排版才不会走形。
      */
-    private fun fitHeadline(p: Paint, num: String, unit: String): HeadSizes {
-        val maxW = (W - PAD * 2).toFloat()
+    private fun fitHeadline(p: Paint, num: String, unit: String, maxW: Float): HeadSizes {
         // 上限从 176 降到 150：第一版 176px 时「20时31分」几乎占满整行，
         // 右侧的单位「本周」被挤到边缘，看着局促。
         var n = 150f
@@ -267,19 +243,19 @@ object SharePoster {
     }
 
     /** 角标胶囊：底色用皮肤色相，文字用深色，任何皮肤下都读得清 */
-    private fun drawBadge(c: Canvas, p: Paint, text: String, top: Float, hue: Float) {
+    private fun drawBadge(c: Canvas, p: Paint, text: String, top: Float, hue: Float, canvasW: Float) {
         p.textSize = 34f
         p.typeface = android.graphics.Typeface.DEFAULT_BOLD
         val tw = p.measureText(text)
         val padH = 34f
         val h = 66f
         val w = tw + padH * 2
-        val left = (W - w) / 2f
+        val left = (canvasW - w) / 2f
         p.color = hsv(hue, 0.55f, 0.92f)
         c.drawRoundRect(left, top, left + w, top + h, h / 2f, h / 2f, p)
         p.color = 0xFF10131A.toInt()
         p.textAlign = Paint.Align.CENTER
-        c.drawText(text, W / 2f, top + h * 0.70f, p)
+        c.drawText(text, canvasW / 2f, top + h * 0.70f, p)
         p.textAlign = Paint.Align.LEFT
         p.typeface = android.graphics.Typeface.DEFAULT
     }

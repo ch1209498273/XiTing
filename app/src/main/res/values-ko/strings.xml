@@ -20,7 +20,7 @@
     <string name="hero_title_stop">스크린 오프 듣기 실행 중</string>
     <string name="hero_sub_start">시작 후 영상 보면서 버블을 누르면 화면이 꺼집니다</string>
     <string name="hero_sub_stop">영상 중에 버블을 누르면 화면은 꺼지고 소리는 계속 · 누르면 도우미 정지</string>
-    <string name="timer_title">자동 종료</string>
+    <string name="timer_title">취침 타이머</string>
     <string name="keepalive_title">자동 종료 방지</string>
     <string name="keepalive_sub">설정 가이드</string>
     <string name="stats_section">절전 통계</string>
@@ -80,7 +80,7 @@
     <string name="caption_row_title">검은 화면 자막(실험적)</string>
     <string name="caption_service_desc">재생 중인 영상의 자막 텍스트를 읽어 息屏听劇 검은 화면에 실시간 표시합니다. 저장·업로드하지 않습니다.</string>
     <string name="update_log_title_fmt">v%1$s 업데이트 내용</string>
-    <string name="update_log_body">· 진화 차이가 뚜렷한 5단계 새 디자인\n· 불꽃, 파동, 번개, 회오리, 별 전용 효과\n· 길게 눌러 충전, 좌우로 회전, 날개 펼치기\n· 조작 안내와 터치 반응 개선</string>
+    <string name="update_log_body">· 성장 안내 수정 및 다섯 형태의 상호작용 미리보기\n· 일시 정지를 요청하고 검은 화면을 유지하는 타이머 옵션\n· 10초 검은 화면 체험 및 재생 확인 추가\n· 공유 및 앱 소개 문구 개선</string>
     <string name="switch_headset">이어폰 뽑으면 자동으로 영상으로</string>
     <string name="bubble_style">버블 표시</string>
     <string name="settings_data">데이터</string>
@@ -135,13 +135,11 @@
     <string name="timer_30">30분</string>
     <string name="timer_60">60분</string>
     <string name="timer_cancel">타이머 해제</string>
-    <string name="toast_timer_set">자동 종료: %1$d분 후</string>
-    <string name="toast_timer_episode">이 편 끝나면 자동으로 꺼집니다</string>
+    <string name="toast_timer_set">타이머 설정: %1$d분 후</string>
+    <string name="toast_timer_episode">타이머 설정: 이번 회차가 끝나면 선택한 동작 실행</string>
     <string name="toast_timer_expired">타이머가 만료되었습니다</string>
     <string name="toast_timer_done">타이머 종료, 화면을 껐습니다</string>
     <string name="toast_timer_cancelled">자동 종료를 해제했습니다</string>
-    <string name="toast_episode_done">이 편 끝나면 자동으로 화면이 꺼집니다(약 %1$d분%2$d초 후)</string>
-    <string name="timer_remain_fmt">남은 시간 %1$d분</string>
     <string name="restore_title">기록 복원</string>
     <string name="restore_msg">이전에 「스크린 오프 듣기」를 쓰다가 삭제했다면: 백업이 다운로드의 XiTing 폴더(XiTing-backup.json)에 있습니다. 여기서 성장값과 통계를 한 번에 복원할 수 있습니다.
 
@@ -221,10 +219,7 @@
     <string name="day_today">오늘</string>
     <string name="day_yesterday">어제</string>
     <string name="share_chooser">공유</string>
-    <string name="share_text">⚡ 「스크린 오프 듣기」로 화면을 끄고 %1$s을(를) 들었어요. 예상 절전 %2$d mAh
-저의 전기 정령이 「%3$s」까지 진화했어요
-무료·무광고 오프라인 앱(0.6MB)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">XiTing으로 %1$s 청취, 예상 절전 %2$d mAh\n정령: %3$s\n개인 개발 Android 도구, 광고와 인터넷 권한 없음\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">공유 완료 · +%1$d 성장값 적립 (통계 페이지 왼쪽 바를 눌러 받기)</string>
     <string name="toast_share_claimed">오늘 공유 보상은 받았습니다. 내일 다시 (하루 한 번)</string>
     <string name="share_sub_claimed">오늘 받음 ✓ · 내일 다시</string>
@@ -246,17 +241,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="unit_s">초</string>
     <string name="about_title">스크린 오프 듣기 정보</string>
     <string name="about_section_app">이 앱에 대하여</string>
-    <string name="about_intro">영상을 보면서 눈을 감고 듣고 싶으신가요? 버블을 한 번 누르면 화면이 완전히 꺼집니다: 백라이트가 물리적으로 꺼지고 터치는 차단되며 소리는 계속 재생됩니다 — 어떤 영상 앱에서도 동작합니다.
-
-어두운 시계와 배터리 표시를 선택할 수 있습니다(다시 잠그면 최저 밝기로 계속 보이며, OLED 보호를 위해 내용이 주기적으로 조금 움직입니다). 전화가 오면 자동으로 꺼져서 전화를 놓치지 않습니다. 자동 종료와 「이 편 끝까지 듣기」 스마트 타이머를 지원하며, 이어폰을 뽑으면 영상으로 돌아갑니다.
-
-화면을 깨우면 편 넘기기가 가능합니다: 이전 / 재생·일시정지 / 다음(설정에서 켤 수 있음).
-
-전기 정령: 듣기 시간이 쌓여 다섯 형태의 정령으로 성장합니다(전 스파크 → 전 구슬 → 뇌우 정령 → 폭풍 정령 → 천왕). 버블 아바타로도 쓸 수 있으며, 업적이 듣기 이력을 기록합니다.
-
-위젯: 세 가지 크기로 정령과 듣기 데이터, 한 번 탭으로 화면 끄기를 제공합니다. 버블을 길게 누르면 빠르게 종료됩니다.
-
-데이터 백업: 다운로드의 XiTing 폴더에 자동 백업(기기 내 전용), 재설치 후 한 번 탭으로 복원. 모든 데이터는 기기 안에만 저장되며 네트워크 권한이 없습니다.</string>
+    <string name="about_intro">검은 오버레이로 화면을 어둡게 하고 오작동을 막으며 소리를 듣습니다. 기기, 시스템, 플레이어에 따라 다르며 시스템 화면 꺼짐과는 다릅니다.\n\n타이머, 재생 조작, 5단계 정령, 아이콘, 위젯과 월간·연간 보고서를 지원합니다.\n\n기록과 성장은 기기에 저장하며 백업과 복원이 가능합니다. 인터넷 권한은 없고 기능별 권한을 사용합니다.</string>
     <string name="about_section_privacy">개인정보와 안전</string>
     <string name="about_privacy">· INTERNET 권한 없음: 물리적으로 인터넷에 연결할 수 없음
 · 화면의 내용을 읽지 않음
@@ -367,10 +352,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="week_report_mah">이번 주 약 %1$d mAh 절전</string>
     <string name="week_report_evolved">정령 %1$s → %2$s (성장값 +%3$d)</string>
     <string name="week_report_gp">이번 주 성장값 +%1$d</string>
-    <string name="week_share_text">이번 주 「스크린 오프 듣기」로 %1$s 들었습니다. %2$d일간 약 %3$d mAh 절전
-전기 정령은 이제 「%4$s」
-무료, 무광고, 완전 오프라인 (0.6MB)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="week_share_text">이번 주 %2$d일 동안 %1$s, 예상 절전 %3$d mAh\n정령: %4$s\n로컬 기록, 광고와 인터넷 권한 없음\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">분 직접 입력</string>
     <string name="timer_custom_hint">1~600분</string>
     <string name="timer_custom_bad">1분 이상 입력하세요</string>
@@ -382,4 +364,31 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="pet_hint_cloud">구름을 눌러 번개를 보내세요</string>
     <string name="pet_hint_storm">정령을 좌우로 밀어 회오리를 만드세요</string>
     <string name="pet_hint_king">눌러 인사하고 길게 눌렀다 놓아 날개를 펼쳐요</string>
+
+    <!-- v4.2 core experience -->
+    <string name="gallery_try_all">5단계 조작 체험</string>
+    <string name="gallery_preview_only">미리보기만 합니다. 해제 상태나 현재 꾸미기는 바뀌지 않습니다.</string>
+    <string name="timer_end_action">타이머 종료 동작</string>
+    <string name="timer_return_video">검은 화면 해제</string>
+    <string name="timer_pause_keep_black">일시정지 요청 후 검은 화면 유지</string>
+    <string name="timer_pause_explain">다음 타이머에 적용되며 현재 타이머는 바뀌지 않습니다. 알림 접근 권한과 지원되는 미디어 세션이 필요합니다. 설정 당시 플레이어에만 요청하며 응답하지 않을 수 있습니다.</string>
+    <string name="timer_no_target">일시정지할 세션이 없습니다. 알림 접근 권한과 플레이어 지원을 확인하세요. 기존 타이머는 유지됩니다.</string>
+    <string name="timer_pause_requested">원래 플레이어에 일시정지를 요청했습니다. 실제 정지는 플레이어 응답에 따릅니다.</string>
+    <string name="timer_already_paused">원래 플레이어가 재생 중이 아닙니다. 재생 전환 명령을 보내지 않았습니다.</string>
+    <string name="timer_pause_failed">원래 세션이 없거나 일시정지를 지원하지 않습니다. 검은 화면은 유지됩니다.</string>
+    <string name="timer_mode_status_fmt">%1$d분 남음 · %2$s</string>
+    <string name="guide_title">처음인가요? 검은 화면 체험</string>
+    <string name="guide_intro">먼저 다른 앱 위에 표시 권한을 허용하세요. 알림은 빠른 조작용이며 알림 접근은 제목, 진행 및 예약 일시정지에 필요합니다.
+
+영상을 재생한 뒤 돌아와 시작하세요. 10초 후 화면이 돌아옵니다. 탭해서 깨운 뒤 돌아갈 수도 있습니다.
+
+체험은 청취 시간이나 성장에 반영되지 않습니다.</string>
+    <string name="guide_start">10초 체험 시작</string>
+    <string name="guide_permission">표시 권한을 허용한 뒤 돌아와 시작하세요.</string>
+    <string name="guide_busy">기존 검은 화면이나 타이머를 끝내고 표시 권한을 확인하세요.</string>
+    <string name="guide_feedback">화면이 검은 동안 소리가 계속 재생됐나요?</string>
+    <string name="guide_yes">소리가 계속 남</string>
+    <string name="guide_no">소리가 멈춤</string>
+    <string name="guide_success">체험을 마쳤습니다. 플로팅 버튼으로 청취를 시작하세요.</string>
+    <string name="guide_retry">영상이 재생 중인지 확인하세요. 소리가 멈추면 백그라운드 제한과 유지 설정을 확인하고 다른 플레이어도 시험하세요.</string>
 </resources>

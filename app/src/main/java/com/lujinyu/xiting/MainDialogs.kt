@@ -123,9 +123,6 @@ internal fun MainActivity.showCustomTimerDialog() {
                 }
                 val clamped = min.coerceAtMost(MAX_CUSTOM_TIMER_MIN)
                 startService(setTimerIntent(clamped.toLong()))
-                Toast.makeText(
-                    this, getString(R.string.toast_timer_set, clamped), Toast.LENGTH_SHORT
-                ).show()
                 postRefresh()
             }
             .setNegativeButton(getString(R.string.dlg_cancel), null)

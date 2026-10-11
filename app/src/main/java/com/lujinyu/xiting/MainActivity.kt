@@ -229,30 +229,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             postRefresh()
         }
 
-        // 定时关闭：听完这集 / 15/30/60分钟 / 自定义，到点自动收黑幕
-        pageHome.findViewById<View>(R.id.timer_chip).setOnClickListener {
-            val items = arrayOf(
-                getString(R.string.timer_item_episode), getString(R.string.timer_15),
-                getString(R.string.timer_30), getString(R.string.timer_60),
-                getString(R.string.timer_custom), getString(R.string.timer_cancel)
-            )
-            android.app.AlertDialog.Builder(this)
-                .setTitle(getString(R.string.timer_title))
-                .setItems(items) { _, which ->
-                    when (which) {
-                        0 -> { finishThisEpisode(); return@setItems }
-                        // 自定义：先弹数字输入，取消则不动现有定时
-                        4 -> { showCustomTimerDialog(); return@setItems }
-                        5 -> { startService(setTimerIntent(0L)); postRefresh(); return@setItems }
-                    }
-                    val minutes = when (which) {
-                        1 -> 15L; 2 -> 30L; 3 -> 60L; else -> 0L
-                    }
-                    startService(setTimerIntent(minutes))
-                    postRefresh()
-                }
-                .show()
-        }
+        pageHome.findViewById<View>(R.id.timer_chip).setOnClickListener { showTimerOptions() }
+        pageHome.findViewById<View>(R.id.btn_first_use).setOnClickListener { showFirstUseGuide() }
 
         // 防杀保活指南
         pageHome.findViewById<View>(R.id.row_keepalive).setOnClickListener { showKeepAliveGuide() }
@@ -272,6 +250,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         refreshHomeStats()
         ReportPoster.maybeNotifyMonthly(this) // 跨月首次回到前台：上月月报本地推送
         if (tab == TAB_STATS) renderStats()
+        showDemoFeedback()
+        OverlayService.instance?.showTimerResult()
     }
 
     override fun onStop() {
@@ -371,7 +351,14 @@ private fun checkRestore() {
         super.onWindowFocusChanged(hasFocus)
         // 黑幕窗口盖上/拿走都会改变本窗口焦点：恰好作为状态刷新时机，
         // 否则从黑幕上解锁回来，胶囊会停留在「黑幕开启中」
-        if (hasFocus) refreshStates()
+        if (hasFocus) { refreshStates();showDemoFeedback();OverlayService.instance?.showTimerResult() }
+    }
+
+    internal val demoFeedbackCheck=Runnable { showDemoFeedback() }
+
+    override fun onDestroy() {
+        window.decorView.removeCallbacks(demoFeedbackCheck)
+        super.onDestroy()
     }
 
     internal fun postRefresh() {
@@ -429,7 +416,9 @@ private fun checkRestore() {
 
         val remain = OverlayService.instance?.timerRemainingMs() ?: 0
         pageHome.findViewById<TextView>(R.id.timer_state).text =
-            if (remain > 0) getString(R.string.timer_remain_fmt, remain / 60000 + 1) else getString(R.string.timer_none)
+            if (remain > 0) getString(R.string.timer_mode_status_fmt,remain / 60000 + 1,
+                getString(if(OverlayService.instance?.timerKeepsBlack()==true) R.string.timer_pause_keep_black else R.string.timer_return_video))
+            else getString(R.string.timer_none)
     }
 
     /** 防杀保活指南：ColorOS后台限制的分步设置引导 */
@@ -496,7 +485,7 @@ private fun checkRestore() {
     }
 
     /** 听完这集再关：读取正在播放会话的进度，定时到本集片尾（个性化·定时关闭选项） */
-    private fun finishThisEpisode() {
+    internal fun finishThisEpisode() {
         val mgr = getSystemService(Context.MEDIA_SESSION_SERVICE) as? MediaSessionManager
         val comp = ComponentName(this, NotificationListener::class.java)
         val sessions = try {
@@ -522,6 +511,7 @@ private fun checkRestore() {
             return
         }
         var bestRemaining = -1L
+        var bestToken:android.media.session.MediaSession.Token?=null
         for (c in sessions) {
             val st = c.playbackState ?: continue
             if (st.state != PlaybackState.STATE_PLAYING) continue
@@ -530,7 +520,7 @@ private fun checkRestore() {
             val speed = st.playbackSpeed
             val pos = st.position + ((SystemClock.elapsedRealtime() - st.lastPositionUpdateTime) * speed).toLong()
             val rem = dur - pos
-            if (rem > 0 && (bestRemaining < 0 || rem < bestRemaining)) bestRemaining = rem
+            if (rem > 0 && (bestRemaining < 0 || rem < bestRemaining)) { bestRemaining = rem;bestToken=c.sessionToken }
         }
         if (bestRemaining <= 0) {
             Toast.makeText(this, getString(R.string.toast_no_progress), Toast.LENGTH_LONG).show()
@@ -541,10 +531,9 @@ private fun checkRestore() {
             Intent(this, OverlayService::class.java)
                 .setAction(OverlayService.ACTION_SET_TIMER)
                 .putExtra(OverlayService.EXTRA_END_AT, endAt)
+                .putExtra(OverlayService.EXTRA_TIMER_SESSION,bestToken)
         )
-        val mins = bestRemaining / 60000
-        val secs = bestRemaining % 60000 / 1000
-        Toast.makeText(this, getString(R.string.toast_episode_done, mins, secs), Toast.LENGTH_LONG).show()
+        postRefresh()
     }
 
     /**

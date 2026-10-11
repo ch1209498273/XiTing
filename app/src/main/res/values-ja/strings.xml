@@ -20,7 +20,7 @@
     <string name="hero_title_stop">画面オフ再生 実行中</string>
     <string name="hero_sub_start">起動後は映像を見ながらバブルをタップするだけでOK</string>
     <string name="hero_sub_stop">映像中にバブルをタップすると画面が消え、音は再生し続けます · タップで停止</string>
-    <string name="timer_title">自動終了</string>
+    <string name="timer_title">スリープタイマー</string>
     <string name="keepalive_title">自動終了防止</string>
     <string name="keepalive_sub">設定ガイド</string>
     <string name="stats_section">省エネ統計</string>
@@ -80,7 +80,7 @@
     <string name="caption_row_title">黒幕字幕（実験的）</string>
     <string name="caption_service_desc">再生中の動画の字幕テキストを読み取り、息屏听劇の黒幕にリアルタイム表示します。保存・アップロードは一切行いません。</string>
     <string name="update_log_title_fmt">v%1$s の更新内容</string>
-    <string name="update_log_body">· 進化がわかりやすい5段階の新デザイン\n· 火花・波紋・稲妻・旋風・星の専用エフェクト\n· 長押しチャージ、スワイプ回転、翼を広げる操作\n· 操作ヒントとタップ反応を改善</string>
+    <string name="update_log_body">· 成長表示を修正、全5形態を操作プレビュー可能に\n· タイマーで一時停止を要求し黒幕を維持する選択肢を追加\n· 10秒の黒幕体験と再生確認を追加\n· 共有とアプリ紹介の文言を更新</string>
     <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
     <string name="bubble_style">バブル表示</string>
     <string name="settings_data">データ</string>
@@ -135,13 +135,11 @@
     <string name="timer_30">30分</string>
     <string name="timer_60">60分</string>
     <string name="timer_cancel">タイマーを解除</string>
-    <string name="toast_timer_set">自動終了：%1$d分後</string>
-    <string name="toast_timer_episode">この話の終了時に自動で画面を消します</string>
+    <string name="toast_timer_set">タイマー設定：%1$d分後</string>
+    <string name="toast_timer_episode">設定完了：このエピソードの終了後に選択した操作を実行</string>
     <string name="toast_timer_expired">タイマーが終了しました</string>
     <string name="toast_timer_done">タイマー終了、画面オフを解除しました</string>
     <string name="toast_timer_cancelled">自動終了を解除しました</string>
-    <string name="toast_episode_done">この話の終了後に自動で画面を消します（現在 %1$d分%2$d秒 後）</string>
-    <string name="timer_remain_fmt">残り %1$d 分</string>
     <string name="restore_title">履歴データを復元</string>
     <string name="restore_msg">以前「画面オフ再生」を使用していて削除した場合：バックアップはダウンロードの XiTing フォルダ（XiTing-backup.json）にあります。ここから成長値と統計をワンタップで復元できます。
 
@@ -221,10 +219,7 @@
     <string name="day_today">今日</string>
     <string name="day_yesterday">昨日</string>
     <string name="share_chooser">共有先</string>
-    <string name="share_text">⚡ 私は「画面オフ再生」で画面を消して %1$s 聴き、推定節約 %2$d mAh でした
-電能精霊は「%3$s」まで進化しました
-完全無料・広告なしの画面オフ再生ツール（0.6MB・オフライン動作）
-https://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">XiTingで%1$s聴きました。推定節電%2$d mAh\n精霊：%3$s\n個人開発のAndroidツール。広告・インターネット権限なし\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">共有完了 · +%1$d 成長値獲得予定（統計ページの左のバーで回収）</string>
     <string name="toast_share_claimed">本日の共有報酬は受取済みです。また明日（1日1回）</string>
     <string name="share_sub_claimed">本日受取済み ✓ · また明日</string>
@@ -246,17 +241,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="unit_s">秒</string>
     <string name="about_title">画面オフ再生について</string>
     <string name="about_section_app">このアプリについて</string>
-    <string name="about_intro">映像を見ながら目を閉じてSimply聴きたい？ バブルを1タップするだけで画面が完全に消えます：バックライトが物理的に消え、タッチも遮断され、音はそのまま再生されます——あらゆる動画アプリで使えます。
-
-暗い表示の時計とバッテリー表示を選択できます（再ロック後も最低輝度で常時表示し、内容を定期的にわずかに動かしてOLEDパネルを保護）；着信時は自動的に画面オフを解除するので電話を逃しません；自動終了と「この話まで聴く」スマートタイマーに対応；イヤホン抜去で自動的に動画へ戻ります。
-
-画面オフの解除後は話送り：前へ / 再生一時停止 / 次へ（設定で有効化できます）。
-
-電能精霊：視聴で得た成長値を蓄積し、5形態の精霊を育てます（電火花 → 電球 → 雷雲精霊 → 嵐の精霊 → 雷王）。バブルのアバターとしても使えます。最高到達後も成長値は蓄積。実績システムが視聴マイルストーンを記録します。
-
-ホーム画面ウィジェット：3サイズで、精霊・視聴データ・ワンタップ画面オフを常設。バブルは長押しで素早く終了できます。
-
-データバックアップ：ダウンロードの XiTing フォルダに自動バックアップ（端末内のみ）、再インストール後もワンタップで復元。全データは端末内にのみ保存され、ネットワーク権限はありません。</string>
+    <string name="about_intro">黒いオーバーレイで画面を暗くし、誤操作を防いで音声を聴けます。動作は端末・OS・プレーヤーにより異なり、システムの画面オフとは違います。\n\nタイマー、再生操作、5段階の精霊、アイコン変更、ウィジェット、月報・年報に対応。\n\n記録と成長は端末内に保存し、バックアップと復元が可能。インターネット権限はなく、機能ごとに必要な権限を使います。</string>
     <string name="about_section_privacy">プライバシーと安全</string>
     <string name="about_privacy">・INTERNET 権限なし：物理的にネットワークに接続できません
 ・画面の内容は一切読み取りません
@@ -367,10 +352,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="week_report_mah">今週の節約 約 %1$d mAh</string>
     <string name="week_report_evolved">精霊 %1$s → %2$s（成長値 +%3$d）</string>
     <string name="week_report_gp">今週の成長値 +%1$d</string>
-    <string name="week_share_text">今週「画面オフ再生」で %1$s 聴きました。%2$d 日間で約 %3$d mAh 節約
-電能精霊は現在「%4$s」
-無料・無広告・完全オフライン（0.6MB）
-https://github.com/ch1209498273/XiTing</string>
+    <string name="week_share_text">今週は%2$d日で%1$s、推定節電%3$d mAh\n精霊：%4$s\n端末内記録、広告・インターネット権限なし\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">分数を指定</string>
     <string name="timer_custom_hint">1〜600 分</string>
     <string name="timer_custom_bad">1 分以上を入力してください</string>
@@ -382,4 +364,31 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="pet_hint_cloud">雲をタップして稲妻を放つ</string>
     <string name="pet_hint_storm">左右にスワイプして旋風を起こす</string>
     <string name="pet_hint_king">タップで挨拶、長押しして離すと翼を広げる</string>
+
+    <!-- v4.2 core experience -->
+    <string name="gallery_try_all">5段階の操作を試す</string>
+    <string name="gallery_preview_only">プレビューのみです。解除や着せ替えは行いません。精霊に触れてみてください。</string>
+    <string name="timer_end_action">タイマー終了時の動作</string>
+    <string name="timer_return_video">黒い画面を解除</string>
+    <string name="timer_pause_keep_black">一時停止を要求し黒い画面を維持</string>
+    <string name="timer_pause_explain">次に設定するタイマーに適用します。現在のタイマーは変わりません。通知へのアクセスと対応する再生セッションが必要です。設定時のプレーヤーだけに要求し、応答しない場合もあります。</string>
+    <string name="timer_no_target">一時停止できるセッションがありません。通知へのアクセスとプレーヤーの対応を確認してください。既存タイマーは変更していません。</string>
+    <string name="timer_pause_requested">元のプレーヤーに一時停止を要求しました。停止するかはプレーヤーの応答によります。</string>
+    <string name="timer_already_paused">元のプレーヤーは再生していません。再生切り替えは送信しません。</string>
+    <string name="timer_pause_failed">元のセッションが無効か一時停止非対応です。黒い画面は変更しません。</string>
+    <string name="timer_mode_status_fmt">残り%1$d分 · %2$s</string>
+    <string name="guide_title">初めてですか？黒い画面を試す</string>
+    <string name="guide_intro">まず重ねて表示する権限を許可してください。通知は操作用、通知へのアクセスは曲名・進捗・タイマー一時停止などに必要です。
+
+動画を再生してから戻り、開始します。10秒後に自動で戻ります。タップして表示し、戻ることもできます。
+
+デモは再生時間や成長値に加算されません。</string>
+    <string name="guide_start">10秒のデモを開始</string>
+    <string name="guide_permission">重ねて表示する権限を許可してから戻ってください。</string>
+    <string name="guide_busy">現在の黒い画面やタイマーを終了し、表示権限を確認してください。</string>
+    <string name="guide_feedback">画面が黒い間も音声は続いていましたか？</string>
+    <string name="guide_yes">音声は続いた</string>
+    <string name="guide_no">音声が止まった</string>
+    <string name="guide_success">デモが完了しました。フローティングボタンで開始できます。</string>
+    <string name="guide_retry">動画の再生を確認してください。停止する場合はバックグラウンド制限と常駐設定を確認し、別のプレーヤーでも試してください。</string>
 </resources>

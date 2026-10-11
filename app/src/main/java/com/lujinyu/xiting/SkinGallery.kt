@@ -70,9 +70,9 @@ internal fun MainActivity.showSkinGallery() {
             )
             previewLabel.text =
                 getString(R.string.name_pair_fmt, PetView.stageName(this@showSkinGallery, curForm), PetSkins.name(this@showSkinGallery, curSkin))
-            val maxed = curForm >= PetForm.unlockedStage(this)
-            growthHint.text = if (maxed) getString(R.string.gallery_form_maxed)
-            else getString(R.string.gallery_form_next, PetForm.requiredFor(curForm + 1))
+            val growth = PetGrowth.progress(EnergyStore.collectedTotal(this).toLong())
+            growthHint.text = if (growth.complete) getString(R.string.gallery_form_maxed)
+            else getString(R.string.gallery_form_next, growth.remaining)
         }
 
         // 形态区的缩略图要随配色变、配色区的缩略图要随形态变，所以两行都必须能整体重建。
@@ -113,9 +113,7 @@ internal fun MainActivity.showSkinGallery() {
                 })
                 box.setOnClickListener {
                     if (!PetForm.select(this@showSkinGallery, i)) {
-                        Toast.makeText(this@showSkinGallery,
-                            getString(R.string.gallery_form_locked_toast, PetForm.requiredFor(i)),
-                            Toast.LENGTH_SHORT).show()
+                        showPetPreview(this@showSkinGallery,i)
                         return@setOnClickListener
                     }
                     curForm = i
@@ -182,6 +180,7 @@ internal fun MainActivity.showSkinGallery() {
             .setTitle(getString(R.string.gallery_title))
             .setView(view)
             .setPositiveButton(getString(R.string.dlg_ok), null)
+            .setNeutralButton(getString(R.string.gallery_try_all)) { _,_ -> showPetPreview(this,curForm) }
             .create()
         dlg.show()
     }

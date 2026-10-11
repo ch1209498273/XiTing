@@ -20,7 +20,7 @@
     <string name="hero_title_stop">Bildschirm-aus-Zuhören läuft</string>
     <string name="hero_sub_start">Nach dem Start: beim Video einfach die Blase antippen</string>
     <string name="hero_sub_stop">Beim Video Blase antippen: Bildschirm aus, Ton läuft weiter · Tippen zum Stoppen</string>
-    <string name="timer_title">Auto-Aus</string>
+    <string name="timer_title">Schlaftimer</string>
     <string name="keepalive_title">Schutz vor Abschalten</string>
     <string name="keepalive_sub">Anleitung</string>
     <string name="stats_section">Energiespar-Statistik</string>
@@ -80,7 +80,7 @@
     <string name="caption_row_title">Black-Screen-Untertitel (Beta)</string>
     <string name="caption_service_desc">Liest Untertiteltexte des laufenden Videos und zeigt sie in Echtzeit auf dem schwarzen Bildschirm. Nie gespeichert, nie hochgeladen, für nichts anderes verwendet.</string>
     <string name="update_log_title_fmt">Neu in v%1$s</string>
-    <string name="update_log_body">· Fünf neue Formen mit klarer Entwicklung\n· Funken, Wellen, Blitze, Wirbel und Sterne\n· Halten zum Laden, Wischen zum Drehen und Flügelöffnen\n· Gestenhinweise und verbesserte Tipp-Erkennung</string>
+    <string name="update_log_body">· Fortschrittsanzeige korrigiert, interaktive Vorschau aller fünf Formen\n· Timer kann Pause anfordern und den Vorhang beibehalten\n· Neue zehnsekündige Vorhang-Demo mit Wiedergabeabfrage\n· Texte zum Teilen und zur App aktualisiert</string>
     <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
     <string name="bubble_style">Blasen-Stil</string>
     <string name="settings_data">Daten</string>
@@ -135,13 +135,11 @@
     <string name="timer_30">30 Min.</string>
     <string name="timer_60">60 Min.</string>
     <string name="timer_cancel">Timer abbrechen</string>
-    <string name="toast_timer_set">Auto-Aus in %1$d Min.</string>
-    <string name="toast_timer_episode">Schaltet am Folgenende aus</string>
+    <string name="toast_timer_set">Timer eingestellt: in %1$d Minuten</string>
+    <string name="toast_timer_episode">Timer eingestellt: gewählte Aktion nach dieser Folge</string>
     <string name="toast_timer_expired">Timer abgelaufen</string>
     <string name="toast_timer_done">Timer beendet, Bildschirm an</string>
     <string name="toast_timer_cancelled">Auto-Aus abgebrochen</string>
-    <string name="toast_episode_done">Geht am Folgenende aus (in ca. %1$d Min. %2$d Sek.)</string>
-    <string name="timer_remain_fmt">Noch %1$d Min.</string>
     <string name="restore_title">Verlauf wiederherstellen</string>
     <string name="restore_msg">Wenn du « Bildschirm-aus-Zuhören » schon genutzt und wieder deinstalliert hast: Die Sicherung liegt im Ordner XiTing unter Downloads (XiTing-backup.json). Fortschritt und Statistik lassen sich hiermit einem Tastendruck zurücksetzen.
 
@@ -221,10 +219,7 @@ Du musst nichts tun — die Messung läuft automatisch, während du das Handy be
     <string name="day_today">Heute</string>
     <string name="day_yesterday">Gestern</string>
     <string name="share_chooser">Teilen mit</string>
-    <string name="share_text">⚡ Mit « Bildschirm-aus-Zuhören » habe ich %1$s bei schwarzem Bildschirm gehört, rund %2$d mAh gespart
-Mein elektrisches Wesen ist zu « %3$s » herangewachsen
-Kostenlos und werbefrei, komplett offline (0,6 MB)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">%1$s mit XiTing gehört, geschätzt %2$d mAh gespart\nGeist: %3$s\nIndie-Android-Tool ohne Werbung oder Internetberechtigung\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">Geteilt · +%1$d gesammelt (auf der Statistik-Seite abholen)</string>
     <string name="toast_share_claimed">Belohnung heute schon geholt, morgen wieder</string>
     <string name="share_sub_claimed">Heute geholt ✓ · Morgen wieder</string>
@@ -246,17 +241,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="unit_s">Sek.</string>
     <string name="about_title">Über die App</string>
     <string name="about_section_app">Über diese App</string>
-    <string name="about_intro">Beim Video die Augen zumachen und einfach zuhören? Ein Tipp auf die Blase, und der Bildschirm wird ganz schwarz: Hintergrundbeleuchtung physisch aus, Berührung gesperrt, der Ton läuft weiter — mit jeder Video-App.
-
-Optionale dunkle Uhr und Akkuanzeige (nach erneutem Sperren auf dunkelster Stufe sichtbar, Inhalt wandert leicht zum Schutz des OLED); bei Anrufen wird der schwarze Bildschirm automatisch verlassen, sodass kein Anruf verpasst wird; Abschalt-Timer und der smarte Timer « Diese Folge fertig »; beim Abziehen der Kopfhörer zurück zum Video.
-
-Nach dem Aufwachen: Folge zurück / Wiedergabe-Pause / weiter (in den Einstellungen aktivierbar).
-
-Elektrisches Wesen: Zuhören lässt es zu fünf Formen wachsen (Funke → Kugel → Gewitterwölkchen → Sturmgeist → Donnerkönig) und kann als Blasen-Avatar dienen; Erfolge halten deine Meilensteine fest.
-
-Widgets: drei Größen mit Wesen, Statistik und einem Tipp zum Ausschalten; langes Drücken der Blase beendet alles.
-
-Backup: automatisch im Ordner XiTing unter Downloads (nur Gerät), nach Neuinstallation mit einem Tipp wiederherstellbar. Alle Daten bleiben auf dem Gerät, keine Netzwerkberechtigung.</string>
+    <string name="about_intro">Ein schwarzes Overlay dimmt das Bild und blockiert versehentliche Berührungen bei laufendem Ton. Verhalten hängt von Gerät, System und Player ab; der Systembildschirm wird nicht ausgeschaltet.\n\nTimer, Mediensteuerung, fünf Geisterformen, Icons, Widgets und Berichte.\n\nDaten bleiben lokal mit Sicherung und Wiederherstellung. Keine Internetberechtigung; andere Rechte je Funktion.</string>
     <string name="about_section_privacy">Datenschutz und Sicherheit</string>
     <string name="about_privacy">· Keine INTERNET-Berechtigung: kann physisch nicht online gehen
 · Liest keinen Bildschirminhalt aus
@@ -367,10 +352,7 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="week_report_mah">Diese Woche etwa %1$d mAh gespart</string>
     <string name="week_report_evolved">Wesen %1$s → %2$s (+%3$d Fortschritt)</string>
     <string name="week_report_gp">Diese Woche %1$d Fortschritt</string>
-    <string name="week_share_text">Ich habe diese Woche mit Bildschirm-aus-Zuhören %1$s gehört und an %2$d Tagen etwa %3$d mAh gespart
-Mein elektrisches Wesen ist jetzt „%4$s“
-Kostenlos, werbefrei, komplett offline (0,6 MB)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="week_share_text">Diese Woche %1$s an %2$d Tagen, geschätzt %3$d mAh gespart\nGeist: %4$s\nLokale Daten, ohne Werbung oder Internetberechtigung\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Eigene Minuten</string>
     <string name="timer_custom_hint">1-600 Minuten</string>
     <string name="timer_custom_bad">Bitte mindestens 1 Minute eingeben</string>
@@ -382,4 +364,31 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="pet_hint_cloud">Die Wolke antippen, um Blitze auszulösen</string>
     <string name="pet_hint_storm">Seitlich wischen, um einen Wirbel zu erzeugen</string>
     <string name="pet_hint_king">Tippen zum Grüßen, halten und loslassen für Flügel</string>
+
+    <!-- v4.2 core experience -->
+    <string name="gallery_try_all">Alle fünf Formen testen</string>
+    <string name="gallery_preview_only">Nur Vorschau. Keine Freischaltung oder Änderung des Aussehens.</string>
+    <string name="timer_end_action">Aktion am Timerende</string>
+    <string name="timer_return_video">Schwarzen Vorhang entfernen</string>
+    <string name="timer_pause_keep_black">Pause anfordern, Vorhang behalten</string>
+    <string name="timer_pause_explain">Gilt für den nächsten Timer, nicht den laufenden. Benachrichtigungszugriff und eine unterstützte Mediensitzung sind nötig. Nur der ursprüngliche Player erhält die Anfrage; eine Reaktion ist nicht garantiert.</string>
+    <string name="timer_no_target">Kein unterstütztes Pausenziel. Zugriff und Player prüfen. Laufender Timer unverändert.</string>
+    <string name="timer_pause_requested">Pause beim ursprünglichen Player angefordert; dessen Reaktion entscheidet.</string>
+    <string name="timer_already_paused">Der ursprüngliche Player spielt nicht mehr. Kein Wiedergabe-Umschaltbefehl gesendet.</string>
+    <string name="timer_pause_failed">Ursprüngliche Sitzung fehlt oder unterstützt keine Pause. Vorhang unverändert.</string>
+    <string name="timer_mode_status_fmt">Noch %1$d Min. · %2$s</string>
+    <string name="guide_title">Zum ersten Mal? Vorhang testen</string>
+    <string name="guide_intro">Zuerst Overlay erlauben. Benachrichtigungen dienen der Steuerung; Benachrichtigungszugriff ist für Titel, Fortschritt und Timerpause nötig.
+
+Video abspielen, zurückkehren und starten. Nach 10 Sekunden kehrt das Bild zurück. Antippen und Zurück ist ebenfalls möglich.
+
+Die Demo zählt nicht zur Hörzeit oder Entwicklung.</string>
+    <string name="guide_start">10-Sekunden-Demo starten</string>
+    <string name="guide_permission">Overlay erlauben und zum Start zurückkehren.</string>
+    <string name="guide_busy">Vorhang oder Timer beenden und Overlay-Berechtigung prüfen.</string>
+    <string name="guide_feedback">Lief der Ton bei schwarzem Vorhang weiter?</string>
+    <string name="guide_yes">Ton lief weiter</string>
+    <string name="guide_no">Ton stoppte</string>
+    <string name="guide_success">Demo abgeschlossen. Über die schwebende Taste starten.</string>
+    <string name="guide_retry">Videowiedergabe prüfen. Bei Tonstopp Hintergrundbeschränkungen und Keep-alive prüfen, dann anderen Player testen.</string>
 </resources>

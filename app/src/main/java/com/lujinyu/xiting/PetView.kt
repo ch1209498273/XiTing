@@ -24,7 +24,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         const val STAGE_STORM = 3
         const val STAGE_KING = 4
 
-        val THRESHOLDS = longArrayOf(0, 30, 300, 1500, 6000)
+        val THRESHOLDS = PetGrowth.thresholds
 
         /** 新点亮徽章的脉冲高亮时长（ms） */
         private const val BADGE_GLOW_MS = 1400L
@@ -61,6 +61,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     var totalMah = 0
     var progress = 0f      // 距下一形态进度 0..1（final 时无用）
     var thumbMode = false  // 图鉴缩略模式：静态单帧、无粒子/进度条/光晕动画
+    var previewOnly = false // Interactive preview: character only, no energy/help controls.
     var hideProgress = false               // 预览非当前形态时隐藏进度条
     var pending: List<PendingEnergy> = emptyList()   // 待收集能量球
     var onCollectAll: (() -> Unit)? = null           // 收集全部回调（延迟到飞入动画后）
@@ -257,6 +258,10 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     }
 
     private fun targetAt(x: Float, y: Float): PetTarget {
+        if (previewOnly) {
+            val (cx,cy,r)=geometry()
+            return if(kotlin.math.abs(x-cx)<=r*1.4f && kotlin.math.abs(y-cy)<=r*1.25f) PetTarget.PET else PetTarget.NONE
+        }
         val (hx, hy) = helpCenter()
         val d = resources.displayMetrics.density
         val help = (x-hx)*(x-hx)+(y-hy)*(y-hy) < 20f*d*20f*d
@@ -352,7 +357,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         // 色相现在是绘制参数（见 PetPalette），精灵身上每个颜色都直接从同一 hue 派生。
         // 附带好处：不再需要每帧分配/回收全尺寸位图，也不会再染色任何承载语义的元素。
         drawBody(canvas)
-        if (!thumbMode) drawBadgeColumn(canvas)
+        if (!thumbMode && !previewOnly) drawBadgeColumn(canvas)
     }
 
     /** 成就徽章列（自下而上）。几何与 [badgeColumn] 一致，颜色恒定不随换肤变化。 */
@@ -382,7 +387,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             elapsed=clock-actionAt, strength=actionStrength, charge=heldCharge)
 
         // ───────── 能量系统：左侧常驻电池条（容量200）+ 充能动画 ─────────
-        if (!thumbMode) {
+        if (!thumbMode && !previewOnly) {
             val bar = energyBar()
             val total = pending.sumOf { it.value }.coerceAtMost(EnergyStore.MAX_PENDING)
             val nearing = pending

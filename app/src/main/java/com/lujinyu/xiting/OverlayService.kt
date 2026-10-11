@@ -68,6 +68,8 @@ class OverlayService : Service() {
         const val ACTION_SET_TIMER = "com.lujinyu.xiting.SET_TIMER"
         const val EXTRA_MINUTES = "minutes"
         const val EXTRA_END_AT = "end_at"        // 听完这集：以绝对时刻（epoch ms）定时
+        const val EXTRA_TIMER_SESSION = "timer_session"
+        const val ACTION_START_DEMO = "com.lujinyu.xiting.START_DEMO"
         const val ACTION_CALIB_START = "com.lujinyu.xiting.CALIB_START"   // 保留：外部 adb 调试用
         const val EXTRA_CALIB_ON_UA = "calib_on_ua"
         private const val ACTION_TEST_TOGGLE = "com.lujinyu.xiting.TEST_TOGGLE"
@@ -149,10 +151,13 @@ class OverlayService : Service() {
     fun isBubbleVisible(): Boolean = bubble != null
 
     private fun hideAllBlack() {
+        val wasDemo=demoOverlay!=null
+        if(wasDemo) { demoOverlay=null;main.removeCallbacks(demoFinish) }
         val wasShowing = black?.isShowing == true
         black?.hide()
         black = null
         main.removeCallbacks(powerTick) // 停止会话功耗采样
+        if(wasDemo && instance===this) resumeSamplingAfterDemo()
         setBubbleAnimating(true)
         // 小组件必须在这里刷，而不是依赖 BlackOverlay 的 onDismissCallback：
         // 那个回调**只在轻点解锁那条路径上被调用**（BlackOverlay.hide() 结尾会把
@@ -381,8 +386,10 @@ class OverlayService : Service() {
             ACTION_BUBBLE -> setBubbleVisible(prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false))
             ACTION_SET_TIMER -> handleSetTimer(
                 intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0,
-                intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0
+                intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0,
+                @Suppress("DEPRECATION") (intent?.getParcelableExtra<android.media.session.MediaSession.Token>(EXTRA_TIMER_SESSION))
             )
+            ACTION_START_DEMO -> startFirstUseDemo()
             // ⚠ 原来的 ACTION_CALIB_START 分支已删：省电实测改成**被动测量**，
             // 不再需要「先亮屏采 3 分钟、再黑屏采 3 分钟」的向导。
             ACTION_TEST_TOGGLE -> toggleOverlay() // 测试广播
@@ -767,39 +774,64 @@ class OverlayService : Service() {
 
     // ---------- 黑屏遮罩 ----------
 
-    // 睡眠定时器：到期自动关闭黑幕（0=未设置）
+    // Monotonic deadline: changing wall clock cannot extend/expire an armed timer.
     @Volatile
     private var timerEndAt = 0L
 
     fun timerRemainingMs(): Long =
-        if (timerEndAt > 0) (timerEndAt - System.currentTimeMillis()).coerceAtLeast(0) else 0
+        if (timerEndAt > 0) (timerEndAt - SystemClock.elapsedRealtime()).coerceAtLeast(0) else 0
+
+    private var timerPauseKeepBlack=false
+    private var timerTarget:TimerPlaybackTarget?=null
+    fun timerKeepsBlack()=timerPauseKeepBlack
 
     private val timerTick: Runnable = Runnable {
         if (timerEndAt <= 0) return@Runnable
-        if (System.currentTimeMillis() >= timerEndAt) {
+        if (SystemClock.elapsedRealtime() >= timerEndAt) {
             timerEndAt = 0
-            if (isAnyBlackShowing()) {
+            if(timerPauseKeepBlack) {
+                val outcome=timerTarget?.pause() ?: PauseDecision.UNAVAILABLE
+                // Report on return rather than lighting a Toast over a sleeping user's curtain.
+                timerResult=when(outcome) {
+                    PauseDecision.REQUEST -> R.string.timer_pause_requested
+                    PauseDecision.ALREADY_PAUSED -> R.string.timer_already_paused
+                    PauseDecision.UNAVAILABLE -> R.string.timer_pause_failed
+                }
+                if(!isAnyBlackShowing()) showTimerResult()
+            } else if (isAnyBlackShowing()) {
                 hideAllBlack()
                 Toast.makeText(this, lstr(R.string.toast_timer_done), Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, lstr(R.string.toast_timer_expired), Toast.LENGTH_SHORT).show()
             }
+            timerTarget=null
             refreshNotification()
         } else {
             refreshNotification()
-            main.postDelayed(timerTick, 30_000)
+            main.postDelayed(timerTick, timerRemainingMs().coerceAtMost(30_000).coerceAtLeast(1))
         }
     }
 
-    private fun handleSetTimer(minutes: Long, endAtMs: Long = 0L) {
-        timerEndAt = when {
-            endAtMs > 0 -> endAtMs
-            minutes > 0 -> System.currentTimeMillis() + minutes * 60_000
-            else -> 0
+    private fun handleSetTimer(minutes: Long, endAtMs: Long = 0L,
+        token:android.media.session.MediaSession.Token?=null) {
+        val next=SleepTimerPolicy.deadline(minutes,endAtMs,System.currentTimeMillis(),SystemClock.elapsedRealtime())
+        if(next>0 && demoOverlay!=null) {
+            Toast.makeText(this,lstr(R.string.guide_busy),Toast.LENGTH_LONG).show();return
         }
+        val pause=prefs.getBoolean(Prefs.TIMER_PAUSE_KEEP_BLACK,false)
+        val target=if(next>0 && pause) {
+            val controller=try { if(token!=null)android.media.session.MediaController(this,token)
+                else queryNowPlaying()?.controller } catch(_:RuntimeException) { null }
+            controller?.let { TimerPlaybackTarget(it) }
+        } else null
+        if(next>0 && pause && target?.canArm()!=true) {
+            Toast.makeText(this,lstr(R.string.timer_no_target),Toast.LENGTH_LONG).show()
+            return // Do not replace an existing timer with an unsupported one.
+        }
+        timerEndAt=next;timerPauseKeepBlack=pause;timerTarget=target;timerResult=0
         main.removeCallbacks(timerTick)
         if (timerEndAt > 0) {
-            main.postDelayed(timerTick, 15_000)
+            main.postDelayed(timerTick,timerRemainingMs().coerceAtMost(15_000))
             if (endAtMs > 0) {
                 Toast.makeText(this, lstr(R.string.toast_timer_episode), Toast.LENGTH_SHORT).show()
             } else {
@@ -811,9 +843,46 @@ class OverlayService : Service() {
         refreshNotification()
     }
 
+    private var timerResult=0
+    fun showTimerResult() {
+        if(!isAnyBlackShowing() && timerResult!=0) { Toast.makeText(this,lstr(timerResult),Toast.LENGTH_LONG).show();timerResult=0 }
+    }
+
+    private var demoOverlay:BlackOverlay?=null
+    private val demoFinish=Runnable {
+        if(demoOverlay!=null && black===demoOverlay) {
+            hideAllBlack()
+            prefs.edit().putBoolean(Prefs.DEMO_FEEDBACK_PENDING,true).apply()
+        }
+    }
+    private fun resumeSamplingAfterDemo() {
+        onSegStartUwh=null;onSegStartAt=0L
+        main.removeCallbacks(powerTick)
+        main.postDelayed(powerTick,60_000)
+    }
+    private fun startFirstUseDemo() {
+        if(isAnyBlackShowing() || timerRemainingMs()>0 || !android.provider.Settings.canDrawOverlays(this)) {
+            Toast.makeText(this,lstr(R.string.guide_busy),Toast.LENGTH_LONG).show();return
+        }
+        val overlay=BlackOverlay(this,WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,recordSession=false)
+        onSegStartUwh=null;onSegStartAt=0L
+        black=overlay;demoOverlay=overlay
+        overlay.show {
+            if(demoOverlay===overlay) {
+                demoOverlay=null;black=null;main.removeCallbacks(demoFinish)
+                resumeSamplingAfterDemo()
+                prefs.edit().putBoolean(Prefs.DEMO_FEEDBACK_PENDING,true).apply()
+            }
+            setBubbleAnimating(true);refreshNotification()
+        }
+        if(overlay.isShowing) { setBubbleAnimating(false);main.postDelayed(demoFinish,10_000) }
+        else { demoOverlay=null;black=null }
+    }
+
     /** 黑幕显示中时重挂（设置变更即时生效；同帧先拆后挂，视觉无闪动） */
     fun reapplyBlack() {
         if (!isAnyBlackShowing()) return
+        if(demoOverlay!=null) return
         hideAllBlack()
         black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
         black?.show { refreshNotification() }

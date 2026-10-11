@@ -24,7 +24,7 @@
     <string name="hero_title_stop">息屏听剧运行中</string>
     <string name="hero_sub_start">启动后，看剧时点悬浮球即可息屏听剧</string>
     <string name="hero_sub_stop">看剧时点悬浮球，黑屏听剧声音继续 · 点此停止助手</string>
-    <string name="timer_title">定时关闭</string>
+    <string name="timer_title">睡前定时</string>
     <string name="keepalive_title">防杀保活</string>
     <string name="keepalive_sub">设置指南</string>
     <string name="stats_section">节能统计</string>
@@ -89,7 +89,7 @@
     <string name="caption_row_title">黑幕字幕（实验性）</string>
     <string name="caption_service_desc">采集正在播放视频的字幕文本，仅实时显示在息屏听剧的黑幕上。不存储、不上传、不用于其他用途。</string>
     <string name="update_log_title_fmt">v%1$s 更新内容</string>
-    <string name="update_log_body">· 五阶精灵全新造型，进化差异更明显\n· 每阶专属火星、波纹、闪电、旋流与星辉\n· 新增蓄力弹跳、左右拨动与长按展翼\n· 精灵操作提示与点击响应优化</string>
+    <string name="update_log_body">· 图鉴成长提示修复，五阶形态均可互动预览\n· 睡前定时可选择请求暂停并保留黑幕\n· 新增十秒黑幕体验与续播反馈\n· 更新分享与关于文案</string>
     <string name="switch_headset">耳机拔出自动返回视频</string>
     <string name="bubble_style">悬浮球样式</string>
     <string name="settings_data">数据</string>
@@ -156,13 +156,11 @@
     <string name="timer_30">30分钟</string>
     <string name="timer_60">60分钟</string>
     <string name="timer_cancel">取消定时</string>
-    <string name="toast_timer_set">定时关闭：%1$d分钟后</string>
-    <string name="toast_timer_episode">本集结束后将自动关闭</string>
+    <string name="toast_timer_set">定时已设置：%1$d分钟后</string>
+    <string name="toast_timer_episode">定时已设置：本集结束后执行所选动作</string>
     <string name="toast_timer_expired">定时已到期</string>
     <string name="toast_timer_done">定时结束，黑幕已关闭</string>
     <string name="toast_timer_cancelled">定时关闭已取消</string>
-    <string name="toast_episode_done">本集结束后自动息屏（约 %1$d分%2$d秒 后）</string>
-    <string name="timer_remain_fmt">剩余 %1$d 分钟</string>
 
     <!-- 动态文案：备份恢复 -->
     <string name="restore_title">恢复历史数据</string>
@@ -242,7 +240,7 @@
     <string name="day_today">今天</string>
     <string name="day_yesterday">昨天</string>
     <string name="share_chooser">分享到</string>
-    <string name="share_text">⚡ 我用「息屏听剧」黑屏听了 %1$s，估算省电 %2$d mAh\n我的电能精灵已经进化到「%3$s」了\n完全免费无广告的息屏听剧神器（0.6MB 离线运行）\nhttps://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">我用「息屏听剧」黑幕听了 %1$s，估算省电 %2$d mAh\n我的精灵是「%3$s」\n个人开发的安卓工具，无广告、无联网权限\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">分享完成 · +%1$d 待收成长值（去统计页点左侧条收取）</string>
     <string name="toast_share_claimed">今日分享奖励已领取，明天再来（每天一次）</string>
     <string name="share_sub_claimed">今日已领取 ✓ · 明天再来</string>
@@ -266,7 +264,7 @@
     <!-- 关于页 -->
     <string name="about_title">关于息屏听剧</string>
     <string name="about_section_app">关于这个App</string>
-    <string name="about_intro">看剧时想闭眼听？点一下悬浮球，屏幕全黑：背光物理关闭、触摸屏蔽，声音照常播放——任意视频App可用。\n\n可选暗色夜钟与电量显示（重锁后保持最暗亮度持续可见），内容周期性微移保护OLED屏幕；来电自动退出黑幕，不会漏接电话；支持定时关闭与「听完这集」智能定时；耳机拔出自动返回视频。\n\n黑幕唤醒后可切集：上一集 / 播放暂停 / 下一集（可在设置中开启）。\n\n电能精灵：听剧积累成长值，养成五形态精灵（电火花 → 电球 → 雷云精灵 → 风暴之灵 → 雷霆之王），可作悬浮球头像，满级后继续储备；成就系统记录你的听剧里程碑。\n\n桌面小部件：三档尺寸，精灵形象、听剧数据与一键息屏随身可见；悬浮球支持长按快速退出。\n\n数据备份：自动备份至下载目录 XiTing 文件夹（仅本机），卸载重装后可一键恢复。所有数据仅保存在本机，无网络权限。</string>
+    <string name="about_intro">用黑色遮罩降低画面亮度、屏蔽误触，继续听声音。实际表现因设备、系统与播放器而异，不等同于系统真正关屏。\n\n支持定时、黑幕播控、五阶精灵互动、图标换肤、桌面小组件和月报年报。\n\n听剧记录与成长数据保存在本机，可手动备份恢复。无联网权限；悬浮窗和通知等按功能授权。</string>
     <string name="about_section_privacy">隐私与安全</string>
     <string name="about_privacy">· 无 INTERNET 权限：物理上无法联网\n· 不读取任何屏幕内容\n· 所有数据仅保存在本机（已显式关闭系统云备份与换机自动迁移）\n· 备份仅在你主动点击导出时写入「下载/XiTing」目录，由你自己保管\n· 仅当你主动授予「通知使用权」后，才统计通知条数用于黑幕角标；不读取通知标题与内容，未授权则完全不启用\n· 应用内含构建标识（构建ID与渠道，仅用于盗版溯源，不含任何设备信息）\n· 无广告、无追踪、无埋点</string>
     <string name="about_section_open">开源与联系</string>
@@ -378,7 +376,7 @@
     <string name="week_report_mah">本周省电约 %1$d mAh</string>
     <string name="week_report_evolved">精灵 %1$s → %2$s（+%3$d 成长值）</string>
     <string name="week_report_gp">本周获得 %1$d 成长值</string>
-    <string name="week_share_text">本周我用「息屏听剧」听了 %1$s，%2$d 天里省电约 %3$d mAh\n我的电能精灵现在是「%4$s」\n免费、无广告、完全离线（0.6MB）\nhttps://github.com/ch1209498273/XiTing</string>
+    <string name="week_share_text">本周听了 %1$s，共 %2$d 天，估算省电 %3$d mAh\n我的精灵是「%4$s」\n本地记录，无广告、无联网权限\nhttps://github.com/ch1209498273/XiTing</string>
 
     <!-- 自定义定时 -->
     <string name="timer_custom">自定义分钟</string>
@@ -392,4 +390,31 @@
     <string name="pet_hint_cloud">轻点雷云，释放闪电</string>
     <string name="pet_hint_storm">左右拨动精灵，卷起旋流</string>
     <string name="pet_hint_king">轻点回应，长按后松手展翼</string>
+
+    <!-- v4.2 core experience -->
+    <string name="gallery_try_all">试试五阶互动</string>
+    <string name="gallery_preview_only">仅预览，不会解锁或改变当前装扮。点击精灵试试吧。</string>
+    <string name="timer_end_action">结束时做什么</string>
+    <string name="timer_return_video">撤掉黑幕</string>
+    <string name="timer_pause_keep_black">请求暂停，保持黑幕</string>
+    <string name="timer_pause_explain">保存后对下次设置的定时生效，当前定时不变。暂停需要通知使用权和支持暂停的媒体会话，仅向设置时的播放器发送请求；第三方播放器可能不响应。</string>
+    <string name="timer_no_target">未找到可暂停的播放会话。请检查通知使用权和播放器支持，原定时未改变。</string>
+    <string name="timer_pause_requested">已向原播放器请求暂停；是否暂停以播放器实际响应为准。</string>
+    <string name="timer_already_paused">原播放器已不在播放，没有发送切换播放指令。</string>
+    <string name="timer_pause_failed">原播放会话已失效或无法暂停，黑幕保持原状。</string>
+    <string name="timer_mode_status_fmt">剩余 %1$d 分钟 · %2$s</string>
+    <string name="guide_title">第一次用？试一次黑幕</string>
+    <string name="guide_intro">先开启悬浮窗权限。通知用于快捷控制；通知使用权仅在剧名、进度和定时暂停等功能中需要。
+
+先在视频 App 正常播放，再回来开始演示。画面会黑下来，10 秒后自动恢复；也可轻点唤醒后点返回。
+
+这次演示不计入听剧时长和成长值。</string>
+    <string name="guide_start">开始10秒演示</string>
+    <string name="guide_permission">请先开启悬浮窗权限，再回来开始演示。</string>
+    <string name="guide_busy">请先结束现有黑幕或定时，并确认悬浮窗权限后再试演示。</string>
+    <string name="guide_feedback">刚才画面黑下来时，声音是否还在继续？</string>
+    <string name="guide_yes">声音还在</string>
+    <string name="guide_no">声音停了</string>
+    <string name="guide_success">这次黑幕与恢复体验已完成，可用悬浮球开始听剧。</string>
+    <string name="guide_retry">先确认视频在正常播放。若声音仍会中断，请检查后台运行限制和保活设置，并换另一个播放器确认兼容性。</string>
 </resources>

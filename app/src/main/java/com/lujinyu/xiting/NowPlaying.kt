@@ -27,7 +27,7 @@ data class NowPlaying(
     val durationMs: Long,     // 总时长；读不到为 0
     val canSeek: Boolean,     // 会话是否声明支持 seekTo（±30s 按钮的兼容性探测依据）
     val playing: Boolean,
-    private val controller: android.media.session.MediaController
+    internal val controller: android.media.session.MediaController
 ) {
     /**
      * 剧名行的展示文案：「App名 · 剧名」。App 名在前（短、稳定），

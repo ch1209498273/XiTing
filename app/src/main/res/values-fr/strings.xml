@@ -20,7 +20,7 @@
     <string name="hero_title_stop">Écoute écran off en cours</string>
     <string name="hero_sub_start">Une fois lancé, touchez la bulle pendant une vidéo</string>
     <string name="hero_sub_stop">Touchez la bulle : l\'écran s\'éteint, le son continue · Touchez pour arrêter</string>
-    <string name="timer_title">Arrêt programmé</string>
+    <string name="timer_title">Minuterie de sommeil</string>
     <string name="keepalive_title">Anti-arrêt</string>
     <string name="keepalive_sub">Guide de config</string>
     <string name="stats_section">Statistiques d\'économie</string>
@@ -80,7 +80,7 @@
     <string name="caption_row_title">Sous-titres écran noir (bêta)</string>
     <string name="caption_service_desc">Lit le texte des sous-titres de la vidéo en cours et laffiche en temps réel sur l\'écran noir. Jamais stocké, jamais envoyé, rien dautre.</string>
     <string name="update_log_title_fmt">Nouveautés de v%1$s</string>
-    <string name="update_log_body">· Cinq nouvelles formes aux évolutions bien visibles\n· Étincelles, ondes, éclairs, tourbillons et étoiles\n· Maintenir pour charger, glisser pour tourner et déployer les ailes\n· Conseils de gestes et meilleure réponse tactile</string>
+    <string name="update_log_body">· Progression corrigée et aperçu interactif des cinq formes\n· La minuterie peut demander une pause et maintenir le rideau\n· Démonstration de dix secondes et retour sur la lecture\n· Textes de partage et de présentation actualisés</string>
     <string name="switch_headset">Retour vidéo au débranchement</string>
     <string name="bubble_style">Style de bulle</string>
     <string name="settings_data">Données</string>
@@ -135,13 +135,11 @@
     <string name="timer_30">30 min</string>
     <string name="timer_60">60 min</string>
     <string name="timer_cancel">Annuler la minuterie</string>
-    <string name="toast_timer_set">Arrêt dans %1$d min</string>
-    <string name="toast_timer_episode">Arrêt à la fin de l\'épisode</string>
+    <string name="toast_timer_set">Minuterie réglée : dans %1$d minutes</string>
+    <string name="toast_timer_episode">Minuterie réglée : action choisie après cet épisode</string>
     <string name="toast_timer_expired">Minuterie expirée</string>
     <string name="toast_timer_done">Minuterie terminée, écran rallumé</string>
     <string name="toast_timer_cancelled">Arrêt programmé annulé</string>
-    <string name="toast_episode_done">Éteindre à la fin de l\'épisode (dans %1$d min %2$d s)</string>
-    <string name="timer_remain_fmt">Il reste %1$d min</string>
     <string name="restore_title">Restaurer les données</string>
     <string name="restore_msg">Si vous avez déjà utilisé « Écoute écran off » puis l\'avez désinstallé : la sauvegarde se trouve dans le dossier XiTing de Téléchargements (XiTing-backup.json). Vous pouvez restaurer ici la progression et les statistiques en un geste.
 
@@ -221,10 +219,7 @@ Vous n\'avez rien à faire — la mesure se fait automatiquement pendant que vou
     <string name="day_today">Aujourd\'hui</string>
     <string name="day_yesterday">Hier</string>
     <string name="share_chooser">Partager vers</string>
-    <string name="share_text">⚡ Avec « Écoute écran off » j\'ai écouté %1$s écran éteint, soit environ %2$d mAh économisés
-Mon esprit électrique a évolué jusqu\'à « %3$s »
-Une appli gratuite, sans publicité, hors ligne (0,6 Mo)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">%1$s avec XiTing, économie estimée : %2$d mAh\nCréature : %3$s\nOutil Android indépendant, sans publicité ni permission Internet\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">Partagé · +%1$d en attente (récupérez sur la page Stats)</string>
     <string name="toast_share_claimed">Récompense du jour déjà récupérée, revenez demain</string>
     <string name="share_sub_claimed">Récupéré aujourd\'hui ✓ · Revenez demain</string>
@@ -246,17 +241,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="unit_s">s</string>
     <string name="about_title">À propos</string>
     <string name="about_section_app">À propos de cette app</string>
-    <string name="about_intro">Vous voulez écouter les yeux fermés pendant une vidéo ? Touchez la bulle et l\'écran s\'éteint complètement : rétroéclairage coupé, toucher bloqué, le son continue — fonctionne avec n\'importe quelle app vidéo.
-
-Horloge sombre et batterie optionnelles (visibles à la luminosité minimale après re-verrouillage, contenu légèrement déplacé pour protéger l\'OLED) ; les appels font sortir automatiquement de l\'écran noir, donc aucun appel manqué ; arrêt programmé et minuterie « finir cet épisode » ; le débranchement des écouteurs ramène à la vidéo.
-
-Après réveil : épisode précédent / lecture-pause / suivant (activables dans les réglages).
-
-Esprit électrique : l\'écoute fait grandir un esprit à cinq formes (Étincelle → Orbe → Esprit d\'orage → Esprit de tempête → Roi du tonnerre), utilisable comme avatar de la bulle ; les succès enregistrent vos étapes.
-
-Widgets : trois tailles avec l\'esprit, les statistiques et un appui pour éteindre ; appui long sur la bulle pour quitter.
-
-Sauvegarde : automatique dans le dossier XiTing de Téléchargements (appareil uniquement), restaurable en un geste après réinstallation. Aucune donnée ne quitte l\'appareil, aucune permission réseau.</string>
+    <string name="about_intro">Un écran superposé noir assombrit le contenu et bloque les touchers accidentels pendant la lecture audio. Le comportement dépend du matériel, du système et du lecteur ; ce ne sont pas les mécanismes système de veille.\n\nMinuteries, commandes, cinq formes de créature, icônes, widgets et rapports.\n\nDonnées locales avec sauvegarde et restauration. Aucune permission Internet ; autres autorisations selon la fonction.</string>
     <string name="about_section_privacy">Confidentialité et sécurité</string>
     <string name="about_privacy">· Aucune permission INTERNET : connexion réseau impossible
 · Aucune capture ni lecture du contenu de l\'écran
@@ -367,10 +352,7 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="week_report_mah">Environ %1$d mAh économisés cette semaine</string>
     <string name="week_report_evolved">Esprit %1$s → %2$s (+%3$d progression)</string>
     <string name="week_report_gp">%1$d de progression cette semaine</string>
-    <string name="week_share_text">J\'ai écouté %1$s cette semaine avec Écoute écran off, économisant environ %3$d mAh sur %2$d jours
-Mon esprit électrique est maintenant « %4$s »
-Gratuit, sans publicité, 100 %% hors ligne (0,6 Mo)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="week_share_text">Cette semaine : %1$s sur %2$d jours, économie estimée : %3$d mAh\nCréature : %4$s\nDonnées locales, sans publicité ni permission Internet\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Minutes personnalisées</string>
     <string name="timer_custom_hint">1 à 600 minutes</string>
     <string name="timer_custom_bad">Saisissez au moins 1 minute</string>
@@ -382,4 +364,31 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="pet_hint_cloud">Touchez le nuage pour libérer des éclairs</string>
     <string name="pet_hint_storm">Balayez sur le côté pour créer un tourbillon</string>
     <string name="pet_hint_king">Touchez pour saluer, maintenez puis relâchez pour les ailes</string>
+
+    <!-- v4.2 core experience -->
+    <string name="gallery_try_all">Essayer les cinq formes</string>
+    <string name="gallery_preview_only">Aperçu uniquement. Aucun déblocage ni changement de tenue.</string>
+    <string name="timer_end_action">Action en fin de minuterie</string>
+    <string name="timer_return_video">Retirer le rideau noir</string>
+    <string name="timer_pause_keep_black">Demander la pause, garder le rideau</string>
+    <string name="timer_pause_explain">Pour la prochaine minuterie, sans modifier celle en cours. Accès aux notifications et session compatible requis. Seul le lecteur initial reçoit la demande, sans garantie de réponse.</string>
+    <string name="timer_no_target">Aucune cible de pause compatible. Vérifiez les autorisations et le lecteur. Minuterie existante inchangée.</string>
+    <string name="timer_pause_requested">Pause demandée au lecteur initial ; sa réponse détermine le résultat.</string>
+    <string name="timer_already_paused">Le lecteur initial ne joue plus. Aucune commande de bascule envoyée.</string>
+    <string name="timer_pause_failed">Session initiale indisponible ou pause non prise en charge. Rideau inchangé.</string>
+    <string name="timer_mode_status_fmt">Reste %1$d min · %2$s</string>
+    <string name="guide_title">Première fois ? Essayer le rideau</string>
+    <string name="guide_intro">Autorisez la superposition. Les notifications servent aux commandes ; leur accès sert aux titres, à la progression et à la pause programmée.
+
+Lancez une vidéo puis revenez démarrer. Retour automatique après 10 secondes. Vous pouvez aussi toucher puis revenir.
+
+La démo ne compte ni temps ni croissance.</string>
+    <string name="guide_start">Démarrer la démo de 10 s</string>
+    <string name="guide_permission">Autorisez la superposition puis revenez démarrer.</string>
+    <string name="guide_busy">Arrêtez le rideau ou la minuterie en cours et vérifiez la superposition.</string>
+    <string name="guide_feedback">Le son a-t-il continué pendant le rideau noir ?</string>
+    <string name="guide_yes">Le son a continué</string>
+    <string name="guide_no">Le son a cessé</string>
+    <string name="guide_success">Démo terminée. Utilisez le bouton flottant pour commencer.</string>
+    <string name="guide_retry">Vérifiez la lecture vidéo. Si le son cesse, vérifiez les restrictions en arrière-plan et le maintien actif, puis essayez un autre lecteur.</string>
 </resources>

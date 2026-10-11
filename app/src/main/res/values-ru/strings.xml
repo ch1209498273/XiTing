@@ -20,7 +20,7 @@
     <string name="hero_title_stop">Слушание с выключенным экраном</string>
     <string name="hero_sub_start">После запуска коснитесь пузырька во время просмотра</string>
     <string name="hero_sub_stop">Коснитесь пузырька: экран погаснет, звук продолжится · Коснитесь, чтобы остановить</string>
-    <string name="timer_title">Автоотключение</string>
+    <string name="timer_title">Таймер сна</string>
     <string name="keepalive_title">Защита от отключения</string>
     <string name="keepalive_sub">Руководство</string>
     <string name="stats_section">Статистика экономии</string>
@@ -80,7 +80,7 @@
     <string name="caption_row_title">Субтитры на чёрном экране (бета)</string>
     <string name="caption_service_desc">Читает текст субтитров играющего видео и показывает его на чёрном экране в реальном времени. Не сохраняется, не отправляется, не используется иначе.</string>
     <string name="update_log_title_fmt">Новое в v%1$s</string>
-    <string name="update_log_body">· Пять новых форм с заметной эволюцией\n· Искры, волны, молнии, вихри и звёзды\n· Удержание для заряда, свайп для вращения и раскрытие крыльев\n· Подсказки жестов и улучшенная обработка касаний</string>
+    <string name="update_log_body">· Исправлены подсказки роста, добавлен интерактивный просмотр пяти форм\n· Таймер может запросить паузу и оставить чёрную шторку\n· Добавлены десятисекундная демонстрация и проверка воспроизведения\n· Обновлены тексты отправки и описания приложения</string>
     <string name="switch_headset">Возврат к видео при отключении наушников</string>
     <string name="bubble_style">Вид пузырька</string>
     <string name="settings_data">Данные</string>
@@ -135,13 +135,11 @@
     <string name="timer_30">30 мин</string>
     <string name="timer_60">60 мин</string>
     <string name="timer_cancel">Отменить таймер</string>
-    <string name="toast_timer_set">Отключение через %1$d мин</string>
-    <string name="toast_timer_episode">Отключится в конце серии</string>
+    <string name="toast_timer_set">Таймер установлен: через %1$d мин.</string>
+    <string name="toast_timer_episode">Таймер установлен: выбранное действие после этой серии</string>
     <string name="toast_timer_expired">Таймер истёк</string>
     <string name="toast_timer_done">Таймер завершён, экран включён</string>
     <string name="toast_timer_cancelled">Автоотключение отменено</string>
-    <string name="toast_episode_done">Погаснет в конце серии (через %1$d мин %2$d с)</string>
-    <string name="timer_remain_fmt">Осталось %1$d мин</string>
     <string name="restore_title">Восстановить данные</string>
     <string name="restore_msg">Если вы уже пользовались « Слушай с выключенным экраном » и удалили приложение: копия лежит в папке XiTing в Загрузках (XiTing-backup.json). Здесь можно одним касанием вернуть прогресс и статистику.
 
@@ -221,10 +219,7 @@
     <string name="day_today">Сегодня</string>
     <string name="day_yesterday">Вчера</string>
     <string name="share_chooser">Поделиться</string>
-    <string name="share_text">⚡ Я слушал %1$s с выключенным экраном в « Слушай с выключенным экраном », сэкономив около %2$d мА·ч
-Мой электрический дух развился до « %3$s »
-Бесплатное приложение без рекламы, полностью офлайн (0,6 МБ)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">%1$s с XiTing, оценка экономии: %2$d мАч\nДух: %3$s\nНезависимый Android-инструмент без рекламы и разрешения на Интернет\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">Отправлено · +%1$d (заберите в Статистике)</string>
     <string name="toast_share_claimed">Награда за сегодня получена, приходите завтра</string>
     <string name="share_sub_claimed">Получено сегодня ✓ · Завтра снова</string>
@@ -246,17 +241,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="unit_s">с</string>
     <string name="about_title">О приложении</string>
     <string name="about_section_app">Об этом приложении</string>
-    <string name="about_intro">Хотите слушать с закрытыми глазами во время видео? Коснитесь пузырька — экран полностью погаснет: подсветка физически выключена, касания заблокированы, звук продолжает играть — работает с любым видеоприложением.
-
-Необязательные тёмные часы и индикатор батареи (видны на минимальной яркости после повторной блокировки, содержимое слегка сдвигается для защиты OLED); при входящем звонке чёрный экран выключается автоматически, так что вы не пропустите звонок; есть таймер выключения и умный таймер « Дослушать серию »; при отключении наушников происходит возврат к видео.
-
-После пробуждения: предыдущая серия / пауза / следующая (включается в настройках).
-
-Электрический дух: прослушивание развивает существо пяти форм (Искра → Сфера → Грозовой дух → Дух бури → Король грома), его можно использовать как аватар пузырька; достижения отмечают ваши вехи.
-
-Виджеты: три размера с духом, статистикой и одним касанием для затемнения; долгое нажатие на пузырёк завершает работу.
-
-Резервная копия: автоматически в папке XiTing в Загрузках (только на устройстве), восстанавливается одним касанием после переустановки. Все данные остаются на устройстве, сетевых разрешений нет.</string>
+    <string name="about_intro">Чёрное наложение затемняет экран и блокирует случайные касания при воспроизведении звука. Работа зависит от устройства, системы и плеера; это не системное выключение экрана.\n\nТаймеры, управление, пять духов, значки, виджеты и отчёты.\n\nДанные локальны, есть резервное копирование и восстановление. Нет разрешения на Интернет; другие разрешения зависят от функции.</string>
     <string name="about_section_privacy">Приватность и безопасность</string>
     <string name="about_privacy">· Нет разрешения INTERNET: физически не может выходить в сеть
 · Не читает содержимое экрана
@@ -367,10 +352,7 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="week_report_mah">За неделю сэкономлено около %1$d мА·ч</string>
     <string name="week_report_evolved">Дух %1$s → %2$s (+%3$d прогресса)</string>
     <string name="week_report_gp">На этой неделе +%1$d прогресса</string>
-    <string name="week_share_text">На этой неделе я слушал %1$s в «Слушай с выключенным экраном», сэкономив около %3$d мА·ч за %2$d дней
-Мой электрический дух теперь «%4$s»
-Бесплатно, без рекламы, полностью офлайн (0,6 МБ)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="week_share_text">За неделю: %1$s за %2$d дней, оценка экономии: %3$d мАч\nДух: %4$s\nЛокальные данные без рекламы и разрешения на Интернет\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Свои минуты</string>
     <string name="timer_custom_hint">1-600 минут</string>
     <string name="timer_custom_bad">Введите хотя бы 1 минуту</string>
@@ -382,4 +364,31 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="pet_hint_cloud">Нажмите на облако, чтобы выпустить молнию</string>
     <string name="pet_hint_storm">Проведите вбок, чтобы закрутить вихрь</string>
     <string name="pet_hint_king">Нажмите для приветствия, удерживайте и отпустите для взмаха</string>
+
+    <!-- v4.2 core experience -->
+    <string name="gallery_try_all">Попробовать пять форм</string>
+    <string name="gallery_preview_only">Только просмотр. Ничего не разблокируется, облик не меняется.</string>
+    <string name="timer_end_action">Действие в конце таймера</string>
+    <string name="timer_return_video">Убрать чёрную шторку</string>
+    <string name="timer_pause_keep_black">Запросить паузу, оставить шторку</string>
+    <string name="timer_pause_explain">Для следующего таймера, текущий не меняется. Нужны доступ к уведомлениям и совместимый сеанс. Запрос отправляется только исходному плееру; ответ не гарантирован.</string>
+    <string name="timer_no_target">Нет совместимого сеанса для паузы. Проверьте доступ и плеер. Текущий таймер не изменён.</string>
+    <string name="timer_pause_requested">Пауза запрошена у исходного плеера; результат зависит от его ответа.</string>
+    <string name="timer_already_paused">Исходный плеер больше не играет. Команда переключения не отправлена.</string>
+    <string name="timer_pause_failed">Исходный сеанс недоступен или не поддерживает паузу. Шторка не изменена.</string>
+    <string name="timer_mode_status_fmt">Осталось %1$d мин · %2$s</string>
+    <string name="guide_title">Впервые? Попробуйте шторку</string>
+    <string name="guide_intro">Разрешите наложение. Уведомления нужны для управления; доступ к ним — для названий, позиции и паузы по таймеру.
+
+Запустите видео и вернитесь для начала. Через 10 секунд изображение вернётся. Можно также коснуться и вернуться.
+
+Демо не учитывается во времени и росте.</string>
+    <string name="guide_start">Запустить демо на 10 с</string>
+    <string name="guide_permission">Разрешите наложение и вернитесь для начала.</string>
+    <string name="guide_busy">Завершите шторку или таймер и проверьте разрешение наложения.</string>
+    <string name="guide_feedback">Продолжался ли звук при чёрной шторке?</string>
+    <string name="guide_yes">Звук продолжался</string>
+    <string name="guide_no">Звук остановился</string>
+    <string name="guide_success">Демо завершено. Начните прослушивание плавающей кнопкой.</string>
+    <string name="guide_retry">Проверьте воспроизведение. Если звук прерывается, проверьте фоновые ограничения и удержание активности, затем попробуйте другой плеер.</string>
 </resources>

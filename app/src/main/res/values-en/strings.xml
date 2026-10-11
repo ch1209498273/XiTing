@@ -20,7 +20,7 @@
     <string name="hero_title_stop">Screen-Off Listening Active</string>
     <string name="hero_sub_start">Once started, tap the bubble while watching to black the screen</string>
     <string name="hero_sub_stop">Tap the bubble while watching — screen goes black, sound keeps playing · Tap here to stop</string>
-    <string name="timer_title">Sleep Timer</string>
+    <string name="timer_title">Sleep timer</string>
     <string name="keepalive_title">Keep-Alive</string>
     <string name="keepalive_sub">Setup guide</string>
     <string name="stats_section">Energy Stats</string>
@@ -80,7 +80,7 @@
     <string name="caption_row_title">Black-screen captions (Beta)</string>
     <string name="caption_service_desc">Reads subtitle text of the playing video and shows it on the black screen in real time. Never stored, never uploaded, used for nothing else.</string>
     <string name="update_log_title_fmt">What\'s new in v%1$s</string>
-    <string name="update_log_body">· Five redesigned spirit forms with clearer evolution\n· Unique sparks, ripples, lightning, wind and stars\n· Hold to charge, swipe to spin, hold to spread wings\n· Gesture hints and improved tap handling</string>
+    <string name="update_log_body">· Correct growth hints and interactive previews for all five forms\n· Sleep timer can request pause and keep the curtain\n· New ten-second curtain demo and playback feedback\n· Updated sharing and about text</string>
     <string name="switch_headset">Return to video when headphones unplug</string>
     <string name="bubble_style">Bubble style</string>
     <string name="settings_data">Data</string>
@@ -135,13 +135,11 @@
     <string name="timer_30">30 min</string>
     <string name="timer_60">60 min</string>
     <string name="timer_cancel">Cancel timer</string>
-    <string name="toast_timer_set">Sleep timer: %1$d min</string>
-    <string name="toast_timer_episode">Will stop after this episode</string>
+    <string name="toast_timer_set">Timer set: in %1$d minutes</string>
+    <string name="toast_timer_episode">Timer set: selected action after this episode</string>
     <string name="toast_timer_expired">Timer ended</string>
     <string name="toast_timer_done">Timer ended — screen restored</string>
     <string name="toast_timer_cancelled">Timer cancelled</string>
-    <string name="toast_episode_done">Screen off after this episode (~%1$dm %2$ds)</string>
-    <string name="timer_remain_fmt">%1$d min left</string>
     <string name="restore_title">Restore history</string>
     <string name="restore_msg">Used XiTing before and uninstalled it? Your backup lives in Download/XiTing (XiTing-backup.json) and can restore growth &amp; stats in one tap.\n\nNew here? Tap \"No thanks\".</string>
     <string name="restore_pick">Choose backup file</string>
@@ -210,7 +208,7 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="day_today">Today</string>
     <string name="day_yesterday">Yesterday</string>
     <string name="share_chooser">Share via</string>
-    <string name="share_text">⚡ Screen-off listening with XiTing: %1$s, ~%2$d mAh saved\nMy energy pet evolved into %3$s\nFree, ad-free, fully offline (0.6MB)\nhttps://github.com/ch1209498273/XiTing</string>
+    <string name="share_text">I listened for %1$s with XiTing; estimated saving %2$d mAh\nMy spirit: %3$s\nAn indie Android tool, no ads or Internet permission\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="toast_share_done">Shared · +%1$d pending growth (tap the bar on Stats to collect)</string>
     <string name="toast_share_claimed">Today\'s reward claimed — come back tomorrow</string>
     <string name="share_sub_claimed">Claimed today ✓ · back tomorrow</string>
@@ -228,7 +226,7 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="unit_s">s</string>
     <string name="about_title">About XiTing</string>
     <string name="about_section_app">About this app</string>
-    <string name="about_intro">Want to just listen while watching? Tap the bubble and the screen goes fully black: backlight physically off, touches blocked, sound keeps playing — works with any video app.\n\nOptional night clock &amp; battery display (stays visible at minimum brightness after re-lock, content micro-shifts to protect OLED); incoming calls exit the black screen so you never miss one; sleep timer and \"finish this episode\" smart timer; headphones unplug returns you to video.\n\nAfter wake you can skip tracks: previous / play-pause / next (enable in Settings).\n\nEnergy Pet: listening earns growth points to evolve a five-form pet (Spark → Orb → Storm Cloud → Tempest → Thunder King), usable as your bubble avatar; achievements track your listening milestones.\n\nHome-screen widgets: three sizes with your pet, listening stats and one-tap screen-off; long-press the bubble to exit quickly.\n\nData backup: auto-backed up to the XiTing folder in Downloads (on device only), restored in one tap after reinstall. Everything stays on this device — no network permission.</string>
+    <string name="about_intro">A black overlay dims the display and blocks accidental touches while audio continues. Behavior depends on device, system and player; this is not system screen-off.\n\nIncludes timers, media controls, five interactive spirit forms, icon skins, widgets and reports.\n\nListening and growth data stay local with backup and restore. No Internet permission. Other permissions depend on the feature.</string>
     <string name="about_section_privacy">Privacy &amp; Security</string>
     <string name="about_privacy">· No INTERNET permission: physically cannot go online\n· Reads nothing on your screen\n· All data stays on this device (system cloud backup and device transfer are explicitly disabled)\n· A backup file is written only when you tap Export, into the Download/XiTing folder, and stays under your control\n· Notification counts are read only after you grant Notification Access, solely for the black-screen badge; notification titles and contents are never read, and the feature stays off entirely without your permission\n· The app embeds a build identifier (build ID and channel, used only to trace pirated copies; it contains no device information)\n· No ads, no tracking, no analytics</string>
     <string name="about_section_open">Open Source &amp; Contact</string>
@@ -330,10 +328,7 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="week_report_mah">About %1$d mAh saved this week</string>
     <string name="week_report_evolved">Pet %1$s → %2$s (+%3$d growth)</string>
     <string name="week_report_gp">Earned %1$d growth this week</string>
-    <string name="week_share_text">I listened for %1$s this week with XiTing, saving about %3$d mAh across %2$d days
-My energy pet is now "%4$s"
-Free, no ads, fully offline (0.6 MB)
-https://github.com/ch1209498273/XiTing</string>
+    <string name="week_share_text">This week: %1$s on %2$d days; estimated saving %3$d mAh\nMy spirit: %4$s\nLocal records, no ads or Internet permission\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Custom minutes</string>
     <string name="timer_custom_hint">1-600 minutes</string>
     <string name="timer_custom_bad">Enter at least 1 minute</string>
@@ -345,4 +340,31 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="pet_hint_cloud">Tap the cloud to release lightning</string>
     <string name="pet_hint_storm">Swipe the spirit sideways to spin</string>
     <string name="pet_hint_king">Tap to greet, hold and release to spread wings</string>
+
+    <!-- v4.2 core experience -->
+    <string name="gallery_try_all">Try all five forms</string>
+    <string name="gallery_preview_only">Preview only. No unlocks or outfit changes. Tap the spirit to interact.</string>
+    <string name="timer_end_action">When the timer ends</string>
+    <string name="timer_return_video">Remove black curtain</string>
+    <string name="timer_pause_keep_black">Request pause, keep curtain</string>
+    <string name="timer_pause_explain">Applies to the next timer you set, not the current timer. Pause needs notification access and a supported media session. Only the original player receives the request; it may not respond.</string>
+    <string name="timer_no_target">No supported pause target. Check notification access and player support. Existing timer unchanged.</string>
+    <string name="timer_pause_requested">Pause requested from the original player; its response determines whether playback stops.</string>
+    <string name="timer_already_paused">The original player is no longer playing. No playback toggle was sent.</string>
+    <string name="timer_pause_failed">Original session unavailable or pause unsupported. Curtain unchanged.</string>
+    <string name="timer_mode_status_fmt">%1$d min left · %2$s</string>
+    <string name="guide_title">First time? Try the curtain</string>
+    <string name="guide_intro">Allow overlay permission first. Notifications provide controls; notification access is optional for titles, progress and timed pause.
+
+Play a video, then return to start. The curtain clears automatically after 10 seconds. You can also tap to wake it and return.
+
+This demo earns no listening time or growth.</string>
+    <string name="guide_start">Start 10-second demo</string>
+    <string name="guide_permission">Allow overlay permission, then return to start.</string>
+    <string name="guide_busy">End the existing curtain or timer and check overlay permission before the demo.</string>
+    <string name="guide_feedback">Did the audio keep playing while the curtain was black?</string>
+    <string name="guide_yes">Audio continued</string>
+    <string name="guide_no">Audio stopped</string>
+    <string name="guide_success">Demo completed. Use the floating button to start listening.</string>
+    <string name="guide_retry">Check that the video is playing. If audio stops, check background restrictions and keep-alive settings, then try another player.</string>
 </resources>

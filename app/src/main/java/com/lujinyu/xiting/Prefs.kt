@@ -116,6 +116,8 @@ object Prefs {
     const val LANG = "lang"
     /** 上次停留的 tab（切语言 recreate() 后恢复现场用） */
     const val LAST_TAB = "ui_last_tab"
+    const val TIMER_PAUSE_KEEP_BLACK = "timer_pause_keep_black"
+    const val DEMO_FEEDBACK_PENDING = "demo_feedback_pending"
 
     // ---- 省电校准（PowerCalib 使用）----
     const val PWR_SAMP_UA_SUM = "pwr_samp_ua_sum"

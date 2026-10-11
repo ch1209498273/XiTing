@@ -38,7 +38,8 @@ import android.widget.TextView
  * @param windowType TYPE_APPLICATION_OVERLAY（普通悬浮窗）或
  *                   TYPE_ACCESSIBILITY_OVERLAY（无障碍服务层）
  */
-class BlackOverlay(private val context: Context, private val windowType: Int) {
+class BlackOverlay(private val context: Context, private val windowType: Int,
+    private val recordSession:Boolean=true) {
 
     companion object {
         private const val TAG = "XiTing"
@@ -391,8 +392,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
         val gd = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 if (directUnlock) {
+                    val onReturn=onDismissCallback
                     hide()
-                    onDismissCallback?.invoke()
+                    onReturn?.invoke()
                 } else if (awake) sleep() else wake()
                 return true
             }
@@ -443,10 +445,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int) {
             unlockPill = pill
             mediaRow = media
             isShowing = true
-            sessionStart = System.currentTimeMillis()
+            sessionStart = if(recordSession)System.currentTimeMillis() else 0L
             sessionStartElapsed = SystemClock.elapsedRealtime()
             // 省电实测：记下会话开始时的能量计数器读数，作为差值法的起点
-            sessionStartUwh = PowerCalib.energyCounter(context)
+            sessionStartUwh = if(recordSession)PowerCalib.energyCounter(context) else null
             Log.i(TAG, "black overlay added, type=$windowType, backlight override OFF")
             hideSystemBars(f)
             f.post {

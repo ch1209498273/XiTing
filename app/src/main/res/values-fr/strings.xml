@@ -80,7 +80,7 @@
     <string name="caption_row_title">Sous-titres écran noir (bêta)</string>
     <string name="caption_service_desc">Lit le texte des sous-titres de la vidéo en cours et laffiche en temps réel sur l\'écran noir. Jamais stocké, jamais envoyé, rien dautre.</string>
     <string name="update_log_title_fmt">Nouveautés de v%1$s</string>
-    <string name="update_log_body">· Icônes débloquables par succès\n· Rapports mensuels / annuels automatiques\n· Écran noir : titre + source, ±30 s\n· Caresses sur la créature\n· Statistiques repensées\n· Corrections diverses</string>
+    <string name="update_log_body">· Cinq nouvelles formes aux évolutions bien visibles\n· Étincelles, ondes, éclairs, tourbillons et étoiles\n· Maintenir pour charger, glisser pour tourner et déployer les ailes\n· Conseils de gestes et meilleure réponse tactile</string>
     <string name="switch_headset">Retour vidéo au débranchement</string>
     <string name="bubble_style">Style de bulle</string>
     <string name="settings_data">Données</string>
@@ -375,4 +375,11 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom_hint">1 à 600 minutes</string>
     <string name="timer_custom_bad">Saisissez au moins 1 minute</string>
     <string name="evolve_fmt">🎉 Évolution ! %1$s → %2$s</string>
+
+    <!-- Per-stage spirit gestures -->
+    <string name="pet_hint_spark">Touchez pour allumer une étincelle</string>
+    <string name="pet_hint_ball">Maintenez pour charger, relâchez pour bondir</string>
+    <string name="pet_hint_cloud">Touchez le nuage pour libérer des éclairs</string>
+    <string name="pet_hint_storm">Balayez sur le côté pour créer un tourbillon</string>
+    <string name="pet_hint_king">Touchez pour saluer, maintenez puis relâchez pour les ailes</string>
 </resources>

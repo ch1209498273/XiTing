@@ -80,12 +80,7 @@
     <string name="caption_row_title">Black-screen captions (Beta)</string>
     <string name="caption_service_desc">Reads subtitle text of the playing video and shows it on the black screen in real time. Never stored, never uploaded, used for nothing else.</string>
     <string name="update_log_title_fmt">What\'s new in v%1$s</string>
-    <string name="update_log_body">· Achievement-unlocked app icon skins
-· Monthly / yearly listening report posters, auto-pushed
-· Black-screen shows title + source app, ±30s seek
-· Pet poke interaction with happy feedback
-· Stats upgraded, history never shrinks
-· Fixes and polish</string>
+    <string name="update_log_body">· Five redesigned spirit forms with clearer evolution\n· Unique sparks, ripples, lightning, wind and stars\n· Hold to charge, swipe to spin, hold to spread wings\n· Gesture hints and improved tap handling</string>
     <string name="switch_headset">Return to video when headphones unplug</string>
     <string name="bubble_style">Bubble style</string>
     <string name="settings_data">Data</string>
@@ -343,4 +338,11 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom_hint">1-600 minutes</string>
     <string name="timer_custom_bad">Enter at least 1 minute</string>
     <string name="evolve_fmt">🎉 Evolved! %1$s → %2$s</string>
+
+    <!-- Per-stage spirit gestures -->
+    <string name="pet_hint_spark">Tap the spirit to ignite a spark</string>
+    <string name="pet_hint_ball">Hold to charge, release to bounce</string>
+    <string name="pet_hint_cloud">Tap the cloud to release lightning</string>
+    <string name="pet_hint_storm">Swipe the spirit sideways to spin</string>
+    <string name="pet_hint_king">Tap to greet, hold and release to spread wings</string>
 </resources>

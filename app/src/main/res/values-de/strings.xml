@@ -80,12 +80,7 @@
     <string name="caption_row_title">Black-Screen-Untertitel (Beta)</string>
     <string name="caption_service_desc">Liest Untertiteltexte des laufenden Videos und zeigt sie in Echtzeit auf dem schwarzen Bildschirm. Nie gespeichert, nie hochgeladen, für nichts anderes verwendet.</string>
     <string name="update_log_title_fmt">Neu in v%1$s</string>
-    <string name="update_log_body">· App-Icons per Erfolg freischalten
-· Monats- / Jahresberichte, automatisch gepusht
-· Black Screen zeigt Titel + Quelle, ±30 s Spulen
-· Streicheleinheiten für dein Haustier
-· Statistiken komplett überholt
-· Fixes und Verbesserungen</string>
+    <string name="update_log_body">· Fünf neue Formen mit klarer Entwicklung\n· Funken, Wellen, Blitze, Wirbel und Sterne\n· Halten zum Laden, Wischen zum Drehen und Flügelöffnen\n· Gestenhinweise und verbesserte Tipp-Erkennung</string>
     <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
     <string name="bubble_style">Blasen-Stil</string>
     <string name="settings_data">Daten</string>
@@ -380,4 +375,11 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom_hint">1-600 Minuten</string>
     <string name="timer_custom_bad">Bitte mindestens 1 Minute eingeben</string>
     <string name="evolve_fmt">🎉 Entwickelt! %1$s → %2$s</string>
+
+    <!-- Per-stage spirit gestures -->
+    <string name="pet_hint_spark">Tippen, um einen Funken zu entzünden</string>
+    <string name="pet_hint_ball">Zum Laden halten, zum Hüpfen loslassen</string>
+    <string name="pet_hint_cloud">Die Wolke antippen, um Blitze auszulösen</string>
+    <string name="pet_hint_storm">Seitlich wischen, um einen Wirbel zu erzeugen</string>
+    <string name="pet_hint_king">Tippen zum Grüßen, halten und loslassen für Flügel</string>
 </resources>

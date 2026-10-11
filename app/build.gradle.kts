@@ -26,7 +26,7 @@ val hasReleaseKeystore = keystoreProps.isNotEmpty()
 val distId = (project.findProperty("dist") as String?) ?: "public-github"
 val buildId = UUID.randomUUID().toString().replace("-", "").take(8)
 val buildTs = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-val appVersion = "4.0.2"
+val appVersion = "4.1.0"
 
 android {
     namespace = "com.lujinyu.xiting"
@@ -35,8 +35,9 @@ android {
     defaultConfig {
         applicationId = "com.lujinyu.xiting"
         minSdk = 26
+        testInstrumentationRunner = "com.lujinyu.xiting.PetDeviceTest"
         targetSdk = 35
-        versionCode = 81
+        versionCode = 82
         versionName = appVersion
 
         // 溯源水印：界面页脚 + 隐藏资产 + 资源表三处冗余

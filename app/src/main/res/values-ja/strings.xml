@@ -80,12 +80,7 @@
     <string name="caption_row_title">黒幕字幕（実験的）</string>
     <string name="caption_service_desc">再生中の動画の字幕テキストを読み取り、息屏听劇の黒幕にリアルタイム表示します。保存・アップロードは一切行いません。</string>
     <string name="update_log_title_fmt">v%1$s の更新内容</string>
-    <string name="update_log_body">· 実績解除でアプリアイコンを変更
-· 月次 / 年次レポートを自動通知
-· 黒幕にタイトルとApp名、±30秒シーク
-· ペットをタップすると嬉しそうな反応
-· 統計データを全面アップグレード
-· 修正と改善</string>
+    <string name="update_log_body">· 進化がわかりやすい5段階の新デザイン\n· 火花・波紋・稲妻・旋風・星の専用エフェクト\n· 長押しチャージ、スワイプ回転、翼を広げる操作\n· 操作ヒントとタップ反応を改善</string>
     <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
     <string name="bubble_style">バブル表示</string>
     <string name="settings_data">データ</string>
@@ -380,4 +375,11 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom_hint">1〜600 分</string>
     <string name="timer_custom_bad">1 分以上を入力してください</string>
     <string name="evolve_fmt">🎉 進化！%1$s → %2$s</string>
+
+    <!-- Per-stage spirit gestures -->
+    <string name="pet_hint_spark">タップして火花を灯す</string>
+    <string name="pet_hint_ball">長押しでチャージ、離すとジャンプ</string>
+    <string name="pet_hint_cloud">雲をタップして稲妻を放つ</string>
+    <string name="pet_hint_storm">左右にスワイプして旋風を起こす</string>
+    <string name="pet_hint_king">タップで挨拶、長押しして離すと翼を広げる</string>
 </resources>

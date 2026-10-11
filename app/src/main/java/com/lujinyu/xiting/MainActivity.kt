@@ -710,6 +710,8 @@ private fun checkRestore() {
         val showStage = PetForm.selected(this)
         val growthStage = PetView.stageOf(gp)
         pet.stage = showStage
+        pageStats.findViewById<TextView>(R.id.pet_interaction_hint).text=PetView.interactionHint(this,showStage)
+        pet.contentDescription=PetView.stageName(this,showStage)+" · "+PetView.interactionHint(this,showStage)
         val lastSessionAt = sessions.maxOfOrNull { it.start } ?: 0L
         pet.sleepy = lastSessionAt > 0 && (now - lastSessionAt) / (24L * 3600 * 1000) >= 3
         pet.totalMah = Stats.estimatedMah(allMs)

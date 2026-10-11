@@ -80,12 +80,7 @@
     <string name="caption_row_title">Субтитры на чёрном экране (бета)</string>
     <string name="caption_service_desc">Читает текст субтитров играющего видео и показывает его на чёрном экране в реальном времени. Не сохраняется, не отправляется, не используется иначе.</string>
     <string name="update_log_title_fmt">Новое в v%1$s</string>
-    <string name="update_log_body">· Значки приложения за достижения
-· Месячные / годовые отчёты с автоуведомлением
-· Чёрный экран: название + источник, ±30 с
-· Погладь питомца — реакция
-· Статистика полностью переработана
-· Исправления и улучшения</string>
+    <string name="update_log_body">· Пять новых форм с заметной эволюцией\n· Искры, волны, молнии, вихри и звёзды\n· Удержание для заряда, свайп для вращения и раскрытие крыльев\n· Подсказки жестов и улучшенная обработка касаний</string>
     <string name="switch_headset">Возврат к видео при отключении наушников</string>
     <string name="bubble_style">Вид пузырька</string>
     <string name="settings_data">Данные</string>
@@ -380,4 +375,11 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom_hint">1-600 минут</string>
     <string name="timer_custom_bad">Введите хотя бы 1 минуту</string>
     <string name="evolve_fmt">🎉 Эволюция! %1$s → %2$s</string>
+
+    <!-- Per-stage spirit gestures -->
+    <string name="pet_hint_spark">Нажмите, чтобы зажечь искру</string>
+    <string name="pet_hint_ball">Удерживайте для заряда, отпустите для прыжка</string>
+    <string name="pet_hint_cloud">Нажмите на облако, чтобы выпустить молнию</string>
+    <string name="pet_hint_storm">Проведите вбок, чтобы закрутить вихрь</string>
+    <string name="pet_hint_king">Нажмите для приветствия, удерживайте и отпустите для взмаха</string>
 </resources>

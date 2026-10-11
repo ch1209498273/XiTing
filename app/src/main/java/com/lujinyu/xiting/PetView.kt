@@ -2,29 +2,19 @@
 package com.lujinyu.xiting
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.RadialGradient
 import android.graphics.RectF
+import android.graphics.Rect
 import android.graphics.Shader
 import android.util.AttributeSet
+import android.os.SystemClock
+import android.animation.ValueAnimator
 import android.view.MotionEvent
 import android.view.View
-import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.sin
 
-/**
- * 电能精灵：由成长值驱动的五形态养成宠物（全 Canvas 手绘，零图片资源）。
- *
- * 成长值 = 听剧分钟数 + 每日分享奖励（+30/天，每天一次）
- * 进化链：电火花(0) → 电球(30) → 雷云精灵(120) → 风暴之灵(360) → 雷霆之王(1200)
- * 体型随形态放大（视图高度的 15% → 38%），每阶配色/细节升级
- * 状态：最近3天无听剧=打瞌睡；点击=放电+展示储能
- */
+/** Five evolving characters with per-stage gestures. Growth/storage IDs stay unchanged.
+ * Panel and static snapshots delegate their character to the shared PetRenderer. */
 class PetView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
     companion object {
@@ -39,15 +29,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         /** 新点亮徽章的脉冲高亮时长（ms） */
         private const val BADGE_GLOW_MS = 1400L
 
-        /**
-         * 各形态的光晕半径（= 视图高度的比例）。
-         *
-         * **必须与实际画出的圆半径完全相等**。之前是渐变 0.475h、实际只画 0.396h，
-         * 于是圆边处渐变还剩 ~16% 不透明度，屏幕上是一个硬边圆盘而不是弥散的光。
-         *
-         * 雷霆之王的脉动因此改为**调制 alpha**（[glowPaint] 的 alpha 会乘在 shader 上），
-         * 而不是改半径 —— 改半径就得重建 shader，缓存当场失效。
-         */
+        /** Legacy geometry constants retained for compatibility; renderer no longer draws the old glow. */
         val GLOW_RATIO = floatArrayOf(0.20f, 0.28f, 0.34f, 0.40f, 0.475f)
 
         fun stageOf(gp: Long): Int = when {
@@ -65,6 +47,13 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             STAGE_STORM -> context.getString(R.string.pet_storm)
             else -> context.getString(R.string.pet_king)
         }
+        fun interactionHint(context:Context,stage:Int):String = context.getString(when(stage) {
+            0 -> R.string.pet_hint_spark
+            1 -> R.string.pet_hint_ball
+            2 -> R.string.pet_hint_cloud
+            3 -> R.string.pet_hint_storm
+            else -> R.string.pet_hint_king
+        })
     }
 
     var stage = STAGE_SPARK
@@ -122,80 +111,34 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private var downY = 0f
     private val ballPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    private var bornAt = System.currentTimeMillis()
-    private var blinkUntil = 0L
-    private var nextBlinkAt = System.currentTimeMillis() + 2500
-    // 摸头互动（v4.0 取代放电电弧——用户反馈「点击特效太丑」）：眯眼笑 + 爱心上浮
-    private var pokeUntil = 0L
-    private var pokeStart = 0L
-    private val pokeHearts = ArrayList<PokeHeart>()
-    private val heartPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFF6E8C.toInt() }
-
-    private data class PokeHeart(val dx: Float, val startAt: Long)
-
-    private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val renderer = PetRenderer()
+    private val animationBornAt = SystemClock.uptimeMillis()
+    private var activeAction = PetAction.NONE
+    private var actionAt = -10_000L
+    private var actionStrength = 1f
+    private var downAt = 0L
+    private var touchTarget = PetTarget.NONE
+    private var collectionAnimating = false
+    private var tapHeldMs = 0L
+    private var tapDx = 0f
+    private var tapDy = 0f
+    private var hasGesture = false
     private val bodyPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeCap = Paint.Cap.ROUND
-    }
-    private val boltPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-    private val eyePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF2E3B47.toInt() }
-    private val starPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFE082.toInt() }
+    private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style=Paint.Style.STROKE }
     private val popPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = context.getColor(R.color.brand)
         textSize = 30f
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
-    private val zzzPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = context.getColor(R.color.text_hint)
-        textAlign = Paint.Align.CENTER
-        isFakeBoldText = true
-    }
     private val barTrackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.bar_track) }
     private val barFillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    // ---- onDraw 热路径复用对象 ----
-    // 精灵在统计页以 30fps 自续挂重绘（onDraw 末尾 postInvalidateDelayed）。
-    // 以前每次 drawMiniFace 都要 new 两个 Paint（五个形态每帧都调它），
-    // 进度条每帧还要 new 两个 RectF 和一个 LinearGradient。
-    // 这些颜色/几何在一次布局内是常量，复用后把每帧的对象分配降到 0。
-    private val faceGlowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x33FFFFFF }
-    private val faceHiPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
+    // Reused geometry for energy/progress UI.
     private val scratchRect = RectF()
     private val scratchRect2 = RectF()
     /** 能量条几何：energyBar() 以前每次调用都 new 一个 RectF，而一帧里要被调用 3~4 次 */
     private val energyScratch = RectF()
-    /** 螺旋飘带 / 星芒的复用 Path（每帧新建会持续给 GC 添压力，见上方注释） */
-    private val ribbon = Path()
-    private val pathA = Path()
-    private val pathB = Path()
-    private val pathC = Path()
-    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-
-    /**
-     * 着色器缓存。
-     *
-     * 之前每帧 new 一个 LinearGradient / RadialGradient（精灵本体 6~7 个，悬浮球另有 4 个），
-     * 统计页 30fps 就是每秒 200 个以上的 native 对象。这些几何只随 **view 尺寸** 变化，
-     * 与动画无关，所以按 (width, height) 缓存即可。
-     *
-     * 底部进度条的渐变早就是这个做法，这里把它推广到其余全部。
-     */
-    private val shaderCache = HashMap<String, android.graphics.Shader>(8)
-    private var shaderKeyW = Int.MIN_VALUE
-    private var shaderKeyH = Int.MIN_VALUE
-
-    /** 尺寸变化时清空着色器缓存（尺寸不变就不清，否则动画中也会反复重建） */
-    private fun shaderCacheCheck() {
-        if (shaderKeyW == width && shaderKeyH == height) return
-        shaderKeyW = width
-        shaderKeyH = height
-        shaderCache.clear()
-    }
-
     /** 进度条渐变缓存：几何随 view 尺寸而定，尺寸不变就不必每帧重建 */
     private var barGradient: android.graphics.LinearGradient? = null
     private var barGradientKey = 0L
@@ -204,50 +147,68 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         setOnClickListener { poke() }
     }
 
-    fun startAnimating() = postInvalidateDelayed(33)
-
-    /**
-     * 摸头（v4.0）：点击精灵本体的开心反馈——眯眼笑 + 三颗爱心错峰上浮。
-     * 动画循环沿用常驻 30fps 重绘；thumbMode（图鉴缩略图）不可点所以恒不触发。
-     */
-    fun poke() {
-        val now = System.currentTimeMillis()
-        if (now - pokeStart < 300) return // 冷却：防连点狂刷爱心
-        pokeStart = now
-        pokeUntil = pokeStart + 1200
-        pokeHearts.clear()
-        pokeHearts.add(PokeHeart(-0.4f, pokeStart))
-        pokeHearts.add(PokeHeart(0.0f, pokeStart + 170))
-        pokeHearts.add(PokeHeart(0.45f, pokeStart + 340))
-        postInvalidateDelayed(33)
+    private val visibleRect=Rect()
+    private val scrollListener=android.view.ViewTreeObserver.OnScrollChangedListener { startAnimating() }
+    private fun shouldAnimate() = !thumbMode && isAttachedToWindow && isShown &&
+        windowVisibility == VISIBLE && ValueAnimator.areAnimatorsEnabled() && getLocalVisibleRect(visibleRect)
+    private val animationTick = object : Runnable {
+        override fun run() {
+            if (shouldAnimate()) { invalidate(); postDelayed(this, 33) }
+        }
     }
-
+    fun startAnimating() {
+        removeCallbacks(animationTick)
+        if (shouldAnimate()) post(animationTick)
+        invalidate()
+    }
+    fun poke() {
+        val now = SystemClock.uptimeMillis()
+        if (now - actionAt < 160) return
+        activeAction = if (hasGesture) PetMotion.action(stage, tapHeldMs, tapDx, tapDy)
+            else PetMotion.action(stage, 0, 0f, 0f)
+        hasGesture = false
+        if (activeAction == PetAction.NONE) return
+        actionAt = now
+        actionStrength = if (activeAction == PetAction.CHARGE) (tapHeldMs / 900f).coerceIn(.45f, 1f) else 1f
+        startAnimating()
+    }
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (!thumbMode) startAnimating()
+        viewTreeObserver.addOnScrollChangedListener(scrollListener)
+        startAnimating()
     }
-
+    override fun onDetachedFromWindow() {
+        removeCallbacks(animationTick)
+        if(viewTreeObserver.isAlive) viewTreeObserver.removeOnScrollChangedListener(scrollListener)
+        touchTarget = PetTarget.NONE
+        super.onDetachedFromWindow()
+    }
+    override fun onLayout(changed:Boolean,left:Int,top:Int,right:Int,bottom:Int) {
+        super.onLayout(changed,left,top,right,bottom)
+        startAnimating()
+    }
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
-        // thumbMode 是静态图（缩略图/图鉴），不参与动画循环 ——
-        // 与 onAttachedToWindow、onDraw 末尾的判断保持一致
-        if (visibility == VISIBLE && !thumbMode) startAnimating()
+        startAnimating()
+    }
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        startAnimating()
     }
 
     /** 当前帧精灵几何（绘制与点击命中共用） */
     private fun geometry(): Triple<Float, Float, Float> {
-        val t = (System.currentTimeMillis() - bornAt) / 1000f
         val cx = width / 2f
-        val cy = height / 2f - 20f + (if (thumbMode) 20f else sin(t * 2.2f) * 8f)
+        val cy = height / 2f
         val h = height.toFloat()
         val r = h * if (thumbMode) {
-            arrayOf(0.19f, 0.24f, 0.29f, 0.33f, 0.37f)[stage]
+            arrayOf(0.22f, 0.26f, 0.29f, 0.32f, 0.34f)[stage.coerceIn(0, 4)]
         } else when (stage) {
-            STAGE_SPARK -> 0.11f
-            STAGE_BALL -> 0.15f
-            STAGE_CLOUD -> 0.19f
-            STAGE_STORM -> 0.22f
-            else -> 0.25f
+            STAGE_SPARK -> 0.15f
+            STAGE_BALL -> 0.18f
+            STAGE_CLOUD -> 0.21f
+            STAGE_STORM -> 0.24f
+            else -> 0.27f
         }
         return Triple(cx, cy, r)
     }
@@ -295,61 +256,72 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         return Triple(x, bar.centerY(), r)
     }
 
+    private fun targetAt(x: Float, y: Float): PetTarget {
+        val (hx, hy) = helpCenter()
+        val d = resources.displayMetrics.density
+        val help = (x-hx)*(x-hx)+(y-hy)*(y-hy) < 20f*d*20f*d
+        val bar = energyBar()
+        val energy = x in (bar.left-16*d)..(bar.right+24*d) &&
+            y in (bar.top-24*d)..(bar.bottom+16*d)
+        val (cx, cy, r) = geometry()
+        val body = kotlin.math.abs(x-cx) <= r*1.4f && kotlin.math.abs(y-cy) <= r*1.25f
+        return PetMotion.target(help, energy, body)
+    }
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (thumbMode) return super.onTouchEvent(event)
+        val density = resources.displayMetrics.density
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                downX = event.x
-                downY = event.y
-                return true
+                downX = event.x; downY = event.y; downAt = SystemClock.uptimeMillis()
+                touchTarget = targetAt(event.x, event.y)
+                if (touchTarget == PetTarget.NONE) return false
+                invalidate(); return true
             }
-            MotionEvent.ACTION_UP -> {
-                val moved = Math.abs(event.x - downX) > 30 || Math.abs(event.y - downY) > 30
-                if (!moved) {
-                    // 走标准点击入口：让无障碍服务（TalkBack）能识别到这个点击，
-                    // 也能触发 registered OnClickListener（lint ClickableViewAccessibility）。
-                    performClick()
-                    // 说明图标命中
-                    val (hx, hy) = helpCenter()
-                    val hdx = event.x - hx
-                    val hdy = event.y - hy
-                    if (hdx * hdx + hdy * hdy < 60f * 60f) {
-                        onHelp?.invoke()
-                        return true
-                    }
-                    // 命中能量条（外扩点击区）：点击即充能
-                    val bar = energyBar()
-                    if (event.x in (bar.left - 50f)..(bar.right + 70f) &&
-                        event.y in (bar.top - 80f)..(bar.bottom + 60f)
-                    ) {
-                        val total = pending.sumOf { it.value }
-                        if (total > 0) {
-                            flyBalls.add(FlyBall(total, bar.centerX(), bar.centerY(), System.currentTimeMillis()))
-                            postDelayed({ onCollectAll?.invoke() }, 340)
-                        }
-                        return true
-                    }
-                    performClick() // 未命中：原有放电效果
+            MotionEvent.ACTION_MOVE -> {
+                val dx = (event.x-downX)/density; val dy = (event.y-downY)/density
+                if (kotlin.math.abs(dy)>18f && kotlin.math.abs(dy)>=kotlin.math.abs(dx)) {
+                    touchTarget = PetTarget.NONE
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                } else if (stage == STAGE_STORM && touchTarget == PetTarget.PET && kotlin.math.abs(dx)>18f) {
+                    parent?.requestDisallowInterceptTouchEvent(true)
                 }
                 return true
             }
-            MotionEvent.ACTION_MOVE -> return true // 交给外层 ScrollView 拦截滚动
+            MotionEvent.ACTION_UP -> {
+                val target = touchTarget; touchTarget = PetTarget.NONE
+                parent?.requestDisallowInterceptTouchEvent(false)
+                val dx = (event.x-downX)/density; val dy = (event.y-downY)/density
+                val stayed = kotlin.math.abs(dx)<=18f && kotlin.math.abs(dy)<=18f
+                when (target) {
+                    PetTarget.HELP -> if (stayed && targetAt(event.x,event.y)==PetTarget.HELP) onHelp?.invoke()
+                    PetTarget.ENERGY -> if (stayed && targetAt(event.x,event.y)==PetTarget.ENERGY && !collectionAnimating) {
+                        val total = pending.sumOf { it.value }
+                        if (total>0) {
+                            collectionAnimating = true
+                            val bar=energyBar()
+                            flyBalls.add(FlyBall(total,bar.centerX(),bar.centerY(),System.currentTimeMillis()))
+                            postDelayed({ collectionAnimating=false; onCollectAll?.invoke() },340)
+                        }
+                    }
+                    PetTarget.PET -> {
+                        tapHeldMs=SystemClock.uptimeMillis()-downAt;tapDx=dx;tapDy=dy
+                        if (PetMotion.action(stage,tapHeldMs,dx,dy)!=PetAction.NONE) {
+                            hasGesture=true;performClick();hasGesture=false
+                        }
+                    }
+                    else -> Unit
+                }
+                invalidate(); return true
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                touchTarget=PetTarget.NONE;hasGesture=false
+                parent?.requestDisallowInterceptTouchEvent(false)
+                invalidate();return true
+            }
         }
         return super.onTouchEvent(event)
     }
-
-    /**
-     * 标准点击入口（lint ClickableViewAccessibility）。
-     *
-     * 本 View 自己在 onTouchEvent 里处理点击，所以必须显式覆盖它：
-     * 不覆盖的话无障碍服务读不到这个控件是可点击的，
-     * 而且 super.performClick() 会顺带发一个 ACTION_CLICK 事件出去。
-     * 这里不做任何事 —— 真正的点击逻辑已经在 onTouchEvent 里执行过了。
-     */
-    override fun performClick(): Boolean {
-        super.performClick()
-        return true
-    }
+    override fun performClick(): Boolean { super.performClick(); return true }
 
     /**
      * 换肤：色相（度），0 = 经典配色。
@@ -373,27 +345,6 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         skinHue = skin.hue
         skinSat = skin.saturation
     }
-
-    /**
-     * 当前形态 + 皮肤的调色板。
-     *
-     * 缓存键含 stage：形态一变色相就可能变，不能只按 skinHue 缓存。
-     * 精灵在统计页 30fps 自续挂重绘，每帧现算 8 个颜色不划算。
-     */
-    private var paletteCache: PetPalette.Palette? = null
-    private var paletteKey = Int.MIN_VALUE to (Float.NaN to Float.NaN)
-
-    private fun palette(): PetPalette.Palette {
-        val key = stage to (skinHue to skinSat)
-        paletteCache?.let { if (key == paletteKey) return it }
-        paletteKey = key
-        // 调色板变了，缓存的着色器（内含具体颜色）全部作废
-        shaderCache.clear()
-        return PetPalette.of(stage, skinHue, skinSat).also { paletteCache = it }
-    }
-
-    private fun cachedShader(key: String, make: () -> android.graphics.Shader): android.graphics.Shader =
-        shaderCache.getOrPut(key) { make() }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -421,85 +372,14 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
 
     private fun drawBody(canvas: Canvas) {
         val now = System.currentTimeMillis()
-        val t = (now - bornAt) / 1000f
         val (cx, cy, r) = geometry()
-        val pal = palette()
-        shaderCacheCheck()
-
-        // 眨眼
-        if (now > nextBlinkAt) {
-            blinkUntil = now + 160
-            nextBlinkAt = now + 2200 + (abs(now % 1800)).toInt()
-        }
-        val blinking = now < blinkUntil
-
-        // 光晕（雷霆之王为脉冲呼吸光晕）
-        val king = stage == STAGE_KING && !sleepy
-        val glowR = height * GLOW_RATIO[stage.coerceIn(0, STAGE_KING)]
-        val glowColor = if (sleepy) 0x14222930.toInt()
-        else (pal.glow and 0x00FFFFFF) or (0x50 shl 24)
-        if (!thumbMode) {
-            // 渐变以本点为圆心建立，再靠 canvas 平移绘制。
-            // 这样它只随尺寸变化 → 可缓存；同时精灵的上下浮动仍能正确带动光晕。
-            glowPaint.shader = cachedShader("glow$sleepy$stage") {
-                RadialGradient(0f, 0f, glowR, glowColor, Color.TRANSPARENT, Shader.TileMode.CLAMP)
-            }
-            // 脉动走 alpha，不走半径（否则每帧都要重建 shader，缓存直接失效）
-            glowPaint.alpha = if (king) (255 * (0.82f + 0.18f * sin(t * 3f))).toInt().coerceIn(0, 255) else 255
-            canvas.save()
-            canvas.translate(cx, cy)
-            canvas.drawCircle(0f, 0f, glowR, glowPaint)
-            canvas.restore()
-            glowPaint.alpha = 255
-        }
-
-        // 环绕微粒（形态越高越多）
-        if (!thumbMode && !sleepy && stage >= STAGE_BALL) {
-            val n = 2 + stage   // 3~6 颗
-            for (i in 0 until n) {
-                val ang = (6.2831855f * i / n) + t * 0.5f * (if (i % 2 == 0) 1f else -0.8f)
-                val rr = r * 1.45f
-                val px = cx + cos(ang) * rr
-                val py = cy + sin(ang) * rr * 0.85f
-                val tw = 0.5f + 0.5f * sin(t * 2.6f + i * 1.3f)
-                starPaint.color = pal.accent
-                starPaint.alpha = (150 * tw).toInt().coerceIn(25, 190)
-                canvas.drawCircle(px, py, r * 0.035f + 1.5f, starPaint)
-            }
-            starPaint.alpha = 255
-        }
-
-        // 摸头爱心（v4.0 取代放电电弧）：错峰上浮 + 渐隐，只在 poke 期间绘制
-        if (!thumbMode && now < pokeUntil) {
-            for (h in pokeHearts) {
-                val k = (now - h.startAt) / 1100f
-                if (k !in 0f..1f) continue
-                heartPaint.alpha = ((1f - k) * 255).toInt().coerceIn(0, 255)
-                drawHeart(canvas, cx + h.dx * r, cy - r * 1.15f - k * r * 0.9f, r * 0.16f)
-            }
-            heartPaint.alpha = 255
-        }
-
-        // 雷霆之王的两层旋转光环已移入 drawKing（要画在核心之前才能被遮挡一部分）
-
-        // 本体
-        when (stage) {
-            STAGE_SPARK -> drawSpark(canvas, cx, cy, r, t, blinking)
-            STAGE_BALL -> drawBall(canvas, cx, cy, r, t, blinking)
-            STAGE_CLOUD -> drawCloud(canvas, cx, cy, r, t, blinking)
-            STAGE_STORM -> drawTornado(canvas, cx, cy, r, t, blinking)
-            else -> drawKing(canvas, cx, cy, r, t, blinking)
-        }
-
-        // 打瞌睡：灰调 + z（z 用低饱和度灰色，不受配色影响）
-        if (sleepy) {
-            val zt = (t * 0.7f) % 3f
-            zzzPaint.textSize = 30f + zt * 10f
-            zzzPaint.alpha = (255 * (1f - zt / 3f)).toInt().coerceIn(0, 255)
-            canvas.drawText("z", cx + r * 0.8f + zt * 14f, cy - r - 8f - zt * 16f, zzzPaint)
-            canvas.drawText("Z", cx + r * 1.0f + zt * 22f, cy - r - 30f - zt * 20f, zzzPaint)
-            zzzPaint.alpha = 255
-        }
+        val animate = !thumbMode && ValueAnimator.areAnimatorsEnabled()
+        val clock = SystemClock.uptimeMillis()
+        val heldCharge = if (touchTarget == PetTarget.PET && stage == STAGE_BALL && animate)
+            ((clock-downAt)/900f).coerceIn(0f,1f) else 0f
+        renderer.draw(canvas, stage, cx, cy, r, (clock-animationBornAt)/1000f,
+            skinHue, skinSat, sleepy, static=!animate, action=activeAction,
+            elapsed=clock-actionAt, strength=actionStrength, charge=heldCharge)
 
         // ───────── 能量系统：左侧常驻电池条（容量200）+ 充能动画 ─────────
         if (!thumbMode) {
@@ -622,395 +502,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
             }
         }
 
-        if (!thumbMode) postInvalidateDelayed(33)
+        // Animation scheduling is owned by one visibility-aware runnable.
     }
 
-    // ─────────────────── 形态一：电火花（四角星形，区别于太阳） ───────────────────
-    private fun drawSpark(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
-        val pal = palette()
-        // 八角星轮廓：长尖+短凹交替（闪烁感），随时间轻微旋转呼吸
-        val spin = t * 0.3f
-        val breathe = 1f + 0.04f * sin(t * 3f)
-        val p = pathA
-        p.reset()
-        for (i in 0 until 16) {
-            val ang = (6.2831855f * i / 16) + spin
-            val rad = (if (i % 2 == 0) r * 1.15f else r * 0.5f) * breathe
-            val x = cx + cos(ang) * rad
-            val y = cy + sin(ang) * rad
-            if (i == 0) p.moveTo(x, y) else p.lineTo(x, y)
-        }
-        p.close()
-        bodyPaint.shader = cachedShader("spark$sleepy") {
-            android.graphics.LinearGradient(
-                cx - r, cy - r, cx + r, cy + r,
-                if (sleepy) 0xFFCFD8DC.toInt() else pal.bodyLight,
-                if (sleepy) 0xFF90A4AE.toInt() else pal.shade,
-                Shader.TileMode.CLAMP
-            )
-        }
-        canvas.drawPath(p, bodyPaint)
-        bodyPaint.shader = null
-        // 外描边亮边
-        linePaint.color = if (sleepy) 0xFFB0BEC5.toInt() else pal.highlight
-        linePaint.strokeWidth = r * 0.06f
-        canvas.drawPath(p, linePaint)
-        // 中心亮核
-        val core = if (sleepy) 0xFFCFD8DC.toInt() else pal.highlight
-        bodyPaint.shader = cachedShader("sparkCore$sleepy") {
-            RadialGradient(
-                cx, cy, r * 0.75f,
-                core, core and 0x00FFFFFF, Shader.TileMode.CLAMP
-            )
-        }
-        canvas.drawCircle(cx, cy, r * 0.72f, bodyPaint)
-        bodyPaint.shader = null
-        drawFace(canvas, cx, cy, r * 0.16f, blinking, fierce = false)
-    }
-
-    // ─────────────────── 形态二：电球（蓝紫等离子球，区别于太阳） ───────────────────
-    private fun drawBall(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
-        val pal = palette()
-        // 深空球体：中心亮 → 边缘深
-        bodyPaint.shader = cachedShader("ball$sleepy") {
-            RadialGradient(
-                cx - r * 0.3f, cy - r * 0.32f, r * 1.55f,
-                if (sleepy) 0xFFCFD8DC.toInt() else pal.bodyLight,
-                if (sleepy) 0xFF78909C.toInt() else pal.deep,
-                Shader.TileMode.CLAMP
-            )
-        }
-        canvas.drawCircle(cx, cy, r, bodyPaint)
-        bodyPaint.shader = null
-        // 内部等离子电弧（两道锯齿电弧，随时间滑动）
-        linePaint.color = if (sleepy) 0x66E0E0E0.toInt() else pal.accentSoft
-        linePaint.strokeWidth = r * 0.09f
-        val ap = pathA
-        for (arc in 0 until 2) {
-            val phase = t * 1.6f + arc * 2.4f
-            ap.reset()
-            var first = true
-            for (k in 0 until 7) {
-                val kk = k / 6f
-                val ax = cx - r * 0.75f + r * 1.5f * kk
-                val ay = cy + sin(phase + kk * 9f) * r * 0.34f + (arc - 0.5f) * r * 0.4f
-                if (first) { ap.moveTo(ax, ay); first = false } else ap.lineTo(ax, ay)
-            }
-            canvas.drawPath(ap, linePaint)
-        }
-        // 外环绕电弧环（两段旋转）
-        linePaint.color = if (sleepy) 0x5580DEEA.toInt() else pal.accent
-        linePaint.strokeWidth = r * 0.11f
-        scratchRect.set(cx - r * 1.32f, cy - r * 1.32f, cx + r * 1.32f, cy + r * 1.32f)
-        canvas.drawArc(scratchRect, -t * 80, 100f, false, linePaint)
-        canvas.drawArc(scratchRect, 180 - t * 80, 100f, false, linePaint)
-        // 左上高光
-        linePaint.color = if (sleepy) 0x99FFFFFF.toInt() else pal.highlight
-        linePaint.strokeWidth = r * 0.08f
-        scratchRect2.set(cx - r * 0.92f, cy - r * 0.92f, cx + r * 0.92f, cy + r * 0.92f)
-        canvas.drawArc(scratchRect2, 205f, 62f, false, linePaint)
-        drawFace(canvas, cx, cy, r * 0.17f, blinking, fierce = false)
-    }
-
-    // ─────────────────── 形态三：雷云精灵（底部平坦的积云） ───────────────────
-    /**
-     * 旧版是上下都是圆弧的“汉堡”，和雷霆之王几乎分不出来。
-     * 真实积云的特征是**顶部圆鼓、底部切平**，这里就按这个做，
-     * 并加一道雨帘和单道闪电，一眼能读出「雷雨云」。
-     */
-    private fun drawCloud(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
-        val pal = palette()
-        val baseY = cy + r * 0.40f
-        // 四个圆鼓，底端统一坐在 baseY 上
-        val lobes = arrayOf(
-            floatArrayOf(-0.60f, 0.42f, -0.30f),
-            floatArrayOf(-0.16f, 0.58f, -0.58f),
-            floatArrayOf(0.34f, 0.50f, -0.46f),
-            floatArrayOf(0.72f, 0.34f, -0.22f)
-        )
-        fun lobesAt(dy: Float, paint: Paint) {
-            for (l in lobes) canvas.drawCircle(cx + l[0] * r, baseY + l[2] * r + dy, l[1] * r, paint)
-            canvas.drawRect(cx - r * 0.90f, baseY - r * 0.36f + dy, cx + r * 0.90f, baseY + dy, paint)
-        }
-        shadowPaint.color = if (sleepy) 0xFF90A4AE.toInt() else pal.shade
-        lobesAt(r * 0.10f, shadowPaint)
-        if (sleepy) {
-            bodyPaint.color = 0xFFCFD8DC.toInt()
-        } else {
-            bodyPaint.shader = cachedShader("cloud") {
-                android.graphics.LinearGradient(
-                    cx, baseY - r * 1.2f, cx, baseY + r * 0.2f,
-                    pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
-                )
-            }
-        }
-        lobesAt(0f, bodyPaint)
-        bodyPaint.shader = null
-        if (!sleepy) {
-            // 受光边缘：只勾上半圈，下缘不描，避免和雨帘粘连
-            linePaint.color = pal.highlight
-            linePaint.strokeWidth = r * 0.07f
-            for (l in lobes) {
-                scratchRect.set(
-                    cx + l[0] * r - l[1] * r, baseY + l[2] * r - l[1] * r,
-                    cx + l[0] * r + l[1] * r, baseY + l[2] * r + l[1] * r
-                )
-                canvas.drawArc(scratchRect, 196f, 148f, false, linePaint)
-            }
-            // 雨帘
-            linePaint.color = pal.accentSoft
-            linePaint.strokeWidth = r * 0.055f
-            for (i in 0 until 6) {
-                val fx = cx - r * 0.80f + i * r * 0.32f
-                val ph = sin(t * 3f + i * 0.9f) * r * 0.05f
-                canvas.drawLine(fx, baseY + r * 0.08f, fx - r * 0.06f + ph, baseY + r * 0.42f, linePaint)
-            }
-            boltPaint.color = pal.accent
-            val sway = sin(t * 2.6f) * r * 0.04f
-            drawBolt(canvas, cx + sway, baseY - r * 0.02f, r * 0.40f)
-        }
-        drawFace(canvas, cx - r * 0.06f, cy - r * 0.10f, r * 0.15f, blinking, fierce = false)
-    }
-
-    // ─────────────────── 形态四：风暴之灵（重叠圆堆） ───────────────────
-    /**
-     * 改了五版才明白两件事：
-     *
-     * 1. **不要用几何轮廓画有机体**。漏斗三角 + 硬边描边，配上脸，就是「一个睁着大眼的
-     *    三角形」，用户反馈「非常诡异」。结论：所有层都必须圆。
-     * 2. **脸部只能有一组圆**。之前在脸上方又画了个「涡眼」小圆，
-     *    两个圆紧叠在一起，是「诡异」观感的重要来源。
-     *
-     * 现在：7 个**重叠的圆**，自上而下逐个变大，横向位置随高度缓慢摆动。
-     * 圆彼此遮挡 + 竖向渐变 → 自然叠出体积与旋转感，且没有任何硬边。
-     * 另外整体宽度收到 ~1.2r（之前是 2r），不再占满整个视图。
-     */
-    private fun drawTornado(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
-        val pal = palette()
-        val n = 7
-        val topY = cy - r * 0.72f
-        val h = r * 1.44f
-        for (i in 0 until n) {
-            val tt = i / (n - 1f)                 // 0=顶 1=底
-            val rad = r * (0.19f + 0.37f * tt)
-            val y = topY + tt * h
-            // 摆动：频率慢（快了像发抖），但幅度必须够大，否则三个相位看起来一模一样、
-            // 看上去根本不动。幅度随高度增大，越往下甩得越开。
-            val off = sin(t * 1.5f - tt * 2.4f) * r * (0.06f + 0.20f * tt)
-            bodyPaint.shader = cachedShader("tornadoBall$i") {
-                android.graphics.LinearGradient(
-                    cx + off, y - rad, cx + off, y + rad,
-                    pal.bodyLight, pal.shade, Shader.TileMode.CLAMP
-                )
-            }
-            canvas.drawCircle(cx + off, y, rad, bodyPaint)
-            bodyPaint.shader = null
-        }
-        // ⚠️ 不要在底部再加一颗深色球：它会被读成「脚」或「底座」，
-        // 圆堆本身已经收口了，多一个反而破坏整体。
-        drawFace(canvas, cx, topY + r * 0.30f, r * 0.15f, blinking, fierce = true)
-    }
-
-    // ─────────────────── 形态五：雷霆之王（尖锐能量核心 + 倾斜光环 + 头顶星芒） ───────────────────
-    /**
-     * 旧版是「云 + 6 片锯齿纸片翅膀 + 锯齿皇冠」：翅膀硬戳在身体两侧像两排刀片，
-     * 皇冠浮在头顶，三者各画各的、凑不到一起，而且剪影和雷云精灵高度相似。
-     *
-     * 现在只保留一个主体：**尖锐的六芒能量核心**（轮廓终于有尖角可读），
-     * 翅膀换成两道倾斜光环（与主体同源、有前后遮挡关系），皇冠换成一颗小星芒。
-     */
-    private fun drawKing(canvas: Canvas, cx: Float, cy: Float, r: Float, t: Float, blinking: Boolean) {
-        val pal = palette()
-
-        // 土星环：上半环画在核心**之前**、下半环画在核心**之后**，于是环从背后穿过。
-        // 之前用的是「两段 150° 弧 + 圆头笔帽」—— 弧的端点成了几个孤零零的圆点，
-        // 两段弧之间的缺口也没有任何东西遮挡，看着像随手划的几根线。
-        val ringRot = floatArrayOf(-16f + sin(t * 0.5f) * 2.5f, 14f - sin(t * 0.5f) * 2.5f)
-        val ringRx = floatArrayOf(r * 1.72f, r * 1.36f)
-        val ringRy = floatArrayOf(r * 0.34f, r * 0.24f)
-
-        fun drawRingHalf(i: Int, start: Float) {
-            canvas.save()
-            canvas.rotate(ringRot[i], cx, cy)
-            scratchRect.set(cx - ringRx[i], cy - ringRy[i], cx + ringRx[i], cy + ringRy[i])
-            linePaint.strokeCap = Paint.Cap.BUTT
-            linePaint.strokeWidth = if (i == 0) r * 0.13f else r * 0.085f
-            linePaint.color = if (i == 0) pal.accent else pal.accentSoft
-            linePaint.alpha = if (i == 0) 225 else 150
-            canvas.drawArc(scratchRect, start, 180f, false, linePaint)
-            canvas.restore()
-        }
-
-        if (!sleepy) {
-            drawRingHalf(0, 180f)
-            drawRingHalf(1, 180f)
-        }
-
-        // 六芒能量核心
-        val core = pathA
-        core.reset()
-        for (i in 0 until 12) {
-            val ang = 6.2831855f * i / 12 - 1.5708f
-            val rad = r * (if (i % 2 == 0) 1.02f else 0.44f)
-            val x = cx + cos(ang) * rad
-            val y = cy + sin(ang) * rad * 0.94f
-            if (i == 0) core.moveTo(x, y) else core.lineTo(x, y)
-        }
-        core.close()
-        if (sleepy) {
-            bodyPaint.color = 0xFFCFD8DC.toInt()
-            canvas.drawPath(core, bodyPaint)
-        } else {
-            bodyPaint.shader = cachedShader("king$sleepy") {
-                RadialGradient(
-                    cx - r * 0.25f, cy - r * 0.30f, r * 1.7f,
-                    pal.highlight, pal.deep, Shader.TileMode.CLAMP
-                )
-            }
-            canvas.drawPath(core, bodyPaint)
-            bodyPaint.shader = null
-        }
-        // 边缘亮线
-        linePaint.color = if (sleepy) 0xFFB0BEC5.toInt() else pal.highlight
-        linePaint.strokeWidth = r * 0.045f
-        linePaint.alpha = if (sleepy) 255 else 190
-        canvas.drawPath(core, linePaint)
-        linePaint.alpha = 255
-        // 核心亮核
-        if (!sleepy) {
-            bodyPaint.color = 0xFFFFFFFF.toInt()
-            bodyPaint.alpha = 200
-            canvas.drawCircle(cx, cy - r * 0.05f, r * 0.24f, bodyPaint)
-            bodyPaint.alpha = 255
-        }
-
-        // 下半环盖在核心之上，形成前后遮挡
-        if (!sleepy) {
-            drawRingHalf(0, 0f)
-            drawRingHalf(1, 0f)
-            linePaint.strokeCap = Paint.Cap.ROUND
-            linePaint.alpha = 255
-        }
-
-        // 头顶星芒（替代锯齿皇冠）
-        if (!sleepy) {
-            val sy = cy - r * 1.08f
-            // ww 必须远小于 hh，否则四角星会退化成一个圆疙瘩（第一版就是这么糊的）
-            val hh = r * 0.40f
-            val ww = r * 0.085f
-            fillPaint.color = pal.highlight
-            fillPaint.alpha = 235
-            val sp = pathB
-            sp.reset()
-            sp.moveTo(cx, sy - hh)
-            sp.lineTo(cx + ww, sy - ww)
-            sp.lineTo(cx + hh, sy)
-            sp.lineTo(cx + ww, sy + ww)
-            sp.lineTo(cx, sy + hh)
-            sp.lineTo(cx - ww, sy + ww)
-            sp.lineTo(cx - hh, sy)
-            sp.lineTo(cx - ww, sy - ww)
-            sp.close()
-            canvas.drawPath(sp, fillPaint)
-            fillPaint.alpha = 255
-        }
-
-        // 三道闪电从核心下方发出（起点抬进核心内，否则看着是贴在下面而非从里面长出来）
-        if (!sleepy) {
-            boltPaint.color = pal.accent
-            drawBolt(canvas, cx, cy + r * 0.50f, r * 0.56f)
-            boltPaint.color = pal.accentSoft
-            drawBolt(canvas, cx - r * 0.56f, cy + r * 0.34f, r * 0.32f)
-            drawBolt(canvas, cx + r * 0.56f, cy + r * 0.38f, r * 0.29f)
-        }
-        drawFace(canvas, cx, cy - r * 0.04f, r * 0.16f, blinking, fierce = true)
-    }
-
-    // ─────────────────── 表情 ───────────────────
-    private fun drawFace(
-        canvas: Canvas, cx: Float, cy: Float, er: Float, blinking: Boolean, fierce: Boolean
-    ) {
-        val off = er * 1.5f
-        // 眉毛（帅气形态）
-        if (fierce && !blinking && !sleepy) {
-            linePaint.color = 0xFF2E3B47.toInt()
-            linePaint.strokeWidth = er * 0.34f
-            canvas.drawLine(cx - off - er * 0.6f, cy - er * 1.7f, cx - off + er * 0.5f, cy - er * 1.15f, linePaint)
-            canvas.drawLine(cx + off + er * 0.6f, cy - er * 1.7f, cx + off - er * 0.5f, cy - er * 1.15f, linePaint)
-        }
-        val happy = !thumbMode && System.currentTimeMillis() < pokeUntil
-        if (happy) {
-            // ^ 弧眼（开心眯眼）
-            linePaint.color = 0xFF2E3B47.toInt()
-            linePaint.strokeWidth = er * 0.3f
-            val hp = pathC
-            hp.reset()
-            hp.moveTo(cx - off - er * 0.55f, cy + er * 0.2f)
-            hp.quadTo(cx - off, cy - er * 0.6f, cx - off + er * 0.55f, cy + er * 0.2f)
-            hp.moveTo(cx + off - er * 0.55f, cy + er * 0.2f)
-            hp.quadTo(cx + off, cy - er * 0.6f, cx + off + er * 0.55f, cy + er * 0.2f)
-            canvas.drawPath(hp, linePaint)
-        } else if (sleepy || blinking) {
-            linePaint.color = 0xFF2E3B47.toInt()
-            linePaint.strokeWidth = er * 0.3f
-            canvas.drawLine(cx - off - er * 0.55f, cy, cx - off + er * 0.55f, cy, linePaint)
-            canvas.drawLine(cx + off - er * 0.55f, cy, cx + off + er * 0.55f, cy, linePaint)
-        } else {
-            // 瞳孔：深色主体 + 底部反光 + 双高光（精致有神）
-            canvas.drawCircle(cx - off, cy, er, eyePaint)
-            canvas.drawCircle(cx + off, cy, er, eyePaint)
-            val glow = faceGlowPaint
-            canvas.drawCircle(cx - off + er * 0.25f, cy + er * 0.3f, er * 0.55f, glow)
-            canvas.drawCircle(cx + off + er * 0.25f, cy + er * 0.3f, er * 0.55f, glow)
-            val hi = faceHiPaint
-            canvas.drawCircle(cx - off - er * 0.34f, cy - er * 0.36f, er * 0.34f, hi)
-            canvas.drawCircle(cx + off - er * 0.34f, cy - er * 0.36f, er * 0.34f, hi)
-            canvas.drawCircle(cx - off + er * 0.3f, cy + er * 0.34f, er * 0.14f, hi)
-            canvas.drawCircle(cx + off + er * 0.3f, cy + er * 0.34f, er * 0.14f, hi)
-        }
-        // 微笑（睡觉时平滑）
-        linePaint.color = 0xFF2E3B47.toInt()
-        linePaint.strokeWidth = er * 0.26f
-        val my = cy + er * 1.35f
-        if (happy) {
-            // 开心：笑容加深
-            val mp = pathC
-            mp.reset()
-            mp.moveTo(cx - er * 0.9f, my - er * 0.2f)
-            mp.quadTo(cx, my + er * 1.3f, cx + er * 0.9f, my - er * 0.2f)
-            canvas.drawPath(mp, linePaint)
-        } else if (sleepy) {
-            canvas.drawLine(cx, my, cx + er * 0.9f, my, linePaint)
-        } else {
-            val mp = pathC
-            mp.reset()
-            mp.moveTo(cx - er * 0.75f, my)
-            mp.quadTo(cx, my + er * 0.85f, cx + er * 0.75f, my)
-            canvas.drawPath(mp, linePaint)
-        }
-    }
-
-    /** 小爱心（摸头互动）：双圆弧贝塞尔，caller 控制位置/尺寸/透明度 */
-    private fun drawHeart(canvas: Canvas, cx: Float, cy: Float, s: Float) {
-        val hp = pathC
-        hp.reset()
-        hp.moveTo(cx, cy + s)
-        hp.cubicTo(cx - s * 1.5f, cy - s * 0.1f, cx - s * 0.75f, cy - s * 1.2f, cx, cy - s * 0.35f)
-        hp.cubicTo(cx + s * 0.75f, cy - s * 1.2f, cx + s * 1.5f, cy - s * 0.1f, cx, cy + s)
-        hp.close()
-        canvas.drawPath(hp, heartPaint)
-    }
-
-    private fun drawBolt(canvas: Canvas, x: Float, y: Float, s: Float) {
-        val p = pathC
-        p.reset()
-        p.moveTo(x + s * 0.25f, y)
-        p.lineTo(x - s * 0.35f, y + s * 0.9f)
-        p.lineTo(x + s * 0.02f, y + s * 0.9f)
-        p.lineTo(x - s * 0.25f, y + s * 1.8f)
-        p.lineTo(x + s * 0.42f, y + s * 0.75f)
-        p.lineTo(x + s * 0.06f, y + s * 0.72f)
-        p.close()
-        canvas.drawPath(p, boltPaint)
-    }
 }

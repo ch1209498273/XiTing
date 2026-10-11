@@ -80,12 +80,7 @@
     <string name="caption_row_title">검은 화면 자막(실험적)</string>
     <string name="caption_service_desc">재생 중인 영상의 자막 텍스트를 읽어 息屏听劇 검은 화면에 실시간 표시합니다. 저장·업로드하지 않습니다.</string>
     <string name="update_log_title_fmt">v%1$s 업데이트 내용</string>
-    <string name="update_log_body">· 업적 달성 시 앱 아이콘 변경
-· 월간 / 연간 시청 리포트 자동 푸시
-· 검은 화면에 제목·출처 앱 표시, ±30초 탐색
-· 펫 터치 시 반응 인터랙션
-· 통계 데이터 전면 개선
-· 수정 및 개선</string>
+    <string name="update_log_body">· 진화 차이가 뚜렷한 5단계 새 디자인\n· 불꽃, 파동, 번개, 회오리, 별 전용 효과\n· 길게 눌러 충전, 좌우로 회전, 날개 펼치기\n· 조작 안내와 터치 반응 개선</string>
     <string name="switch_headset">이어폰 뽑으면 자동으로 영상으로</string>
     <string name="bubble_style">버블 표시</string>
     <string name="settings_data">데이터</string>
@@ -380,4 +375,11 @@ https://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom_hint">1~600분</string>
     <string name="timer_custom_bad">1분 이상 입력하세요</string>
     <string name="evolve_fmt">🎉 진화! %1$s → %2$s</string>
+
+    <!-- Per-stage spirit gestures -->
+    <string name="pet_hint_spark">정령을 눌러 불꽃을 켜세요</string>
+    <string name="pet_hint_ball">길게 눌러 충전하고 놓으면 점프해요</string>
+    <string name="pet_hint_cloud">구름을 눌러 번개를 보내세요</string>
+    <string name="pet_hint_storm">정령을 좌우로 밀어 회오리를 만드세요</string>
+    <string name="pet_hint_king">눌러 인사하고 길게 눌렀다 놓아 날개를 펼쳐요</string>
 </resources>

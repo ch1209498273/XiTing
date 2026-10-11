@@ -89,12 +89,7 @@
     <string name="caption_row_title">黑幕字幕（实验性）</string>
     <string name="caption_service_desc">采集正在播放视频的字幕文本，仅实时显示在息屏听剧的黑幕上。不存储、不上传、不用于其他用途。</string>
     <string name="update_log_title_fmt">v%1$s 更新内容</string>
-    <string name="update_log_body">· 成就解锁桌面图标换肤
-· 听剧月报 / 年报海报，跨月自动推送
-· 黑幕剧名 + 来源 App 显示，±30 秒快进退
-· 摸头互动：点精灵有开心反馈
-· 统计数据全面升级，历史不再缩水
-· 若干修复与体验优化</string>
+    <string name="update_log_body">· 五阶精灵全新造型，进化差异更明显\n· 每阶专属火星、波纹、闪电、旋流与星辉\n· 新增蓄力弹跳、左右拨动与长按展翼\n· 精灵操作提示与点击响应优化</string>
     <string name="switch_headset">耳机拔出自动返回视频</string>
     <string name="bubble_style">悬浮球样式</string>
     <string name="settings_data">数据</string>
@@ -390,4 +385,11 @@
     <string name="timer_custom_hint">1–600 分钟</string>
     <string name="timer_custom_bad">请输入 1 以上的分钟数</string>
     <string name="evolve_fmt">🎉 进化！%1$s → %2$s</string>
+
+    <!-- Per-stage spirit gestures -->
+    <string name="pet_hint_spark">轻点精灵，让小火花亮起来</string>
+    <string name="pet_hint_ball">按住精灵蓄力，松手弹跳</string>
+    <string name="pet_hint_cloud">轻点雷云，释放闪电</string>
+    <string name="pet_hint_storm">左右拨动精灵，卷起旋流</string>
+    <string name="pet_hint_king">轻点回应，长按后松手展翼</string>
 </resources>

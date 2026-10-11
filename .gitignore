@@ -32,3 +32,6 @@ uat/
 小红书/
 .cowork-temp/
 tools/__pycache__/
+
+# 本地构建/测试日志
+*.log

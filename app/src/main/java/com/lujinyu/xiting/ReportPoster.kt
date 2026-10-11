@@ -32,6 +32,9 @@ object ReportPoster {
     ): SharePoster.Data? {
         val st = monthStats(sessions, System.currentTimeMillis())
         if (st.totalMs <= 0L) return null
+        // 月份标注进 hint：分享出去的图过俩月也看得出是哪个月的
+        val monthLabel = java.text.SimpleDateFormat("yyyy MMMM", java.util.Locale.getDefault())
+            .format(java.util.Date())
         val stage = PetForm.selected(ctx)
         val skin = PetSkins.active(ctx)
         val best = Streaks.computeFromDays(HistoryStore.listenDays(ctx)).best
@@ -55,7 +58,7 @@ object ReportPoster {
             stageName = PetView.stageName(ctx, stage),
             headline = ctx.fmtDur(st.totalMs),
             headlineUnit = ctx.getString(R.string.poster_unit_month),
-            hint = ctx.getString(R.string.poster_hint_month),
+            hint = "$monthLabel · " + ctx.getString(R.string.poster_hint_month),
             lines = lines,
             footer = ctx.getString(R.string.poster_footer_month),
             shareText = ctx.getString(
@@ -83,6 +86,7 @@ object ReportPoster {
         val year = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
         val ys = HistoryStore.yearStats(ctx, year)
         if (ys.totalMs <= 0L) return null
+        val yearLabel = year.toString()
         val stage = PetForm.selected(ctx)
         val skin = PetSkins.active(ctx)
         val best = Streaks.computeFromDays(HistoryStore.listenDays(ctx)).best
@@ -104,7 +108,7 @@ object ReportPoster {
             stageName = PetView.stageName(ctx, stage),
             headline = ctx.fmtDur(ys.totalMs),
             headlineUnit = ctx.getString(R.string.poster_unit_year),
-            hint = ctx.getString(R.string.poster_hint_year),
+            hint = "$yearLabel · " + ctx.getString(R.string.poster_hint_year),
             lines = lines,
             footer = ctx.getString(R.string.poster_footer_year),
             shareText = ctx.getString(

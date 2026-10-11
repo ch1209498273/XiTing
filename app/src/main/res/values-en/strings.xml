@@ -78,12 +78,14 @@
     <string name="notif_suggest_msg">Tap to dim and keep listening</string>
     <string name="channel_suggest">Dim suggestions</string>
     <string name="caption_row_title">Black-screen captions (Beta)</string>
-    <string name="caption_on">On</string>
-    <string name="caption_off">Off</string>
-    <string name="caption_guide">Show the current video subtitles on the black screen (only for text-based subtitles like Bilibili CC or YouTube; burned-in subtitles cannot be read). Requires accessibility permission. Caption text is displayed in real time only — never stored or uploaded.</string>
-    <string name="caption_go">Enable</string>
-    <string name="caption_settings_btn">Open settings</string>
     <string name="caption_service_desc">Reads subtitle text of the playing video and shows it on the black screen in real time. Never stored, never uploaded, used for nothing else.</string>
+    <string name="update_log_title_fmt">What\'s new in v%1$s</string>
+    <string name="update_log_body">· Achievement-unlocked app icon skins
+· Monthly / yearly listening report posters, auto-pushed
+· Black-screen shows title + source app, ±30s seek
+· Pet poke interaction with happy feedback
+· Stats upgraded, history never shrinks
+· Fixes and polish</string>
     <string name="switch_headset">Return to video when headphones unplug</string>
     <string name="bubble_style">Bubble style</string>
     <string name="settings_data">Data</string>

@@ -111,6 +111,18 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         if (intent?.getStringExtra(ReportPoster.EXTRA_SHOW_REPORT) == ReportPoster.SHOW_MONTH) {
             ReportPoster.shareMonthReport(this)
         }
+        // 版本更新日志：升级后首次打开弹一次（全新安装 seen==null 不弹，别打扰新用户）
+        val seenVersion = prefs().getString(Prefs.UPDATE_SEEN_VERSION, null)
+        if (seenVersion != null && seenVersion != BuildConfig.VERSION_NAME) {
+            prefs().edit().putString(Prefs.UPDATE_SEEN_VERSION, BuildConfig.VERSION_NAME).apply()
+            android.app.AlertDialog.Builder(this)
+                .setTitle(getString(R.string.update_log_title_fmt, BuildConfig.VERSION_NAME))
+                .setMessage(getString(R.string.update_log_body))
+                .setPositiveButton(getString(R.string.dlg_got_it), null)
+                .show()
+        } else if (seenVersion == null) {
+            prefs().edit().putString(Prefs.UPDATE_SEEN_VERSION, BuildConfig.VERSION_NAME).apply()
+        }
     }
 
     // ───────────────────────── 导航 ─────────────────────────
@@ -140,7 +152,6 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             refreshBubbleStyleValue()
             refreshLangValue()
             refreshIconStyleValue()
-            refreshCaptionValue()
         }
     }
 
@@ -1056,8 +1067,6 @@ private fun checkRestore() {
         // 图标样式：成就解锁的启动图标（activity-alias 切换）
         page.findViewById<View>(R.id.row_icon_style).setOnClickListener { showIconStyleDialog() }
 
-        // 黑幕字幕（实验性）：状态展示 + 跳无障碍设置
-        page.findViewById<View>(R.id.row_caption).setOnClickListener { showCaptionDialog() }
 
         // 界面语言
         page.findViewById<View>(R.id.row_lang).setOnClickListener { showLangDialog() }

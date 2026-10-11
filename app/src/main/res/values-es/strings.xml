@@ -78,12 +78,14 @@
     <string name="notif_suggest_msg">Toca para apagar y seguir escuchando</string>
     <string name="channel_suggest">Sugerencias de apagado</string>
     <string name="caption_row_title">Subtítulos de pantalla negra (beta)</string>
-    <string name="caption_on">Activado</string>
-    <string name="caption_off">Desactivado</string>
-    <string name="caption_guide">Muestra los subtítulos del video en reproducción sobre la pantalla negra (solo subtítulos de texto como Bilibili CC o YouTube; los incrustados no se pueden leer). Requiere permiso de accesibilidad. El texto se muestra en tiempo real únicamente: nunca se guarda ni se envía.</string>
-    <string name="caption_go">Activar</string>
-    <string name="caption_settings_btn">Abrir ajustes</string>
     <string name="caption_service_desc">Lee el texto de los subtítulos del video en reproducción y lo muestra en tiempo real sobre la pantalla negra. Nunca se guarda ni se envía.</string>
+    <string name="update_log_title_fmt">Novedades de v%1$s</string>
+    <string name="update_log_body">· Iconos desbloqueables por logro
+· Informes mensuales / anuales automáticos
+· Pantalla negra con título y app de origen, ±30 s
+· Interacción al tocar a tu mascota
+· Estadísticas renovadas, histórico estable
+· Correcciones y mejoras</string>
     <string name="switch_headset">Volver al vídeo al quitar los auriculares</string>
     <string name="bubble_style">Estilo de burbuja</string>
     <string name="settings_data">Datos</string>

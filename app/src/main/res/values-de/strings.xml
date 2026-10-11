@@ -78,12 +78,14 @@
     <string name="notif_suggest_msg">Tippen zum Abdimmen, Ton läuft weiter</string>
     <string name="channel_suggest">Dimm-Vorschläge</string>
     <string name="caption_row_title">Black-Screen-Untertitel (Beta)</string>
-    <string name="caption_on">Ein</string>
-    <string name="caption_off">Aus</string>
-    <string name="caption_guide">Zeigt die Untertitel des laufenden Videos auf dem schwarzen Bildschirm (nur textbasierte Untertitel wie Bilibili-CC oder YouTube; eingebrannte Untertitel sind nicht lesbar). Erfordert die Bedienungshilfen-Berechtigung. Untertexte werden nur in Echtzeit angezeigt – nie gespeichert oder hochgeladen.</string>
-    <string name="caption_go">Aktivieren</string>
-    <string name="caption_settings_btn">Einstellungen öffnen</string>
     <string name="caption_service_desc">Liest Untertiteltexte des laufenden Videos und zeigt sie in Echtzeit auf dem schwarzen Bildschirm. Nie gespeichert, nie hochgeladen, für nichts anderes verwendet.</string>
+    <string name="update_log_title_fmt">Neu in v%1$s</string>
+    <string name="update_log_body">· App-Icons per Erfolg freischalten
+· Monats- / Jahresberichte, automatisch gepusht
+· Black Screen zeigt Titel + Quelle, ±30 s Spulen
+· Streicheleinheiten für dein Haustier
+· Statistiken komplett überholt
+· Fixes und Verbesserungen</string>
     <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
     <string name="bubble_style">Blasen-Stil</string>
     <string name="settings_data">Daten</string>

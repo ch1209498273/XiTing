@@ -78,12 +78,14 @@
     <string name="notif_suggest_msg">Нажмите, чтобы выключить экран</string>
     <string name="channel_suggest">Предложения затемнения</string>
     <string name="caption_row_title">Субтитры на чёрном экране (бета)</string>
-    <string name="caption_on">Вкл</string>
-    <string name="caption_off">Выкл</string>
-    <string name="caption_guide">Показывает субтитры играющего видео на чёрном экране (только текстовые субтитры, как CC на Bilibili или YouTube; вшитые субтитры прочитать нельзя). Требуется разрешение специальных возможностей. Текст субтитров показывается только в реальном времени — не сохраняется и не отправляется.</string>
-    <string name="caption_go">Включить</string>
-    <string name="caption_settings_btn">Открыть настройки</string>
     <string name="caption_service_desc">Читает текст субтитров играющего видео и показывает его на чёрном экране в реальном времени. Не сохраняется, не отправляется, не используется иначе.</string>
+    <string name="update_log_title_fmt">Новое в v%1$s</string>
+    <string name="update_log_body">· Значки приложения за достижения
+· Месячные / годовые отчёты с автоуведомлением
+· Чёрный экран: название + источник, ±30 с
+· Погладь питомца — реакция
+· Статистика полностью переработана
+· Исправления и улучшения</string>
     <string name="switch_headset">Возврат к видео при отключении наушников</string>
     <string name="bubble_style">Вид пузырька</string>
     <string name="settings_data">Данные</string>

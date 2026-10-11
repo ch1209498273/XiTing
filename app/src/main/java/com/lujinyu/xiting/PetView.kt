@@ -211,7 +211,9 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
      * 动画循环沿用常驻 30fps 重绘；thumbMode（图鉴缩略图）不可点所以恒不触发。
      */
     fun poke() {
-        pokeStart = System.currentTimeMillis()
+        val now = System.currentTimeMillis()
+        if (now - pokeStart < 300) return // 冷却：防连点狂刷爱心
+        pokeStart = now
         pokeUntil = pokeStart + 1200
         pokeHearts.clear()
         pokeHearts.add(PokeHeart(-0.4f, pokeStart))

@@ -66,6 +66,7 @@ class PrefsKeysTest {
         assertEquals("report_last_month", Prefs.REPORT_LAST_MONTH)
         assertEquals("suggest_notify", Prefs.SUGGEST_NOTIFY)
         assertEquals("suggest_last_day", Prefs.SUGGEST_LAST_DAY)
+        assertEquals("update_seen_version", Prefs.UPDATE_SEEN_VERSION)
         assertEquals("pwr_samp_ua_sum", Prefs.PWR_SAMP_UA_SUM)
         assertEquals("pwr_samp_count", Prefs.PWR_SAMP_COUNT)
         assertEquals("calib_on_ua", Prefs.CALIB_ON_UA)

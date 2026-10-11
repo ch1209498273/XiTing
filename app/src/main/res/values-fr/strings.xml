@@ -78,12 +78,9 @@
     <string name="notif_suggest_msg">Toucher pour éteindre, le son continue</string>
     <string name="channel_suggest">Suggestions décran noir</string>
     <string name="caption_row_title">Sous-titres écran noir (bêta)</string>
-    <string name="caption_on">Activé</string>
-    <string name="caption_off">Désactivé</string>
-    <string name="caption_guide">Affiche les sous-titres de la vidéo en cours sur l\'écran noir (uniquement les sous-titres textuels comme Bilibili CC ou YouTube ; les sous-titres incrustés ne sont pas lisibles). Nécessite la permission d\'accessibilité. Le texte est affiché en temps réel seulement — jamais stocké ni envoyé.</string>
-    <string name="caption_go">Activer</string>
-    <string name="caption_settings_btn">Ouvrir les réglages</string>
     <string name="caption_service_desc">Lit le texte des sous-titres de la vidéo en cours et laffiche en temps réel sur l\'écran noir. Jamais stocké, jamais envoyé, rien dautre.</string>
+    <string name="update_log_title_fmt">Nouveautés de v%1$s</string>
+    <string name="update_log_body">· Icônes débloquables par succès\n· Rapports mensuels / annuels automatiques\n· Écran noir : titre + source, ±30 s\n· Caresses sur la créature\n· Statistiques repensées\n· Corrections diverses</string>
     <string name="switch_headset">Retour vidéo au débranchement</string>
     <string name="bubble_style">Style de bulle</string>
     <string name="settings_data">Données</string>

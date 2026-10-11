@@ -90,6 +90,8 @@ object Prefs {
     // ---- 月报推送 ----
     /** 上次提示过月报的月份（yyyy-MM，US locale 内部比较）。跨月首次打开时发本地通知 */
     const val REPORT_LAST_MONTH = "report_last_month"
+    /** 上次弹过更新日志的版本号；升级后首次打开弹一次（全新安装不弹） */
+    const val UPDATE_SEEN_VERSION = "update_seen_version"
 
     // ---- 全量历史聚合（HistoryStore，v4.0）----
     // 明细 sessions.json 只保留 60 天；累计/最长/连续天数/月口径全部在这里。

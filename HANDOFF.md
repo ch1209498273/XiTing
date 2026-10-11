@@ -2,9 +2,11 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-11 · **v3.8.0 已发布**（tag / GitHub Release / 蒲公英，versionCode 77）。
-> v3.8.0 内容：MainActivity 三步瘦身（1760→1099 行）、海报版式声明化 + 1:1、
-> 黑幕播控（剧名两行 + ±30s）、真机验证全绿（海报 + 播控 + 降级路径）。
+> 最后更新：2026-10-11 · **v4.0**（10 项功能/优化 + 全量聚合数据架构，见下方清单）。
+> v4.0：成就图标换肤（五枚徽章图标，ColorOS 验证）、听剧月报/年报海报 + 跨月本地推送、
+> 全量历史聚合（明细裁剪 60 天，派生数据不进备份）、摸头互动、黑幕剧名加播放 App 名、
+> 关于页诊断反馈、CI/发版 lint+i18n 门禁、息屏建议通知（双路径）、targetSdk 36 预研文档。
+> v3.8.0：MainActivity 三步瘦身、海报 1:1、黑幕播控（剧名+±30s）。
 > 另：**「暂停检测/播放中断提醒」已拍板不做**（主场景听到睡着，无声是正常收尾），见第七节。
 > v3.6.2：深色模式（跟随系统）+ 成就弹窗联动高亮。
 > v3.6.1：多语言热刷新与布局修复、成就口径改「连续 7 天」、崩溃自捕获、
@@ -19,9 +21,9 @@
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**背光物理关闭**）而声音继续。
 纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 302 KB。
 
-- 包名 `com.lujinyu.xiting`，versionCode 77 / versionName 3.8.0
-- `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节）**
-- 源码约 6200 行 Kotlin，单模块
+- 包名 `com.lujinyu.xiting`，versionCode 78 / versionName 4.0.0
+- `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节 + docs/targetsdk36_黑幕兼容预研.md）**
+- 源码约 6800 行 Kotlin，单模块
 - **路径含中文是既定事实**：用户 2026-10-11 明确拍板**不迁移**纯 ASCII 路径，
   测试继续走 `tools/run_tests.ps1` 镜像方案，别再提搬迁
 
@@ -175,6 +177,21 @@ powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
    直接 setTextColor 会得到 alpha≈01 的隐形色——别用，按 uiMode 选最稳。
    另：真机自动化点击对话框元素时，**每次布局高度变化（比例切换/按钮换行）
    都会让旧坐标失效，先 uiautomator dump 拿 bounds 再点**，盲点必踩坑。
+
+### v4.0 十项（2026-10-11，用户从 15 建议清单逐项拍板）
+
+| 项 | 落点 |
+|---|---|
+| 成就图标换肤 | manifest activity-alias ×5 + IconStyle.kt + 设置「图标样式」行；ColorOS 真机验证通过（切换即时/双向/不杀进程）；图标美术从 Badges 徽章路径 1:1 翻译，tools/icon_preview.py 预览 |
+| 月报/年报海报 + 本地推送 | MonthReport.kt（月聚合纯函数）+ ReportPoster.kt（组装/跨月本地通知/点击直达）；**年报依赖聚合，见 HistoryStore**；服务器推送违反零网络根基（本地通知等体验，用户拍板） |
+| 全量历史聚合 | HistoryStore.kt：累计/最长/听剧日集合/月聚合（prefs），明细 sessions.json 裁剪 60 天，SessionLog.add 同步累加，一次性迁移 + 备份恢复重算（派生数据不进备份）；**降级 v3.x 会看到累计缩水（已知取舍）** |
+| 摸头互动 | PetView.poke()：眯眼笑 + 三颗爱心上浮，替换放电电弧（用户嫌丑）；mah_saved_fmt 死资源随删 |
+| 黑幕底部布局 + 播放 App 名 | hint 移顶部居中；剧名行 = NowPlaying.displayTitle()（「B站 · 剧名」前缀） |
+| 诊断反馈 | 关于页 about_diag：版本/机型/权限/崩溃 打包复制（剪贴板零网络） |
+| CI/发版门禁 | ci.yml + release.ps1 补 gradle lint + i18n check（forceDarkAllowed 教训制度化） |
+| 息屏建议通知 | 双路径：OverlayService tick（通知使用权精确）/ SuggestJobService 15min 兜底；开关默认关、每天一条、点击直接 ACTION_TOGGLE |
+| targetSdk 36 预研 | docs/targetsdk36_黑幕兼容预研.md（风险表 + 验证计划，触发条件=上 Play） |
+| 砍掉 | 双击解锁（已有类似）、桌面快捷方式（用户否）、云同步（违反零依赖） |
 
 ### 顺手修的既有问题
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 持之以恒前景：Badges.flame 1:1 翻译（s=30 图标定稿参数） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M54,25.2 C77.35,47.48 78.6,63.66 61.98,78.66 C48.87,87.94 28.46,71.13 39.7,55.1 C44.6,63.68 47.52,53.1 50.35,62.1 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54"
+                android:startY="25"
+                android:endX="54"
+                android:endY="87"
+                android:type="linear">
+                <item android:offset="0" android:color="#FFFF7043" />
+                <item android:offset="1" android:color="#FFD84315" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#FFFFD54F"
+        android:pathData="M54,44.04 C64.71,52.99 62.71,68.63 54,72.08 C45.29,68.63 43.29,52.99 54,44.04 Z" />
+</vector>

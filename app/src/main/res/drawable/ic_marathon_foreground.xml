@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 马拉松前景：Badges.hourglass 1:1 翻译（框架加粗 / 沙饱满为图标定稿参数） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFE65100"
+        android:pathData="M44.0,45.4 L64.0,45.4 L54,54 Z" />
+    <path
+        android:fillColor="#FFE65100"
+        android:pathData="M43.9,74.9 L64.1,74.9 L60.0,55.0 L48.0,55.0 Z" />
+    <path
+        android:fillColor="#00FFFFFF"
+        android:strokeColor="#FF6D4C41"
+        android:strokeWidth="4.4"
+        android:strokeLineJoin="round"
+        android:pathData="M36.9,30.6 L71.1,30.6 L54,54 Z M36.9,77.4 L71.1,77.4 L54,54 Z" />
+    <path
+        android:fillColor="#FF5D4037"
+        android:pathData="M30.4,26.6 L77.6,26.6 L77.6,32.6 L30.4,32.6 Z" />
+    <path
+        android:fillColor="#FF5D4037"
+        android:pathData="M30.4,76.4 L77.6,76.4 L77.6,82.4 L30.4,82.4 Z" />
+</vector>

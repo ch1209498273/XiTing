@@ -39,6 +39,12 @@ object IconStyle {
     val OPTIONS = listOf(
         Option("default", ComponentName(PKG, "$PKG.LauncherDefault"),
             { c -> c.getString(R.string.app_name) }, null),
+        Option("marathon", ComponentName(PKG, "$PKG.LauncherMarathon"),
+            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "marathon" }) }, "marathon"),
+        Option("week", ComponentName(PKG, "$PKG.LauncherWeek"),
+            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "week" }) }, "week"),
+        Option("c100", ComponentName(PKG, "$PKG.LauncherC100"),
+            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "c100" }) }, "c100"),
         Option("king", ComponentName(PKG, "$PKG.LauncherCrown"),
             { c -> Achievements.title(c, Achievements.ALL.first { it.id == "king" }) }, "king")
     )

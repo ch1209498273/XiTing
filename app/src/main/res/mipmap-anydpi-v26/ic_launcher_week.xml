@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 持之以恒成就图标（🔥 火焰） -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/bg_flame" />
-    <foreground android:drawable="@drawable/ic_week_foreground" />
-    <monochrome android:drawable="@drawable/ic_week_foreground" />
+ <background android:drawable="@drawable/bg_achievement_icon"/>
+ <foreground android:drawable="@drawable/ic_week_foreground"/>
+ <monochrome android:drawable="@drawable/ic_week_monochrome"/>
 </adaptive-icon>

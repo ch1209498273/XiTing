@@ -208,9 +208,33 @@ internal fun MainActivity.showIconStyleDialog() {
     }.toTypedArray()
     val cur = IconStyle.currentId(this)
     val checked = opts.indexOfFirst { it.id == cur }.let { if (it < 0) 0 else it }
+    val density=resources.displayMetrics.density
+    val adapter=object:android.widget.ArrayAdapter<String>(this,android.R.layout.simple_list_item_single_choice,labels) {
+        override fun getView(position:Int,convertView:android.view.View?,parent:android.view.ViewGroup):android.view.View {
+            val row=LinearLayout(context).apply {
+                orientation=LinearLayout.HORIZONTAL;gravity=android.view.Gravity.CENTER_VERTICAL
+                setPadding((20*density).toInt(),(8*density).toInt(),(12*density).toInt(),(8*density).toInt())
+                minimumHeight=(68*density).toInt()
+            }
+            row.addView(android.widget.ImageView(context).apply {
+                setImageResource(opts[position].iconRes)
+                importantForAccessibility=android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            },LinearLayout.LayoutParams((48*density).toInt(),(48*density).toInt()))
+            row.addView(TextView(context).apply {
+                text=labels[position];textSize=15f
+                setTextColor(getColor(if(IconStyle.isUnlocked(this@showIconStyleDialog,opts[position].id))R.color.text_primary else R.color.text_hint))
+                setPadding((12*density).toInt(),0,0,0)
+            },LinearLayout.LayoutParams(0,-2,1f))
+            row.addView(android.widget.RadioButton(context).apply {
+                isChecked=position==checked;isClickable=false;isFocusable=false
+                importantForAccessibility=android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            })
+            return row
+        }
+    }
     android.app.AlertDialog.Builder(this)
         .setTitle(getString(R.string.icon_style_title))
-        .setSingleChoiceItems(labels, checked) { d, which ->
+        .setSingleChoiceItems(adapter, checked) { d, which ->
             val o = opts[which]
             if (!IconStyle.isUnlocked(this, o.id)) {
                 Toast.makeText(this, getString(R.string.icon_locked_toast), Toast.LENGTH_SHORT).show()

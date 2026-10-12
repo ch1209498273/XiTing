@@ -31,6 +31,11 @@ internal fun MainActivity.showBadgeCelebration(items:List<Achievements.A>,fresh:
             gravity=Gravity.CENTER;text=Achievements.desc(this@showBadgeCelebration,a)
             textSize=13f;setTextColor(getColor(R.color.text_secondary))
         })
+        val icon=IconStyle.OPTIONS.first { it.unlockAchievement==a.id }
+        content.addView(android.widget.ImageView(this).apply {
+            setImageResource(icon.iconRes)
+            contentDescription=getString(R.string.icon_style_title)+" · "+Achievements.title(this@showBadgeCelebration,a)
+        },LinearLayout.LayoutParams(dp(48),dp(48)).apply { gravity=Gravity.CENTER;topMargin=dp(12) })
         content.addView(Button(this).apply {
             text=getString(R.string.ach_replay);isAllCaps=false
             setOnClickListener { badge.playCelebration() }

@@ -1,31 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 百次成习：奖章化前景（VectorDrawable；全部内容在自适应图标安全区 r33 内） -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
-    android:width="108dp" android:height="108dp"
-    android:viewportWidth="108" android:viewportHeight="108">
-    <path android:pathData="M54,54 m-29,0 a29,29 0 1,1 58,0 a29,29 0 1,1 -58,0"
-    android:strokeWidth="2.4">
-    <aapt:attr name="android:strokeColor">
-      <gradient android:type="linear" android:startX="54" android:startY="25" android:endX="54" android:endY="83">
-        <item android:offset="0" android:color="#FFFFE082"/>
-        <item android:offset="0.5" android:color="#FFFFA000"/>
-        <item android:offset="1" android:color="#FFFF8F00"/>
-      </gradient>
-    </aapt:attr>
-  </path>
-  <path
-    android:pathData="M54,54 m-27.6,0 a27.6,27.6 0 1,1 55.2,0 a27.6,27.6 0 1,1 -55.2,0"
-    android:strokeColor="#33000000"
-    android:strokeWidth="1.2"/>
-  <path android:pathData="M54,54 m-18,0 a18,18 0 1,1 36,0 a18,18 0 1,1 -36,0" android:fillColor="#FFE53935"/>
-  <path android:pathData="M54,54 m-12.6,0 a12.6,12.6 0 1,1 25.2,0 a12.6,12.6 0 1,1 -25.2,0" android:fillColor="#FFFFFDFD"/>
-  <path android:pathData="M54,54 m-7.56,0 a7.56,7.56 0 1,1 15.12,0 a7.56,7.56 0 1,1 -15.12,0" android:fillColor="#FFE53935"/>
-  <path
-    android:pathData="M54,46.44 A7.56,7.56 0 0 1 61.56,54"
-    android:strokeColor="#66FFFFFF" android:strokeWidth="2"/>
-  <path
-    android:pathData="M74.1,39.2 L62.7,47.4"
-    android:strokeColor="#FF37474F" android:strokeWidth="2.9" android:strokeLineCap="round"/>
-  <path android:pathData="M62,48.1 L67.3,45.2 L61,43.5 Z" android:fillColor="#FF37474F"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+<path android:pathData="M24.5,54 a29.5,29.5 0 1,1 59,0 a29.5,29.5 0 1,1 -59,0"><aapt:attr name="android:fillColor"><gradient android:type="linear" android:startX="33" android:startY="25" android:endX="75" android:endY="84"><item android:offset="0" android:color="#FFFFF0BC"/><item android:offset="0.5" android:color="#FFFFD367"/><item android:offset="1" android:color="#FFDEA128"/></gradient></aapt:attr></path>
+<path android:pathData="M24.5,54 a29.5,29.5 0 1,1 59,0 a29.5,29.5 0 1,1 -59,0" android:fillColor="@android:color/transparent" android:strokeColor="#FFF0BC4C" android:strokeWidth="1.5"/>
+<path android:pathData="M28,54 a26,26 0 1,1 52,0 a26,26 0 1,1 -52,0" android:fillColor="@android:color/transparent" android:strokeColor="#FFB97D18" android:strokeWidth="1"/>
+<path android:pathData="M31,44 A26,26 0 0,1 65,30" android:fillColor="@android:color/transparent" android:strokeColor="#FFFFF7D9" android:strokeWidth="2" android:strokeLineCap="round"/>
+<path android:pathData="M54,36 a18,18 0 1,1 0,36 a18,18 0 1,1 0,-36 M54,41 a13,13 0 1,0 0,26 a13,13 0 1,0 0,-26 M54,47 a7,7 0 1,1 0,14 a7,7 0 1,1 0,-14" android:fillColor="#FF694411" android:fillType="evenOdd"/><path android:pathData="M75,35 L61,48" android:fillColor="@android:color/transparent" android:strokeColor="#FF694411" android:strokeWidth="4" android:strokeLineCap="round" android:strokeLineJoin="round"/><path android:pathData="M59,44 L59,51 L66,50" android:fillColor="#FF694411"/>
 </vector>

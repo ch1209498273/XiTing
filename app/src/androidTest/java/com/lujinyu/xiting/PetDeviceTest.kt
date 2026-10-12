@@ -33,7 +33,8 @@ class PetDeviceTest : Instrumentation() {
             testServiceTimerAndDemoLifecycle()
             testBadgeCelebrationLifecycleAndReducedMotion()
             testGoldMedalCanvasAndDialog()
-            result.putString("stream","PASS: 10 device checks (gestures, routing, Canvas/skins, lifecycle, preview isolation, targeted pause, demo isolation, full service timer/demo, medal lifecycle/reduced motion, gold medal Canvas/dialog).")
+            testLauncherResourcesMasksAndSwitching()
+            result.putString("stream","PASS: 11 device checks (gestures, routing, Canvas/skins, lifecycle, preview isolation, targeted pause, demo isolation, full service timer/demo, medal lifecycle/reduced motion, gold medal Canvas/dialog, launcher resources/masks/switching).")
             finish(Activity.RESULT_OK,result)
         } catch(t:Throwable) {
             result.putString("stream","FAIL: "+t.stackTraceToString())
@@ -224,16 +225,30 @@ class PetDeviceTest : Instrumentation() {
         val activity=startActivitySync(android.content.Intent(targetContext,MainActivity::class.java)
             .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
         lateinit var badge:BadgeView
+        lateinit var host:android.app.AlertDialog
+        // Let the activity finish its delayed restore check before giving the test its own focused window.
+        SystemClock.sleep(850)
         fun scheduled():Boolean {
             val field=BadgeView::class.java.getDeclaredField("celebrationTick").apply { isAccessible=true }
             return badge.handler?.hasCallbacks(field.get(badge) as Runnable)==true
         }
         main {
             badge=BadgeView(activity).apply { heroMode=true;bind(Badges.Kind.CROWN,true) }
-            activity.setContentView(badge)
+            host=android.app.AlertDialog.Builder(activity).setView(badge).create()
+            host.show()
+            host.window!!.setLayout(420,420)
         }
-        waitForIdleSync();SystemClock.sleep(150)
-        main { badge.playCelebration();assertTrue(scheduled()) }
+        waitForIdleSync()
+        val focusDeadline=SystemClock.elapsedRealtime()+3000
+        var ready=false
+        while(!ready && SystemClock.elapsedRealtime()<focusDeadline) {
+            main { ready=badge.isAttachedToWindow && badge.isShown && badge.hasWindowFocus() }
+            if(!ready)SystemClock.sleep(30)
+        }
+        main {
+            check(ready) { "Badge test window never acquired focus" }
+            badge.playCelebration();assertTrue(scheduled())
+        }
         SystemClock.sleep(1950)
         main {
             assertTrue(!scheduled());badge.playCelebration();assertTrue(scheduled())
@@ -256,7 +271,7 @@ class PetDeviceTest : Instrumentation() {
                 badge.playCelebration();assertTrue(!scheduled())
             }
         } finally { scale(old) }
-        main { activity.finish();assertTrue(!scheduled()) }
+        main { host.dismiss();activity.finish();assertTrue(!scheduled()) }
     }
     fun testGoldMedalCanvasAndDialog() {
         main {
@@ -302,6 +317,78 @@ class PetDeviceTest : Instrumentation() {
             badge.playCelebration();dialog.dismiss();activity.finish()
         }
         assertEquals(before,Achievements.unlockedIds(targetContext))
+    }
+    fun testLauncherResourcesMasksAndSwitching() {
+        main {
+            val options=IconStyle.OPTIONS.drop(1)
+            val atlas=Bitmap.createBitmap(1200,1050,Bitmap.Config.ARGB_8888)
+            val c=Canvas(atlas);c.drawColor(0xFFF5F4EF.toInt())
+            val paint=Paint(Paint.ANTI_ALIAS_FLAG).apply {color=0xFF243330.toInt();textSize=20f}
+            for((column,o) in options.withIndex()) {
+                val info=targetContext.packageManager.getActivityInfo(o.component,android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS)
+                assertEquals(o.iconRes,info.icon)
+                val adaptive=targetContext.getDrawable(o.iconRes) as android.graphics.drawable.AdaptiveIconDrawable
+                c.drawText(o.id.uppercase(),column*300f+30,28f,paint)
+                for(row in 0..3) {
+                    val icon=Bitmap.createBitmap(144,144,Bitmap.Config.ARGB_8888)
+                    val ic=Canvas(icon)
+                    val mask=android.graphics.Path()
+                    when(row) {
+                        0 -> mask.addCircle(72f,72f,72f,android.graphics.Path.Direction.CW)
+                        1,3 -> mask.addRoundRect(0f,0f,144f,144f,34f,34f,android.graphics.Path.Direction.CW)
+                        else -> {
+                            mask.moveTo(72f,0f);mask.cubicTo(132f,0f,144f,12f,144f,72f)
+                            mask.cubicTo(144f,132f,132f,144f,72f,144f)
+                            mask.cubicTo(12f,144f,0f,132f,0f,72f)
+                            mask.cubicTo(0f,12f,12f,0f,72f,0f);mask.close()
+                        }
+                    }
+                    ic.clipPath(mask)
+                    if(row==3 && android.os.Build.VERSION.SDK_INT>=33) {
+                        ic.drawColor(0xFF23332D.toInt())
+                        val mono=adaptive.monochrome!!
+                        mono.setTint(0xFFF4DB9F.toInt());mono.setBounds(-36,-36,180,180);mono.draw(ic)
+                        // Dedicated silhouette must not include the medal disk.
+                        val sample=Bitmap.createBitmap(108,108,Bitmap.Config.ARGB_8888)
+                        mono.setBounds(0,0,108,108);mono.draw(Canvas(sample))
+                        assertEquals(0,Color.alpha(sample.getPixel(54,26)))
+                        assertEquals(0,Color.alpha(sample.getPixel(25,54)));sample.recycle()
+                    } else {
+                        adaptive.background.setBounds(-36,-36,180,180);adaptive.background.draw(ic)
+                        adaptive.foreground.setBounds(-36,-36,180,180);adaptive.foreground.draw(ic)
+                    }
+                    val y=row*250f+45f;val x=column*300f+30f
+                    c.drawBitmap(icon,x,y,null)
+                    // Native 48/32px reductions expose small-size recognition.
+                    c.drawBitmap(icon,null,android.graphics.RectF(x+174,y+20,x+222,y+68),null)
+                    c.drawBitmap(icon,null,android.graphics.RectF(x+180,y+88,x+212,y+120),null)
+                    c.drawText(arrayOf("CIRCLE","ROUNDED","SQUIRCLE","THEMED")[row],x,y+180,paint)
+                    icon.recycle()
+                }
+            }
+            File(targetContext.cacheDir,"launcher-gold-proof.png").outputStream().use {atlas.compress(Bitmap.CompressFormat.PNG,100,it)}
+            atlas.recycle()
+            val pm=targetContext.packageManager
+            val old=IconStyle.OPTIONS.associate {it.component to pm.getComponentEnabledSetting(it.component)}
+            val got=Achievements.unlockedIds(targetContext)
+            try {
+                for(o in IconStyle.OPTIONS) {
+                    IconStyle.apply(targetContext,o.id)
+                    val intent=android.content.Intent(android.content.Intent.ACTION_MAIN)
+                        .addCategory(android.content.Intent.CATEGORY_LAUNCHER).setPackage(targetContext.packageName)
+                    val launchers=pm.queryIntentActivities(intent,0)
+                    assertEquals(1,launchers.size);assertEquals(o.component.className,launchers.single().activityInfo.name)
+                    assertEquals(o.id,IconStyle.currentId(targetContext))
+                }
+            } finally {
+                // Enable the original launcher first, then restore every exact component state.
+                val original=IconStyle.OPTIONS.firstOrNull {old[it.component]==android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED}
+                    ?:IconStyle.OPTIONS.first()
+                pm.setComponentEnabledSetting(original.component,android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED,android.content.pm.PackageManager.DONT_KILL_APP)
+                for(o in IconStyle.OPTIONS)pm.setComponentEnabledSetting(o.component,old.getValue(o.component),android.content.pm.PackageManager.DONT_KILL_APP)
+            }
+            assertEquals(got,Achievements.unlockedIds(targetContext))
+        }
     }
     private fun main(block:()->Unit) {
         var failure:Throwable?=null

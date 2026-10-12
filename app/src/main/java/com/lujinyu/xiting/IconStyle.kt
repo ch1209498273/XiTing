@@ -27,7 +27,8 @@ object IconStyle {
         val component: ComponentName,
         val title: (Context) -> String,
         /** 解锁所需的成就 id；null = 恒可用 */
-        val unlockAchievement: String?
+        val unlockAchievement: String?,
+        val iconRes:Int
     )
 
     private const val PKG = "com.lujinyu.xiting"
@@ -38,15 +39,15 @@ object IconStyle {
      */
     val OPTIONS = listOf(
         Option("default", ComponentName(PKG, "$PKG.LauncherDefault"),
-            { c -> c.getString(R.string.app_name) }, null),
+            { c -> c.getString(R.string.app_name) }, null, R.mipmap.ic_launcher),
         Option("marathon", ComponentName(PKG, "$PKG.LauncherMarathon"),
-            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "marathon" }) }, "marathon"),
+            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "marathon" }) }, "marathon", R.mipmap.ic_launcher_marathon),
         Option("week", ComponentName(PKG, "$PKG.LauncherWeek"),
-            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "week" }) }, "week"),
+            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "week" }) }, "week", R.mipmap.ic_launcher_week),
         Option("c100", ComponentName(PKG, "$PKG.LauncherC100"),
-            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "c100" }) }, "c100"),
+            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "c100" }) }, "c100", R.mipmap.ic_launcher_c100),
         Option("king", ComponentName(PKG, "$PKG.LauncherCrown"),
-            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "king" }) }, "king")
+            { c -> Achievements.title(c, Achievements.ALL.first { it.id == "king" }) }, "king", R.mipmap.ic_launcher_crown)
     )
 
     private fun option(id: String): Option = OPTIONS.first { it.id == id }

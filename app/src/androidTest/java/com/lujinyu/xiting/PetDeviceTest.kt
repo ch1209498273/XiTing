@@ -15,11 +15,15 @@ import java.io.File
 /** Runs the actual Android Canvas renderer/gesture dispatch without modifying user prefs. */
 @Suppress("DEPRECATION")
 class PetDeviceTest : Instrumentation() {
+    private var achievementClickOnly=false
     private var medalOnly=false
-    override fun onCreate(arguments:Bundle?) { medalOnly=arguments?.getString("medalOnly")=="true";super.onCreate(arguments);start() }
+    override fun onCreate(arguments:Bundle?) { achievementClickOnly=arguments?.getString("achievementClickOnly")=="true";medalOnly=arguments?.getString("medalOnly")=="true";super.onCreate(arguments);start() }
     override fun onStart() {
         val result=Bundle()
         try {
+            if(achievementClickOnly) {
+                testLockedAchievementClicksKeepListOpen();testUnlockedAchievementClicksOpenDetails();result.putString("stream","PASS: four locked clicks retain list; four unlocked clicks open details and replay; state preserved");finish(Activity.RESULT_OK,result);return
+            }
             if(medalOnly) {
                 testGoldMedalCanvasAndDialog();result.putString("stream","PASS: medal pixel regression");finish(Activity.RESULT_OK,result);return
             }
@@ -34,7 +38,9 @@ class PetDeviceTest : Instrumentation() {
             testBadgeCelebrationLifecycleAndReducedMotion()
             testGoldMedalCanvasAndDialog()
             testLauncherResourcesMasksAndSwitching()
-            result.putString("stream","PASS: 11 device checks (gestures, routing, Canvas/skins, lifecycle, preview isolation, targeted pause, demo isolation, full service timer/demo, medal lifecycle/reduced motion, gold medal Canvas/dialog, launcher resources/masks/switching).")
+            testLockedAchievementClicksKeepListOpen()
+            testUnlockedAchievementClicksOpenDetails()
+            result.putString("stream","PASS: 13 device checks (gestures, routing, Canvas/skins, lifecycle, preview isolation, targeted pause, demo isolation, full service timer/demo, medal lifecycle/reduced motion, gold medal Canvas/dialog, launcher resources/masks/switching).")
             finish(Activity.RESULT_OK,result)
         } catch(t:Throwable) {
             result.putString("stream","FAIL: "+t.stackTraceToString())
@@ -388,6 +394,70 @@ class PetDeviceTest : Instrumentation() {
                 for(o in IconStyle.OPTIONS)pm.setComponentEnabledSetting(o.component,old.getValue(o.component),android.content.pm.PackageManager.DONT_KILL_APP)
             }
             assertEquals(got,Achievements.unlockedIds(targetContext))
+        }
+    }
+    fun testLockedAchievementClicksKeepListOpen() {
+        val activity=startActivitySync(android.content.Intent(targetContext,MainActivity::class.java)
+            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) as MainActivity
+        main {
+            val p=targetContext.prefs()
+            val original=p.getStringSet(Prefs.ACH_UNLOCKED,emptySet())?.toSet()?:emptySet()
+            val energy=EnergyStore.collectedTotal(targetContext)
+            val icon=IconStyle.currentId(targetContext)
+            var dialog:android.app.AlertDialog?=null
+            try {
+                // Synthetic emulator fixture only; always restore the original state.
+                p.edit().putStringSet(Prefs.ACH_UNLOCKED,emptySet()).commit()
+                dialog=activity.showAchievements()
+                val rows=dialog.findViewById<android.widget.LinearLayout>(R.id.ach_rows)
+                assertEquals(4,rows.childCount)
+                for(i in 0 until rows.childCount) {
+                    rows.getChildAt(i).performClick()
+                    check(dialog.isShowing) { "Locked achievement $i closed the achievement list" }
+                    check(!activity.isFinishing && !activity.isDestroyed)
+                    assertTrue(Achievements.unlockedIds(targetContext).isEmpty())
+                    assertEquals(energy,EnergyStore.collectedTotal(targetContext))
+                    assertEquals(icon,IconStyle.currentId(targetContext))
+                }
+            } finally {
+                dialog?.dismiss()
+                p.edit().putStringSet(Prefs.ACH_UNLOCKED,original).commit()
+                activity.finish()
+            }
+        }
+    }
+    fun testUnlockedAchievementClicksOpenDetails() {
+        val activity=startActivitySync(android.content.Intent(targetContext,MainActivity::class.java)
+            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) as MainActivity
+        val p=targetContext.prefs()
+        val original=p.getStringSet(Prefs.ACH_UNLOCKED,emptySet())?.toSet()?:emptySet()
+        val fixture=Achievements.ALL.map {it.id}.toSet()
+        try {
+            main { p.edit().putStringSet(Prefs.ACH_UNLOCKED,fixture).commit() }
+            for(i in Achievements.ALL.indices) {
+                main {
+                    val list=activity.showAchievements()
+                    list.findViewById<android.widget.LinearLayout>(R.id.ach_rows).getChildAt(i).performClick()
+                    check(!list.isShowing) { "Unlocked achievement did not open detail" }
+                    check(!activity.isFinishing)
+                }
+                waitForIdleSync()
+                val deadline=SystemClock.uptimeMillis()+3000
+                var replay:android.view.accessibility.AccessibilityNodeInfo?=null
+                while(replay==null && SystemClock.uptimeMillis()<deadline) {
+                    replay=uiAutomation.rootInActiveWindow
+                        ?.findAccessibilityNodeInfosByText(targetContext.getString(R.string.ach_replay))?.firstOrNull()
+                    if(replay==null)SystemClock.sleep(50)
+                }
+                check(replay!=null) { "Unlocked achievement $i has no replay detail" }
+                check(replay.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK))
+                waitForIdleSync()
+                sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+                waitForIdleSync()
+                assertEquals(fixture,Achievements.unlockedIds(targetContext))
+            }
+        } finally {
+            main { p.edit().putStringSet(Prefs.ACH_UNLOCKED,original).commit();activity.finish() }
         }
     }
     private fun main(block:()->Unit) {

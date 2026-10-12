@@ -24,7 +24,7 @@ private const val MAX_CUSTOM_TIMER_MIN = 600
  * 原来是纯文本的 ✅/🔒 列表，解锁之后什么都不给 —— 用户评价「没啥意思」。
  * 现在徽章直接挂在精灵左侧身上，弹窗是它的明细视图。
  */
-internal fun MainActivity.showAchievements() {
+internal fun MainActivity.showAchievements(): android.app.AlertDialog {
         val raw = prefs()
             .getStringSet(Prefs.ACH_UNLOCKED, emptySet()) ?: emptySet()
         // 必须走 knownUnlocked 过滤，不能直接用 raw.size ——
@@ -39,7 +39,7 @@ internal fun MainActivity.showAchievements() {
         val d = resources.displayMetrics.density
 
         var dlgRef: android.app.AlertDialog? = null
-        for ((idx, a) in Achievements.ALL.withIndex()) {
+        for (a in Achievements.ALL) {
             val got = a.id in gotIds
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -74,18 +74,19 @@ internal fun MainActivity.showAchievements() {
                 textSize = 11f
             })
             row.addView(textCol)
-            // 点某条成就 → 关弹窗、回到「精灵可见」处、对应格脉冲一下（1.4s）
+            // 未解锁时保留列表并解释条件；已解锁时打开勋章详情。
             row.isClickable = true
             val tv = android.util.TypedValue()
             if (theme.resolveAttribute(android.R.attr.selectableItemBackground, tv, true)) {
                 row.setBackgroundResource(tv.resourceId)
             }
             row.setOnClickListener {
+                if (!got) {
+                    Toast.makeText(this, Achievements.desc(this, a), Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
                 dlgRef?.dismiss()
-                if(got) { showBadgeCelebration(listOf(a),false);return@setOnClickListener }
-                (pageStats as? android.widget.ScrollView)?.smoothScrollTo(0, 0)
-                val pet = pageStats.findViewById<PetView>(R.id.pet_view)
-                pet?.postDelayed({ pet.pulseBadge(idx) }, 400)
+                showBadgeCelebration(listOf(a), false)
             }
             rows.addView(row)
         }
@@ -96,6 +97,7 @@ internal fun MainActivity.showAchievements() {
             .create()
         dlgRef = dlg
         dlg.show()
+        return dlg
     }
 
 /**

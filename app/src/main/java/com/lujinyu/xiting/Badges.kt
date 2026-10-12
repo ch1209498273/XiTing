@@ -107,6 +107,7 @@ object Badges {
                 disc.color = ((glow * 90).toInt().coerceIn(0, 255) shl 24) or 0x00FFC107
                 canvas.drawCircle(cx, cy, r * (1f + 0.35f * (1f - glow)), disc)
             }
+            disc.alpha = 255 // Halo alpha must not leak into the solid medal.
             disc.shader = RadialGradient(
                 cx - r * 0.3f, cy - r * 0.35f, r * 1.5f,
                 GOLD_PALE, GOLD_DEEP, Shader.TileMode.CLAMP
@@ -116,6 +117,18 @@ object Badges {
             stroke.color = GOLD_DEEP
             stroke.strokeWidth = r * 0.1f
             canvas.drawCircle(cx, cy, r * 0.97f, stroke)
+            stroke.color=0xFF9A650D.toInt();stroke.strokeWidth=r*.025f
+            canvas.drawCircle(cx,cy,r*.80f,stroke)
+            stroke.color=GOLD_PALE;stroke.strokeWidth=r*.035f
+            canvas.drawArc(cx-r*.88f,cy-r*.88f,cx+r*.88f,cy+r*.88f,195f,105f,false,stroke)
+            if(r>=18f) {
+                stroke.color=0xFFB98019.toInt();stroke.strokeWidth=r*.018f
+                for(i in 0 until 24) {
+                    val angle=i*Math.PI/12
+                    val x=kotlin.math.cos(angle).toFloat();val y=kotlin.math.sin(angle).toFloat()
+                    canvas.drawLine(cx+x*r*.87f,cy+y*r*.87f,cx+x*r*.92f,cy+y*r*.92f,stroke)
+                }
+            }
         } else {
             disc.shader = null
             disc.color = DISC_LOCKED
@@ -176,7 +189,7 @@ object Badges {
         if (filled) {
             fill.shader = android.graphics.LinearGradient(
                 cx, cy - hh, cx, cy + hh,
-                0xFFFF7043.toInt(), 0xFFD84315.toInt(), Shader.TileMode.CLAMP
+                0xFFFFD45C.toInt(), 0xFFB37513.toInt(), Shader.TileMode.CLAMP
             )
             canvas.drawPath(scratch, fill)
             fill.shader = null
@@ -199,9 +212,9 @@ object Badges {
     private fun target(canvas: Canvas, cx: Float, cy: Float, s: Float, filled: Boolean) {
         // 同心环：红 / 白 / 红。识别度全靠这三圈，箭只能当点缀。
         val rings = arrayOf(
-            0.96f to 0xFFE53935.toInt(),
+            0.96f to 0xFF9B6015.toInt(),
             0.68f to 0xFFFFFDFD.toInt(),
-            0.42f to 0xFFE53935.toInt()
+            0.42f to 0xFF9B6015.toInt()
         )
         if (filled) {
             for ((rr, col) in rings) {
@@ -216,7 +229,7 @@ object Badges {
         // 短箭：从盘内右上角指向靶心。
         // 曾经把杆拉长到 1.25s 且起点落在靶心内部，结果是一根斜线从红心戳穿出去，
         // 缩小后完全不像箭。改成短促的一截，只保留「指向」这个信息。
-        stroke.color = if (filled) 0xFF37474F.toInt() else INK_LOCKED
+        stroke.color = if (filled) 0xFF604218.toInt() else INK_LOCKED
         stroke.strokeWidth = s * 0.16f
         canvas.drawLine(cx + s * 1.16f, cy - s * 0.86f, cx + s * 0.48f, cy - s * 0.36f, stroke)
         val head = Path()
@@ -225,7 +238,7 @@ object Badges {
         head.lineTo(cx + s * 0.34f, cy - s * 0.52f)
         head.close()
         if (filled) {
-            fill.color = 0xFF37474F.toInt()
+            fill.color = 0xFF604218.toInt()
             canvas.drawPath(head, fill)
         } else {
             canvas.drawPath(head, stroke)
@@ -267,9 +280,9 @@ object Badges {
             canvas.drawPath(crownPath(cx, cy, w), fill)
             fill.shader = null
             // 冠底宝石
-            fill.color = 0xFFE53935.toInt()
+            fill.color = 0xFF9B6015.toInt()
             canvas.drawCircle(cx, cy + w * 0.16f, w * 0.07f, fill)
-            fill.color = 0xFF42A5F5.toInt()
+            fill.color = 0xFFFFF0B4.toInt()
             canvas.drawCircle(cx - w * 0.28f, cy + w * 0.26f, w * 0.05f, fill)
             canvas.drawCircle(cx + w * 0.28f, cy + w * 0.26f, w * 0.05f, fill)
         } else {

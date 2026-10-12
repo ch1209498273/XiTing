@@ -80,7 +80,7 @@
     <string name="caption_row_title">Субтитры на чёрном экране (бета)</string>
     <string name="caption_service_desc">Читает текст субтитров играющего видео и показывает его на чёрном экране в реальном времени. Не сохраняется, не отправляется, не используется иначе.</string>
     <string name="update_log_title_fmt">Новое в v%1$s</string>
-    <string name="update_log_body">· Исправлены подсказки роста, добавлен интерактивный просмотр пяти форм\n· Таймер может запросить паузу и оставить чёрную шторку\n· Добавлены десятисекундная демонстрация и проверка воспроизведения\n· Обновлены тексты отправки и описания приложения</string>
+    <string name="update_log_body">· Четыре значка достижений обновлены в стиле золотых медалей\n· Новые достижения появляются с ореолом и особыми частицами\n· Просмотр полученных медалей и повтор анимации\n· Анимации учитывают настройки системы и останавливаются после завершения или скрытия</string>
     <string name="switch_headset">Возврат к видео при отключении наушников</string>
     <string name="bubble_style">Вид пузырька</string>
     <string name="settings_data">Данные</string>
@@ -176,9 +176,8 @@
     <string name="locale_dlg_go">Разрешить</string>
     <string name="locale_dlg_fallback">Использовать таймер</string>
     <string name="toast_no_progress">Не удалось прочитать прогресс: сначала включите серию или используйте таймер.</string>
-    <string name="ach_toast_fmt">🏆 Достижение: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">Достижения %1$d/%2$d</string>
-    <string name="ach_dlg_hint">Значки загораются слева от духа, от простых к сложным</string>
+    <string name="ach_dlg_hint">Нажмите на открытый значок, чтобы увидеть медаль и повторить анимацию</string>
     <string name="ach_row_unlocked">Зажжён</string>
     <string name="ach_row_locked">Закрыт</string>
     <string name="dlg_ok">ОК</string>
@@ -391,4 +390,7 @@
     <string name="guide_no">Звук остановился</string>
     <string name="guide_success">Демо завершено. Начните прослушивание плавающей кнопкой.</string>
     <string name="guide_retry">Проверьте воспроизведение. Если звук прерывается, проверьте фоновые ограничения и удержание активности, затем попробуйте другой плеер.</string>
+    <string name="ach_celebration_title">Достижение открыто</string>
+    <string name="ach_medal_title">Моя золотая медаль</string>
+    <string name="ach_replay">Повторить анимацию</string>
 </resources>

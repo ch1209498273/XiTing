@@ -80,7 +80,7 @@
     <string name="caption_row_title">黒幕字幕（実験的）</string>
     <string name="caption_service_desc">再生中の動画の字幕テキストを読み取り、息屏听劇の黒幕にリアルタイム表示します。保存・アップロードは一切行いません。</string>
     <string name="update_log_title_fmt">v%1$s の更新内容</string>
-    <string name="update_log_body">· 成長表示を修正、全5形態を操作プレビュー可能に\n· タイマーで一時停止を要求し黒幕を維持する選択肢を追加\n· 10秒の黒幕体験と再生確認を追加\n· 共有とアプリ紹介の文言を更新</string>
+    <string name="update_log_body">· 4つの実績バッジをゴールドメダルに刷新\n· 獲得時にポップ、光輪、専用パーティクルを表示\n· 獲得済みメダルを拡大しアニメーションを再生可能\n· システム設定に従い、非表示や終了時にアニメーション停止</string>
     <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
     <string name="bubble_style">バブル表示</string>
     <string name="settings_data">データ</string>
@@ -176,9 +176,8 @@
     <string name="locale_dlg_go">権限を付与</string>
     <string name="locale_dlg_fallback">タイマーを使う</string>
     <string name="toast_no_progress">再生位置を読み取れませんでした：先に1話再生してから選ぶか、タイマーを使ってください</string>
-    <string name="ach_toast_fmt">🏆 実績解除：%1$s %2$s</string>
     <string name="ach_dlg_title_fmt">精霊の実績 %1$d/%2$d</string>
-    <string name="ach_dlg_hint">バッジは精霊の左に、下から難易度順に点灯します</string>
+    <string name="ach_dlg_hint">獲得済みバッジをタップしてメダルとアニメーションを表示</string>
     <string name="ach_row_unlocked">点灯済み</string>
     <string name="ach_row_locked">未解除</string>
     <string name="dlg_ok">OK</string>
@@ -391,4 +390,7 @@
     <string name="guide_no">音声が止まった</string>
     <string name="guide_success">デモが完了しました。フローティングボタンで開始できます。</string>
     <string name="guide_retry">動画の再生を確認してください。停止する場合はバックグラウンド制限と常駐設定を確認し、別のプレーヤーでも試してください。</string>
+    <string name="ach_celebration_title">実績を達成</string>
+    <string name="ach_medal_title">ゴールドメダル</string>
+    <string name="ach_replay">アニメーションを再生</string>
 </resources>

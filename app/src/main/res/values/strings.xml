@@ -89,7 +89,7 @@
     <string name="caption_row_title">黑幕字幕（实验性）</string>
     <string name="caption_service_desc">采集正在播放视频的字幕文本，仅实时显示在息屏听剧的黑幕上。不存储、不上传、不用于其他用途。</string>
     <string name="update_log_title_fmt">v%1$s 更新内容</string>
-    <string name="update_log_body">· 图鉴成长提示修复，五阶形态均可互动预览\n· 睡前定时可选择请求暂停并保留黑幕\n· 新增十秒黑幕体验与续播反馈\n· 更新分享与关于文案</string>
+    <string name="update_log_body">· 四枚成就徽章升级为统一金色勋章\n· 新解锁集中展示弹入、光环与专属粒子\n· 已解锁徽章可查看大图并重播动画\n· 动画遵循系统设置，隐藏或播完停止</string>
     <string name="switch_headset">耳机拔出自动返回视频</string>
     <string name="bubble_style">悬浮球样式</string>
     <string name="settings_data">数据</string>
@@ -194,10 +194,9 @@
     <string name="toast_no_progress">没读到播放进度：先播放一集再选，或改用倒计时</string>
 
     <!-- 动态文案：成就与精灵 -->
-    <string name="ach_toast_fmt">🏆 成就解锁：%1$s %2$s</string>
     <string name="ach_dlg_title_fmt">精灵成就 %1$d/%2$d</string>
     <!-- 徽章化后成就弹窗的说明：徽章会点亮在精灵身上 -->
-    <string name="ach_dlg_hint">徽章会点亮在精灵左侧，自下而上按难度递进</string>
+    <string name="ach_dlg_hint">已点亮徽章可点击查看勋章与重播动画</string>
     <string name="ach_row_unlocked">已点亮</string>
     <string name="ach_row_locked">未解锁</string>
     <string name="dlg_ok">好的</string>
@@ -417,4 +416,7 @@
     <string name="guide_no">声音停了</string>
     <string name="guide_success">这次黑幕与恢复体验已完成，可用悬浮球开始听剧。</string>
     <string name="guide_retry">先确认视频在正常播放。若声音仍会中断，请检查后台运行限制和保活设置，并换另一个播放器确认兼容性。</string>
+    <string name="ach_celebration_title">成就达成</string>
+    <string name="ach_medal_title">我的金色勋章</string>
+    <string name="ach_replay">重播动画</string>
 </resources>

@@ -69,6 +69,7 @@ object Prefs {
     const val SHARE_BONUS_GP_LEGACY = "share_bonus_gp"
 
     // ---- 成就与皮肤 ----
+    const val ACH_CELEBRATION_PENDING = "ach_celebration_pending"
     const val ACH_UNLOCKED = "ach_unlocked"
     const val SKINS_UNLOCKED = "skins_unlocked"
     const val PET_SKIN = "pet_skin"

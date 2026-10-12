@@ -351,7 +351,7 @@ private fun checkRestore() {
         super.onWindowFocusChanged(hasFocus)
         // 黑幕窗口盖上/拿走都会改变本窗口焦点：恰好作为状态刷新时机，
         // 否则从黑幕上解锁回来，胶囊会停留在「黑幕开启中」
-        if (hasFocus) { refreshStates();showDemoFeedback();OverlayService.instance?.showTimerResult() }
+        if (hasFocus) { refreshStates();showDemoFeedback();OverlayService.instance?.showTimerResult();showPendingAchievementCelebration() }
     }
 
     internal val demoFeedbackCheck=Runnable { showDemoFeedback() }
@@ -903,9 +903,7 @@ private fun checkRestore() {
             this, HistoryStore.totalCount(this).toInt(),
             maxSingle, streakInfo.best, stageNow
         )
-        freshAch.take(2).forEach {
-            Toast.makeText(this, getString(R.string.ach_toast_fmt, it.icon, Achievements.title(this, it)), Toast.LENGTH_LONG).show()
-        }
+        queueAchievementCelebration(freshAch)
         val (gotCount, achSub) = Achievements.summary(this)
         pageStats.findViewById<TextView>(R.id.ach_title).text = getString(R.string.ach_dlg_title_fmt, gotCount, Achievements.ALL.size)
         pageStats.findViewById<TextView>(R.id.ach_sub).text = achSub

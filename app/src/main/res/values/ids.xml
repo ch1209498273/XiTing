@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="pet_preview_live" type="id" />
+    <item name="badge_hero" type="id" />
 </resources>

@@ -80,7 +80,7 @@
     <string name="caption_row_title">Black-Screen-Untertitel (Beta)</string>
     <string name="caption_service_desc">Liest Untertiteltexte des laufenden Videos und zeigt sie in Echtzeit auf dem schwarzen Bildschirm. Nie gespeichert, nie hochgeladen, für nichts anderes verwendet.</string>
     <string name="update_log_title_fmt">Neu in v%1$s</string>
-    <string name="update_log_body">· Fortschrittsanzeige korrigiert, interaktive Vorschau aller fünf Formen\n· Timer kann Pause anfordern und den Vorhang beibehalten\n· Neue zehnsekündige Vorhang-Demo mit Wiedergabeabfrage\n· Texte zum Teilen und zur App aktualisiert</string>
+    <string name="update_log_body">· Vier Erfolgsabzeichen als Goldmedaillen neu gestaltet\n· Neue Erfolge mit Einblendung, Lichtring und eigenen Partikeln\n· Verdiente Medaillen ansehen und Animation wiederholen\n· Animationen beachten Systemeinstellungen und stoppen nach Abschluss oder Ausblenden</string>
     <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
     <string name="bubble_style">Blasen-Stil</string>
     <string name="settings_data">Daten</string>
@@ -176,9 +176,8 @@ Ohne Berechtigung funktioniert der normale Countdown genauso.</string>
     <string name="locale_dlg_go">Erlauben</string>
     <string name="locale_dlg_fallback">Timer verwenden</string>
     <string name="toast_no_progress">Wiedergabefortschritt nicht lesbar: erst eine Folge abspielen oder den Countdown verwenden.</string>
-    <string name="ach_toast_fmt">🏆 Erfolg: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">Erfolge %1$d/%2$d</string>
-    <string name="ach_dlg_hint">Abzeichen leuchten links vom Wesen, von leicht nach schwer</string>
+    <string name="ach_dlg_hint">Tippe auf ein freigeschaltetes Abzeichen, um die Medaille und Animation zu sehen</string>
     <string name="ach_row_unlocked">Erleuchtet</string>
     <string name="ach_row_locked">Gesperrt</string>
     <string name="dlg_ok">OK</string>
@@ -391,4 +390,7 @@ Die Demo zählt nicht zur Hörzeit oder Entwicklung.</string>
     <string name="guide_no">Ton stoppte</string>
     <string name="guide_success">Demo abgeschlossen. Über die schwebende Taste starten.</string>
     <string name="guide_retry">Videowiedergabe prüfen. Bei Tonstopp Hintergrundbeschränkungen und Keep-alive prüfen, dann anderen Player testen.</string>
+    <string name="ach_celebration_title">Erfolg freigeschaltet</string>
+    <string name="ach_medal_title">Meine Goldmedaille</string>
+    <string name="ach_replay">Animation wiederholen</string>
 </resources>

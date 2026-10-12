@@ -80,7 +80,7 @@
     <string name="caption_row_title">Black-screen captions (Beta)</string>
     <string name="caption_service_desc">Reads subtitle text of the playing video and shows it on the black screen in real time. Never stored, never uploaded, used for nothing else.</string>
     <string name="update_log_title_fmt">What\'s new in v%1$s</string>
-    <string name="update_log_body">· Correct growth hints and interactive previews for all five forms\n· Sleep timer can request pause and keep the curtain\n· New ten-second curtain demo and playback feedback\n· Updated sharing and about text</string>
+    <string name="update_log_body">· Four achievement badges redesigned as gold medals\n· New unlocks show a pop-in, halo and unique particles\n· View earned medals and replay their animation\n· Animations respect system settings and stop when hidden or finished</string>
     <string name="switch_headset">Return to video when headphones unplug</string>
     <string name="bubble_style">Bubble style</string>
     <string name="settings_data">Data</string>
@@ -165,9 +165,8 @@
     <string name="locale_dlg_go">Grant</string>
     <string name="locale_dlg_fallback">Use timer</string>
     <string name="toast_no_progress">No playback progress found — play an episode first, or use the timer</string>
-    <string name="ach_toast_fmt">🏆 Unlocked: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">Pet Achievements %1$d/%2$d</string>
-    <string name="ach_dlg_hint">Badges light up on the left of the pet, easiest at the bottom</string>
+    <string name="ach_dlg_hint">Tap an unlocked badge to view its medal and replay the animation</string>
     <string name="ach_row_unlocked">Unlocked</string>
     <string name="ach_row_locked">Locked</string>
     <string name="dlg_ok">OK</string>
@@ -367,4 +366,7 @@ This demo earns no listening time or growth.</string>
     <string name="guide_no">Audio stopped</string>
     <string name="guide_success">Demo completed. Use the floating button to start listening.</string>
     <string name="guide_retry">Check that the video is playing. If audio stops, check background restrictions and keep-alive settings, then try another player.</string>
+    <string name="ach_celebration_title">Achievement unlocked</string>
+    <string name="ach_medal_title">My gold medal</string>
+    <string name="ach_replay">Replay animation</string>
 </resources>

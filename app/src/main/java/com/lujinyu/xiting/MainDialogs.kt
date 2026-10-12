@@ -47,7 +47,7 @@ internal fun MainActivity.showAchievements() {
                 setPadding(0, (10 * d).toInt(), 0, (10 * d).toInt())
             }
             row.addView(BadgeView(this).apply {
-                val s = (40 * d).toInt()
+                val s = (52 * d).toInt()
                 layoutParams = LinearLayout.LayoutParams(s, s)
                 bind(a.badge, got)
             })
@@ -82,6 +82,7 @@ internal fun MainActivity.showAchievements() {
             }
             row.setOnClickListener {
                 dlgRef?.dismiss()
+                if(got) { showBadgeCelebration(listOf(a),false);return@setOnClickListener }
                 (pageStats as? android.widget.ScrollView)?.smoothScrollTo(0, 0)
                 val pet = pageStats.findViewById<PetView>(R.id.pet_view)
                 pet?.postDelayed({ pet.pulseBadge(idx) }, 400)

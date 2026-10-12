@@ -80,7 +80,7 @@
     <string name="caption_row_title">Sous-titres écran noir (bêta)</string>
     <string name="caption_service_desc">Lit le texte des sous-titres de la vidéo en cours et laffiche en temps réel sur l\'écran noir. Jamais stocké, jamais envoyé, rien dautre.</string>
     <string name="update_log_title_fmt">Nouveautés de v%1$s</string>
-    <string name="update_log_body">· Progression corrigée et aperçu interactif des cinq formes\n· La minuterie peut demander une pause et maintenir le rideau\n· Démonstration de dix secondes et retour sur la lecture\n· Textes de partage et de présentation actualisés</string>
+    <string name="update_log_body">· Quatre badges de succès redessinés en médailles dorées\n· Nouveaux succès avec apparition, halo et particules dédiées\n· Voir les médailles acquises et rejouer leur animation\n· Animations conformes aux réglages système, arrêtées une fois terminées ou masquées</string>
     <string name="switch_headset">Retour vidéo au débranchement</string>
     <string name="bubble_style">Style de bulle</string>
     <string name="settings_data">Données</string>
@@ -176,9 +176,8 @@ Sans autorisation, le compte à rebours normal fonctionne aussi.</string>
     <string name="locale_dlg_go">Autoriser</string>
     <string name="locale_dlg_fallback">Utiliser le minuteur</string>
     <string name="toast_no_progress">Progression de lecture illisible : lisez un épisode d\'abord, ou utilisez le compte à rebours.</string>
-    <string name="ach_toast_fmt">🏆 Réalisation : %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">Réalisations %1$d/%2$d</string>
-    <string name="ach_dlg_hint">Les badges s\'allument à gauche de l\'esprit, du plus facile au plus dur</string>
+    <string name="ach_dlg_hint">Touchez un badge débloqué pour voir sa médaille et rejouer l’animation</string>
     <string name="ach_row_unlocked">Allumé</string>
     <string name="ach_row_locked">Verrouillé</string>
     <string name="dlg_ok">OK</string>
@@ -391,4 +390,7 @@ La démo ne compte ni temps ni croissance.</string>
     <string name="guide_no">Le son a cessé</string>
     <string name="guide_success">Démo terminée. Utilisez le bouton flottant pour commencer.</string>
     <string name="guide_retry">Vérifiez la lecture vidéo. Si le son cesse, vérifiez les restrictions en arrière-plan et le maintien actif, puis essayez un autre lecteur.</string>
+    <string name="ach_celebration_title">Succès débloqué</string>
+    <string name="ach_medal_title">Ma médaille dorée</string>
+    <string name="ach_replay">Rejouer l’animation</string>
 </resources>

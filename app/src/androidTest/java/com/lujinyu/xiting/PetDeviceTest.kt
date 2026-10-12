@@ -15,10 +15,14 @@ import java.io.File
 /** Runs the actual Android Canvas renderer/gesture dispatch without modifying user prefs. */
 @Suppress("DEPRECATION")
 class PetDeviceTest : Instrumentation() {
-    override fun onCreate(arguments:Bundle?) { super.onCreate(arguments);start() }
+    private var medalOnly=false
+    override fun onCreate(arguments:Bundle?) { medalOnly=arguments?.getString("medalOnly")=="true";super.onCreate(arguments);start() }
     override fun onStart() {
         val result=Bundle()
         try {
+            if(medalOnly) {
+                testGoldMedalCanvasAndDialog();result.putString("stream","PASS: medal pixel regression");finish(Activity.RESULT_OK,result);return
+            }
             testFiveActualGesturesAndCancel()
             testHelpAndEnergyDoNotPokeOrRepeatClick()
             testActualCanvasAtlasAllStagesSkinsAndMotion()
@@ -27,7 +31,9 @@ class PetDeviceTest : Instrumentation() {
             testPauseIsBoundToTheOriginalSession()
             testDemoDoesNotRecordListening()
             testServiceTimerAndDemoLifecycle()
-            result.putString("stream","PASS: 8 device checks (gestures, routing, Canvas/skins, lifecycle, preview isolation, targeted pause, demo isolation, full service timer/demo).")
+            testBadgeCelebrationLifecycleAndReducedMotion()
+            testGoldMedalCanvasAndDialog()
+            result.putString("stream","PASS: 10 device checks (gestures, routing, Canvas/skins, lifecycle, preview isolation, targeted pause, demo isolation, full service timer/demo, medal lifecycle/reduced motion, gold medal Canvas/dialog).")
             finish(Activity.RESULT_OK,result)
         } catch(t:Throwable) {
             result.putString("stream","FAIL: "+t.stackTraceToString())
@@ -214,7 +220,94 @@ class PetDeviceTest : Instrumentation() {
         waitForIdleSync();SystemClock.sleep(150)
         main { activity.finish() }
     }
-    private fun main(block:()->Unit)=runOnMainSync(block)
+    fun testBadgeCelebrationLifecycleAndReducedMotion() {
+        val activity=startActivitySync(android.content.Intent(targetContext,MainActivity::class.java)
+            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+        lateinit var badge:BadgeView
+        fun scheduled():Boolean {
+            val field=BadgeView::class.java.getDeclaredField("celebrationTick").apply { isAccessible=true }
+            return badge.handler?.hasCallbacks(field.get(badge) as Runnable)==true
+        }
+        main {
+            badge=BadgeView(activity).apply { heroMode=true;bind(Badges.Kind.CROWN,true) }
+            activity.setContentView(badge)
+        }
+        waitForIdleSync();SystemClock.sleep(150)
+        main { badge.playCelebration();assertTrue(scheduled()) }
+        SystemClock.sleep(1950)
+        main {
+            assertTrue(!scheduled());badge.playCelebration();assertTrue(scheduled())
+            badge.visibility=View.GONE;assertTrue(!scheduled())
+            badge.visibility=View.VISIBLE;badge.bind(Badges.Kind.FLAME,false)
+            badge.playCelebration();assertTrue(!scheduled())
+            badge.bind(Badges.Kind.FLAME,true)
+        }
+        val old=android.provider.Settings.Global.getString(targetContext.contentResolver,"animator_duration_scale")?:"1"
+        fun scale(value:String) {
+            uiAutomation.executeShellCommand("settings put global animator_duration_scale "+value).use { fd ->
+                android.os.ParcelFileDescriptor.AutoCloseInputStream(fd).use { it.readBytes() }
+            }
+            SystemClock.sleep(250)
+        }
+        try {
+            scale("0")
+            main {
+                assertTrue(!android.animation.ValueAnimator.areAnimatorsEnabled())
+                badge.playCelebration();assertTrue(!scheduled())
+            }
+        } finally { scale(old) }
+        main { activity.finish();assertTrue(!scheduled()) }
+    }
+    fun testGoldMedalCanvasAndDialog() {
+        main {
+            val sample=Bitmap.createBitmap(420,180,Bitmap.Config.ARGB_8888)
+            val c=Canvas(sample);c.drawColor(Color.WHITE)
+            Badges.draw(c,90f,90f,60f,Badges.Kind.CROWN,true,1f)
+            // Locked drawing resets the shared paint, as another row would.
+            Badges.draw(c,-100f,-100f,20f,Badges.Kind.CROWN,false)
+            Badges.draw(c,300f,90f,60f,Badges.Kind.CROWN,true,0f)
+            assertEquals(sample.getPixel(130,90),sample.getPixel(340,90))
+            sample.recycle()
+            val bitmap=Bitmap.createBitmap(1200,700,Bitmap.Config.ARGB_8888)
+            val canvas=Canvas(bitmap)
+            val paint=Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize=24f }
+            for(dark in 0..1) {
+                paint.color=if(dark==0)0xFFF8F6F0.toInt() else 0xFF151820.toInt()
+                canvas.drawRect(0f,dark*350f,1200f,(dark+1)*350f,paint)
+                for((i,kind) in Badges.Kind.entries.withIndex()) {
+                    val x=150f+i*300f;val y=dark*350f+140f
+                    Badges.draw(canvas,x,y,78f,kind,true)
+                    Badges.draw(canvas,x,y+140f,32f,kind,false)
+                    paint.color=if(dark==0)0xFF604218.toInt() else 0xFFF5D591.toInt()
+                    canvas.drawText(kind.name,x-70f,dark*350f+32f,paint)
+                }
+            }
+            File(targetContext.cacheDir,"badge-gold-proof.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}
+            bitmap.recycle()
+        }
+        val activity=startActivitySync(android.content.Intent(targetContext,MainActivity::class.java)
+            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+        val before=Achievements.unlockedIds(targetContext)
+        lateinit var dialog:android.app.AlertDialog
+        main { dialog=(activity as MainActivity).showBadgeCelebration(listOf(Achievements.ALL[3]),false) }
+        waitForIdleSync();SystemClock.sleep(450)
+        main {
+            val decor=dialog.window!!.decorView
+            val bitmap=Bitmap.createBitmap(decor.width,decor.height,Bitmap.Config.ARGB_8888)
+            decor.draw(Canvas(bitmap))
+            File(targetContext.cacheDir,"badge-celebration-proof.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}
+            bitmap.recycle()
+            val badge=dialog.findViewById<BadgeView>(R.id.badge_hero)
+            assertTrue(badge.unlocked);assertTrue(badge.heroMode)
+            badge.playCelebration();dialog.dismiss();activity.finish()
+        }
+        assertEquals(before,Achievements.unlockedIds(targetContext))
+    }
+    private fun main(block:()->Unit) {
+        var failure:Throwable?=null
+        runOnMainSync { try { block() } catch(t:Throwable) { failure=t } }
+        failure?.let { throw it }
+    }
     private fun view(stage:Int):PetView {
         var result:PetView?=null
         main { result=PetView(targetContext).apply {
@@ -233,7 +326,7 @@ class PetDeviceTest : Instrumentation() {
     }
     private fun action(v:PetView):String {
         val f=PetView::class.java.getDeclaredField("activeAction");f.isAccessible=true
-        return f.get(v).toString()
+        return f.get(v)?.toString()?:"NONE"
     }
     fun testFiveActualGesturesAndCancel() {
         for(s in 0..4) {

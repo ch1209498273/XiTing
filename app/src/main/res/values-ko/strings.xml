@@ -80,7 +80,7 @@
     <string name="caption_row_title">검은 화면 자막(실험적)</string>
     <string name="caption_service_desc">재생 중인 영상의 자막 텍스트를 읽어 息屏听劇 검은 화면에 실시간 표시합니다. 저장·업로드하지 않습니다.</string>
     <string name="update_log_title_fmt">v%1$s 업데이트 내용</string>
-    <string name="update_log_body">· 성장 안내 수정 및 다섯 형태의 상호작용 미리보기\n· 일시 정지를 요청하고 검은 화면을 유지하는 타이머 옵션\n· 10초 검은 화면 체험 및 재생 확인 추가\n· 공유 및 앱 소개 문구 개선</string>
+    <string name="update_log_body">· 네 가지 업적 배지를 금메달로 개선\n· 새 업적에 등장 효과, 광환, 전용 입자 표시\n· 획득한 메달 확대 및 애니메이션 재생\n· 시스템 설정을 따르며 숨기거나 완료하면 애니메이션 중지</string>
     <string name="switch_headset">이어폰 뽑으면 자동으로 영상으로</string>
     <string name="bubble_style">버블 표시</string>
     <string name="settings_data">데이터</string>
@@ -176,9 +176,8 @@
     <string name="locale_dlg_go">권한 허용</string>
     <string name="locale_dlg_fallback">타이머 사용</string>
     <string name="toast_no_progress">재생 위치를 읽지 못했습니다: 먼저 한 편을 재생한 뒤 고르거나 타이머를 사용하세요.</string>
-    <string name="ach_toast_fmt">🏆 업적 해금: %1$s %2$s</string>
     <string name="ach_dlg_title_fmt">정령 업적 %1$d/%2$d</string>
-    <string name="ach_dlg_hint">배지는 정령 왼쪽에, 아래에서 위로 난이도순으로 점등됩니다</string>
+    <string name="ach_dlg_hint">획득한 배지를 눌러 메달과 애니메이션을 확인하세요</string>
     <string name="ach_row_unlocked">점등됨</string>
     <string name="ach_row_locked">미해금</string>
     <string name="dlg_ok">확인</string>
@@ -391,4 +390,7 @@
     <string name="guide_no">소리가 멈춤</string>
     <string name="guide_success">체험을 마쳤습니다. 플로팅 버튼으로 청취를 시작하세요.</string>
     <string name="guide_retry">영상이 재생 중인지 확인하세요. 소리가 멈추면 백그라운드 제한과 유지 설정을 확인하고 다른 플레이어도 시험하세요.</string>
+    <string name="ach_celebration_title">업적 달성</string>
+    <string name="ach_medal_title">나의 금메달</string>
+    <string name="ach_replay">애니메이션 다시 보기</string>
 </resources>

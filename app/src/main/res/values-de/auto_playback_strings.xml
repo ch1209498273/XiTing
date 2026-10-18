@@ -1,0 +1,8 @@
+<resources>
+    <string name="auto_playback_source">Aktuelle Wiedergabe</string>
+    <string name="auto_playback_unknown">Keine steuerbare Wiedergabe erkannt</string>
+    <string name="auto_playback_unavailable">Die Wiedergabequelle ist unklar. Schwarzer Bildschirm und zeitgesteuerte Rückkehr bleiben verfügbar.</string>
+    <string name="auto_playback_changed">Die Wiedergabe hat sich geändert. Den Timer schließen und erneut öffnen.</string>
+    <string name="auto_playback_update">Zuletzt gehört · Link speichern · Stelle markieren · Position beim Setzen des Timers\n\nErkannte Inhalte bleiben standardmäßig 90 Tage lokal. Markierungen und gespeicherte Links sind geschützt. Aufzeichnung lässt sich in der Verwaltung deaktivieren.</string>
+    <string name="playback_source_control_in_app">Möglicherweise %1$s · Wiedergabe im Video steuern</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">History management</string>
+    <string name="history_scope">View and export retained details from the last 60 days (up to 500 sessions). Older sessions retain aggregate statistics only.</string>
+    <string name="history_date">Select date</string>
+    <string name="history_all">All dates</string>
+    <string name="history_export">Export current records as CSV</string>
+    <string name="history_empty">No records for this date</string>
+    <string name="history_row">%1$s · %2$d min · %3$s</string>
+    <string name="history_black">Black screen</string>
+    <string name="history_screen_off">Screen off</string>
+    <string name="history_delete">Delete</string>
+    <string name="history_delete_impact">Deleting reduces totals by %1$d minutes and 1 session. Monthly totals, longest session and streaks update. Pet growth, unlocked achievements and unlock history are retained. Delete?</string>
+    <string name="history_delete_unavailable">Some details in this month were archived. Its longest session and listening days cannot be recomputed accurately, so deletion is unavailable.</string>
+    <string name="history_deleted">Record deleted; statistics updated</string>
+    <string name="history_delete_failed">Deletion failed; please retry</string>
+    <string name="history_exported">Export complete</string>
+    <string name="history_export_failed">Export failed; choose another location</string>
+</resources>

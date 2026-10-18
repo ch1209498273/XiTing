@@ -19,6 +19,9 @@ class XiTingApp : Application() {
         super.onCreate()
         CrashLog.install(this)
         scheduleSuggestJob()
+        com.lujinyu.xiting.listening.ListeningWork.submit({
+            if(RestoreSnapshot.recoverPending(this))com.lujinyu.xiting.listening.ListeningStore.settleInterruptedTimers(this)
+        })
     }
 
     /**

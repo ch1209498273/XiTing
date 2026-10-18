@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="support_title">Diagnostic</string>
+    <string name="support_yes">Oui</string>
+    <string name="support_no">Non</string>
+    <string name="support_overlay">Autorisation de superposition</string>
+    <string name="support_media_access">Accès aux notifications</string>
+    <string name="support_notifications">Notifications activées</string>
+    <string name="support_battery">Exemption optimisation batterie</string>
+    <string name="support_session">Session média lisible</string>
+    <string name="support_playing">Lecture en cours</string>
+    <string name="support_pause">La session déclare la pause</string>
+    <string name="support_seek">La session déclare la navigation</string>
+    <string name="support_service">Assistant en cours</string>
+    <string name="support_black">Rideau noir visible</string>
+    <string name="support_scope">État local actuel. Les fonctions déclarées ne garantissent pas la réponse des autres applis. Actualisez au retour.</string>
+    <string name="support_fix_overlay">Autoriser la superposition</string>
+    <string name="support_fix_media">Autoriser accès notifications</string>
+    <string name="support_fix_notifications">Réglages des notifications</string>
+    <string name="support_fix_player">Vérifier le lecteur</string>
+    <string name="support_fix_start">Démarrer assistant</string>
+    <string name="support_fix_battery">Optimisation batterie</string>
+    <string name="support_fix_app">Informations appli</string>
+    <string name="support_refresh">Actualiser</string>
+    <string name="support_player_help">Lancez la lecture puis revenez ici. Essayez un autre lecteur si les sessions ou les commandes sont indisponibles.</string>
+    <string name="support_open_failed">Impossible d’ouvrir cet écran. Recherchez cette appli dans les réglages système.</string>
+    <string name="support_selected">Sélectionné</string>
+    <string name="support_first_title">Vérifier votre essai</string>
+    <string name="support_first_intro">Essayez le rideau noir avec une voix intégrée, sans autre application vidéo.</string>
+    <string name="support_check_result">Vérifier résultat</string>
+    <string name="support_sound_question">Avez-vous entendu la voix de test ?</string>
+    <string name="support_return_question">La page précédente est-elle revenue ?</string>
+    <string name="support_first_success">Cet essai est terminé. Lancez une vidéo, puis touchez la bulle flottante.</string>
+</resources>

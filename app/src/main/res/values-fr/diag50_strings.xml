@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diag50_title">Résumé de diagnostic</string>
+    <string name="diag50_export">Aperçu du diagnostic</string>
+    <string name="diag50_share">Partager le résumé</string>
+    <string name="diag50_scope">Ces champs sont transmis à l’application choisie uniquement après avoir touché Partager. Ils incluent le modèle, les autorisations et l’état de la session, sans titres, identifiants ni journaux bruts. Les durées de verrouillage de veille sont mesurées dans ce processus et ne mesurent pas la consommation de batterie.</string>
+</resources>

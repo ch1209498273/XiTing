@@ -1,0 +1,4 @@
+<resources>
+    <string name="switch_black_timer">黑幕显示睡前定时</string>
+    <string name="switch_black_timer_sub">关闭后隐藏入口与倒计时，已设置的定时继续执行</string>
+</resources>

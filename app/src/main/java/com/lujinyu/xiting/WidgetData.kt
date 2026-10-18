@@ -9,9 +9,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.view.View
 import android.widget.RemoteViews
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 
 /**
  * 小部件共享渲染核心：三档样式（标准4×2 / 紧凑2×2 / 大号4×3）共用同一份数据与素材。
@@ -70,14 +71,27 @@ object WidgetData {
 
     fun refresh(context: Context, style: Style) {
         try {
-            val c = AppLocales.wrap(context)
+            val views=buildViews(context,style)
+            val provider = when (style) {
+                Style.STANDARD -> XiTingWidget::class.java
+                Style.COMPACT -> XiTingWidgetCompact::class.java
+                Style.LARGE -> XiTingWidgetLarge::class.java
+            }
+            AppWidgetManager.getInstance(context)
+                .updateAppWidget(ComponentName(context, provider), views)
+        } catch (_: Exception) {
+        }
+    }
+
+    internal fun buildViews(context:Context,style:Style,localizedContext:Context=AppLocales.wrap(context)):RemoteViews {
+            val c = localizedContext
             val layout = when (style) {
                 Style.STANDARD -> R.layout.widget_main
                 Style.COMPACT -> R.layout.widget_compact
                 Style.LARGE -> R.layout.widget_large
             }
             val views = RemoteViews(context.packageName, layout)
-            val running = OverlayService.isRunning
+            val running = SessionRuntime.snapshot().assistant==AssistantPhase.RUNNING
 
             // ---- 数据 ----
             val gp = EnergyStore.collectedTotal(context).toLong()
@@ -107,26 +121,33 @@ object WidgetData {
             }
 
             // ---- 通用绑定（三档布局共用同一组 id）----
-            val skin = PetSkins.active(context)
-            views.setImageViewBitmap(
-                R.id.widget_pet_img,
-                PetSkins.snapshot(context, showStage, skin, 160, withBar = true, pct = pct)
-            )
-            views.setTextViewText(R.id.widget_pet, PetView.stageName(c, showStage))
-            views.setTextViewText(
-                R.id.widget_growth,
-                if (growthStage >= PetView.STAGE_KING) c.getString(R.string.widget_growth_max, gp)
-                else c.getString(R.string.widget_growth_next, gp, th[growthStage + 1] - gp)
-            )
+            // 2×2 only has room for time, service state and the main action.
+            // Avoid dispatching RemoteViews actions to absent views or drawing unused bitmaps.
+            if (style != Style.COMPACT) {
+                val skin = PetSkins.active(context)
+                views.setImageViewBitmap(
+                    R.id.widget_pet_img,
+                    PetSkins.snapshot(context, showStage, skin, 160, withBar = true, pct = pct)
+                )
+                views.setTextViewText(R.id.widget_pet, PetView.stageName(c, showStage))
+                views.setTextViewText(
+                    R.id.widget_growth,
+                    if (growthStage >= PetView.STAGE_KING) c.getString(R.string.widget_growth_max, gp)
+                    else c.getString(R.string.widget_growth_next, gp, th[growthStage + 1] - gp)
+                )
+                views.setTextViewText(R.id.widget_total, "${c.getString(R.string.label_total)} ${fmtMin(totalMs)}")
+            }
             views.setTextViewText(R.id.widget_today, c.getString(R.string.widget_today_fmt, fmtMin(todayMs)))
+            views.setTextViewText(R.id.widget_btn_black, c.getString(R.string.widget_black))
             views.setTextViewText(
                 R.id.widget_status,
-                c.getString(if (running) R.string.widget_active else R.string.widget_idle)
+                if(running)SessionConsoleUi.summary(c,SessionRuntime.snapshot()) else c.getString(R.string.widget_idle)
             )
 
             // ---- 大号独有：近7天迷你柱状图 ----
             if (style == Style.LARGE) {
-                views.setImageViewBitmap(R.id.widget_bars, renderBars(sessions, todayStart))
+                views.setTextViewText(R.id.widget_chart_label, c.getString(R.string.chart_title))
+                views.setImageViewBitmap(R.id.widget_bars, renderBars(c, sessions, todayStart))
             }
 
             // ---- 按钮 ----
@@ -143,27 +164,16 @@ object WidgetData {
             )
             views.setOnClickPendingIntent(R.id.widget_root, piOpen)
 
-            val provider = when (style) {
-                Style.STANDARD -> XiTingWidget::class.java
-                Style.COMPACT -> XiTingWidgetCompact::class.java
-                Style.LARGE -> XiTingWidgetLarge::class.java
-            }
-            AppWidgetManager.getInstance(context)
-                .updateAppWidget(ComponentName(context, provider), views)
-        } catch (_: Exception) {
-        }
+            return views
     }
 
 
-    /** 近7天迷你柱状图位图（大号小部件专用，今日金色） */
-    private fun renderBars(sessions: List<ListenSession>, todayStart: Long): Bitmap {
+    /** 近7天迷你柱状图位图（大号专用；绿色标记今日，零数据不画示例柱）。 */
+    private fun renderBars(context: Context, sessions: List<ListenSession>, todayStart: Long): Bitmap {
         val w = 560
         val h = 150
         val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
-        val cal = Calendar.getInstance().apply {
-            timeInMillis = todayStart
-        }
         val dayMs = 24L * 3600 * 1000
         val perDay = LongArray(7)
         for (s in sessions) {
@@ -178,12 +188,17 @@ object WidgetData {
         val maxMs = perDay.max().coerceAtLeast(1L)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         val barW = w / 7f * 0.52f
+        val bottom = h - 30f
+        val dateFormat = SimpleDateFormat("M/d", context.resources.configuration.locales[0])
         for (i in 0..6) {
-            val bh = (perDay[i].toFloat() / maxMs * (h - 14)).coerceAtLeast(6f)
+            val bh = perDay[i].toFloat() / maxMs * (bottom - 6f)
             val x = w / 7f * i + (w / 7f - barW) / 2
-            paint.color = if (i == 6) android.graphics.Color.rgb(240, 200, 126)
-                          else android.graphics.Color.argb(190, 120, 140, 180)
-            c.drawRoundRect(x, h - bh, x + barW, h - 4f, 8f, 8f, paint)
+            paint.color = context.getColor(if (i == 6) R.color.brand else R.color.chart_stub)
+            if (perDay[i] > 0) c.drawRoundRect(x, bottom - bh.coerceAtLeast(2f), x + barW, bottom, 8f, 8f, paint)
+            paint.color = context.getColor(R.color.text_secondary)
+            paint.textSize = 20f
+            paint.textAlign = Paint.Align.CENTER
+            c.drawText(dateFormat.format(Date(todayStart - (6 - i) * dayMs)), x + barW / 2, h - 5f, paint)
         }
         return bmp
     }

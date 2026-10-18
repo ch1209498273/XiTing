@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flow_timer_setup">设置定时</string>
+    <string name="flow_timer_pending">正在确认定时…</string>
+    <string name="flow_timer_unconfirmed">尚未确认设置结果，请检查当前定时</string>
+    <string name="flow_player_lost">所选播放器已失效，请重新选择</string>
+    <string name="flow_player_error">暂时无法读取播放器，请重试</string>
+    <string name="flow_player_empty">请先在播放器中开始播放</string>
+    <string name="flow_player_permission">播放控制未授权</string>
+    <string name="flow_player_reselect">重新选择播放器</string>
+    <string name="flow_timer_failed">定时未生效，已保留原设置</string>
+    <string name="flow_timer_ready">定时已设置</string>
+    <string name="flow_end_action">到时执行</string>
+    <string name="flow_minutes">%1$d 分钟</string>
+    <string name="flow_custom">自定义</string>
+    <string name="flow_timer_review">请确认播放器、时长和结束动作</string>
+    <string name="flow_timer_return">撤掉黑幕</string>
+    <string name="flow_timer_pause">请求暂停，保持黑幕</string>
+    <string name="flow_episode_unavailable">当前播放器未提供本集进度</string>
+    <string name="flow_timer_result">定时结果</string>
+    <string name="flow_setup_success">体验已完成，可随时在帮助中重试</string>
+    <string name="flow_request_expired">设置请求已过期，请重试</string>
+</resources>

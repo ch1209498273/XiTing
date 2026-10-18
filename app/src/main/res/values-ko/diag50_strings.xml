@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diag50_title">진단 요약</string>
+    <string name="diag50_export">진단 미리보기</string>
+    <string name="diag50_share">요약 공유</string>
+    <string name="diag50_scope">공유를 누른 후에만 선택한 앱에 아래 정보가 전달됩니다. 기기 모델, 권한 및 세션 상태를 포함하며 작품명, 식별자 또는 원본 로그는 포함하지 않습니다. 웨이크 잠금 시간은 이 프로세스 내의 측정값이며 배터리 소모량을 나타내지 않습니다.</string>
+</resources>

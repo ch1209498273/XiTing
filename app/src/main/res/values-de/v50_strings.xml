@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v50_scenes">Hörszenario wählen</string>
+    <string name="v50_sleep">Einschlaftimer</string>
+    <string name="v50_episode">Diese Folge beenden</string>
+    <string name="v50_continuous">Weiterhören</string>
+    <string name="v50_overlay_needed">Erlaube zuerst die Anzeige über anderen Apps.</string>
+    <string name="v50_continuous_cancel">Der aktuelle Timer wird beendet. Du musst selbst stoppen. Nur der Assistent startet. Kehre zum Player zurück und aktiviere den Vorhang über die schwebende Taste.</string>
+    <string name="v50_continuous_review">Ohne Timer: Du musst selbst stoppen. Nur der Assistent startet. Kehre zum Player zurück und aktiviere den Vorhang über die schwebende Taste.</string>
+    <string name="v50_ready">Bereit. Kehre zum Player zurück und aktiviere den Vorhang über die schwebende Taste.</string>
+    <string name="v50_session">Diese Sitzung</string>
+    <string name="v50_idle">Assistent inaktiv</string>
+    <string name="v50_starting">Assistent startet</string>
+    <string name="v50_running">Assistent aktiv</string>
+    <string name="v50_stopping">Assistent stoppt</string>
+    <string name="v50_interrupted">Sitzung unterbrochen</string>
+    <string name="v50_curtain_off">Vorhang aus</string>
+    <string name="v50_curtain_locked">Vorhang gesperrt</string>
+    <string name="v50_curtain_awake">Vorhangsteuerung aktiv</string>
+    <string name="v50_play_unknown">Wiedergabe unbekannt</string>
+    <string name="v50_play_playing">Player meldet Wiedergabe</string>
+    <string name="v50_play_paused">Player meldet Pause</string>
+    <string name="v50_play_buffering">Player meldet Pufferung</string>
+    <string name="v50_play_invalid">Playersitzung ungültig</string>
+    <string name="v50_timer_fixed">Fester Timer</string>
+    <string name="v50_timer_waiting">Warten auf Wiedergabe</string>
+    <string name="v50_timer_executing">Endaktion wird ausgeführt</string>
+    <string name="v50_timer_ended">Timer beendet</string>
+    <string name="v50_remaining">Verbleibend %1$d:%2$02d</string>
+    <string name="v50_pause_requested">Pause angefordert</string>
+    <string name="v50_pause_confirmed">Player bestätigt Pause</string>
+    <string name="v50_pause_already">Player war bereits pausiert</string>
+    <string name="v50_pause_unavailable">Pause derzeit nicht möglich. Bitte im Player bedienen</string>
+    <string name="v50_pause_failed">Pause fehlgeschlagen</string>
+    <string name="v50_pause_unconfirmed">Pause nicht bestätigt. Bitte im Player prüfen</string>
+    <string name="v50_recent">Letztes Ergebnis</string>
+    <string name="v50_records">Sitzungsergebnisse</string>
+    <string name="v50_end_user">Von dir beendet</string>
+    <string name="v50_end_timer">Timer abgelaufen</string>
+    <string name="v50_end_unknown">Endgrund unbekannt</string>
+    <string name="v50_no_records">Noch keine Sitzungsergebnisse</string>
+    <string name="v50_recap_enabled">Letzte Sitzung anzeigen</string>
+    <string name="v50_settings_tools">Daten, Diagnose und Rückblick</string>
+    <string name="v50_target_changed">Playerinhalt geändert. Prüfe das neue Ziel und die Endaktion und bestätige erneut. Die Dauer bleibt erhalten.</string>
+</resources>
+

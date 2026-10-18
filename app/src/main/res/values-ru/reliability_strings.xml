@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rel_backup_manage">Управление копиями</string>
+    <string name="rel_auto_backup">Автокопия в Загрузки</string>
+    <string name="rel_backup_history">История копий</string>
+    <string name="rel_undo_restore">Отменить восстановление</string>
+    <string name="rel_no_snapshot">Нет снимка для отката</string>
+    <string name="rel_stop_first">Остановите помощника перед восстановлением или откатом.</string>
+    <string name="rel_snapshot_explain">Перед восстановлением сохраняется локальный снимок. Новые копии включают несобранную энергию, исходный срок, общую статистику и часть настроек. Отсутствующие поля старых копий сохраняют локальные значения.</string>
+    <string name="rel_backup_failed">Последняя копия не удалась. Проверьте место или повторите экспорт.</string>
+    <string name="rel_backup_ok">Копия записана</string>
+    <string name="rel_backup_none">Нет доступных копий</string>
+    <string name="rel_delete_backup">Удалить эту копию</string>
+    <string name="rel_delete_confirm">Безвозвратно удаляется только выбранный общедоступный файл копии. Локальные данные не меняются.</string>
+    <string name="rel_saved_backups">Читаемые копии (доступ зависит от системы)</string>
+    <string name="rel_restore_undo_ok">Данные до восстановления возвращены</string>
+    <string name="rel_recovery_title">Предыдущий запуск прерван</string>
+    <string name="rel_recovery_message">Помощник был прерван или устройство перезапущено. Плавающую кнопку можно запустить снова. Затемнение и таймер не возобновляются автоматически; настройте таймер заново.</string>
+    <string name="rel_recovery_timer">Остаток прежнего таймера для справки: %1$d мин. Во время прерывания завершающее действие не выполнялось.</string>
+    <string name="rel_recovery_episode">Прежний таймер был до конца эпизода. Выберите плеер заново.</string>
+    <string name="rel_ack">Понятно</string>
+    <string name="rel_pending_summary">Действительная несобранная энергия: %1$d. Исходный срок сохранён.</string>
+    <string name="rel_recovery_storage_fail">Предыдущее восстановление не завершено, запись недоступна. Исходный снимок сохранён. Проверьте свободное место и откройте приложение снова. Помощник и новая запись приостановлены.</string>
+</resources>

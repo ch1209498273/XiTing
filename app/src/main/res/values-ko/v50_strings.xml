@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v50_scenes">듣기 방식 선택</string>
+    <string name="v50_sleep">취침 타이머</string>
+    <string name="v50_episode">이 에피소드 끝까지</string>
+    <string name="v50_continuous">계속 듣기</string>
+    <string name="v50_overlay_needed">먼저 다른 앱 위에 표시 권한을 허용하세요.</string>
+    <string name="v50_continuous_cancel">현재 타이머를 취소하며 직접 종료해야 합니다. 도우미만 시작합니다. 플레이어로 돌아가 플로팅 버튼으로 검은 화면을 여세요.</string>
+    <string name="v50_continuous_review">타이머 없이 직접 종료해야 합니다. 도우미만 시작합니다. 플레이어로 돌아가 플로팅 버튼으로 검은 화면을 여세요.</string>
+    <string name="v50_ready">준비되었습니다. 플레이어로 돌아가 플로팅 버튼으로 검은 화면을 여세요.</string>
+    <string name="v50_session">이번 세션</string>
+    <string name="v50_idle">도우미 대기 중</string>
+    <string name="v50_starting">도우미 시작 중</string>
+    <string name="v50_running">도우미 실행 중</string>
+    <string name="v50_stopping">도우미 종료 중</string>
+    <string name="v50_interrupted">세션 중단됨</string>
+    <string name="v50_curtain_off">검은 화면 꺼짐</string>
+    <string name="v50_curtain_locked">검은 화면 잠김</string>
+    <string name="v50_curtain_awake">검은 화면 조작 중</string>
+    <string name="v50_play_unknown">재생 상태 알 수 없음</string>
+    <string name="v50_play_playing">플레이어가 재생 중이라고 보고</string>
+    <string name="v50_play_paused">플레이어가 일시정지라고 보고</string>
+    <string name="v50_play_buffering">플레이어가 버퍼링이라고 보고</string>
+    <string name="v50_play_invalid">플레이어 세션 무효</string>
+    <string name="v50_timer_fixed">고정 타이머</string>
+    <string name="v50_timer_waiting">재생 재개 대기 중</string>
+    <string name="v50_timer_executing">종료 동작 실행 중</string>
+    <string name="v50_timer_ended">타이머 종료</string>
+    <string name="v50_remaining">남은 시간 %1$d:%2$02d</string>
+    <string name="v50_pause_requested">일시정지 요청됨</string>
+    <string name="v50_pause_confirmed">플레이어 일시정지 확인됨</string>
+    <string name="v50_pause_already">이미 일시정지 상태였음</string>
+    <string name="v50_pause_unavailable">지금 일시정지할 수 없습니다. 플레이어에서 조작하세요</string>
+    <string name="v50_pause_failed">일시정지 실패</string>
+    <string name="v50_pause_unconfirmed">일시정지를 확인할 수 없습니다. 플레이어를 확인하세요</string>
+    <string name="v50_recent">최근 결과</string>
+    <string name="v50_records">세션 결과 기록</string>
+    <string name="v50_end_user">사용자가 종료함</string>
+    <string name="v50_end_timer">타이머 만료</string>
+    <string name="v50_end_unknown">종료 이유 알 수 없음</string>
+    <string name="v50_no_records">아직 세션 결과가 없습니다</string>
+    <string name="v50_recap_enabled">지난 세션 요약 표시</string>
+    <string name="v50_settings_tools">데이터, 진단 및 요약</string>
+    <string name="v50_target_changed">재생 콘텐츠가 변경되었습니다. 새 대상과 종료 동작을 검토하고 다시 확인하세요. 입력한 시간은 유지됩니다.</string>
+</resources>
+

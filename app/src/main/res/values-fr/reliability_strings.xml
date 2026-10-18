@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rel_backup_manage">Gestion des sauvegardes</string>
+    <string name="rel_auto_backup">Sauvegarde automatique dans Téléchargements</string>
+    <string name="rel_backup_history">Historique des sauvegardes</string>
+    <string name="rel_undo_restore">Annuler la dernière restauration</string>
+    <string name="rel_no_snapshot">Aucun instantané disponible</string>
+    <string name="rel_stop_first">Arrêtez l’assistant avant de restaurer ou annuler.</string>
+    <string name="rel_snapshot_explain">Un instantané local est enregistré avant restauration. Les nouvelles sauvegardes incluent énergie en attente, échéance initiale, statistiques cumulées et certains réglages. Les champs absents des anciennes sauvegardes restent inchangés.</string>
+    <string name="rel_backup_failed">Échec de la dernière sauvegarde. Vérifiez le stockage ou exportez à nouveau.</string>
+    <string name="rel_backup_ok">Sauvegarde écrite</string>
+    <string name="rel_backup_none">Aucune sauvegarde lisible</string>
+    <string name="rel_delete_backup">Supprimer cette sauvegarde</string>
+    <string name="rel_delete_confirm">Seul le fichier public sélectionné sera supprimé définitivement. Les données locales restent intactes.</string>
+    <string name="rel_saved_backups">Sauvegardes lisibles (accès selon le système)</string>
+    <string name="rel_restore_undo_ok">Données précédant la restauration récupérées</string>
+    <string name="rel_recovery_title">Exécution précédente interrompue</string>
+    <string name="rel_recovery_message">Assistant interrompu ou appareil redémarré. La bulle peut être relancée. Écran noir et minuterie ne reprennent pas automatiquement ; réglez la minuterie à nouveau.</string>
+    <string name="rel_recovery_timer">Minuterie précédente : environ %1$d minutes restantes. Aucune action finale exécutée pendant l’interruption.</string>
+    <string name="rel_recovery_episode">La minuterie concernait cet épisode. Choisissez le lecteur à nouveau.</string>
+    <string name="rel_ack">Compris</string>
+    <string name="rel_pending_summary">Énergie en attente valide : %1$d. Échéance initiale conservée.</string>
+    <string name="rel_recovery_storage_fail">La restauration précédente est incomplète et le stockage est inaccessible en écriture. L’instantané initial est conservé. Vérifiez l’espace et rouvrez l’application. L’assistant et les nouvelles écritures sont suspendus.</string>
+</resources>

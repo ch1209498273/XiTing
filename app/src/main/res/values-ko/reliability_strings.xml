@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rel_backup_manage">백업 관리</string>
+    <string name="rel_auto_backup">다운로드에 자동 백업</string>
+    <string name="rel_backup_history">백업 기록</string>
+    <string name="rel_undo_restore">마지막 복원 취소</string>
+    <string name="rel_no_snapshot">복원 스냅샷 없음</string>
+    <string name="rel_stop_first">복원하거나 되돌리기 전에 도우미를 중지하세요.</string>
+    <string name="rel_snapshot_explain">복원 전에 로컬 스냅샷을 저장합니다. 새 백업에는 미수집 에너지, 원래 만료 시간, 누적 통계와 일부 설정이 포함됩니다. 이전 백업에 없는 필드는 로컬 값을 유지합니다.</string>
+    <string name="rel_backup_failed">최근 백업 실패. 저장 공간을 확인하거나 다시 내보내세요.</string>
+    <string name="rel_backup_ok">백업 저장 완료</string>
+    <string name="rel_backup_none">읽을 수 있는 백업 없음</string>
+    <string name="rel_delete_backup">이 백업 삭제</string>
+    <string name="rel_delete_confirm">선택한 공용 백업 파일만 영구 삭제합니다. 취소할 수 없습니다. 로컬 청취 데이터는 유지됩니다.</string>
+    <string name="rel_saved_backups">읽을 수 있는 백업 (접근 범위는 시스템에 따름)</string>
+    <string name="rel_restore_undo_ok">복원 전 데이터로 되돌렸습니다</string>
+    <string name="rel_recovery_title">이전 실행 중단</string>
+    <string name="rel_recovery_message">도우미가 중단되었거나 기기가 재시작되었습니다. 플로팅 버튼은 다시 시작할 수 있습니다. 검은 화면과 타이머는 자동 재개되지 않으니 타이머를 다시 설정하세요.</string>
+    <string name="rel_recovery_timer">이전 타이머 참고 잔여: %1$d분. 중단 중 종료 동작은 실행하지 않았습니다.</string>
+    <string name="rel_recovery_episode">이전 타이머는 이 에피소드용입니다. 플레이어를 다시 선택하세요.</string>
+    <string name="rel_ack">확인</string>
+    <string name="rel_pending_summary">유효한 미수집 에너지: %1$d. 원래 만료 시간을 유지합니다.</string>
+    <string name="rel_recovery_storage_fail">이전 복원이 완료되지 않았고 저장소에 쓸 수 없습니다. 원래 스냅샷은 보존되어 있습니다. 여유 공간을 확인하고 앱을 다시 여세요. 도우미와 새 데이터 쓰기는 일시 중지되었습니다.</string>
+</resources>

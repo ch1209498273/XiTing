@@ -1,0 +1,12 @@
+<resources>
+    <string name="guide_sound_help_title">没有听到测试声音？</string>
+    <string name="guide_sound_help">请按手机音量键调高媒体音量。若连接了耳机，声音会从耳机播放，请检查耳机音量和连接。调整后可以重新体验。</string>
+    <string name="guide_retry_audio">重新体验</string>
+    <string name="guide_return_help_title">画面没有正常返回？</string>
+    <string name="guide_return_help">轻点黑幕，再点击“结束体验”。若黑幕仍未关闭，可从通知栏退出助手后重试。</string>
+    <string name="guide_audio_failed">测试声音暂时无法播放，请稍后重新体验。</string>
+    <string name="guide_pause_first">请先暂停正在播放的视频或音乐，再体验测试声音。</string>
+    <string name="guide_black_hint">测试声音正在播放，结束后会自动返回。</string>
+    <string name="guide_exit">结束体验</string>
+    <string name="guide_preparing">正在准备测试声音…</string>
+</resources>

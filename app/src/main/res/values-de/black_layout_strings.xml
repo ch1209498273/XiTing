@@ -1,0 +1,8 @@
+<resources>
+    <string name="black_demo_return">Vorschau beenden</string>
+    <string name="black_control_unavailable">Wiedergabe im Player steuern</string>
+    <string name="black_timer_off">Aus</string>
+    <string name="black_timer_pause_fmt">Pause in %1$s</string>
+    <string name="black_timer_return_fmt">Zurück in %1$s</string>
+    <string name="black_wake_hint">Außerhalb des Feldes tippen, um abzudunkeln</string>
+</resources>

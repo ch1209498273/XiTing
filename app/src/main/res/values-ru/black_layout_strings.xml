@@ -1,0 +1,8 @@
+<resources>
+    <string name="black_demo_return">Завершить просмотр</string>
+    <string name="black_control_unavailable">Управляйте воспроизведением в плеере</string>
+    <string name="black_timer_off">Выключен</string>
+    <string name="black_timer_pause_fmt">Пауза через %1$s</string>
+    <string name="black_timer_return_fmt">Возврат через %1$s</string>
+    <string name="black_wake_hint">Нажмите вне панели, чтобы вернуться к чёрному экрану</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="ui_backup_version_fmt">备份版本：%1$s</string>
+    <string name="ui_backup_same_device">来自本设备</string>
+    <string name="ui_backup_other_device">来自其他或未知设备</string>
+    <string name="ui_backup_restore_effect">恢复将替换成长值和分享日期；有有效会话时替换听剧明细并重算统计，无有效会话时保留本机明细。有效的形态、皮肤和悬浮球设置会恢复；成就与本机合并，已有首次记录不变。</string>
+    <string name="ui_backup_unknown_version">未知</string>
+    <string name="ui_last_backup_fmt">最近成功备份：%1$s</string>
+    <string name="ui_timer_review">确认后立即应用此处的时长、结束动作和播放器。暂停需要通知使用权及播放器支持；仅向选定会话发送请求，第三方播放器可能不响应。</string>
+    <string name="ui_model_estimate">固定模型估算，非本机节电实测</string>
+    <string name="ui_timer_summary_fmt">%1$s\n%2$s\n%3$s</string>
+</resources>

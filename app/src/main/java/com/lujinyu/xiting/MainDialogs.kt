@@ -31,6 +31,7 @@ internal fun MainActivity.showAchievements(): android.app.AlertDialog {
         // 老用户 prefs 里还留着已砍掉的 first/h1/h10/h50，直接取大小会显示「6/4」。
         val known = knownUnlocked(raw)
         val gotIds = known.map { it.id }.toSet()
+        val history = Achievements.history(this).associateBy { it.id }
 
         val view = layoutInflater.inflate(R.layout.dialog_achievements, null)
         view.findViewById<TextView>(R.id.ach_dlg_title).text =
@@ -41,6 +42,16 @@ internal fun MainActivity.showAchievements(): android.app.AlertDialog {
         var dlgRef: android.app.AlertDialog? = null
         for (a in Achievements.ALL) {
             val got = a.id in gotIds
+            val achievementProgress = Achievements.progress(this, a.id)
+            fun progressValue(value: Long): String = when (a.id) {
+                "marathon" -> fmtDur(value)
+                "week" -> getString(R.string.fmt_days, value)
+                "c100" -> getString(R.string.fmt_sessions, value)
+                "king" -> PetView.stageName(this, value.toInt())
+                else -> value.toString()
+            }
+            val progressText = getString(R.string.ui_achievement_progress_fmt,
+                progressValue(achievementProgress.current), progressValue(achievementProgress.target))
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = android.view.Gravity.CENTER_VERTICAL
@@ -69,6 +80,27 @@ internal fun MainActivity.showAchievements(): android.app.AlertDialog {
                 textSize = 12f
             })
             textCol.addView(TextView(this).apply {
+                text = progressText
+                setTextColor(getColor(R.color.text_secondary))
+                textSize = 12f
+            })
+            textCol.addView(android.widget.ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+                max = 100
+                progress = achievementProgress.percent
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (6 * d).toInt())
+                contentDescription = progressText
+            })
+            if (got) textCol.addView(TextView(this).apply {
+                val at = history[a.id]?.recordedAt
+                text = if (at == null) getString(R.string.ui_unknown_date) else getString(
+                    R.string.ui_recorded_date_fmt,
+                    java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT)
+                        .format(java.util.Date(at))
+                )
+                setTextColor(getColor(R.color.text_hint))
+                textSize = 13f
+            })
+            textCol.addView(TextView(this).apply {
                 text = getString(if (got) R.string.ach_row_unlocked else R.string.ach_row_locked)
                 setTextColor(if (got) getColor(R.color.brand) else getColor(R.color.text_disabled))
                 textSize = 11f
@@ -82,7 +114,7 @@ internal fun MainActivity.showAchievements(): android.app.AlertDialog {
             }
             row.setOnClickListener {
                 if (!got) {
-                    Toast.makeText(this, Achievements.desc(this, a), Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "${Achievements.desc(this, a)}\n$progressText", Toast.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
                 dlgRef?.dismiss()
@@ -92,7 +124,7 @@ internal fun MainActivity.showAchievements(): android.app.AlertDialog {
         }
 
         val dlg = android.app.AlertDialog.Builder(this)
-            .setView(view)
+            .setView(android.widget.ScrollView(this).apply { addView(view) })
             .setPositiveButton(getString(R.string.dlg_ok), null)
             .create()
         dlgRef = dlg

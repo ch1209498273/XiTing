@@ -1,0 +1,4 @@
+<resources>
+    <string name="switch_black_timer">Schlaftimer auf dem schwarzen Bildschirm</string>
+    <string name="switch_black_timer_sub">Bedienelemente und Countdown ausblenden, ohne den laufenden Timer abzubrechen</string>
+</resources>

@@ -44,8 +44,8 @@ class CaptionService : android.accessibilityservice.AccessibilityService() {
                 ctx.contentResolver,
                 android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
             ) ?: return false
-            return v.contains("${ctx.packageName}/.$javaClass.simpleName") ||
-                v.contains("${ctx.packageName}/$javaClass.name")
+            val component=android.content.ComponentName(ctx,CaptionService::class.java)
+            return v.split(':').any { android.content.ComponentName.unflattenFromString(it)==component }
         }
     }
 
@@ -84,7 +84,7 @@ class CaptionService : android.accessibilityservice.AccessibilityService() {
         } else {
             CaptionBus.post(text)
         }
-        android.util.Log.i(TAG, "caption[$pkg]: $text")
+        // Subtitle contents are transient; never write them to diagnostic logs.
         lastText = text
         lastAt = now
     }

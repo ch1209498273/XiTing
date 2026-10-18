@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_media_access_missing">Media control access not granted · Black screen and timed return available</string>
+    <string name="player_choice_intro">Choose an app to use with XiTing. Pause and end-of-playback features depend on the media session the app provides.</string>
+    <string name="player_control_unavailable">No controllable media session · Black screen and timed return available</string>
+    <string name="player_state_playing">Playing</string>
+    <string name="player_state_paused">Paused</string>
+    <string name="player_state_available">Media session available</string>
+    <string name="player_control_pause">Pause can be requested</string>
+    <string name="player_control_no_pause">Pause not supported</string>
+    <string name="player_selected_no_session">The selected app provides no media controls. You can use black screen or timed return.</string>
+    <string name="player_choice_none">Choose a player</string>
+</resources>

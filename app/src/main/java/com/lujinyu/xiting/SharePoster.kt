@@ -191,6 +191,7 @@ object SharePoster {
         p.textAlign = Paint.Align.CENTER
         p.textSize = 34f
         p.color = 0x99FFFFFF.toInt()
+        while(p.measureText(d.footer)>w-2*PAD && p.textSize>22f) p.textSize-=1f
         c.drawText(d.footer, (w / 2f), f.footer1Y, p)
         p.textSize = 28f
         p.color = 0x80FFFFFF.toInt()

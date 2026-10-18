@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rel_backup_manage">Sicherungen verwalten</string>
+    <string name="rel_auto_backup">Automatische Sicherung in Downloads</string>
+    <string name="rel_backup_history">Sicherungsverlauf</string>
+    <string name="rel_undo_restore">Letzte Wiederherstellung rückgängig</string>
+    <string name="rel_no_snapshot">Kein Wiederherstellungspunkt vorhanden</string>
+    <string name="rel_stop_first">Assistent vor Wiederherstellung oder Rücknahme stoppen.</string>
+    <string name="rel_snapshot_explain">Vor der Wiederherstellung wird ein lokaler Rückkehrpunkt gespeichert. Neue Sicherungen enthalten ausstehende Energie, ursprünglichen Ablauf, Gesamtstatistik und ausgewählte Einstellungen. Fehlende Felder alter Sicherungen bleiben lokal erhalten.</string>
+    <string name="rel_backup_failed">Letzte Sicherung fehlgeschlagen. Speicher prüfen oder erneut exportieren.</string>
+    <string name="rel_backup_ok">Sicherung erfolgreich geschrieben</string>
+    <string name="rel_backup_none">Keine lesbaren Sicherungen</string>
+    <string name="rel_delete_backup">Diese Sicherung löschen</string>
+    <string name="rel_delete_confirm">Nur die ausgewählte öffentliche Sicherung wird unwiderruflich gelöscht. Lokale Hördaten bleiben erhalten.</string>
+    <string name="rel_saved_backups">Lesbare Sicherungen (Zugriff hängt vom System ab)</string>
+    <string name="rel_restore_undo_ok">Daten vor Wiederherstellung wiederhergestellt</string>
+    <string name="rel_recovery_title">Vorheriger Lauf unterbrochen</string>
+    <string name="rel_recovery_message">Assistent unterbrochen oder Gerät neu gestartet. Die Schaltblase kann neu starten. Schwarzbild und Timer werden nicht automatisch fortgesetzt; Timer neu einstellen.</string>
+    <string name="rel_recovery_timer">Vorheriger Timer: ungefähr %1$d Minuten verbleibend. Die Endaktion wurde während der Unterbrechung nicht ausgeführt.</string>
+    <string name="rel_recovery_episode">Vorheriger Timer galt dieser Folge. Player neu auswählen.</string>
+    <string name="rel_ack">Verstanden</string>
+    <string name="rel_pending_summary">Gültige ausstehende Energie: %1$d. Ursprünglicher Ablauf bleibt erhalten.</string>
+    <string name="rel_recovery_storage_fail">Die letzte Wiederherstellung ist unvollständig; der Speicher ist nicht beschreibbar. Der ursprüngliche Rückkehrpunkt bleibt erhalten. Freien Speicher prüfen und App neu öffnen. Assistent und neue Schreibvorgänge sind pausiert.</string>
+</resources>

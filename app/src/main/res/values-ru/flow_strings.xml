@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flow_timer_setup">Настроить таймер</string>
+    <string name="flow_timer_pending">Подтверждение таймера…</string>
+    <string name="flow_timer_unconfirmed">Результат настройки ещё не подтверждён. Проверьте текущий таймер.</string>
+    <string name="flow_player_lost">Выбранный плеер больше недоступен. Выберите его заново.</string>
+    <string name="flow_player_error">Сейчас не удаётся прочитать данные плеера. Повторите попытку.</string>
+    <string name="flow_player_empty">Сначала запустите воспроизведение в плеере.</string>
+    <string name="flow_player_permission">Нет разрешения на управление воспроизведением</string>
+    <string name="flow_player_reselect">Выбрать плеер заново</string>
+    <string name="flow_timer_failed">Таймер не применён. Прежние настройки сохранены.</string>
+    <string name="flow_timer_ready">Таймер установлен</string>
+    <string name="flow_end_action">Действие по окончании</string>
+    <string name="flow_minutes">%1$d мин.</string>
+    <string name="flow_custom">Другое время</string>
+    <string name="flow_timer_review">Проверьте плеер, длительность и действие по окончании.</string>
+    <string name="flow_timer_return">Убрать чёрную завесу</string>
+    <string name="flow_timer_pause">Запросить паузу и оставить чёрную завесу</string>
+    <string name="flow_episode_unavailable">Текущий плеер не предоставляет данные о ходе воспроизведения эпизода.</string>
+    <string name="flow_timer_result">Результат настройки таймера</string>
+    <string name="flow_setup_success">Проба завершена. Её можно повторить в любое время в разделе помощи.</string>
+    <string name="flow_request_expired">Срок действия запроса настройки истёк. Повторите попытку.</string>
+</resources>

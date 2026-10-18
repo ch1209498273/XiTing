@@ -150,7 +150,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
 
     private val visibleRect=Rect()
     private val scrollListener=android.view.ViewTreeObserver.OnScrollChangedListener { startAnimating() }
-    private fun shouldAnimate() = !thumbMode && isAttachedToWindow && isShown &&
+    private fun shouldAnimate() = !thumbMode && isAttachedToWindow && isShown && hasWindowFocus() &&
         windowVisibility == VISIBLE && ValueAnimator.areAnimatorsEnabled() && getLocalVisibleRect(visibleRect)
     private val animationTick = object : Runnable {
         override fun run() {
@@ -161,6 +161,9 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
         removeCallbacks(animationTick)
         if (shouldAnimate()) post(animationTick)
         invalidate()
+    }
+    override fun onWindowFocusChanged(hasWindowFocus:Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus);startAnimating()
     }
     fun poke() {
         val now = SystemClock.uptimeMillis()

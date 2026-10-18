@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="ui_backup_version_fmt">バックアップ形式：%1$s</string>
+    <string name="ui_backup_same_device">この端末のデータ</string>
+    <string name="ui_backup_other_device">別の端末または不明な端末</string>
+    <string name="ui_backup_restore_effect">復元すると成長値と共有日を置き換えます。有効なセッションがあれば明細を置き換えて統計を再計算し、なければ端末の明細を保持します。有効な外見・バブル設定を復元します。実績は統合し、既存の初回記録を保持します。</string>
+    <string name="ui_backup_unknown_version">不明</string>
+    <string name="ui_last_backup_fmt">前回の成功したバックアップ：%1$s</string>
+    <string name="ui_timer_review">確定すると時間・終了動作・プレーヤーを直ちに適用します。一時停止には通知へのアクセスと対応プレーヤーが必要です。選択したセッションだけに要求を送り、応答はプレーヤーによります。</string>
+    <string name="ui_model_estimate">固定モデルの推定値・端末の節電実測ではありません</string>
+    <string name="ui_timer_summary_fmt">%1$s\n%2$s\n%3$s</string>
+</resources>

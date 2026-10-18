@@ -1,0 +1,8 @@
+<resources>
+    <string name="auto_playback_source">再生中のコンテンツ</string>
+    <string name="auto_playback_unknown">操作できる再生が見つかりません</string>
+    <string name="auto_playback_unavailable">再生元を特定できません。黒画面とタイマー解除は利用できます。</string>
+    <string name="auto_playback_changed">再生内容が変わりました。タイマーを閉じて開き直してください。</string>
+    <string name="auto_playback_update">最近聴いた内容 · リンクを保存 · ここを記録 · タイマー設定時の位置\n\n識別した内容は端末内に通常90日保存されます。マークと保存リンクは保持されます。管理画面で記録の停止や削除ができます。</string>
+    <string name="playback_source_control_in_app">%1$s の可能性があります · 操作は動画に戻ってください</string>
+</resources>

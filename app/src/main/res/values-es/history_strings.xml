@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Gestionar historial</string>
+    <string name="history_scope">Ver y exportar detalles conservados de los últimos 60 días (hasta 500 sesiones). Los anteriores conservan solo estadísticas acumuladas.</string>
+    <string name="history_date">Elegir fecha</string>
+    <string name="history_all">Todas las fechas</string>
+    <string name="history_export">Exportar registros actuales a CSV</string>
+    <string name="history_empty">Sin registros para esta fecha</string>
+    <string name="history_row">%1$s · %2$d min · %3$s</string>
+    <string name="history_black">Pantalla negra</string>
+    <string name="history_screen_off">Pantalla apagada</string>
+    <string name="history_delete">Eliminar</string>
+    <string name="history_delete_impact">El total baja %1$d minutos y 1 sesión. Se actualizan meses, sesión más larga y rachas. Se conservan el crecimiento, los logros desbloqueados y su historial. ¿Eliminar?</string>
+    <string name="history_delete_unavailable">Se archivaron algunos detalles del mes. No se pueden recalcular con precisión la sesión más larga y los días de escucha; no se permite eliminar.</string>
+    <string name="history_deleted">Registro eliminado; estadísticas actualizadas</string>
+    <string name="history_delete_failed">Error al eliminar; inténtalo de nuevo</string>
+    <string name="history_exported">Exportación completada</string>
+    <string name="history_export_failed">Error al exportar; elige otra ubicación</string>
+</resources>

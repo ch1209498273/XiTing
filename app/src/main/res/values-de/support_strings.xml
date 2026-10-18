@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="support_title">Diagnose</string>
+    <string name="support_yes">Ja</string>
+    <string name="support_no">Nein</string>
+    <string name="support_overlay">Overlay-Berechtigung</string>
+    <string name="support_media_access">Benachrichtigungszugriff</string>
+    <string name="support_notifications">Benachrichtigungen aktiviert</string>
+    <string name="support_battery">Von Akkuoptimierung ausgenommen</string>
+    <string name="support_session">Mediensitzung lesbar</string>
+    <string name="support_playing">Medienwiedergabe aktiv</string>
+    <string name="support_pause">Sitzung meldet Pause-Unterstützung</string>
+    <string name="support_seek">Sitzung meldet Suchlauf-Unterstützung</string>
+    <string name="support_service">Assistent läuft</string>
+    <string name="support_black">Schwarzer Vorhang sichtbar</string>
+    <string name="support_scope">Aktueller lokaler Status. Gemeldete Medienfunktionen garantieren keine Reaktion anderer Apps. Nach der Rückkehr aktualisieren.</string>
+    <string name="support_fix_overlay">Overlays erlauben</string>
+    <string name="support_fix_media">Benachrichtigungszugriff erlauben</string>
+    <string name="support_fix_notifications">Benachrichtigungseinstellungen</string>
+    <string name="support_fix_player">Player prüfen</string>
+    <string name="support_fix_start">Assistent starten</string>
+    <string name="support_fix_battery">Akkuoptimierung prüfen</string>
+    <string name="support_fix_app">App-Info</string>
+    <string name="support_refresh">Aktualisieren</string>
+    <string name="support_player_help">Wiedergabe im Player starten und zurückkehren. Bei fehlenden Sitzungen oder Steuerfunktionen einen anderen Player versuchen.</string>
+    <string name="support_open_failed">Diese Seite konnte nicht geöffnet werden. Die App in den Systemeinstellungen suchen.</string>
+    <string name="support_selected">Ausgewählt</string>
+    <string name="support_first_title">Vorschau prüfen</string>
+    <string name="support_first_intro">Schwarzen Bildschirm mit integrierter Stimme ausprobieren. Keine Video-App nötig.</string>
+    <string name="support_check_result">Ergebnis prüfen</string>
+    <string name="support_sound_question">War die Teststimme hörbar?</string>
+    <string name="support_return_question">Ist die vorherige Seite wieder sichtbar?</string>
+    <string name="support_first_success">Die Grundfunktion wurde getestet. Ein Video starten und die schwebende Schaltfläche antippen.</string>
+</resources>

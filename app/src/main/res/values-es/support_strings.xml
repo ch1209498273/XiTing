@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="support_title">Diagnóstico</string>
+    <string name="support_yes">Sí</string>
+    <string name="support_no">No</string>
+    <string name="support_overlay">Permiso de superposición</string>
+    <string name="support_media_access">Acceso a notificaciones</string>
+    <string name="support_notifications">Notificaciones activadas</string>
+    <string name="support_battery">Sin optimización de batería</string>
+    <string name="support_session">Sesión multimedia legible</string>
+    <string name="support_playing">Reproduciendo</string>
+    <string name="support_pause">La sesión declara soporte de pausa</string>
+    <string name="support_seek">La sesión declara soporte de búsqueda</string>
+    <string name="support_service">Asistente en ejecución</string>
+    <string name="support_black">Cortina negra visible</string>
+    <string name="support_scope">Estado local actual. Las funciones declaradas no garantizan la respuesta de otras apps. Actualiza al volver.</string>
+    <string name="support_fix_overlay">Permitir superposición</string>
+    <string name="support_fix_media">Permitir acceso a notificaciones</string>
+    <string name="support_fix_notifications">Ajustes de notificaciones</string>
+    <string name="support_fix_player">Revisar reproductor</string>
+    <string name="support_fix_start">Iniciar asistente</string>
+    <string name="support_fix_battery">Optimización de batería</string>
+    <string name="support_fix_app">Información de la app</string>
+    <string name="support_refresh">Actualizar</string>
+    <string name="support_player_help">Inicia la reproducción y vuelve aquí. Prueba otro reproductor si no hay sesión o controles compatibles.</string>
+    <string name="support_open_failed">No se pudo abrir esta pantalla. Busca esta app en los ajustes del sistema.</string>
+    <string name="support_selected">Seleccionado</string>
+    <string name="support_first_title">Comprobar la prueba</string>
+    <string name="support_first_intro">Prueba la pantalla negra con una voz integrada, sin otra aplicación de vídeo.</string>
+    <string name="support_check_result">Comprobar resultado</string>
+    <string name="support_sound_question">¿Has oído la voz de prueba?</string>
+    <string name="support_return_question">¿Has vuelto a la página anterior?</string>
+    <string name="support_first_success">La prueba básica ha terminado. Reproduce un vídeo y toca la burbuja flotante.</string>
+</resources>

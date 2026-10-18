@@ -1,0 +1,12 @@
+<resources>
+    <string name="guide_sound_help_title">テスト音声が聞こえませんか？</string>
+    <string name="guide_sound_help">メディア音量を上げてください。イヤホン接続中は音量と接続を確認してから再試行してください。</string>
+    <string name="guide_retry_audio">もう一度試す</string>
+    <string name="guide_return_help_title">画面が戻りませんか？</string>
+    <string name="guide_return_help">黒画面をタップして体験終了を選んでください。戻らない場合は通知から終了し、再試行してください。</string>
+    <string name="guide_audio_failed">テスト音声を再生できませんでした。もう一度お試しください。</string>
+    <string name="guide_pause_first">動画や音楽を一時停止してからお試しください。</string>
+    <string name="guide_black_hint">テスト音声を再生中です。終了後に画面が戻ります。</string>
+    <string name="guide_exit">体験終了</string>
+    <string name="guide_preparing">テスト音声を準備中…</string>
+</resources>

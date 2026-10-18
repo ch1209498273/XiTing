@@ -80,7 +80,7 @@
     <string name="caption_row_title">Black-screen captions (Beta)</string>
     <string name="caption_service_desc">Reads subtitle text of the playing video and shows it on the black screen in real time. Never stored, never uploaded, used for nothing else.</string>
     <string name="update_log_title_fmt">What\'s new in v%1$s</string>
-    <string name="update_log_body">· Four achievement badges redesigned as gold medals\n· New unlocks show a pop-in, halo and unique particles\n· View earned medals and replay their animation\n· Animations respect system settings and stop when hidden or finished</string>
+    <string name="update_log_body">· Set timers inside the curtain with the original player\n· Confirm timer acceptance and preserve inputs on failure\n· Remember timer choices and completed first-use guidance</string>
     <string name="switch_headset">Return to video when headphones unplug</string>
     <string name="bubble_style">Bubble style</string>
     <string name="settings_data">Data</string>
@@ -101,7 +101,7 @@
     <string name="widget_growth_next">Growth %1$d · %2$d to next</string>
     <string name="widget_growth_max">Growth %1$d · Maxed</string>
     <string name="black_hint">Screen-off listening · Tap to unlock</string>
-    <string name="black_return">🔒 Tap to return to video</string>
+    <string name="black_return">Return to player</string>
     <string name="channel_name">XiTing assistant</string>
     <string name="notif_title">XiTing assistant running</string>
     <string name="notif_text">Tap the bubble to black the screen — sound keeps playing%1$s</string>
@@ -183,15 +183,13 @@
     <string name="ach_king_t">Crowned</string>
     <string name="ach_king_d">Evolve to Thunder King</string>
     <string name="meas_title">Power measurement</string>
-    <string name="meas_purpose">Method: reads your battery\'s energy counter and compares the real consumption between "normal use" and "screen-off listening" to work out the saving.
-
-You don\'t need to do anything — samples are taken automatically as you use your phone. Not measured while charging (the data would be meaningless).</string>
+    <string name="meas_purpose">Method: reads CHARGE_COUNTER (charge in µAh), accumulating charge consumption during normal screen-on use and black-screen listening. Savings are estimated from the difference in average consumption rates.\n\nSamples are collected automatically during use, excluding charging. This is not a controlled causal experiment under identical conditions: player, brightness, network and background activity affect results. Sample count does not indicate statistical confidence.</string>
     <string name="meas_progress_fmt">Collected: screen-off %1$d times · screen-on %2$d times</string>
-    <string name="meas_level_0">Not enough samples yet, using a generic model for now. It gets more accurate after a few days of normal use.</string>
-    <string name="meas_level_1">Few samples so far, treat the estimate as rough. It improves after a few days.</string>
-    <string name="meas_level_2">A good number of samples — the estimate is fairly reliable.</string>
-    <string name="meas_level_3">Plenty of samples — the estimate is reliable.</string>
-    <string name="meas_black_power_fmt">Whole-device draw with screen off ≈ %1$.0f mW (from %2$d real sessions)</string>
+    <string name="meas_level_0">Insufficient samples; using a generic model. Results depend on usage conditions.</string>
+    <string name="meas_level_1">A few samples collected; estimates are approximate. Sample count does not indicate statistical confidence.</string>
+    <string name="meas_level_2">More samples collected; results still depend on usage conditions. Sample count does not indicate statistical confidence.</string>
+    <string name="meas_level_3">Highest sample-count tier reached; this does not establish causality or statistical confidence.</string>
+    <string name="meas_black_power_fmt">Average whole-device charge use under black screen ≈ %1$.2f mAh/min (%2$d samples)</string>
     <string name="meas_note_charging">· Not measured while charging (the counter goes back up)</string>
     <string name="meas_note_screendim">· Not counted as screen-on while the display is off</string>
     <string name="meas_note_minlen">· Segments shorter than 2 minutes are ignored</string>
@@ -227,7 +225,7 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="about_section_app">About this app</string>
     <string name="about_intro">A black overlay dims the display and blocks accidental touches while audio continues. Behavior depends on device, system and player; this is not system screen-off.\n\nIncludes timers, media controls, five interactive spirit forms, icon skins, widgets and reports.\n\nListening and growth data stay local with backup and restore. No Internet permission. Other permissions depend on the feature.</string>
     <string name="about_section_privacy">Privacy &amp; Security</string>
-    <string name="about_privacy">· No INTERNET permission: physically cannot go online\n· Reads nothing on your screen\n· All data stays on this device (system cloud backup and device transfer are explicitly disabled)\n· A backup file is written only when you tap Export, into the Download/XiTing folder, and stays under your control\n· Notification counts are read only after you grant Notification Access, solely for the black-screen badge; notification titles and contents are never read, and the feature stays off entirely without your permission\n· The app embeds a build identifier (build ID and channel, used only to trace pirated copies; it contains no device information)\n· No ads, no tracking, no analytics</string>
+    <string name="about_privacy">· No INTERNET permission; the app does not upload data\n· Listening records, growth and settings are stored locally; automatic backups can be written to Download/XiTing, and manual exports to a chosen location\n· System cloud backup is excluded; Android 12 and later retain system point-to-point device transfer. Older versions use file backup and restore\n· With Notification Access, notification counts and media-session metadata (title, player, playback state and progress) are read for the badge, controls and timers; ordinary notification bodies are not read\n· Optional experimental captions require a separately enabled accessibility service. It can read foreground window node text and filter captions for live display; text bodies are not stored or uploaded\n· Build ID and channel identify the version and contain no device information themselves; local backups contain a device identifier for restore checks\n· No ads, tracking or analytics</string>
     <string name="about_section_open">Open Source &amp; Contact</string>
     <string name="about_github">GitHub: github.com/ch1209498273/XiTing\n(Tap to open the project page)</string>
     <string name="about_feedback">Feedback: 1209498273@qq.com</string>
@@ -295,7 +293,7 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">Off</string>
-    <string name="notif_timer_fmt">· turns off in %1$d min</string>
+    <string name="notif_timer_fmt"> · Timer: %1$d min remaining</string>
     <string name="dlg_got_it">Got it</string>
     <string name="poster_preview_save">Save</string>
     <string name="poster_saved">Saved to Pictures/XiTing</string>
@@ -349,16 +347,12 @@ You don\'t need to do anything — samples are taken automatically as you use yo
     <string name="timer_pause_explain">Applies to the next timer you set, not the current timer. Pause needs notification access and a supported media session. Only the original player receives the request; it may not respond.</string>
     <string name="timer_no_target">No supported pause target. Check notification access and player support. Existing timer unchanged.</string>
     <string name="timer_pause_requested">Pause requested from the original player; its response determines whether playback stops.</string>
-    <string name="timer_already_paused">The original player is no longer playing. No playback toggle was sent.</string>
-    <string name="timer_pause_failed">Original session unavailable or pause unsupported. Curtain unchanged.</string>
+    <string name="timer_already_paused">The original player is already paused. The curtain stays unchanged.</string>
+    <string name="timer_pause_failed">Cannot pause right now. Use the player controls. The curtain stays unchanged.</string>
     <string name="timer_mode_status_fmt">%1$d min left · %2$s</string>
-    <string name="guide_title">First time? Try the curtain</string>
-    <string name="guide_intro">Allow overlay permission first. Notifications provide controls; notification access is optional for titles, progress and timed pause.
-
-Play a video, then return to start. The curtain clears automatically after 10 seconds. You can also tap to wake it and return.
-
-This demo earns no listening time or growth.</string>
-    <string name="guide_start">Start 10-second demo</string>
+    <string name="guide_title">Try a test sound</string>
+    <string name="guide_intro">No video app is needed. A built-in voice sample plays while the screen goes dark, then the page returns in about 10 seconds. Check media volume first. Connected headphones will play the sound.\n\nThis preview adds no listening time or growth points.</string>
+    <string name="guide_start">Start preview</string>
     <string name="guide_permission">Allow overlay permission, then return to start.</string>
     <string name="guide_busy">End the existing curtain or timer and check overlay permission before the demo.</string>
     <string name="guide_feedback">Did the audio keep playing while the curtain was black?</string>
@@ -369,4 +363,35 @@ This demo earns no listening time or growth.</string>
     <string name="ach_celebration_title">Achievement unlocked</string>
     <string name="ach_medal_title">My gold medal</string>
     <string name="ach_replay">Replay animation</string>
+    <!-- Shared playback and navigation copy -->
+    <string name="timer_episode_changed">The original content changed or the session expired. The episode timer was cancelled.</string>
+    <string name="timer_episode_waiting">Episode timer is waiting for playback to resume</string>
+    <string name="ui_home_intro">Ready to relax and listen</string>
+    <string name="ui_playback_source">Playback source</string>
+    <string name="ui_no_session">No readable playback session</string>
+    <string name="ui_media_permission">Enable Notification Access to see playback sources and supported controls</string>
+    <string name="ui_capabilities_fmt">Pause: %1$s · Seek: %2$s</string>
+    <string name="ui_supported">Supported</string>
+    <string name="ui_unsupported">Unsupported</string>
+    <string name="ui_growth_title">Spirit growth</string>
+    <string name="ui_listening_title">Listening overview</string>
+    <string name="ui_settings_playback">Playback and black screen</string>
+    <string name="ui_settings_appearance">Appearance</string>
+    <string name="ui_settings_permissions">Permissions and background</string>
+    <string name="ui_settings_data">Data and backups</string>
+    <string name="ui_settings_help">About and help</string>
+    <string name="ui_timer_extend">Add 15 minutes</string>
+    <string name="ui_unknown_date">Previously unlocked; date unknown</string>
+    <string name="ui_recorded_date_fmt">First recorded: %1$s</string>
+    <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
+    <string name="ui_timer_target_fmt">Target: %1$s</string>
+    <string name="ui_choose_player">Choose a player</string>
+    <string name="ui_no_backup">No successful backup recorded</string>
+    <string name="ui_backup_summary_fmt">Growth %1$d · %2$d sessions</string>
+    <string name="ui_estimate_basis">Estimates depend on usage conditions; sample count does not indicate statistical confidence.</string>
+    <string name="ui_stop_assistant">Stop assistant</string>
+    <string name="ui_ready">Ready</string>
+    <string name="ui_permission_ready">Basic permissions ready</string>
+    <string name="ui_permissions_details">Permission details</string>
+    <string name="ui_timer_minutes">Minutes</string>
 </resources>

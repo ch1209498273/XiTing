@@ -1,0 +1,12 @@
+<resources>
+    <string name="guide_sound_help_title">테스트 소리가 들리지 않나요?</string>
+    <string name="guide_sound_help">휴대폰의 미디어 음량을 높여 주세요. 이어폰 연결과 음량을 확인한 후 다시 시도하세요.</string>
+    <string name="guide_retry_audio">다시 체험</string>
+    <string name="guide_return_help_title">화면이 돌아오지 않나요?</string>
+    <string name="guide_return_help">검은 화면을 누른 후 체험 종료를 선택하세요. 계속 표시되면 알림에서 도우미를 종료한 후 다시 시도하세요.</string>
+    <string name="guide_audio_failed">테스트 소리를 재생할 수 없습니다. 잠시 후 다시 시도하세요.</string>
+    <string name="guide_pause_first">영상이나 음악을 일시 정지한 후 체험하세요.</string>
+    <string name="guide_black_hint">테스트 소리 재생 중입니다. 끝나면 화면이 돌아옵니다.</string>
+    <string name="guide_exit">체험 종료</string>
+    <string name="guide_preparing">테스트 소리 준비 중…</string>
+</resources>

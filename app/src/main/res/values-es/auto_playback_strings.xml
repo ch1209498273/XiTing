@@ -1,0 +1,8 @@
+<resources>
+    <string name="auto_playback_source">Reproducción actual</string>
+    <string name="auto_playback_unknown">No se detectó reproducción controlable</string>
+    <string name="auto_playback_unavailable">La fuente no está clara. La pantalla negra y el retorno programado siguen disponibles.</string>
+    <string name="auto_playback_changed">La reproducción cambió. Cierra y vuelve a abrir el temporizador.</string>
+    <string name="auto_playback_update">Escuchado recientemente · Guardar enlace · Marcar este momento · Posición al configurar el temporizador\n\nEl contenido identificado se guarda localmente 90 días. Marcas y enlaces guardados están protegidos. Puedes desactivar o limpiar el registro en gestión.</string>
+    <string name="playback_source_control_in_app">Posiblemente %1$s · Controla la reproducción en el vídeo</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rel_backup_manage">Gestión de copias</string>
+    <string name="rel_auto_backup">Copia automática en Descargas</string>
+    <string name="rel_backup_history">Historial de copias</string>
+    <string name="rel_undo_restore">Deshacer última restauración</string>
+    <string name="rel_no_snapshot">No hay instantánea disponible</string>
+    <string name="rel_stop_first">Detén el asistente antes de restaurar o deshacer.</string>
+    <string name="rel_snapshot_explain">Se guarda una instantánea local antes de restaurar. Las nuevas copias incluyen energía pendiente, caducidad original, estadísticas acumuladas y ciertos ajustes. Los campos ausentes de copias antiguas conservan el valor local.</string>
+    <string name="rel_backup_failed">Falló la última copia. Comprueba el espacio o exporta de nuevo.</string>
+    <string name="rel_backup_ok">Copia guardada</string>
+    <string name="rel_backup_none">No hay copias legibles</string>
+    <string name="rel_delete_backup">Eliminar esta copia</string>
+    <string name="rel_delete_confirm">Solo se elimina definitivamente el archivo público seleccionado. Los datos locales no cambian.</string>
+    <string name="rel_saved_backups">Copias legibles (acceso según el sistema)</string>
+    <string name="rel_restore_undo_ok">Recuperados los datos anteriores</string>
+    <string name="rel_recovery_title">Ejecución anterior interrumpida</string>
+    <string name="rel_recovery_message">Se interrumpió el asistente o se reinició el dispositivo. Puedes reiniciar la burbuja. La pantalla negra y el temporizador no se reanudan solos; configura el temporizador de nuevo.</string>
+    <string name="rel_recovery_timer">Temporizador anterior: unos %1$d minutos restantes. No se ejecutó su acción final durante la interrupción.</string>
+    <string name="rel_recovery_episode">El temporizador era para este episodio. Selecciona de nuevo el reproductor.</string>
+    <string name="rel_ack">Entendido</string>
+    <string name="rel_pending_summary">Energía pendiente válida: %1$d. Se conserva su caducidad original.</string>
+    <string name="rel_recovery_storage_fail">La restauración anterior está incompleta y no se puede escribir. Se conserva la instantánea original. Comprueba el espacio y abre de nuevo la app. El asistente y las nuevas escrituras están pausados.</string>
+</resources>

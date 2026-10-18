@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extras_presets">常用听剧方案</string>
+    <string name="extras_save_preset">保存当前方案</string>
+    <string name="extras_manage_presets">管理方案</string>
+    <string name="extras_preset_review">方案仅填入定时面板；请重新确认播放器和结束动作。</string>
+    <string name="extras_preset_format">%1$d 分钟 · %2$s</string>
+    <string name="extras_delete_preset">删除此方案？</string>
+    <string name="extras_delete">删除</string>
+    <string name="extras_no_presets">暂无保存方案</string>
+    <string name="extras_preset_saved">已保存方案</string>
+    <string name="extras_preset_duplicate">该方案已保存</string>
+    <string name="extras_personalization">个性化</string>
+    <string name="extras_appearance">外观</string>
+    <string name="extras_theme_system">跟随系统</string>
+    <string name="extras_theme_light">浅色</string>
+    <string name="extras_theme_dark">深色</string>
+    <string name="extras_entry_order">常用入口顺序</string>
+    <string name="extras_entry_order_hint">点击入口可将其移到首位；主操作保持固定。</string>
+    <string name="extras_entry_timer">定时</string>
+    <string name="extras_entry_player">播放器</string>
+    <string name="extras_entry_demo">演示</string>
+    <string name="extras_entry_permissions">权限</string>
+    <string name="extras_reset_order">恢复默认顺序</string>
+    <string name="extras_use_preset">使用方案</string>
+</resources>

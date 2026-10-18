@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Verlauf verwalten</string>
+    <string name="history_scope">Details der letzten 60 Tage anzeigen und exportieren (bis 500 Sitzungen). Ältere Daten bleiben als Summen erhalten.</string>
+    <string name="history_date">Datum wählen</string>
+    <string name="history_all">Alle Daten</string>
+    <string name="history_export">Aktuelle Einträge als CSV exportieren</string>
+    <string name="history_empty">Keine Einträge für dieses Datum</string>
+    <string name="history_row">%1$s · %2$d Min. · %3$s</string>
+    <string name="history_black">Schwarzer Bildschirm</string>
+    <string name="history_screen_off">Bildschirm aus</string>
+    <string name="history_delete">Löschen</string>
+    <string name="history_delete_impact">Die Summe sinkt um %1$d Minuten und 1 Sitzung. Monatswerte, längste Sitzung und Serien werden aktualisiert. Wachstum, freigeschaltete Erfolge und deren Verlauf bleiben erhalten. Löschen?</string>
+    <string name="history_delete_unavailable">Einige Monatsdetails wurden archiviert. Längste Sitzung und Hörtage lassen sich nicht genau neu berechnen; Löschen ist daher nicht verfügbar.</string>
+    <string name="history_deleted">Eintrag gelöscht; Statistik aktualisiert</string>
+    <string name="history_delete_failed">Löschen fehlgeschlagen; erneut versuchen</string>
+    <string name="history_exported">Export abgeschlossen</string>
+    <string name="history_export_failed">Export fehlgeschlagen; anderen Ort wählen</string>
+</resources>

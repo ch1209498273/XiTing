@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="support_title">Diagnostics</string>
+    <string name="support_yes">Yes</string>
+    <string name="support_no">No</string>
+    <string name="support_overlay">Overlay permission</string>
+    <string name="support_media_access">Notification access</string>
+    <string name="support_notifications">Notifications enabled</string>
+    <string name="support_battery">Battery optimization exempt</string>
+    <string name="support_session">Media session readable</string>
+    <string name="support_playing">Media playing</string>
+    <string name="support_pause">Session declares pause support</string>
+    <string name="support_seek">Session declares seek support</string>
+    <string name="support_service">Assistant service running</string>
+    <string name="support_black">Black curtain visible</string>
+    <string name="support_scope">Current local snapshot. Declared media capabilities do not guarantee a response from another app. Refresh after returning.</string>
+    <string name="support_fix_overlay">Allow overlays</string>
+    <string name="support_fix_media">Allow notification access</string>
+    <string name="support_fix_notifications">Notification settings</string>
+    <string name="support_fix_player">Check player</string>
+    <string name="support_fix_start">Start assistant</string>
+    <string name="support_fix_battery">Battery optimization</string>
+    <string name="support_fix_app">App details</string>
+    <string name="support_refresh">Refresh</string>
+    <string name="support_player_help">Start playback in your player, then return here. Try another player if media sessions or controls are unavailable.</string>
+    <string name="support_open_failed">Unable to open this screen. Find this app in system settings.</string>
+    <string name="support_selected">Selected</string>
+    <string name="support_first_title">Check your preview</string>
+    <string name="support_first_intro">Try a built-in voice sample with the black curtain, then check sound and return. No other video app is needed.</string>
+    <string name="support_check_result">Check result</string>
+    <string name="support_sound_question">Did you hear the test voice?</string>
+    <string name="support_return_question">Did the preview return to the previous page?</string>
+    <string name="support_first_success">The basic preview is complete. For listening, play a video and tap the floating bubble.</string>
+</resources>

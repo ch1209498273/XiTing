@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diag50_title">诊断摘要</string>
+    <string name="diag50_export">预览诊断摘要</string>
+    <string name="diag50_share">分享摘要</string>
+    <string name="diag50_scope">以下字段仅在你点击分享后交给所选应用。包含设备型号、权限和会话状态；不含剧名、标识符或原始日志。唤醒锁时长仅为本进程测量，不代表系统耗电。</string>
+</resources>

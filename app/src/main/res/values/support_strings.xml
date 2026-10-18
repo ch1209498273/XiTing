@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="support_title">诊断与自检</string>
+    <string name="support_yes">是</string>
+    <string name="support_no">否</string>
+    <string name="support_overlay">悬浮窗权限</string>
+    <string name="support_media_access">通知使用权</string>
+    <string name="support_notifications">通知已开启</string>
+    <string name="support_battery">电池优化已豁免</string>
+    <string name="support_session">可读取媒体会话</string>
+    <string name="support_playing">媒体正在播放</string>
+    <string name="support_pause">会话声明支持暂停</string>
+    <string name="support_seek">会话声明支持快进后退</string>
+    <string name="support_service">助手服务运行中</string>
+    <string name="support_black">黑幕正在显示</string>
+    <string name="support_scope">状态来自本机当前快照。媒体能力是播放器的声明，不保证第三方会响应。返回后请刷新。</string>
+    <string name="support_fix_overlay">开启悬浮窗权限</string>
+    <string name="support_fix_media">开启通知使用权</string>
+    <string name="support_fix_notifications">打开通知设置</string>
+    <string name="support_fix_player">检查播放器</string>
+    <string name="support_fix_start">启动助手</string>
+    <string name="support_fix_battery">检查电池优化</string>
+    <string name="support_fix_app">打开应用详情</string>
+    <string name="support_refresh">刷新状态</string>
+    <string name="support_player_help">请回到播放器开始播放，再返回自检。若该播放器不提供媒体会话或不响应控制，可尝试其他播放器。</string>
+    <string name="support_open_failed">无法打开此入口，请在系统设置中查找本应用。</string>
+    <string name="support_selected">已选中</string>
+    <string name="support_first_title">体验确认</string>
+    <string name="support_first_intro">播放一段内置测试语音并体验黑幕，结束后确认声音和返回画面。无需打开其他视频应用。</string>
+    <string name="support_check_result">检查结果</string>
+    <string name="support_sound_question">刚才有没有听到测试语音？</string>
+    <string name="support_return_question">体验结束后，是否正常回到了原来的页面？</string>
+    <string name="support_first_success">基础体验已完成。实际听剧时，先播放视频，再点悬浮球开启黑幕。</string>
+</resources>

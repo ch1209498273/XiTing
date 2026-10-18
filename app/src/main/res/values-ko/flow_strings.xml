@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flow_timer_setup">타이머 설정</string>
+    <string name="flow_timer_pending">타이머 확인 중…</string>
+    <string name="flow_timer_unconfirmed">설정 결과가 아직 확인되지 않았습니다. 현재 타이머를 확인해 주세요</string>
+    <string name="flow_player_lost">선택한 플레이어를 더 이상 사용할 수 없습니다. 다시 선택해 주세요</string>
+    <string name="flow_player_error">지금은 플레이어 정보를 읽을 수 없습니다. 다시 시도해 주세요</string>
+    <string name="flow_player_empty">먼저 플레이어에서 재생을 시작해 주세요</string>
+    <string name="flow_player_permission">재생 제어 권한이 허용되지 않았습니다</string>
+    <string name="flow_player_reselect">플레이어 다시 선택</string>
+    <string name="flow_timer_failed">타이머가 적용되지 않았습니다. 기존 설정을 유지했습니다</string>
+    <string name="flow_timer_ready">타이머가 설정되었습니다</string>
+    <string name="flow_end_action">타이머 종료 시 동작</string>
+    <string name="flow_minutes">%1$d분</string>
+    <string name="flow_custom">직접 설정</string>
+    <string name="flow_timer_review">플레이어, 시간, 종료 시 동작을 확인해 주세요</string>
+    <string name="flow_timer_return">검은 오버레이 해제</string>
+    <string name="flow_timer_pause">일시 정지를 요청하고 검은 오버레이 유지</string>
+    <string name="flow_episode_unavailable">현재 플레이어에서 에피소드 재생 진행 정보를 제공하지 않습니다</string>
+    <string name="flow_timer_result">타이머 설정 결과</string>
+    <string name="flow_setup_success">체험이 완료되었습니다. 도움말에서 언제든 다시 시도할 수 있습니다</string>
+    <string name="flow_request_expired">설정 요청이 만료되었습니다. 다시 시도해 주세요</string>
+</resources>

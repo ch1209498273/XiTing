@@ -1,0 +1,4 @@
+<resources>
+    <string name="switch_black_timer">Таймер сна на чёрном экране</string>
+    <string name="switch_black_timer_sub">Скрыть управление и обратный отсчёт без отмены активного таймера</string>
+</resources>

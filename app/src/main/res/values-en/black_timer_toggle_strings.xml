@@ -1,0 +1,4 @@
+<resources>
+    <string name="switch_black_timer">Show sleep timer on black screen</string>
+    <string name="switch_black_timer_sub">Hide timer controls and countdown without cancelling an active timer</string>
+</resources>

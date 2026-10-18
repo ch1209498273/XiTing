@@ -1,0 +1,4 @@
+<resources>
+    <string name="switch_black_timer">Afficher la minuterie sur écran noir</string>
+    <string name="switch_black_timer_sub">Masquer les commandes et le compte à rebours sans annuler la minuterie active</string>
+</resources>

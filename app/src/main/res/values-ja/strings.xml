@@ -80,7 +80,7 @@
     <string name="caption_row_title">黒幕字幕（実験的）</string>
     <string name="caption_service_desc">再生中の動画の字幕テキストを読み取り、息屏听劇の黒幕にリアルタイム表示します。保存・アップロードは一切行いません。</string>
     <string name="update_log_title_fmt">v%1$s の更新内容</string>
-    <string name="update_log_body">· 4つの実績バッジをゴールドメダルに刷新\n· 獲得時にポップ、光輪、専用パーティクルを表示\n· 獲得済みメダルを拡大しアニメーションを再生可能\n· システム設定に従い、非表示や終了時にアニメーション停止</string>
+    <string name="update_log_body">· 黒幕内で元のプレーヤーを対象にタイマーを設定\n· 設定結果を確認し失敗時は入力と元のタイマーを保持\n· タイマー設定と初回体験の完了を記憶</string>
     <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
     <string name="bubble_style">バブル表示</string>
     <string name="settings_data">データ</string>
@@ -101,7 +101,7 @@
     <string name="widget_growth_next">成長値 %1$d · 次の形態まで %2$d</string>
     <string name="widget_growth_max">成長値 %1$d · 最高到達</string>
     <string name="black_hint">画面オフ再生中 · 軽くタップするとロック解除</string>
-    <string name="black_return">🔒 タップで動画へ戻る</string>
+    <string name="black_return">プレーヤーに戻る</string>
     <string name="channel_name">画面オフ再生アシスタント</string>
     <string name="notif_title">画面オフ再生アシスタント 実行中</string>
     <string name="notif_text">バブルをタップすると画面が消え音は再生し続けます%1$s</string>
@@ -194,15 +194,13 @@
     <string name="ach_king_t">雷王の戴冠式</string>
     <string name="ach_king_d">精霊が雷王に進化</string>
     <string name="meas_title">省エネの実測</string>
-    <string name="meas_purpose">測り方：バッテリーのエネルギーカウンタを読み取り、「通常の使用」と「画面オフ再生」の実際の消費電力の差から節約量を算出します。
-
-あなたが做任何ことをする必要はありません — 普通に端末を使っている間に自動で採取されます。充電中は測定しません（データが意味を持たないため）。</string>
+    <string name="meas_purpose">測定方法：CHARGE_COUNTER 電荷カウンター（単位 µAh）を読み取り、通常の画面点灯時と黒画面で聴く間の電荷消費を集計し、平均消費速度の差から節電量を推定します。\n\n通常使用中に自動で採取し、充電中は除外します。同一条件を厳密に管理した因果実験ではなく、プレーヤー、明るさ、ネットワーク、バックグラウンド動作などが結果に影響します。サンプル数は統計的な信頼度を示しません。</string>
     <string name="meas_progress_fmt">採取済み：画面オフ %1$d 回 · 画面オン %2$d 回</string>
-    <string name="meas_level_0">サンプルがまだ不足しています。暂时は汎用モデルで試算しています。数日間使うと正確になります。</string>
-    <string name="meas_level_1">サンプルはまだ少なめです。試算値は目安としてください。数日間で正確になります。</string>
-    <string name="meas_level_2">十分なサンプルが集まりました。試算値は比較的信じられます。</string>
-    <string name="meas_level_3">サンプルが十分です。試算値を信じてください。</string>
-    <string name="meas_black_power_fmt">画面オフ時の端末消費電力 ≈ %1$.0f mW（実際の %2$d 回から算出）</string>
+    <string name="meas_level_0">サンプル不足のため汎用モデルで推定します。結果は使用状況に左右されます。</string>
+    <string name="meas_level_1">少数のサンプルを収集しました。推定値は参考値です。サンプル数は統計的な信頼度を示しません。</string>
+    <string name="meas_level_2">サンプルが増えましたが、結果は使用状況に左右されます。サンプル数は統計的な信頼度を示しません。</string>
+    <string name="meas_level_3">現在のサンプル数区分の上限に達しました。因果関係や統計的な信頼度を証明するものではありません。</string>
+    <string name="meas_black_power_fmt">黒画面中の端末全体の平均電荷消費 ≈ %1$.2f mAh/min（%2$d サンプル）</string>
     <string name="meas_note_charging">· 充電中は採取しません（カウンタが戻ります）</string>
     <string name="meas_note_screendim">· 画面消灯中は画面オンのサンプルに含めません</string>
     <string name="meas_note_minlen">· 2 分未満の区間は集計しません</string>
@@ -242,13 +240,7 @@
     <string name="about_section_app">このアプリについて</string>
     <string name="about_intro">黒いオーバーレイで画面を暗くし、誤操作を防いで音声を聴けます。動作は端末・OS・プレーヤーにより異なり、システムの画面オフとは違います。\n\nタイマー、再生操作、5段階の精霊、アイコン変更、ウィジェット、月報・年報に対応。\n\n記録と成長は端末内に保存し、バックアップと復元が可能。インターネット権限はなく、機能ごとに必要な権限を使います。</string>
     <string name="about_section_privacy">プライバシーと安全</string>
-    <string name="about_privacy">・INTERNET 権限なし：物理的にネットワークに接続できません
-・画面の内容は一切読み取りません
-・全データは端末内のみに保存（システムのクラウドバックアップと機種変更時の自動移行は明示的にオフ）
-・バックアップはあなたが明示的に書き出しをタップした時のみ「ダウンロード/XiTing」ディレクトリに保存され、管理は自分で行います
-・「通知の読み取り権限」を明示的に付与した場合に限り、画面オフのバッジ用に通知件数をカウントします。通知のタイトルや内容は読み取らず、権限がなければ機能全体が動作しません
-・アプリにはビルド識別子（ビルドIDとチャネル）を含みます（不正複製の追跡専用で、端末情報は一切含みません）
-・広告なし、トラッキングなし、計測なし</string>
+    <string name="about_privacy">· INTERNET 権限はなく、データをアップロードしません\n· 視聴記録、成長、設定は端末内に保存します。Download/XiTing への自動バックアップと指定場所への手動エクスポートが可能です\n· システムのクラウドバックアップは除外しています。Android 12 以降ではシステムの端末間直接移行を許可し、旧版ではファイルから復元します\n· 通知へのアクセスを許可すると、通知数とメディアセッションのメタデータ（タイトル、プレーヤー、再生状態、進行状況など）をバッジ、再生操作、タイマーに使用します。通常の通知本文は読み取りません\n· 任意の実験的字幕機能には別途有効にするアクセシビリティサービスが必要です。前面ウィンドウのノードテキストを読み、字幕を抽出してリアルタイム表示します。本文は保存・アップロードしません\n· ビルドIDと配信チャネルはバージョン追跡用で、それ自体に端末情報を含みません。ローカルバックアップには復元確認用の端末識別子を含みます\n· 広告、追跡、アクセス解析はありません</string>
     <string name="about_section_open">オープンソースと連絡先</string>
     <string name="about_github">GitHub：github.com/ch1209498273/XiTing
 （タップでプロジェクトページを開く）</string>
@@ -319,7 +311,7 @@
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">消灯</string>
-    <string name="notif_timer_fmt">· %1$d分後に終了</string>
+    <string name="notif_timer_fmt"> · タイマー：残り%1$d分</string>
     <string name="dlg_got_it">了解</string>
     <string name="poster_preview_save">保存</string>
     <string name="poster_saved">「Pictures/XiTing」に保存しました</string>
@@ -373,16 +365,12 @@
     <string name="timer_pause_explain">次に設定するタイマーに適用します。現在のタイマーは変わりません。通知へのアクセスと対応する再生セッションが必要です。設定時のプレーヤーだけに要求し、応答しない場合もあります。</string>
     <string name="timer_no_target">一時停止できるセッションがありません。通知へのアクセスとプレーヤーの対応を確認してください。既存タイマーは変更していません。</string>
     <string name="timer_pause_requested">元のプレーヤーに一時停止を要求しました。停止するかはプレーヤーの応答によります。</string>
-    <string name="timer_already_paused">元のプレーヤーは再生していません。再生切り替えは送信しません。</string>
-    <string name="timer_pause_failed">元のセッションが無効か一時停止非対応です。黒い画面は変更しません。</string>
+    <string name="timer_already_paused">元のプレーヤーは一時停止中です。黒画面はそのままです。</string>
+    <string name="timer_pause_failed">一時停止できません。プレーヤーで操作してください。黒画面はそのままです。</string>
     <string name="timer_mode_status_fmt">残り%1$d分 · %2$s</string>
-    <string name="guide_title">初めてですか？黒い画面を試す</string>
-    <string name="guide_intro">まず重ねて表示する権限を許可してください。通知は操作用、通知へのアクセスは曲名・進捗・タイマー一時停止などに必要です。
-
-動画を再生してから戻り、開始します。10秒後に自動で戻ります。タップして表示し、戻ることもできます。
-
-デモは再生時間や成長値に加算されません。</string>
-    <string name="guide_start">10秒のデモを開始</string>
+    <string name="guide_title">テスト音声を試す</string>
+    <string name="guide_intro">動画アプリは不要です。内蔵音声と黒画面を試し、約10秒後に元の画面へ戻ります。メディア音量とイヤホンの接続をご確認ください。体験時間は記録されません。</string>
+    <string name="guide_start">体験開始</string>
     <string name="guide_permission">重ねて表示する権限を許可してから戻ってください。</string>
     <string name="guide_busy">現在の黒い画面やタイマーを終了し、表示権限を確認してください。</string>
     <string name="guide_feedback">画面が黒い間も音声は続いていましたか？</string>
@@ -393,4 +381,35 @@
     <string name="ach_celebration_title">実績を達成</string>
     <string name="ach_medal_title">ゴールドメダル</string>
     <string name="ach_replay">アニメーションを再生</string>
+    <!-- Shared playback and navigation copy -->
+    <string name="timer_episode_changed">元の再生内容が変わったか、セッションが無効になったため、この回のタイマーを解除しました。</string>
+    <string name="timer_episode_waiting">この回のタイマーは再生の再開を待っています</string>
+    <string name="ui_home_intro">準備できたら、ゆっくり聴こう</string>
+    <string name="ui_playback_source">再生元</string>
+    <string name="ui_no_session">読み取れる再生セッションはありません</string>
+    <string name="ui_media_permission">通知へのアクセスを許可すると、再生元と対応する操作を確認できます</string>
+    <string name="ui_capabilities_fmt">一時停止：%1$s · シーク：%2$s</string>
+    <string name="ui_supported">対応</string>
+    <string name="ui_unsupported">非対応</string>
+    <string name="ui_growth_title">精霊の成長</string>
+    <string name="ui_listening_title">視聴の概要</string>
+    <string name="ui_settings_playback">再生と黒画面</string>
+    <string name="ui_settings_appearance">外観</string>
+    <string name="ui_settings_permissions">権限とバックグラウンド</string>
+    <string name="ui_settings_data">データとバックアップ</string>
+    <string name="ui_settings_help">アプリ情報とヘルプ</string>
+    <string name="ui_timer_extend">15分延長</string>
+    <string name="ui_unknown_date">過去に解除済み・日付不明</string>
+    <string name="ui_recorded_date_fmt">初回記録：%1$s</string>
+    <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
+    <string name="ui_timer_target_fmt">対象：%1$s</string>
+    <string name="ui_choose_player">プレーヤーを選択</string>
+    <string name="ui_no_backup">成功したバックアップの記録はありません</string>
+    <string name="ui_backup_summary_fmt">成長値 %1$d · セッション %2$d 件</string>
+    <string name="ui_estimate_basis">推定値は使用状況に左右されます。サンプル数は統計的な信頼度を示しません。</string>
+    <string name="ui_stop_assistant">アシスタントを停止</string>
+    <string name="ui_ready">準備完了</string>
+    <string name="ui_permission_ready">基本権限の準備完了</string>
+    <string name="ui_permissions_details">権限の詳細</string>
+    <string name="ui_timer_minutes">分</string>
 </resources>

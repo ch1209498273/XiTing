@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flow_timer_setup">Set timer</string>
+    <string name="flow_timer_pending">Confirming timer…</string>
+    <string name="flow_timer_unconfirmed">The result is not confirmed yet. Please check the current timer.</string>
+    <string name="flow_player_lost">The selected player is no longer available. Please select it again.</string>
+    <string name="flow_player_error">Unable to read the player right now. Please try again.</string>
+    <string name="flow_player_empty">Please start playback in your player first.</string>
+    <string name="flow_player_permission">Playback control permission not granted</string>
+    <string name="flow_player_reselect">Select player again</string>
+    <string name="flow_timer_failed">Timer not applied. Previous settings kept.</string>
+    <string name="flow_timer_ready">Timer set</string>
+    <string name="flow_end_action">When the timer ends</string>
+    <string name="flow_minutes">%1$d min</string>
+    <string name="flow_custom">Custom</string>
+    <string name="flow_timer_review">Please confirm the player, duration and end action.</string>
+    <string name="flow_timer_return">Remove black overlay</string>
+    <string name="flow_timer_pause">Request pause and keep black overlay</string>
+    <string name="flow_episode_unavailable">The current player does not provide episode progress.</string>
+    <string name="flow_timer_result">Timer result</string>
+    <string name="flow_setup_success">Tryout complete. You can try again anytime in Help.</string>
+    <string name="flow_request_expired">The setup request has expired. Please try again.</string>
+</resources>

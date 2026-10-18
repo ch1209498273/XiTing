@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="ui_backup_version_fmt">Backup version: %1$s</string>
+    <string name="ui_backup_same_device">From this device</string>
+    <string name="ui_backup_other_device">From another or unknown device</string>
+    <string name="ui_backup_restore_effect">Restoring replaces growth and share date. Valid sessions replace listening details and rebuild statistics; otherwise local sessions remain. Valid outfit and bubble settings are restored. Achievements merge, preserving existing first records.</string>
+    <string name="ui_backup_unknown_version">Unknown</string>
+    <string name="ui_last_backup_fmt">Last successful backup: %1$s</string>
+    <string name="ui_timer_review">Confirm applies this duration, end action and player now. Pause needs notification access and player support. Only the selected session receives the request; the player may ignore it.</string>
+    <string name="ui_model_estimate">Fixed model estimate, not measured savings</string>
+    <string name="ui_timer_summary_fmt">%1$s\n%2$s\n%3$s</string>
+</resources>

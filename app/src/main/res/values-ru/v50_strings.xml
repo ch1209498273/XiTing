@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v50_scenes">Выберите сценарий</string>
+    <string name="v50_sleep">Таймер сна</string>
+    <string name="v50_episode">До конца серии</string>
+    <string name="v50_continuous">Слушать дальше</string>
+    <string name="v50_overlay_needed">Сначала разрешите показ поверх других приложений.</string>
+    <string name="v50_continuous_cancel">Текущий таймер будет отменён. Завершить нужно вручную. Запустится только помощник. Вернитесь в плеер и включите чёрный экран плавающей кнопкой.</string>
+    <string name="v50_continuous_review">Без таймера: завершить нужно вручную. Запустится только помощник. Вернитесь в плеер и включите чёрный экран плавающей кнопкой.</string>
+    <string name="v50_ready">Готово. Вернитесь в плеер и включите чёрный экран плавающей кнопкой.</string>
+    <string name="v50_session">Текущий сеанс</string>
+    <string name="v50_idle">Помощник не запущен</string>
+    <string name="v50_starting">Помощник запускается</string>
+    <string name="v50_running">Помощник работает</string>
+    <string name="v50_stopping">Помощник останавливается</string>
+    <string name="v50_interrupted">Сеанс прерван</string>
+    <string name="v50_curtain_off">Чёрный экран выключен</string>
+    <string name="v50_curtain_locked">Чёрный экран заблокирован</string>
+    <string name="v50_curtain_awake">Управление чёрным экраном</string>
+    <string name="v50_play_unknown">Воспроизведение неизвестно</string>
+    <string name="v50_play_playing">Плеер сообщает о воспроизведении</string>
+    <string name="v50_play_paused">Плеер сообщает о паузе</string>
+    <string name="v50_play_buffering">Плеер сообщает о буферизации</string>
+    <string name="v50_play_invalid">Сеанс плеера недействителен</string>
+    <string name="v50_timer_fixed">Таймер времени</string>
+    <string name="v50_timer_waiting">Ожидание воспроизведения</string>
+    <string name="v50_timer_executing">Выполняется действие завершения</string>
+    <string name="v50_timer_ended">Таймер завершён</string>
+    <string name="v50_remaining">Осталось %1$d:%2$02d</string>
+    <string name="v50_pause_requested">Пауза запрошена</string>
+    <string name="v50_pause_confirmed">Плеер подтвердил паузу</string>
+    <string name="v50_pause_already">Плеер уже был на паузе</string>
+    <string name="v50_pause_unavailable">Пауза сейчас недоступна. Используйте плеер</string>
+    <string name="v50_pause_failed">Не удалось поставить на паузу</string>
+    <string name="v50_pause_unconfirmed">Пауза не подтверждена. Проверьте плеер</string>
+    <string name="v50_recent">Последний результат</string>
+    <string name="v50_records">Результаты сеансов</string>
+    <string name="v50_end_user">Завершено вами</string>
+    <string name="v50_end_timer">Время таймера истекло</string>
+    <string name="v50_end_unknown">Причина завершения неизвестна</string>
+    <string name="v50_no_records">Результатов пока нет</string>
+    <string name="v50_recap_enabled">Показывать итог прошлого сеанса</string>
+    <string name="v50_settings_tools">Данные, диагностика и итоги</string>
+    <string name="v50_target_changed">Содержимое плеера изменилось. Проверьте новую цель и действие завершения, затем подтвердите снова. Длительность сохранена.</string>
+</resources>
+

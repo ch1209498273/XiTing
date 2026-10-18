@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_media_access_missing">Acceso a controles multimedia no autorizado · Pantalla negra y regreso programado disponibles</string>
+    <string name="player_choice_intro">Elige una aplicación para usar. La pausa y las funciones de fin de reproducción dependen de la sesión multimedia que ofrece la aplicación.</string>
+    <string name="player_control_unavailable">Sin sesión multimedia controlable · Pantalla negra y regreso programado disponibles</string>
+    <string name="player_state_playing">Reproduciendo</string>
+    <string name="player_state_paused">En pausa</string>
+    <string name="player_state_available">Sesión multimedia disponible</string>
+    <string name="player_control_pause">Se puede solicitar una pausa</string>
+    <string name="player_control_no_pause">Pausa no compatible</string>
+    <string name="player_selected_no_session">La aplicación elegida no ofrece controles multimedia. Puedes usar la pantalla negra o el regreso programado.</string>
+    <string name="player_choice_none">Elige un reproductor</string>
+</resources>

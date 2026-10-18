@@ -80,7 +80,7 @@
     <string name="caption_row_title">Sous-titres écran noir (bêta)</string>
     <string name="caption_service_desc">Lit le texte des sous-titres de la vidéo en cours et laffiche en temps réel sur l\'écran noir. Jamais stocké, jamais envoyé, rien dautre.</string>
     <string name="update_log_title_fmt">Nouveautés de v%1$s</string>
-    <string name="update_log_body">· Quatre badges de succès redessinés en médailles dorées\n· Nouveaux succès avec apparition, halo et particules dédiées\n· Voir les médailles acquises et rejouer leur animation\n· Animations conformes aux réglages système, arrêtées une fois terminées ou masquées</string>
+    <string name="update_log_body">· Régler le minuteur dans le rideau pour le lecteur sélectionné\n· Confirmer le réglage et conserver la saisie en cas de refus\n· Mémoriser les choix et la fin de la prise en main</string>
     <string name="switch_headset">Retour vidéo au débranchement</string>
     <string name="bubble_style">Style de bulle</string>
     <string name="settings_data">Données</string>
@@ -101,7 +101,7 @@
     <string name="widget_growth_next">Progression %1$d · %2$d avant la forme suivante</string>
     <string name="widget_growth_max">Progression %1$d · Au sommet</string>
     <string name="black_hint">Écoute écran off · Touchez pour déverrouiller</string>
-    <string name="black_return">🔒 Toucher pour revenir à la vidéo</string>
+    <string name="black_return">Retour au lecteur</string>
     <string name="channel_name">Assistant Écran off</string>
     <string name="notif_title">Assistant écran off en marche</string>
     <string name="notif_text">Touchez la bulle : l\'écran s\'éteint, le son continue%1$s</string>
@@ -194,15 +194,13 @@ Sans autorisation, le compte à rebours normal fonctionne aussi.</string>
     <string name="ach_king_t">Couronnement</string>
     <string name="ach_king_d">L\'esprit atteint le Roi du tonnerre</string>
     <string name="meas_title">Mesure d\'économie</string>
-    <string name="meas_purpose">Méthode : lit le compteur d\'énergie de la batterie et compare la consommation réelle entre « usage normal » et « écoute écran off » pour en déduire l\'économie.
-
-Vous n\'avez rien à faire — la mesure se fait automatiquement pendant que vous utilisez le téléphone. Rien n\'est mesuré en charge (les données n\'auraient aucun sens).</string>
+    <string name="meas_purpose">Méthode : lecture du compteur de charge CHARGE_COUNTER (en µAh), cumul de la charge consommée pendant l’utilisation normale avec écran allumé et l’écoute sur écran noir, puis estimation des économies par la différence des débits moyens.\n\nCollecte automatique pendant l’utilisation, hors charge. Ce n’est pas une expérience causale strictement contrôlée dans des conditions identiques : lecteur, luminosité, réseau et activités en arrière-plan influencent les résultats. Le nombre d’échantillons ne représente pas une confiance statistique.</string>
     <string name="meas_progress_fmt">Collecté : écran off %1$d fois · écran allumé %2$d fois</string>
-    <string name="meas_level_0">Pas encore assez d\'échantillons, estimation sur un modèle générique. Plus juste après quelques jours d\'usage normal.</string>
-    <string name="meas_level_1">Peu d\'échantillons, l\'estimation est approximative. Elle s\'améliore après quelques jours.</string>
-    <string name="meas_level_2">Échantillons suffisants — l\'estimation est assez fiable.</string>
-    <string name="meas_level_3">Beaucoup d\'échantillons — l\'estimation est fiable.</string>
-    <string name="meas_black_power_fmt">Consommation écran éteint ≈ %1$.0f mW (d\'après %2$d sessions réelles)</string>
+    <string name="meas_level_0">Échantillons insuffisants : estimation par un modèle générique. Les résultats dépendent de l’utilisation.</string>
+    <string name="meas_level_1">Quelques échantillons recueillis : estimation indicative. Leur nombre ne représente pas une confiance statistique.</string>
+    <string name="meas_level_2">Davantage d’échantillons recueillis, mais les résultats dépendent toujours de l’utilisation. Leur nombre ne représente pas une confiance statistique.</string>
+    <string name="meas_level_3">Seuil maximal des catégories d’échantillons atteint ; cela ne démontre ni causalité ni confiance statistique.</string>
+    <string name="meas_black_power_fmt">Charge moyenne consommée par l’appareil sur écran noir ≈ %1$.2f mAh/min (%2$d échantillons)</string>
     <string name="meas_note_charging">· Pas de mesure en charge (le compteur remonte)</string>
     <string name="meas_note_screendim">· Écran éteint ne compte pas comme « écran allumé »</string>
     <string name="meas_note_minlen">· Les segments de moins de 2 minutes sont ignorés</string>
@@ -242,13 +240,7 @@ Vous n\'avez rien à faire — la mesure se fait automatiquement pendant que vou
     <string name="about_section_app">À propos de cette app</string>
     <string name="about_intro">Un écran superposé noir assombrit le contenu et bloque les touchers accidentels pendant la lecture audio. Le comportement dépend du matériel, du système et du lecteur ; ce ne sont pas les mécanismes système de veille.\n\nMinuteries, commandes, cinq formes de créature, icônes, widgets et rapports.\n\nDonnées locales avec sauvegarde et restauration. Aucune permission Internet ; autres autorisations selon la fonction.</string>
     <string name="about_section_privacy">Confidentialité et sécurité</string>
-    <string name="about_privacy">· Aucune permission INTERNET : connexion réseau impossible
-· Aucune capture ni lecture du contenu de l\'écran
-· Toutes les données restent sur l\'appareil (sauvegarde cloud et transfert automatique désactivés)
-· La sauvegarde n\'est écrite que lorsque vous appuyez sur Exporter, dans Téléchargements/XiTing, et vous la gérez
-· Le nombre de notifications n\'est compté (pour l\'indicateur de l\'écran noir) qu\'après votre autorisation explicite ; ni titre ni contenu ne sont lus, et la fonction reste inactive sans autorisation
-· L\'app contient un identifiant de build (ID et canal), uniquement pour tracer les copies pirates, sans aucune information d\'appareil
-· Pas de publicité, pas de tracking, pas de télémétrie</string>
+    <string name="about_privacy">· Sans autorisation INTERNET, l’application ne téléverse pas de données\n· Historique d’écoute, croissance et réglages sont conservés localement ; sauvegardes automatiques dans Download/XiTing et export manuel vers un emplacement choisi\n· La sauvegarde cloud du système est exclue ; Android 12 et versions ultérieures permettent le transfert direct entre appareils par le système. Les versions antérieures utilisent une restauration depuis un fichier\n· Avec l’accès aux notifications, le nombre de notifications et les métadonnées des sessions multimédias (titre, lecteur, état et progression) servent au badge, aux commandes et aux minuteurs. Le corps des notifications ordinaires n’est pas lu\n· Les sous-titres expérimentaux facultatifs nécessitent un service d’accessibilité activé séparément. Il peut lire le texte des nœuds de la fenêtre au premier plan pour filtrer et afficher les sous-titres en direct ; le texte n’est ni stocké ni téléversé\n· L’identifiant de build et le canal servent à retracer la version et ne contiennent pas eux-mêmes d’informations sur l’appareil ; les sauvegardes locales contiennent un identifiant d’appareil pour vérifier la restauration\n· Sans publicité, suivi ni collecte analytique</string>
     <string name="about_section_open">Open source et contact</string>
     <string name="about_github">GitHub : github.com/ch1209498273/XiTing
 (appuyez pour ouvrir la page du projet)</string>
@@ -319,7 +311,7 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">Off</string>
-    <string name="notif_timer_fmt">· extinction dans %1$d min</string>
+    <string name="notif_timer_fmt"> · Minuteur : %1$d min restantes</string>
     <string name="dlg_got_it">J\'ai compris</string>
     <string name="poster_preview_save">Enregistrer</string>
     <string name="poster_saved">Enregistré dans Pictures/XiTing</string>
@@ -373,16 +365,12 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="timer_pause_explain">Pour la prochaine minuterie, sans modifier celle en cours. Accès aux notifications et session compatible requis. Seul le lecteur initial reçoit la demande, sans garantie de réponse.</string>
     <string name="timer_no_target">Aucune cible de pause compatible. Vérifiez les autorisations et le lecteur. Minuterie existante inchangée.</string>
     <string name="timer_pause_requested">Pause demandée au lecteur initial ; sa réponse détermine le résultat.</string>
-    <string name="timer_already_paused">Le lecteur initial ne joue plus. Aucune commande de bascule envoyée.</string>
-    <string name="timer_pause_failed">Session initiale indisponible ou pause non prise en charge. Rideau inchangé.</string>
+    <string name="timer_already_paused">Le lecteur initial est déjà en pause. Le rideau reste inchangé.</string>
+    <string name="timer_pause_failed">Pause indisponible. Utilisez le lecteur. Le rideau reste inchangé.</string>
     <string name="timer_mode_status_fmt">Reste %1$d min · %2$s</string>
-    <string name="guide_title">Première fois ? Essayer le rideau</string>
-    <string name="guide_intro">Autorisez la superposition. Les notifications servent aux commandes ; leur accès sert aux titres, à la progression et à la pause programmée.
-
-Lancez une vidéo puis revenez démarrer. Retour automatique après 10 secondes. Vous pouvez aussi toucher puis revenir.
-
-La démo ne compte ni temps ni croissance.</string>
-    <string name="guide_start">Démarrer la démo de 10 s</string>
+    <string name="guide_title">Essayer un son de test</string>
+    <string name="guide_intro">Aucune application vidéo requise. Une voix intégrée accompagne le rideau noir, puis la page revient après environ 10 secondes. Vérifiez le volume multimédia et le casque. Cet essai ne compte pas dans le temps enregistré.</string>
+    <string name="guide_start">Commencer</string>
     <string name="guide_permission">Autorisez la superposition puis revenez démarrer.</string>
     <string name="guide_busy">Arrêtez le rideau ou la minuterie en cours et vérifiez la superposition.</string>
     <string name="guide_feedback">Le son a-t-il continué pendant le rideau noir ?</string>
@@ -393,4 +381,35 @@ La démo ne compte ni temps ni croissance.</string>
     <string name="ach_celebration_title">Succès débloqué</string>
     <string name="ach_medal_title">Ma médaille dorée</string>
     <string name="ach_replay">Rejouer l’animation</string>
+    <!-- Shared playback and navigation copy -->
+    <string name="timer_episode_changed">Le contenu initial a changé ou la session a expiré. Le minuteur de cet épisode a été annulé.</string>
+    <string name="timer_episode_waiting">Le minuteur de cet épisode attend la reprise de la lecture</string>
+    <string name="ui_home_intro">Prêt pour une écoute tranquille</string>
+    <string name="ui_playback_source">Source de lecture</string>
+    <string name="ui_no_session">Aucune session de lecture lisible</string>
+    <string name="ui_media_permission">Autorisez l’accès aux notifications pour voir la source et les commandes prises en charge</string>
+    <string name="ui_capabilities_fmt">Pause : %1$s · Recherche : %2$s</string>
+    <string name="ui_supported">Pris en charge</string>
+    <string name="ui_unsupported">Non pris en charge</string>
+    <string name="ui_growth_title">Croissance de l’esprit</string>
+    <string name="ui_listening_title">Aperçu de l’écoute</string>
+    <string name="ui_settings_playback">Lecture et écran noir</string>
+    <string name="ui_settings_appearance">Apparence</string>
+    <string name="ui_settings_permissions">Autorisations et arrière-plan</string>
+    <string name="ui_settings_data">Données et sauvegardes</string>
+    <string name="ui_settings_help">À propos et aide</string>
+    <string name="ui_timer_extend">Ajouter 15 minutes</string>
+    <string name="ui_unknown_date">Débloqué auparavant, date inconnue</string>
+    <string name="ui_recorded_date_fmt">Premier enregistrement : %1$s</string>
+    <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
+    <string name="ui_timer_target_fmt">Cible : %1$s</string>
+    <string name="ui_choose_player">Choisir un lecteur</string>
+    <string name="ui_no_backup">Aucune sauvegarde réussie enregistrée</string>
+    <string name="ui_backup_summary_fmt">Croissance %1$d · %2$d sessions</string>
+    <string name="ui_estimate_basis">Les estimations dépendent de l’utilisation ; le nombre d’échantillons ne représente pas une confiance statistique.</string>
+    <string name="ui_stop_assistant">Arrêter l’assistant</string>
+    <string name="ui_ready">Prêt</string>
+    <string name="ui_permission_ready">Autorisations de base prêtes</string>
+    <string name="ui_permissions_details">Détails des autorisations</string>
+    <string name="ui_timer_minutes">Minutes</string>
 </resources>

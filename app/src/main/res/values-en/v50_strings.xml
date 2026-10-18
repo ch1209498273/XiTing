@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v50_scenes">Choose a listening scene</string>
+    <string name="v50_sleep">Sleep timer</string>
+    <string name="v50_episode">Finish this episode</string>
+    <string name="v50_continuous">Keep listening</string>
+    <string name="v50_overlay_needed">Allow display over other apps before preparing a scene.</string>
+    <string name="v50_continuous_cancel">This cancels the current timer. End listening yourself. Only the assistant starts. Return to your player and use the floating button to cover the screen.</string>
+    <string name="v50_continuous_review">No timer: end listening yourself. Only the assistant starts. Return to your player and use the floating button to cover the screen.</string>
+    <string name="v50_ready">Ready. Return to your player and use the floating button to cover the screen.</string>
+    <string name="v50_session">This session</string>
+    <string name="v50_idle">Assistant idle</string>
+    <string name="v50_starting">Assistant starting</string>
+    <string name="v50_running">Assistant running</string>
+    <string name="v50_stopping">Assistant stopping</string>
+    <string name="v50_interrupted">Session interrupted</string>
+    <string name="v50_curtain_off">Curtain off</string>
+    <string name="v50_curtain_locked">Curtain locked</string>
+    <string name="v50_curtain_awake">Curtain controls awake</string>
+    <string name="v50_play_unknown">Playback unknown</string>
+    <string name="v50_play_playing">Player reports playing</string>
+    <string name="v50_play_paused">Player reports paused</string>
+    <string name="v50_play_buffering">Player reports buffering</string>
+    <string name="v50_play_invalid">Player session invalid</string>
+    <string name="v50_timer_fixed">Fixed timer</string>
+    <string name="v50_timer_waiting">Waiting for playback</string>
+    <string name="v50_timer_executing">Applying end action</string>
+    <string name="v50_timer_ended">Timer ended</string>
+    <string name="v50_remaining">Remaining %1$d:%2$02d</string>
+    <string name="v50_pause_requested">Pause requested</string>
+    <string name="v50_pause_confirmed">Player confirmed paused</string>
+    <string name="v50_pause_already">Player was already paused</string>
+    <string name="v50_pause_unavailable">Cannot pause right now. Use the player controls</string>
+    <string name="v50_pause_failed">Pause failed</string>
+    <string name="v50_pause_unconfirmed">Pause could not be confirmed. Check the player</string>
+    <string name="v50_recent">Latest result</string>
+    <string name="v50_records">Session results</string>
+    <string name="v50_end_user">Ended by you</string>
+    <string name="v50_end_timer">Timer expired</string>
+    <string name="v50_end_unknown">End reason unknown</string>
+    <string name="v50_no_records">No session results yet</string>
+    <string name="v50_recap_enabled">Show last session recap</string>
+    <string name="v50_settings_tools">Data, diagnostics and recap</string>
+    <string name="v50_target_changed">Player content changed. Review the new target and end action, then confirm again. Your duration is kept.</string>
+</resources>
+

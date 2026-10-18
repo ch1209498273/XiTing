@@ -39,6 +39,8 @@ object Prefs {
     const val DIRECT_UNLOCK = "direct_unlock"
     /** 黑幕上显示暗色夜钟与电量 */
     const val BLACK_INFO_SHOW = "black_info_show"
+    /** 黑幕定时入口与倒计时；默认隐藏，避免误触。独立于后台定时执行。 */
+    const val BLACK_TIMER_SHOW = "black_timer_show"
     /** 黑幕内媒体控制行（上一集/播放暂停/下一集） */
     const val BLACK_MEDIA_CONTROLS = "black_media_controls"
     /** 耳机拔出/蓝牙断连自动撤幕 */
@@ -71,6 +73,8 @@ object Prefs {
     // ---- 成就与皮肤 ----
     const val ACH_CELEBRATION_PENDING = "ach_celebration_pending"
     const val ACH_UNLOCKED = "ach_unlocked"
+    const val ACH_HISTORY = "ach_history"
+    const val LAST_SUCCESSFUL_BACKUP_AT = "last_successful_backup_at"
     const val SKINS_UNLOCKED = "skins_unlocked"
     const val PET_SKIN = "pet_skin"
     /** 当前展示的精灵形态（0..4）。成长值只决定「解锁到哪一形态」，显示哪个由用户选 */

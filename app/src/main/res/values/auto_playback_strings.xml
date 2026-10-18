@@ -1,0 +1,8 @@
+<resources>
+    <string name="auto_playback_source">当前播放内容</string>
+    <string name="auto_playback_unknown">未识别到可控制的播放内容</string>
+    <string name="auto_playback_unavailable">暂时无法确定播放来源，可用黑幕和定时返回</string>
+    <string name="auto_playback_changed">播放内容已切换，请关闭后重新设置定时</string>
+    <string name="auto_playback_update">最近听过 · 保存链接 · 记住这里 · 设置定时时的位置\n\n自动记录可识别的内容，普通记录默认保留90天，仅存本机。标记和主动保存会保留，可在管理与清理中关闭自动记录或删除。</string>
+    <string name="playback_source_control_in_app">可能来自 %1$s · 请返回视频操作</string>
+</resources>

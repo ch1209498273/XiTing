@@ -17,10 +17,31 @@ import java.io.File
 class PetDeviceTest : Instrumentation() {
     private var achievementClickOnly=false
     private var medalOnly=false
-    override fun onCreate(arguments:Bundle?) { achievementClickOnly=arguments?.getString("achievementClickOnly")=="true";medalOnly=arguments?.getString("medalOnly")=="true";super.onCreate(arguments);start() }
+    private var upgradeOnly=false
+    private var incrementOnly=false
+    private var incrementDialogs=false
+    private var v50Only=false
+    private var correctionOnly=false
+    private var flowOnly=false
+    private var flowPart:String?=null
+    override fun onCreate(arguments:Bundle?) { flowPart=arguments?.getString("flowPart");flowOnly=arguments?.getString("flowOnly")=="true";correctionOnly=arguments?.getString("correctionOnly")=="true";v50Only=arguments?.getString("v50Only")=="true";incrementDialogs=arguments?.getString("incrementDialogs")=="true";incrementOnly=arguments?.getString("incrementOnly")=="true";upgradeOnly=arguments?.getString("upgradeOnly")=="true";achievementClickOnly=arguments?.getString("achievementClickOnly")=="true";medalOnly=arguments?.getString("medalOnly")=="true";super.onCreate(arguments);start() }
     override fun onStart() {
         val result=Bundle()
         try {
+            if(flowOnly) { ListeningFlowDeviceChecks(this).run(flowPart);result.putString("stream","PASS: listening flow device checks");finish(Activity.RESULT_OK,result);return }
+            if(correctionOnly) { UiCorrectionDeviceChecks(this).run();result.putString("stream","PASS: v4 page hierarchy restored; no home console/scenario stack; direct theme/backup settings");finish(Activity.RESULT_OK,result);return }
+            if(v50Only) {
+                V50SessionDeviceChecks(this).run();UiCorrectionDeviceChecks(this).run()
+                result.putString("stream","PASS: v5.0 outcome backup/rollback, checkpoint recovery, idempotence, original target pause confirmation/timeout and restored UI hierarchy")
+                finish(Activity.RESULT_OK,result);return
+            }
+            if(incrementDialogs) { IncrementDialogChecks(this).run();result.putString("stream","PASS: 96 actual dynamic dialogs across 8 languages and 2 app themes; backup/history scroll paths; screenshots cached");finish(Activity.RESULT_OK,result);return }
+            if(incrementOnly) {
+                ReliabilityDeviceChecks(this).run();result.putString("stream","PASS: complete v3 backup, original expiry, archived totals, v1 compatibility, durable undo, invalid backup isolation, automatic backup switch, recovery checkpoints, history delete journal, CPU benchmark, presets, actual light/dark resources, accessibility semantics and first-success failure routing");finish(Activity.RESULT_OK,result);return
+            }
+            if(upgradeOnly) {
+                UpgradeDeviceChecks(this).run();result.putString("stream","PASS: upgrade navigation/timer validation/backup cancellation, original episode service pause/speed/seek/change, 288 native layout variants (8 languages x 2 themes x 3 sizes/fonts x 6 layouts)");finish(Activity.RESULT_OK,result);return
+            }
             if(achievementClickOnly) {
                 testLockedAchievementClicksKeepListOpen();testUnlockedAchievementClicksOpenDetails();result.putString("stream","PASS: four locked clicks retain list; four unlocked clicks open details and replay; state preserved");finish(Activity.RESULT_OK,result);return
             }
@@ -33,6 +54,7 @@ class PetDeviceTest : Instrumentation() {
             testInitialLayoutStartsAndVisibilityStopsAnimation()
             testLockedPreviewDoesNotChangeGrowthOrOutfit()
             testPauseIsBoundToTheOriginalSession()
+            testEpisodeTracksOriginalTimeline()
             testDemoDoesNotRecordListening()
             testServiceTimerAndDemoLifecycle()
             testBadgeCelebrationLifecycleAndReducedMotion()
@@ -40,7 +62,7 @@ class PetDeviceTest : Instrumentation() {
             testLauncherResourcesMasksAndSwitching()
             testLockedAchievementClicksKeepListOpen()
             testUnlockedAchievementClicksOpenDetails()
-            result.putString("stream","PASS: 13 device checks (gestures, routing, Canvas/skins, lifecycle, preview isolation, targeted pause, demo isolation, full service timer/demo, medal lifecycle/reduced motion, gold medal Canvas/dialog, launcher resources/masks/switching).")
+            result.putString("stream","PASS: 14 device checks (gestures, routing, Canvas/skins, lifecycle, preview isolation, targeted pause, original episode, demo isolation, full service timer/demo, medal lifecycle/reduced motion, gold medal Canvas/dialog, launcher resources/masks/switching, locked and unlocked achievements).")
             finish(Activity.RESULT_OK,result)
         } catch(t:Throwable) {
             result.putString("stream","FAIL: "+t.stackTraceToString())
@@ -49,6 +71,42 @@ class PetDeviceTest : Instrumentation() {
     }
     private fun assertEquals(expected:Any,actual:Any) { check(expected==actual){"expected=$expected actual=$actual"} }
     private fun assertTrue(value:Boolean) { check(value) }
+    fun testEpisodeTracksOriginalTimeline() {
+        lateinit var session:android.media.session.MediaSession
+        lateinit var target:EpisodeTimerTarget
+        var changed=0
+        main {
+            session=android.media.session.MediaSession(targetContext,"episode-upgrade")
+            session.setMetadata(android.media.MediaMetadata.Builder()
+                .putString(android.media.MediaMetadata.METADATA_KEY_MEDIA_ID,"episode-1")
+                .putLong(android.media.MediaMetadata.METADATA_KEY_DURATION,600_000).build())
+            fun state(kind:Int,pos:Long,speed:Float)=android.media.session.PlaybackState.Builder()
+                .setState(kind,pos,speed,android.os.SystemClock.elapsedRealtime()).build()
+            session.setPlaybackState(state(android.media.session.PlaybackState.STATE_PLAYING,100_000,2f))
+            session.isActive=true
+            target=EpisodeTimerTarget(android.media.session.MediaController(targetContext,session.sessionToken))
+            val reading=target.read()
+            assertTrue(reading.valid && reading.advancing)
+            assertTrue(reading.remainingMs in 249_000L..250_000L)
+            target.observe { changed++ }
+            session.setPlaybackState(state(android.media.session.PlaybackState.STATE_PAUSED,200_000,0f))
+        }
+        SystemClock.sleep(100)
+        main {
+            assertTrue(changed>0)
+            val paused=target.read()
+            assertTrue(paused.valid && !paused.advancing)
+            session.setPlaybackState(android.media.session.PlaybackState.Builder()
+                .setState(android.media.session.PlaybackState.STATE_PLAYING,400_000,1f,
+                    android.os.SystemClock.elapsedRealtime()).build())
+            assertTrue(target.read().remainingMs in 199_000L..200_000L)
+            session.setMetadata(android.media.MediaMetadata.Builder()
+                .putString(android.media.MediaMetadata.METADATA_KEY_MEDIA_ID,"episode-2")
+                .putLong(android.media.MediaMetadata.METADATA_KEY_DURATION,600_000).build())
+            assertTrue(!target.read().valid)
+            target.close();session.release()
+        }
+    }
     fun testLockedPreviewDoesNotChangeGrowthOrOutfit() {
         val activity=startActivitySync(android.content.Intent(targetContext,MainActivity::class.java)
             .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -154,9 +212,9 @@ class PetDeviceTest : Instrumentation() {
                 val service=OverlayService.instance!!
                 assertTrue(service.isAnyBlackShowing())
                 // Result must wait while the curtain is still visible.
-                val result=OverlayService::class.java.getDeclaredField("timerResult").apply { isAccessible=true }
-                service.showTimerResult();assertTrue(result.getInt(service)!=0)
-                service.toggleOverlay();service.showTimerResult();assertEquals(0,result.getInt(service))
+                val controller=OverlayService::class.java.getDeclaredField("timerController").apply { isAccessible=true }.get(service) as TimerController
+                service.showTimerResult();assertTrue(controller.result!=0)
+                service.toggleOverlay();service.showTimerResult();assertEquals(0,controller.result)
                 prefs.edit().putBoolean(Prefs.TIMER_PAUSE_KEEP_BLACK,false).commit()
                 service.toggleOverlay()
                 send(OverlayService.ACTION_SET_TIMER) { it.putExtra(OverlayService.EXTRA_END_AT,System.currentTimeMillis()+700) }
@@ -206,12 +264,15 @@ class PetDeviceTest : Instrumentation() {
             .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
         lateinit var pet:PetView
         lateinit var bubble:BubblePetView
+        lateinit var dialog:android.app.AlertDialog
+        SystemClock.sleep(850)
         main {
             val host=android.widget.LinearLayout(activity)
             pet=PetView(activity);bubble=BubblePetView(activity)
             host.addView(pet,android.widget.LinearLayout.LayoutParams(320,320))
             host.addView(bubble,android.widget.LinearLayout.LayoutParams(180,180))
-            activity.setContentView(host)
+            dialog=android.app.AlertDialog.Builder(activity).setView(host).create()
+            dialog.show()
         }
         waitForIdleSync();SystemClock.sleep(150)
         main {
@@ -219,13 +280,14 @@ class PetDeviceTest : Instrumentation() {
                 val field=v.javaClass.getDeclaredField(name);field.isAccessible=true
                 return v.handler.hasCallbacks(field.get(v) as Runnable)
             }
-            assertTrue(scheduled(pet,"animationTick"));assertTrue(scheduled(bubble,"tick"))
+            check(scheduled(pet,"animationTick")) { "Pet animation not scheduled: attached=${pet.isAttachedToWindow} shown=${pet.isShown} focus=${pet.hasWindowFocus()} size=${pet.width}x${pet.height}" }
+            assertTrue(scheduled(bubble,"tick"))
             pet.visibility=View.GONE;bubble.visibility=View.GONE
             assertTrue(!scheduled(pet,"animationTick"));assertTrue(!scheduled(bubble,"tick"))
             pet.visibility=View.VISIBLE;bubble.visibility=View.VISIBLE
         }
         waitForIdleSync();SystemClock.sleep(150)
-        main { activity.finish() }
+        main { dialog.dismiss();activity.finish() }
     }
     fun testBadgeCelebrationLifecycleAndReducedMotion() {
         val activity=startActivitySync(android.content.Intent(targetContext,MainActivity::class.java)
@@ -449,7 +511,15 @@ class PetDeviceTest : Instrumentation() {
                         ?.findAccessibilityNodeInfosByText(targetContext.getString(R.string.ach_replay))?.firstOrNull()
                     if(replay==null)SystemClock.sleep(50)
                 }
-                check(replay!=null) { "Unlocked achievement $i has no replay detail" }
+                if(replay==null) {
+                    fun describe(node:android.view.accessibility.AccessibilityNodeInfo?):String {
+                        if(node==null)return "NO ACTIVE WINDOW"
+                        return "${node.packageName}: ${node.text} ${node.contentDescription}\n"+
+                            (0 until node.childCount).joinToString("") { describe(node.getChild(it)) }
+                    }
+                    File(targetContext.cacheDir,"achievement-detail-failure.txt").writeText(describe(uiAutomation.rootInActiveWindow))
+                }
+                check(replay!=null) { "Unlocked achievement $i has no replay detail; see cached active-window evidence" }
                 check(replay.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK))
                 waitForIdleSync()
                 sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)

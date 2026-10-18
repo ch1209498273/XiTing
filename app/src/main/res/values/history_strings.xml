@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">历史管理</string>
+    <string name="history_scope">可查看并导出最近60天内保留的明细（最多500条）。更早的记录仅保留累计统计。</string>
+    <string name="history_date">选择日期</string>
+    <string name="history_all">全部日期</string>
+    <string name="history_export">导出当前记录 CSV</string>
+    <string name="history_empty">当前日期没有记录</string>
+    <string name="history_row">%1$s · %2$d 分钟 · %3$s</string>
+    <string name="history_black">黑幕</string>
+    <string name="history_screen_off">真息屏</string>
+    <string name="history_delete">删除</string>
+    <string name="history_delete_impact">删除后累计减少 %1$d 分钟、1 次，相关月份、最长单次及连续天数随之更新。精灵成长、已解锁成就和解锁历史不回收。确定删除？</string>
+    <string name="history_delete_unavailable">该月部分旧明细已归档，无法准确重算最长单次及听剧日；为保留真实统计，此记录暂不支持删除。</string>
+    <string name="history_deleted">记录已删除，统计已更新</string>
+    <string name="history_delete_failed">删除未完成，请重试</string>
+    <string name="history_exported">导出完成</string>
+    <string name="history_export_failed">导出失败，请选择其他位置</string>
+</resources>

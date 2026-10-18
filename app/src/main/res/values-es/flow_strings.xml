@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flow_timer_setup">Configurar temporizador</string>
+    <string name="flow_timer_pending">Confirmando temporizador…</string>
+    <string name="flow_timer_unconfirmed">El resultado aún no está confirmado. Comprueba el temporizador actual.</string>
+    <string name="flow_player_lost">El reproductor seleccionado ya no está disponible. Vuelve a seleccionarlo.</string>
+    <string name="flow_player_error">No se puede leer la información del reproductor ahora. Inténtalo de nuevo.</string>
+    <string name="flow_player_empty">Primero inicia la reproducción en tu reproductor.</string>
+    <string name="flow_player_permission">Control de reproducción no autorizado</string>
+    <string name="flow_player_reselect">Volver a seleccionar reproductor</string>
+    <string name="flow_timer_failed">El temporizador no se ha aplicado. Se han conservado los ajustes anteriores.</string>
+    <string name="flow_timer_ready">Temporizador configurado</string>
+    <string name="flow_end_action">Acción al finalizar</string>
+    <string name="flow_minutes">%1$d minutos</string>
+    <string name="flow_custom">Personalizado</string>
+    <string name="flow_timer_review">Confirma el reproductor, la duración y la acción al finalizar.</string>
+    <string name="flow_timer_return">Quitar la capa negra</string>
+    <string name="flow_timer_pause">Solicitar pausa y mantener la capa negra</string>
+    <string name="flow_episode_unavailable">El reproductor actual no proporciona el progreso de este episodio.</string>
+    <string name="flow_timer_result">Resultado del temporizador</string>
+    <string name="flow_setup_success">Prueba completada. Puedes repetirla en cualquier momento desde Ayuda.</string>
+    <string name="flow_request_expired">La solicitud de configuración ha caducado. Inténtalo de nuevo.</string>
+</resources>

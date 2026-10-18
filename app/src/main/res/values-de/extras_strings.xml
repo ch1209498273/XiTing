@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extras_presets">Hörvorlagen</string>
+    <string name="extras_save_preset">Aktuelle Vorlage speichern</string>
+    <string name="extras_manage_presets">Vorlagen verwalten</string>
+    <string name="extras_preset_review">Füllt nur das Bedienfeld. Aktuellen Player und Endaktion prüfen.</string>
+    <string name="extras_preset_format">%1$d Min. · %2$s</string>
+    <string name="extras_delete_preset">Diese Vorlage löschen?</string>
+    <string name="extras_delete">Löschen</string>
+    <string name="extras_no_presets">Keine gespeicherten Vorlagen</string>
+    <string name="extras_preset_saved">Vorlage gespeichert</string>
+    <string name="extras_preset_duplicate">Bereits gespeichert</string>
+    <string name="extras_personalization">Personalisierung</string>
+    <string name="extras_appearance">Darstellung</string>
+    <string name="extras_theme_system">System</string>
+    <string name="extras_theme_light">Hell</string>
+    <string name="extras_theme_dark">Dunkel</string>
+    <string name="extras_entry_order">Reihenfolge der Zugriffe</string>
+    <string name="extras_entry_order_hint">Antippen verschiebt nach vorn. Die Hauptaktion bleibt fest.</string>
+    <string name="extras_entry_timer">Timer</string>
+    <string name="extras_entry_player">Player</string>
+    <string name="extras_entry_demo">Demo</string>
+    <string name="extras_entry_permissions">Berechtigungen</string>
+    <string name="extras_reset_order">Standardreihenfolge</string>
+    <string name="extras_use_preset">Vorlage verwenden</string>
+</resources>

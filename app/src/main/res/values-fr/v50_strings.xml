@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v50_scenes">Choisir un scénario</string>
+    <string name="v50_sleep">Minuterie de sommeil</string>
+    <string name="v50_episode">Finir cet épisode</string>
+    <string name="v50_continuous">Continuer à écouter</string>
+    <string name="v50_overlay_needed">Autorisez l’affichage par-dessus les autres apps.</string>
+    <string name="v50_continuous_cancel">La minuterie actuelle sera annulée. Vous devrez arrêter vous-même. Seul l’assistant démarre. Revenez au lecteur et utilisez le bouton flottant pour masquer l’écran.</string>
+    <string name="v50_continuous_review">Sans minuterie : vous devrez arrêter vous-même. Seul l’assistant démarre. Revenez au lecteur et utilisez le bouton flottant pour masquer l’écran.</string>
+    <string name="v50_ready">Prêt. Revenez au lecteur et utilisez le bouton flottant pour masquer l’écran.</string>
+    <string name="v50_session">Cette session</string>
+    <string name="v50_idle">Assistant inactif</string>
+    <string name="v50_starting">Démarrage de l’assistant</string>
+    <string name="v50_running">Assistant actif</string>
+    <string name="v50_stopping">Arrêt de l’assistant</string>
+    <string name="v50_interrupted">Session interrompue</string>
+    <string name="v50_curtain_off">Écran noir désactivé</string>
+    <string name="v50_curtain_locked">Écran noir verrouillé</string>
+    <string name="v50_curtain_awake">Commandes de l’écran noir actives</string>
+    <string name="v50_play_unknown">Lecture inconnue</string>
+    <string name="v50_play_playing">Le lecteur signale la lecture</string>
+    <string name="v50_play_paused">Le lecteur signale une pause</string>
+    <string name="v50_play_buffering">Le lecteur signale un chargement</string>
+    <string name="v50_play_invalid">Session du lecteur invalide</string>
+    <string name="v50_timer_fixed">Minuterie fixe</string>
+    <string name="v50_timer_waiting">En attente de lecture</string>
+    <string name="v50_timer_executing">Application de l’action finale</string>
+    <string name="v50_timer_ended">Minuterie terminée</string>
+    <string name="v50_remaining">Reste %1$d:%2$02d</string>
+    <string name="v50_pause_requested">Pause demandée</string>
+    <string name="v50_pause_confirmed">Pause confirmée par le lecteur</string>
+    <string name="v50_pause_already">Lecteur déjà en pause</string>
+    <string name="v50_pause_unavailable">Pause indisponible. Utilisez le lecteur</string>
+    <string name="v50_pause_failed">Échec de la pause</string>
+    <string name="v50_pause_unconfirmed">Pause non confirmée. Vérifiez le lecteur</string>
+    <string name="v50_recent">Dernier résultat</string>
+    <string name="v50_records">Résultats des sessions</string>
+    <string name="v50_end_user">Terminée par vous</string>
+    <string name="v50_end_timer">Minuterie écoulée</string>
+    <string name="v50_end_unknown">Motif de fin inconnu</string>
+    <string name="v50_no_records">Aucun résultat de session</string>
+    <string name="v50_recap_enabled">Afficher le bilan précédent</string>
+    <string name="v50_settings_tools">Données, diagnostic et bilan</string>
+    <string name="v50_target_changed">Le contenu a changé. Vérifiez la nouvelle cible et l’action finale, puis confirmez à nouveau. La durée est conservée.</string>
+</resources>
+

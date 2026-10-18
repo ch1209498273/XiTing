@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rel_backup_manage">Backup management</string>
+    <string name="rel_auto_backup">Automatic backup to Downloads</string>
+    <string name="rel_backup_history">Backup history</string>
+    <string name="rel_undo_restore">Undo last restore</string>
+    <string name="rel_no_snapshot">No restore snapshot available</string>
+    <string name="rel_stop_first">Stop the assistant before restoring or undoing data.</string>
+    <string name="rel_snapshot_explain">A local rollback snapshot is saved before restore. New backups include pending energy, original expiry, lifetime statistics and selected settings. Missing fields in older backups keep local values.</string>
+    <string name="rel_backup_failed">Last backup failed. Check storage or export again.</string>
+    <string name="rel_backup_ok">Backup written successfully</string>
+    <string name="rel_backup_none">No readable backups</string>
+    <string name="rel_delete_backup">Delete this backup</string>
+    <string name="rel_delete_confirm">Only the selected public backup file is deleted. This cannot be undone. Local listening data is unchanged.</string>
+    <string name="rel_saved_backups">Readable backups (access depends on the system)</string>
+    <string name="rel_restore_undo_ok">Data before restore recovered</string>
+    <string name="rel_recovery_title">Previous run interrupted</string>
+    <string name="rel_recovery_message">The assistant was interrupted or the device restarted. You can restart the bubble. The curtain and timer are not resumed automatically; set the timer again.</string>
+    <string name="rel_recovery_timer">Previous timer reference: %1$d minutes remaining. Its end action was not executed during interruption.</string>
+    <string name="rel_recovery_episode">The previous timer was for this episode. Select the player again.</string>
+    <string name="rel_ack">Got it</string>
+    <string name="rel_pending_summary">Valid pending energy in backup: %1$d. Original expiry is preserved.</string>
+    <string name="rel_recovery_storage_fail">The previous restore is incomplete and storage cannot be written. The original rollback snapshot is retained. Check free space and reopen the app. The assistant and new data writes are paused.</string>
+</resources>

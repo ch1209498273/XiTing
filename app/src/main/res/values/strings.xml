@@ -89,7 +89,7 @@
     <string name="caption_row_title">黑幕字幕（实验性）</string>
     <string name="caption_service_desc">采集正在播放视频的字幕文本，仅实时显示在息屏听剧的黑幕上。不存储、不上传、不用于其他用途。</string>
     <string name="update_log_title_fmt">v%1$s 更新内容</string>
-    <string name="update_log_body">· 四枚成就徽章升级为统一金色勋章\n· 新解锁集中展示弹入、光环与专属粒子\n· 已解锁徽章可查看大图并重播动画\n· 动画遵循系统设置，隐藏或播完停止</string>
+    <string name="update_log_body">· 黑幕内直接设置定时，保留播放器目标\n· 定时生效后反馈，失败保留输入与原定时\n· 记住常用时长，首次体验完成后收起提示</string>
     <string name="switch_headset">耳机拔出自动返回视频</string>
     <string name="bubble_style">悬浮球样式</string>
     <string name="settings_data">数据</string>
@@ -114,7 +114,7 @@
 
     <!-- 黑幕 -->
     <string name="black_hint">息屏听剧中 · 轻点屏幕解除锁定</string>
-    <string name="black_return">🔒 点击返回视频</string>
+    <string name="black_return">返回播放器</string>
 
     <!-- 通知 -->
     <string name="channel_name">息屏听剧助手</string>
@@ -215,13 +215,13 @@
 
     <!-- 动态文案：校准 -->    <!-- 省电实测（被动测量版）：不再需要 6 分钟专门测试，改为用真实使用累积 -->
     <string name="meas_title">省电实测</string>
-    <string name="meas_purpose">测量方式：读取手机电池的能量计数器，用「正常使用」与「息屏听剧」两段时间的**真实耗电差**算出省电量。\n\n你不需要做任何事——正常使用手机时就在自动采样，插电时不测（插电数据无意义）。</string>
+    <string name="meas_purpose">测量方式：读取 CHARGE_COUNTER 电荷计数器（单位 µAh），分别累积正常亮屏使用与黑幕听剧期间的电荷消耗，按平均消耗速率之差估算省电量。\n\n正常使用时自动采样，充电时不采集。这不是严格同场景的因果实验，播放器、亮度、网络和后台活动等差异都会影响结果；样本数量不代表统计置信度。</string>
     <string name="meas_progress_fmt">已采集：息屏 %1$d 次 · 亮屏 %2$d 次</string>
-    <string name="meas_level_0">样本不足，先按通用模型估算。正常使用几天后会更准。</string>
-    <string name="meas_level_1">样本较少，估算值仅供参考。正常使用几天后会更准。</string>
-    <string name="meas_level_2">已有较多样本，估算值比较可信。</string>
-    <string name="meas_level_3">样本充足，估算值可信。</string>
-    <string name="meas_black_power_fmt">息屏时整机能耗 ≈ %1$.0f mW（基于 %2$d 次真实息屏）</string>
+    <string name="meas_level_0">样本不足，使用通用模型估算；结果受使用场景影响。</string>
+    <string name="meas_level_1">已积累少量样本，估算仅供参考；样本数量不代表统计置信度。</string>
+    <string name="meas_level_2">已积累较多样本，结果仍受使用场景影响；样本数量不代表统计置信度。</string>
+    <string name="meas_level_3">已达到当前样本分档上限，仍不能证明因果或统计置信度。</string>
+    <string name="meas_black_power_fmt">黑幕期间整机平均电荷消耗 ≈ %1$.2f mAh/min（%2$d 个样本）</string>
     <string name="meas_note_charging">· 充电时不采集（计数器会回升）</string>
     <string name="meas_note_screendim">· 熄屏/锁屏时不算作亮屏样本</string>
     <string name="meas_note_minlen">· 短于 2 分钟的片段不计入</string>
@@ -265,7 +265,7 @@
     <string name="about_section_app">关于这个App</string>
     <string name="about_intro">用黑色遮罩降低画面亮度、屏蔽误触，继续听声音。实际表现因设备、系统与播放器而异，不等同于系统真正关屏。\n\n支持定时、黑幕播控、五阶精灵互动、图标换肤、桌面小组件和月报年报。\n\n听剧记录与成长数据保存在本机，可手动备份恢复。无联网权限；悬浮窗和通知等按功能授权。</string>
     <string name="about_section_privacy">隐私与安全</string>
-    <string name="about_privacy">· 无 INTERNET 权限：物理上无法联网\n· 不读取任何屏幕内容\n· 所有数据仅保存在本机（已显式关闭系统云备份与换机自动迁移）\n· 备份仅在你主动点击导出时写入「下载/XiTing」目录，由你自己保管\n· 仅当你主动授予「通知使用权」后，才统计通知条数用于黑幕角标；不读取通知标题与内容，未授权则完全不启用\n· 应用内含构建标识（构建ID与渠道，仅用于盗版溯源，不含任何设备信息）\n· 无广告、无追踪、无埋点</string>
+    <string name="about_privacy">· 应用无 INTERNET 权限，不主动上传数据\n· 听剧记录、成长与设置保存在本机；可自动备份到「下载/XiTing」，也可手动导出到所选位置\n· 系统云备份已排除；Android 12 及以上保留系统点对点换机迁移，旧版请使用文件备份恢复\n· 授予通知使用权后，可读取通知数量及媒体会话元数据（如标题、播放器、播放状态与进度），用于黑幕角标、播控和定时；不读取普通通知正文\n· 可选的黑幕字幕实验功能需单独开启无障碍服务，可读取前台窗口节点文本并筛选字幕实时显示；不存储正文、不上传\n· 构建ID与渠道标识用于版本溯源，本身不含设备信息；本地备份含用于恢复核对的设备标识\n· 无广告、无追踪、无埋点</string>
     <string name="about_section_open">开源与联系</string>
     <string name="about_github">GitHub：github.com/ch1209498273/XiTing\n（点按打开项目主页）</string>
     <string name="about_feedback">问题反馈：1209498273@qq.com</string>
@@ -340,7 +340,7 @@
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">息屏</string>
-    <string name="notif_timer_fmt"> · 定时%1$d分钟后关闭</string>
+    <string name="notif_timer_fmt"> · 定时剩余%1$d分钟</string>
     <string name="dlg_got_it">知道了</string>
          「校准无效」却不知道该做什么，只能反复重试。 -->
     <!-- 本周小结。上面三张卡是绝对值（今日/近7天/累计），看不出习惯；
@@ -399,16 +399,12 @@
     <string name="timer_pause_explain">保存后对下次设置的定时生效，当前定时不变。暂停需要通知使用权和支持暂停的媒体会话，仅向设置时的播放器发送请求；第三方播放器可能不响应。</string>
     <string name="timer_no_target">未找到可暂停的播放会话。请检查通知使用权和播放器支持，原定时未改变。</string>
     <string name="timer_pause_requested">已向原播放器请求暂停；是否暂停以播放器实际响应为准。</string>
-    <string name="timer_already_paused">原播放器已不在播放，没有发送切换播放指令。</string>
-    <string name="timer_pause_failed">原播放会话已失效或无法暂停，黑幕保持原状。</string>
+    <string name="timer_already_paused">原播放器已暂停，黑幕保持原状。</string>
+    <string name="timer_pause_failed">暂时无法暂停，请返回播放器操作。黑幕保持原状。</string>
     <string name="timer_mode_status_fmt">剩余 %1$d 分钟 · %2$s</string>
-    <string name="guide_title">第一次用？试一次黑幕</string>
-    <string name="guide_intro">先开启悬浮窗权限。通知用于快捷控制；通知使用权仅在剧名、进度和定时暂停等功能中需要。
-
-先在视频 App 正常播放，再回来开始演示。画面会黑下来，10 秒后自动恢复；也可轻点唤醒后点返回。
-
-这次演示不计入听剧时长和成长值。</string>
-    <string name="guide_start">开始10秒演示</string>
+    <string name="guide_title">听一段测试声音</string>
+    <string name="guide_intro">无需先打开视频。开始后会播放内置测试语音并显示黑幕，约10秒后自动返回。请先调好媒体音量；连接耳机时声音会从耳机播放。\n\n这次体验不计入听剧时长和成长值。</string>
+    <string name="guide_start">开始体验</string>
     <string name="guide_permission">请先开启悬浮窗权限，再回来开始演示。</string>
     <string name="guide_busy">请先结束现有黑幕或定时，并确认悬浮窗权限后再试演示。</string>
     <string name="guide_feedback">刚才画面黑下来时，声音是否还在继续？</string>
@@ -419,4 +415,35 @@
     <string name="ach_celebration_title">成就达成</string>
     <string name="ach_medal_title">我的金色勋章</string>
     <string name="ach_replay">重播动画</string>
+    <!-- Shared playback and navigation copy -->
+    <string name="timer_episode_changed">原播放内容已更换或会话失效，本集定时已取消</string>
+    <string name="timer_episode_waiting">本集定时等待播放继续</string>
+    <string name="ui_home_intro">准备好，安心听</string>
+    <string name="ui_playback_source">播放来源</string>
+    <string name="ui_no_session">暂无可读播放会话</string>
+    <string name="ui_media_permission">开启通知使用权以查看播放来源与控制支持</string>
+    <string name="ui_capabilities_fmt">暂停：%1$s · 进度跳转：%2$s</string>
+    <string name="ui_supported">支持</string>
+    <string name="ui_unsupported">不支持</string>
+    <string name="ui_growth_title">精灵成长</string>
+    <string name="ui_listening_title">听剧概览</string>
+    <string name="ui_settings_playback">播放与黑幕</string>
+    <string name="ui_settings_appearance">外观</string>
+    <string name="ui_settings_permissions">权限与后台</string>
+    <string name="ui_settings_data">数据与备份</string>
+    <string name="ui_settings_help">关于与帮助</string>
+    <string name="ui_timer_extend">延长15分钟</string>
+    <string name="ui_unknown_date">历史解锁，日期未知</string>
+    <string name="ui_recorded_date_fmt">首次记录：%1$s</string>
+    <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
+    <string name="ui_timer_target_fmt">目标：%1$s</string>
+    <string name="ui_choose_player">选择播放器</string>
+    <string name="ui_no_backup">暂无成功备份记录</string>
+    <string name="ui_backup_summary_fmt">成长值 %1$d · 会话 %2$d 条</string>
+    <string name="ui_estimate_basis">估算受使用场景影响；样本数量不代表统计置信度。</string>
+    <string name="ui_stop_assistant">停止助手</string>
+    <string name="ui_ready">已就绪</string>
+    <string name="ui_permission_ready">基础权限已就绪</string>
+    <string name="ui_permissions_details">权限详情</string>
+    <string name="ui_timer_minutes">分钟</string>
 </resources>

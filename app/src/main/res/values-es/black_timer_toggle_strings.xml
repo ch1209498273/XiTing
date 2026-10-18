@@ -1,0 +1,4 @@
+<resources>
+    <string name="switch_black_timer">Mostrar temporizador en pantalla negra</string>
+    <string name="switch_black_timer_sub">Oculta los controles y la cuenta atrás sin cancelar el temporizador activo</string>
+</resources>

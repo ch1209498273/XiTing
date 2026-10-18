@@ -46,8 +46,8 @@ internal fun MainActivity.shareAllTime() {
                 getString(R.string.poster_row_mah) to getString(R.string.fmt_mah, mah),
                 getString(R.string.poster_row_streak) to getString(R.string.fmt_days, best)
             ),
-            footer = getString(R.string.poster_footer_all),
-            shareText = getString(R.string.share_text, fmtDur(allMs), mah, PetView.stageName(this, stage)),
+            footer = getString(R.string.ui_model_estimate),
+            shareText = getString(R.string.share_text, fmtDur(allMs), mah, PetView.stageName(this, stage))+"\n"+getString(R.string.ui_model_estimate),
             // 连续天数是这类 App 最值得炫耀的指标，给它一个角标位
             badge = if (best >= 2) getString(R.string.poster_badge_streak, best) else null
         )
@@ -72,11 +72,11 @@ internal fun MainActivity.shareWeekPoster() {
                 getString(R.string.poster_row_mah) to getString(R.string.fmt_mah, s.mahSaved),
                 getString(R.string.poster_row_gp) to s.weekGp.toString()
             ),
-            footer = getString(R.string.poster_footer_week),
+            footer = getString(R.string.ui_model_estimate),
             shareText = getString(
                 R.string.week_share_text, fmtDur(s.weekMs), s.listenDays, s.mahSaved,
                 PetView.stageName(this, stage)
-            ),
+            )+"\n"+getString(R.string.ui_model_estimate),
             badge = null
         )
         sharePoster(d, "week")
@@ -91,7 +91,9 @@ internal fun MainActivity.shareWeekPoster() {
  * 2. 排版（数字过长、明细行溢出）用户自己一眼能看出来，能直接取消重来；
  * 3. 主流 App 都是「先看图再发」，一步到位反而像在赌。
  */
-internal fun MainActivity.sharePoster(d: SharePoster.Data, tag: String) {
+internal fun MainActivity.sharePoster(supplied: SharePoster.Data, tag: String) {
+        val basis=getString(R.string.ui_model_estimate)
+        val d=if(supplied.shareText.contains(basis))supplied else supplied.copy(shareText=supplied.shareText+"\n"+basis)
         // 1080×1440 的 Canvas 绘制 + 一次 View 的 measure/layout/draw 约几十到上百毫秒，
         // 放主线程会掉一帧。放到后台线程，回主线程弹预览。
         Thread {

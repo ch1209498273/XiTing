@@ -1,0 +1,4 @@
+<resources>
+    <string name="switch_black_timer">검은 화면에 취침 타이머 표시</string>
+    <string name="switch_black_timer_sub">버튼과 남은 시간을 숨겨도 설정된 타이머는 계속 실행됩니다</string>
+</resources>

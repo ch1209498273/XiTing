@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diag50_title">Resumen de diagnóstico</string>
+    <string name="diag50_export">Vista previa del diagnóstico</string>
+    <string name="diag50_share">Compartir resumen</string>
+    <string name="diag50_scope">Estos campos se envían a la aplicación elegida solo al pulsar Compartir. Incluyen el modelo del dispositivo, permisos y estado de la sesión, sin títulos, identificadores ni registros originales. Los tiempos de bloqueo de activación se miden en este proceso y no indican consumo de batería.</string>
+</resources>

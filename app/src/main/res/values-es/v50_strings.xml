@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v50_scenes">Elige una escena</string>
+    <string name="v50_sleep">Temporizador para dormir</string>
+    <string name="v50_episode">Terminar este episodio</string>
+    <string name="v50_continuous">Seguir escuchando</string>
+    <string name="v50_overlay_needed">Permite mostrar sobre otras apps.</string>
+    <string name="v50_continuous_cancel">Se cancelará el temporizador actual. Debes terminar la escucha. Solo inicia el asistente. Vuelve al reproductor y usa el botón flotante para cubrir la pantalla.</string>
+    <string name="v50_continuous_review">Sin temporizador: debes terminar la escucha. Solo inicia el asistente. Vuelve al reproductor y usa el botón flotante para cubrir la pantalla.</string>
+    <string name="v50_ready">Listo. Vuelve al reproductor y usa el botón flotante para cubrir la pantalla.</string>
+    <string name="v50_session">Esta sesión</string>
+    <string name="v50_idle">Asistente inactivo</string>
+    <string name="v50_starting">Iniciando asistente</string>
+    <string name="v50_running">Asistente activo</string>
+    <string name="v50_stopping">Deteniendo asistente</string>
+    <string name="v50_interrupted">Sesión interrumpida</string>
+    <string name="v50_curtain_off">Cortina desactivada</string>
+    <string name="v50_curtain_locked">Cortina bloqueada</string>
+    <string name="v50_curtain_awake">Controles de cortina activos</string>
+    <string name="v50_play_unknown">Reproducción desconocida</string>
+    <string name="v50_play_playing">El reproductor indica reproducción</string>
+    <string name="v50_play_paused">El reproductor indica pausa</string>
+    <string name="v50_play_buffering">El reproductor indica carga</string>
+    <string name="v50_play_invalid">Sesión del reproductor inválida</string>
+    <string name="v50_timer_fixed">Temporizador fijo</string>
+    <string name="v50_timer_waiting">Esperando reproducción</string>
+    <string name="v50_timer_executing">Aplicando acción final</string>
+    <string name="v50_timer_ended">Temporizador finalizado</string>
+    <string name="v50_remaining">Queda %1$d:%2$02d</string>
+    <string name="v50_pause_requested">Pausa solicitada</string>
+    <string name="v50_pause_confirmed">El reproductor confirmó la pausa</string>
+    <string name="v50_pause_already">El reproductor ya estaba en pausa</string>
+    <string name="v50_pause_unavailable">No se puede pausar ahora. Usa el reproductor</string>
+    <string name="v50_pause_failed">Falló la pausa</string>
+    <string name="v50_pause_unconfirmed">No se pudo confirmar la pausa. Revisa el reproductor</string>
+    <string name="v50_recent">Último resultado</string>
+    <string name="v50_records">Resultados de sesiones</string>
+    <string name="v50_end_user">Finalizada por ti</string>
+    <string name="v50_end_timer">Temporizador agotado</string>
+    <string name="v50_end_unknown">Motivo de finalización desconocido</string>
+    <string name="v50_no_records">Aún no hay resultados</string>
+    <string name="v50_recap_enabled">Mostrar resumen de la última sesión</string>
+    <string name="v50_settings_tools">Datos, diagnóstico y resumen</string>
+    <string name="v50_target_changed">El contenido cambió. Revisa el nuevo destino y la acción final y confirma otra vez. Se conserva la duración.</string>
+</resources>
+

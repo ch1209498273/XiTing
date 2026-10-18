@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_media_access_missing">メディア操作の読み取り未許可 · 黒画面とタイマー復帰は利用可能</string>
+    <string name="player_choice_intro">連携するアプリを選択してください。一時停止と再生終了時の機能は、アプリが提供するメディアセッションによって異なります。</string>
+    <string name="player_control_unavailable">操作可能なメディアセッションなし · 黒画面とタイマー復帰は利用可能</string>
+    <string name="player_state_playing">再生中</string>
+    <string name="player_state_paused">一時停止中</string>
+    <string name="player_state_available">メディアセッション利用可能</string>
+    <string name="player_control_pause">一時停止を要求可能</string>
+    <string name="player_control_no_pause">一時停止非対応</string>
+    <string name="player_selected_no_session">選択したアプリはメディア操作に対応していません。黒画面またはタイマー復帰を利用できます。</string>
+    <string name="player_choice_none">プレーヤーを選択してください</string>
+</resources>

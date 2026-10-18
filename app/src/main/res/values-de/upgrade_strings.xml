@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="ui_backup_version_fmt">Sicherungsversion: %1$s</string>
+    <string name="ui_backup_same_device">Von diesem Gerät</string>
+    <string name="ui_backup_other_device">Von einem anderen oder unbekannten Gerät</string>
+    <string name="ui_backup_restore_effect">Wiederherstellung ersetzt Wachstum und Freigabedatum. Gültige Sitzungen ersetzen Details und berechnen Statistiken neu; sonst bleiben lokale Sitzungen. Gültiges Aussehen und Blaseneinstellungen werden wiederhergestellt. Erfolge werden zusammengeführt; erste Einträge bleiben erhalten.</string>
+    <string name="ui_backup_unknown_version">Unbekannt</string>
+    <string name="ui_last_backup_fmt">Letzte erfolgreiche Sicherung: %1$s</string>
+    <string name="ui_timer_review">Bestätigen wendet Dauer, Endaktion und Player sofort an. Pause benötigt Benachrichtigungszugriff und Player-Unterstützung. Nur die gewählte Sitzung erhält die Anfrage; der Player kann sie ignorieren.</string>
+    <string name="ui_model_estimate">Modellschätzung, keine gemessene Ersparnis</string>
+    <string name="ui_timer_summary_fmt">%1$s\n%2$s\n%3$s</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flow_timer_setup">Timer einstellen</string>
+    <string name="flow_timer_pending">Timer wird bestätigt…</string>
+    <string name="flow_timer_unconfirmed">Das Ergebnis ist noch nicht bestätigt. Bitte den aktuellen Timer prüfen.</string>
+    <string name="flow_player_lost">Der gewählte Player ist nicht mehr verfügbar. Bitte erneut auswählen.</string>
+    <string name="flow_player_error">Der Player kann gerade nicht ausgelesen werden. Bitte erneut versuchen.</string>
+    <string name="flow_player_empty">Bitte zuerst die Wiedergabe im Player starten.</string>
+    <string name="flow_player_permission">Keine Berechtigung zur Wiedergabesteuerung</string>
+    <string name="flow_player_reselect">Player erneut auswählen</string>
+    <string name="flow_timer_failed">Timer nicht übernommen. Bisherige Einstellungen beibehalten.</string>
+    <string name="flow_timer_ready">Timer eingestellt</string>
+    <string name="flow_end_action">Aktion nach Ablauf</string>
+    <string name="flow_minutes">%1$d Minuten</string>
+    <string name="flow_custom">Benutzerdefiniert</string>
+    <string name="flow_timer_review">Bitte Player, Dauer und Aktion nach Ablauf bestätigen.</string>
+    <string name="flow_timer_return">Schwarze Abdeckung entfernen</string>
+    <string name="flow_timer_pause">Pause anfordern und schwarze Abdeckung beibehalten</string>
+    <string name="flow_episode_unavailable">Der aktuelle Player liefert keinen Fortschritt für diese Folge.</string>
+    <string name="flow_timer_result">Timer-Ergebnis</string>
+    <string name="flow_setup_success">Ausprobieren abgeschlossen. Unter Hilfe jederzeit erneut möglich.</string>
+    <string name="flow_request_expired">Die Einstellungsanfrage ist abgelaufen. Bitte erneut versuchen.</string>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extras_presets">Préréglages d’écoute</string>
+    <string name="extras_save_preset">Enregistrer ce réglage</string>
+    <string name="extras_manage_presets">Gérer les préréglages</string>
+    <string name="extras_preset_review">Remplit le panneau. Vérifiez le lecteur actuel et l’action de fin.</string>
+    <string name="extras_preset_format">%1$d min · %2$s</string>
+    <string name="extras_delete_preset">Supprimer ce préréglage ?</string>
+    <string name="extras_delete">Supprimer</string>
+    <string name="extras_no_presets">Aucun préréglage</string>
+    <string name="extras_preset_saved">Préréglage enregistré</string>
+    <string name="extras_preset_duplicate">Déjà enregistré</string>
+    <string name="extras_personalization">Personnalisation</string>
+    <string name="extras_appearance">Apparence</string>
+    <string name="extras_theme_system">Système</string>
+    <string name="extras_theme_light">Clair</string>
+    <string name="extras_theme_dark">Sombre</string>
+    <string name="extras_entry_order">Ordre des accès</string>
+    <string name="extras_entry_order_hint">Touchez un accès pour le placer en premier. L’action principale reste fixe.</string>
+    <string name="extras_entry_timer">Minuteur</string>
+    <string name="extras_entry_player">Lecteur</string>
+    <string name="extras_entry_demo">Démo</string>
+    <string name="extras_entry_permissions">Autorisations</string>
+    <string name="extras_reset_order">Ordre par défaut</string>
+    <string name="extras_use_preset">Utiliser</string>
+</resources>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="guide_sound_help_title">Could not hear the sample?</string>
+    <string name="guide_sound_help">Turn up media volume using the phone volume buttons. If headphones are connected, check their volume and connection, then try again.</string>
+    <string name="guide_retry_audio">Try again</string>
+    <string name="guide_return_help_title">Did the picture fail to return?</string>
+    <string name="guide_return_help">Tap the curtain, then End preview. If it stays visible, exit the assistant from the notification and try again.</string>
+    <string name="guide_audio_failed">The test sound could not play. Please try again shortly.</string>
+    <string name="guide_pause_first">Pause your video or music before trying the test sound.</string>
+    <string name="guide_black_hint">Test sound is playing. The picture will return when it ends.</string>
+    <string name="guide_exit">End preview</string>
+    <string name="guide_preparing">Preparing the test sound…</string>
+</resources>

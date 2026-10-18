@@ -69,7 +69,7 @@ internal fun MainActivity.showSkinGallery() {
                 PetSkins.snapshot(this@showSkinGallery, curForm, curSkin, (110 * d).toInt(), withBar = false, pct = 0)
             )
             previewLabel.text =
-                getString(R.string.name_pair_fmt, PetView.stageName(this@showSkinGallery, curForm), PetSkins.name(this@showSkinGallery, curSkin))
+                getString(R.string.gallery_worn, getString(R.string.name_pair_fmt, PetView.stageName(this@showSkinGallery, curForm), PetSkins.name(this@showSkinGallery, curSkin)))
             val growth = PetGrowth.progress(EnergyStore.collectedTotal(this).toLong())
             growthHint.text = if (growth.complete) getString(R.string.gallery_form_maxed)
             else getString(R.string.gallery_form_next, growth.remaining)
@@ -108,7 +108,7 @@ internal fun MainActivity.showSkinGallery() {
                 box.addView(android.widget.TextView(this@showSkinGallery).apply {
                     text = if (unlocked) PetView.stageName(this@showSkinGallery, i)
                            else getString(R.string.gallery_locked_short, PetView.stageName(this@showSkinGallery, i))
-                    textSize = 11f
+                    textSize = 13f
                     setTextColor(getColor(R.color.text_secondary))
                 })
                 box.setOnClickListener {
@@ -145,7 +145,7 @@ internal fun MainActivity.showSkinGallery() {
                 })
                 box.addView(android.widget.TextView(this@showSkinGallery).apply {
                     text = if (unlocked) PetSkins.name(this@showSkinGallery, skin) else "🔒"
-                    textSize = 11f
+                    textSize = 13f
                     setTextColor(getColor(R.color.text_secondary))
                 })
                 box.setOnClickListener {
@@ -178,7 +178,7 @@ internal fun MainActivity.showSkinGallery() {
         //（换肤的收尾走 rebuildRows + applySkinEverywhere，不 dismiss）。
         val dlg = android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.gallery_title))
-            .setView(view)
+            .setView(android.widget.ScrollView(this).apply { addView(view) })
             .setPositiveButton(getString(R.string.dlg_ok), null)
             .setNeutralButton(getString(R.string.gallery_try_all)) { _,_ -> showPetPreview(this,curForm) }
             .create()

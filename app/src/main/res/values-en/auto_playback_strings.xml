@@ -1,0 +1,8 @@
+<resources>
+    <string name="auto_playback_source">Current playback</string>
+    <string name="auto_playback_unknown">No controllable playback detected</string>
+    <string name="auto_playback_unavailable">Playback source is unclear. Curtain and timed return remain available.</string>
+    <string name="auto_playback_changed">Playback changed. Close and reopen the timer to review the current content.</string>
+    <string name="auto_playback_update">Recently listened · Save a link · Mark this moment · Position when timer was set\n\nRecognized content is recorded locally for 90 days by default. Marks and saved links are protected. Manage or disable recording in Manage and clear.</string>
+    <string name="playback_source_control_in_app">Possibly %1$s · Use playback controls in the video</string>
+</resources>

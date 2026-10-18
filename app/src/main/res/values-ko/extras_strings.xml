@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extras_presets">듣기 프리셋</string>
+    <string name="extras_save_preset">현재 설정 저장</string>
+    <string name="extras_manage_presets">프리셋 관리</string>
+    <string name="extras_preset_review">패널에 설정만 입력합니다. 현재 플레이어와 종료 동작을 확인하세요.</string>
+    <string name="extras_preset_format">%1$d분 · %2$s</string>
+    <string name="extras_delete_preset">이 프리셋을 삭제할까요?</string>
+    <string name="extras_delete">삭제</string>
+    <string name="extras_no_presets">저장된 프리셋 없음</string>
+    <string name="extras_preset_saved">저장됨</string>
+    <string name="extras_preset_duplicate">이미 저장된 프리셋</string>
+    <string name="extras_personalization">개인 설정</string>
+    <string name="extras_appearance">화면 모드</string>
+    <string name="extras_theme_system">시스템 설정</string>
+    <string name="extras_theme_light">밝게</string>
+    <string name="extras_theme_dark">어둡게</string>
+    <string name="extras_entry_order">홈 항목 순서</string>
+    <string name="extras_entry_order_hint">항목을 누르면 맨 앞으로 이동합니다. 주요 동작은 고정됩니다.</string>
+    <string name="extras_entry_timer">타이머</string>
+    <string name="extras_entry_player">플레이어</string>
+    <string name="extras_entry_demo">데모</string>
+    <string name="extras_entry_permissions">권한</string>
+    <string name="extras_reset_order">기본 순서 복원</string>
+    <string name="extras_use_preset">프리셋 사용</string>
+</resources>

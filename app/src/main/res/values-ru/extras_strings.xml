@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extras_presets">Настройки прослушивания</string>
+    <string name="extras_save_preset">Сохранить настройку</string>
+    <string name="extras_manage_presets">Управление настройками</string>
+    <string name="extras_preset_review">Только заполняет панель. Проверьте текущий плеер и действие по завершении.</string>
+    <string name="extras_preset_format">%1$d мин · %2$s</string>
+    <string name="extras_delete_preset">Удалить эту настройку?</string>
+    <string name="extras_delete">Удалить</string>
+    <string name="extras_no_presets">Нет сохранённых настроек</string>
+    <string name="extras_preset_saved">Настройка сохранена</string>
+    <string name="extras_preset_duplicate">Уже сохранено</string>
+    <string name="extras_personalization">Персонализация</string>
+    <string name="extras_appearance">Оформление</string>
+    <string name="extras_theme_system">Системное</string>
+    <string name="extras_theme_light">Светлое</string>
+    <string name="extras_theme_dark">Тёмное</string>
+    <string name="extras_entry_order">Порядок пунктов</string>
+    <string name="extras_entry_order_hint">Нажмите для перемещения в начало. Основное действие закреплено.</string>
+    <string name="extras_entry_timer">Таймер</string>
+    <string name="extras_entry_player">Плеер</string>
+    <string name="extras_entry_demo">Демо</string>
+    <string name="extras_entry_permissions">Разрешения</string>
+    <string name="extras_reset_order">Стандартный порядок</string>
+    <string name="extras_use_preset">Использовать</string>
+</resources>

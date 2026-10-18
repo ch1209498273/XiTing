@@ -80,7 +80,7 @@
     <string name="caption_row_title">검은 화면 자막(실험적)</string>
     <string name="caption_service_desc">재생 중인 영상의 자막 텍스트를 읽어 息屏听劇 검은 화면에 실시간 표시합니다. 저장·업로드하지 않습니다.</string>
     <string name="update_log_title_fmt">v%1$s 업데이트 내용</string>
-    <string name="update_log_body">· 네 가지 업적 배지를 금메달로 개선\n· 새 업적에 등장 효과, 광환, 전용 입자 표시\n· 획득한 메달 확대 및 애니메이션 재생\n· 시스템 설정을 따르며 숨기거나 완료하면 애니메이션 중지</string>
+    <string name="update_log_body">· 검은 화면에서 원래 플레이어의 타이머 설정\n· 설정 결과 확인 및 실패 시 입력과 기존 타이머 유지\n· 타이머 선택 및 첫 사용 완료 상태 저장</string>
     <string name="switch_headset">이어폰 뽑으면 자동으로 영상으로</string>
     <string name="bubble_style">버블 표시</string>
     <string name="settings_data">데이터</string>
@@ -101,7 +101,7 @@
     <string name="widget_growth_next">성장값 %1$d · 다음 형태까지 %2$d</string>
     <string name="widget_growth_max">성장값 %1$d · 최고 도달</string>
     <string name="black_hint">스크린 오프 듣기 중 · 화면을 가볍게 누르면 잠금 해제</string>
-    <string name="black_return">🔒 누르면 영상으로 돌아가기</string>
+    <string name="black_return">플레이어로 돌아가기</string>
     <string name="channel_name">스크린 오프 듣기 도우미</string>
     <string name="notif_title">스크린 오프 듣기 도우미 실행 중</string>
     <string name="notif_text">버블을 누르면 화면이 꺼지고 소리는 계속됩니다%1$s</string>
@@ -194,15 +194,13 @@
     <string name="ach_king_t">천왕의 대관식</string>
     <string name="ach_king_d">정령이 천왕으로 진화</string>
     <string name="meas_title">절전 실측</string>
-    <string name="meas_purpose">측정 방법: 배터리 에너지 카운터를 읽어 「일반 사용」과 「화면 끄기」의 실제 소비 전력 차이로 절전량을 계산합니다.
-
-별도로 하실 건 없습니다 — 휴대폰을 쓰는 동안 자동으로 수집됩니다. 충전 중에는 측정하지 않습니다(데이터가 의미 없기 때문).</string>
+    <string name="meas_purpose">측정 방법: CHARGE_COUNTER 전하 카운터(단위 µAh)를 읽어 일반 화면 켜짐 사용과 검은 화면 듣기 중 전하 소비를 누적하고, 평균 소비 속도의 차이로 절감량을 추정합니다.\n\n일반 사용 중 자동 수집하며 충전 중에는 수집하지 않습니다. 동일한 조건을 엄격히 통제한 인과 실험이 아니므로 플레이어, 밝기, 네트워크, 백그라운드 활동 등이 결과에 영향을 줍니다. 표본 수는 통계적 신뢰도를 의미하지 않습니다.</string>
     <string name="meas_progress_fmt">수집됨: 화면 끄기 %1$d회 · 화면 켜짐 %2$d회</string>
-    <string name="meas_level_0">표본이 아직 부족합니다. 지금은 일반 모델로 추정하며, 며칠 사용하면 더 정확해집니다.</string>
-    <string name="meas_level_1">표본이 아직 적습니다. 추정치를 참고용으로 보시고, 며칠 후 다시 확인하세요.</string>
-    <string name="meas_level_2">충분한 표본이 모였습니다. 추정치를 신뢰할 만합니다.</string>
-    <string name="meas_level_3">표본이 충분합니다. 추정치를 믿어도 좋습니다.</string>
-    <string name="meas_black_power_fmt">화면 끈 상태의 기기 소비 ≈ %1$.0f mW (실제 %2$d회 기준)</string>
+    <string name="meas_level_0">표본이 부족하여 일반 모델로 추정합니다. 결과는 사용 환경의 영향을 받습니다.</string>
+    <string name="meas_level_1">소수의 표본이 수집되었습니다. 추정치는 참고용이며 표본 수는 통계적 신뢰도를 의미하지 않습니다.</string>
+    <string name="meas_level_2">더 많은 표본이 수집되었지만 결과는 사용 환경의 영향을 받습니다. 표본 수는 통계적 신뢰도를 의미하지 않습니다.</string>
+    <string name="meas_level_3">현재 표본 수 등급의 상한에 도달했습니다. 인과관계나 통계적 신뢰도를 입증하지는 않습니다.</string>
+    <string name="meas_black_power_fmt">검은 화면 중 기기 전체의 평균 전하 소비 ≈ %1$.2f mAh/min (표본 %2$d개)</string>
     <string name="meas_note_charging">· 충전 중에는 수집하지 않습니다(카운터가 되돌아갑니다)</string>
     <string name="meas_note_screendim">· 화면이 꺼진 동안은 화면 켜짐 표본에 포함하지 않습니다</string>
     <string name="meas_note_minlen">· 2분 미만 구간은 집계하지 않습니다</string>
@@ -242,13 +240,7 @@
     <string name="about_section_app">이 앱에 대하여</string>
     <string name="about_intro">검은 오버레이로 화면을 어둡게 하고 오작동을 막으며 소리를 듣습니다. 기기, 시스템, 플레이어에 따라 다르며 시스템 화면 꺼짐과는 다릅니다.\n\n타이머, 재생 조작, 5단계 정령, 아이콘, 위젯과 월간·연간 보고서를 지원합니다.\n\n기록과 성장은 기기에 저장하며 백업과 복원이 가능합니다. 인터넷 권한은 없고 기능별 권한을 사용합니다.</string>
     <string name="about_section_privacy">개인정보와 안전</string>
-    <string name="about_privacy">· INTERNET 권한 없음: 물리적으로 인터넷에 연결할 수 없음
-· 화면의 내용을 읽지 않음
-· 모든 데이터는 기기 안에만 저장(시스템 클라우드 백업과 기기 변경 자동 이전을 명시적으로 끔)
-· 백업은 직접 「내보내기」를 누를 때에만 「다운로드/XiTing」 폴더에 기록되며, 관리는 사용자가 직접 함
-· 「알림 사용 권한」을 직접 허용한 경우에만 화면 끔 표시용 알림 개수를 집계하며, 알림 제목과 내용은 읽지 않고 권한이 없으면 기능이 아예 동작하지 않음
-· 앱에 빌드 식별자(빌드 ID와 채널)가 포함됨 — 불법 복제 역추적 전용이며 기기 정보는 포함하지 않음
-· 광고 없음, 추적 없음, 분석 없음</string>
+    <string name="about_privacy">· INTERNET 권한이 없으며 데이터를 업로드하지 않습니다\n· 듣기 기록, 성장 및 설정은 기기에 저장됩니다. Download/XiTing에 자동 백업하거나 선택한 위치로 직접 내보낼 수 있습니다\n· 시스템 클라우드 백업은 제외됩니다. Android 12 이상에서는 시스템의 기기 간 직접 이전을 허용하며, 이전 버전은 파일 백업으로 복원합니다\n· 알림 접근을 허용하면 알림 수와 미디어 세션 메타데이터(제목, 플레이어, 재생 상태 및 진행 상황 등)를 배지, 재생 제어 및 타이머에 사용합니다. 일반 알림 본문은 읽지 않습니다\n· 선택 사항인 실험적 자막 기능은 접근성 서비스를 별도로 켜야 합니다. 전면 창의 노드 텍스트를 읽고 자막을 걸러 실시간 표시할 수 있으며 본문은 저장하거나 업로드하지 않습니다\n· 빌드 ID와 채널은 버전 추적용이며 그 자체에는 기기 정보가 없습니다. 로컬 백업에는 복원 확인용 기기 식별자가 포함됩니다\n· 광고, 추적 및 분석 수집이 없습니다</string>
     <string name="about_section_open">오픈소스와 연락</string>
     <string name="about_github">GitHub: github.com/ch1209498273/XiTing
 (누르면 프로젝트 페이지를 엽니다)</string>
@@ -319,7 +311,7 @@
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">끄기</string>
-    <string name="notif_timer_fmt">· %1$d분 후 종료</string>
+    <string name="notif_timer_fmt"> · 타이머: %1$d분 남음</string>
     <string name="dlg_got_it">확인</string>
     <string name="poster_preview_save">저장</string>
     <string name="poster_saved">Pictures/XiTing에 저장했습니다</string>
@@ -373,16 +365,12 @@
     <string name="timer_pause_explain">다음 타이머에 적용되며 현재 타이머는 바뀌지 않습니다. 알림 접근 권한과 지원되는 미디어 세션이 필요합니다. 설정 당시 플레이어에만 요청하며 응답하지 않을 수 있습니다.</string>
     <string name="timer_no_target">일시정지할 세션이 없습니다. 알림 접근 권한과 플레이어 지원을 확인하세요. 기존 타이머는 유지됩니다.</string>
     <string name="timer_pause_requested">원래 플레이어에 일시정지를 요청했습니다. 실제 정지는 플레이어 응답에 따릅니다.</string>
-    <string name="timer_already_paused">원래 플레이어가 재생 중이 아닙니다. 재생 전환 명령을 보내지 않았습니다.</string>
-    <string name="timer_pause_failed">원래 세션이 없거나 일시정지를 지원하지 않습니다. 검은 화면은 유지됩니다.</string>
+    <string name="timer_already_paused">원래 플레이어가 이미 일시정지되었습니다. 검은 화면은 유지됩니다.</string>
+    <string name="timer_pause_failed">지금 일시정지할 수 없습니다. 플레이어에서 조작하세요. 검은 화면은 유지됩니다.</string>
     <string name="timer_mode_status_fmt">%1$d분 남음 · %2$s</string>
-    <string name="guide_title">처음인가요? 검은 화면 체험</string>
-    <string name="guide_intro">먼저 다른 앱 위에 표시 권한을 허용하세요. 알림은 빠른 조작용이며 알림 접근은 제목, 진행 및 예약 일시정지에 필요합니다.
-
-영상을 재생한 뒤 돌아와 시작하세요. 10초 후 화면이 돌아옵니다. 탭해서 깨운 뒤 돌아갈 수도 있습니다.
-
-체험은 청취 시간이나 성장에 반영되지 않습니다.</string>
-    <string name="guide_start">10초 체험 시작</string>
+    <string name="guide_title">테스트 소리 체험</string>
+    <string name="guide_intro">동영상 앱은 필요하지 않습니다. 내장 음성과 검은 화면을 체험한 후 약 10초 뒤 원래 화면으로 돌아옵니다. 미디어 음량과 이어폰 연결을 확인하세요. 체험 시간은 기록되지 않습니다.</string>
+    <string name="guide_start">체험 시작</string>
     <string name="guide_permission">표시 권한을 허용한 뒤 돌아와 시작하세요.</string>
     <string name="guide_busy">기존 검은 화면이나 타이머를 끝내고 표시 권한을 확인하세요.</string>
     <string name="guide_feedback">화면이 검은 동안 소리가 계속 재생됐나요?</string>
@@ -393,4 +381,35 @@
     <string name="ach_celebration_title">업적 달성</string>
     <string name="ach_medal_title">나의 금메달</string>
     <string name="ach_replay">애니메이션 다시 보기</string>
+    <!-- Shared playback and navigation copy -->
+    <string name="timer_episode_changed">원래 재생 내용이 변경되었거나 세션이 만료되어 이번 회 타이머를 취소했습니다.</string>
+    <string name="timer_episode_waiting">이번 회 타이머가 재생 재개를 기다리는 중입니다</string>
+    <string name="ui_home_intro">준비되면 편안하게 들어요</string>
+    <string name="ui_playback_source">재생 출처</string>
+    <string name="ui_no_session">읽을 수 있는 재생 세션이 없습니다</string>
+    <string name="ui_media_permission">알림 접근을 허용하면 재생 출처와 지원되는 제어를 볼 수 있습니다</string>
+    <string name="ui_capabilities_fmt">일시 정지: %1$s · 탐색: %2$s</string>
+    <string name="ui_supported">지원</string>
+    <string name="ui_unsupported">미지원</string>
+    <string name="ui_growth_title">정령 성장</string>
+    <string name="ui_listening_title">듣기 개요</string>
+    <string name="ui_settings_playback">재생과 검은 화면</string>
+    <string name="ui_settings_appearance">외관</string>
+    <string name="ui_settings_permissions">권한과 백그라운드</string>
+    <string name="ui_settings_data">데이터와 백업</string>
+    <string name="ui_settings_help">정보와 도움말</string>
+    <string name="ui_timer_extend">15분 연장</string>
+    <string name="ui_unknown_date">이전에 잠금 해제됨 · 날짜 알 수 없음</string>
+    <string name="ui_recorded_date_fmt">최초 기록: %1$s</string>
+    <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
+    <string name="ui_timer_target_fmt">대상: %1$s</string>
+    <string name="ui_choose_player">플레이어 선택</string>
+    <string name="ui_no_backup">성공한 백업 기록이 없습니다</string>
+    <string name="ui_backup_summary_fmt">성장치 %1$d · 세션 %2$d개</string>
+    <string name="ui_estimate_basis">추정치는 사용 환경의 영향을 받으며, 표본 수는 통계적 신뢰도를 의미하지 않습니다.</string>
+    <string name="ui_stop_assistant">도우미 중지</string>
+    <string name="ui_ready">준비됨</string>
+    <string name="ui_permission_ready">기본 권한 준비됨</string>
+    <string name="ui_permissions_details">권한 상세</string>
+    <string name="ui_timer_minutes">분</string>
 </resources>

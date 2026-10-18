@@ -1,0 +1,12 @@
+<resources>
+    <string name="guide_sound_help_title">Testton nicht gehört?</string>
+    <string name="guide_sound_help">Medienlautstärke mit den Lautstärketasten erhöhen. Bei Kopfhörern Lautstärke und Verbindung prüfen und erneut versuchen.</string>
+    <string name="guide_retry_audio">Erneut versuchen</string>
+    <string name="guide_return_help_title">Bild nicht zurückgekehrt?</string>
+    <string name="guide_return_help">Schwarzen Bildschirm antippen und Vorschau beenden wählen. Falls nötig, den Assistenten über die Benachrichtigung beenden.</string>
+    <string name="guide_audio_failed">Der Testton konnte nicht abgespielt werden. Bitte erneut versuchen.</string>
+    <string name="guide_pause_first">Video oder Musik vor dem Test pausieren.</string>
+    <string name="guide_black_hint">Der Testton läuft. Danach kehrt das Bild zurück.</string>
+    <string name="guide_exit">Vorschau beenden</string>
+    <string name="guide_preparing">Testton wird vorbereitet…</string>
+</resources>

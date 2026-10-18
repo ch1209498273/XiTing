@@ -14,6 +14,16 @@ import kotlin.math.abs
  */
 class MeasMathTest {
 
+    @Test fun `1500mA边界按电荷单位过滤`() {
+        assertTrue(MeasMath.rate(1_000_000, 950_000, 120_000, 1500.0) != null)
+        assertNull(MeasMath.rate(1_000_000, 949_999, 120_000, 1500.0))
+    }
+
+    @Test fun `无效电荷读数拒绝且不溢出`() {
+        assertNull(MeasMath.rate(Long.MAX_VALUE, -1, 120_000, 1500.0))
+        assertNull(MeasMath.rate(-1, -2, 120_000, 1500.0))
+    }
+
     private val MAX = 1500.0
     private val MIN_MS = 2 * 60_000L
     private val ONE_HOUR = 3_600_000L

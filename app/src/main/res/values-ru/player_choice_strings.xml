@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_media_access_missing">Доступ к медиоуправлению не разрешён · Доступны чёрный экран и возврат по таймеру</string>
+    <string name="player_choice_intro">Выберите приложение для совместного использования. Пауза и функции завершения воспроизведения зависят от медиасеанса приложения.</string>
+    <string name="player_control_unavailable">Нет управляемого медиасеанса · Доступны чёрный экран и возврат по таймеру</string>
+    <string name="player_state_playing">Воспроизводится</string>
+    <string name="player_state_paused">На паузе</string>
+    <string name="player_state_available">Медиасеанс доступен</string>
+    <string name="player_control_pause">Можно запросить паузу</string>
+    <string name="player_control_no_pause">Пауза не поддерживается</string>
+    <string name="player_selected_no_session">Выбранное приложение не предоставляет управление медиа. Можно использовать чёрный экран или возврат по таймеру.</string>
+    <string name="player_choice_none">Выберите плеер</string>
+</resources>

@@ -12,6 +12,7 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action ?: return
         if (action == Intent.ACTION_BOOT_COMPLETED || action == "android.intent.action.QUICKBOOT_POWERON") {
+            if(!context.prefs().getBoolean(Prefs.ASSISTANT_WANTED,false))return
             try {
                 context.startForegroundService(Intent(context, OverlayService::class.java))
                 Log.d("XiTing", "boot completed: service started")

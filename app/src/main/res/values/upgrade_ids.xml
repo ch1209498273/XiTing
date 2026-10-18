@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="timer_minutes_input" />
+    <item type="id" name="black_timer_extend" />
+    <item type="id" name="black_play_pause" />
+    <item type="id" name="black_timer_cancel" />
+    <item type="id" name="black_return_button" />
+    <item type="id" name="backup_last_success" />
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Gérer l’historique</string>
+    <string name="history_scope">Consulter et exporter les détails conservés des 60 derniers jours (500 sessions maximum). Les anciens enregistrements restent dans les statistiques cumulées.</string>
+    <string name="history_date">Choisir une date</string>
+    <string name="history_all">Toutes les dates</string>
+    <string name="history_export">Exporter les entrées actuelles en CSV</string>
+    <string name="history_empty">Aucune entrée pour cette date</string>
+    <string name="history_row">%1$s · %2$d min · %3$s</string>
+    <string name="history_black">Écran noir</string>
+    <string name="history_screen_off">Écran éteint</string>
+    <string name="history_delete">Supprimer</string>
+    <string name="history_delete_impact">Le total diminue de %1$d minutes et de 1 session. Les mois, la session la plus longue et les séries sont recalculés. La croissance, les succès débloqués et leur historique sont conservés. Supprimer ?</string>
+    <string name="history_delete_unavailable">Certains détails du mois sont archivés. La session la plus longue et les jours ne peuvent être recalculés précisément ; suppression indisponible.</string>
+    <string name="history_deleted">Entrée supprimée ; statistiques mises à jour</string>
+    <string name="history_delete_failed">Échec de suppression ; réessayez</string>
+    <string name="history_exported">Export terminé</string>
+    <string name="history_export_failed">Échec de l’export ; choisissez un autre emplacement</string>
+</resources>

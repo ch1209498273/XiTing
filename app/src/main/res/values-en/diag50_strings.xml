@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diag50_title">Diagnostics summary</string>
+    <string name="diag50_export">Preview diagnostics</string>
+    <string name="diag50_share">Share summary</string>
+    <string name="diag50_scope">These fields are passed to your chosen app only after you tap Share. They include device model, permissions and session state, with no titles, identifiers or raw logs. Wake lock durations are measured within this process and do not measure battery drain.</string>
+</resources>

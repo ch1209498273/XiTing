@@ -46,8 +46,15 @@ object HistoryStore {
     }
 
     /** 月份 key（yyyy-MM，US locale——内部 key 与展示无关） */
-    fun monthKey(ms: Long): String =
-        java.text.SimpleDateFormat("yyyy-MM", java.util.Locale.US).format(java.util.Date(ms))
+    // A migration may format 500 dates. Reuse per thread: DateFormat is mutable and not thread safe.
+    private val monthFormatter = object : ThreadLocal<java.text.SimpleDateFormat>() {
+        override fun initialValue() = java.text.SimpleDateFormat("yyyy-MM", java.util.Locale.US)
+    }
+    fun monthKey(ms: Long): String = monthFormatter.get()!!.let {
+        // A timezone can change while the process remains alive.
+        it.timeZone = java.util.TimeZone.getDefault()
+        it.format(java.util.Date(ms))
+    }
 
     // ── 写（SessionLog.add 锁内调用）──
 

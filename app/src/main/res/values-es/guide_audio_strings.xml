@@ -1,0 +1,12 @@
+<resources>
+    <string name="guide_sound_help_title">¿No oyes el sonido de prueba?</string>
+    <string name="guide_sound_help">Sube el volumen multimedia con los botones del teléfono. Si usas auriculares, comprueba su volumen y conexión y vuelve a intentarlo.</string>
+    <string name="guide_retry_audio">Reintentar</string>
+    <string name="guide_return_help_title">¿No volvió la imagen?</string>
+    <string name="guide_return_help">Toca la pantalla negra y elige Finalizar. Si continúa, cierra el asistente desde la notificación y reintenta.</string>
+    <string name="guide_audio_failed">No se pudo reproducir el sonido de prueba. Vuelve a intentarlo.</string>
+    <string name="guide_pause_first">Pausa el vídeo o la música antes de la prueba.</string>
+    <string name="guide_black_hint">Se reproduce el sonido de prueba. La imagen volverá al terminar.</string>
+    <string name="guide_exit">Finalizar</string>
+    <string name="guide_preparing">Preparando el sonido de prueba…</string>
+</resources>

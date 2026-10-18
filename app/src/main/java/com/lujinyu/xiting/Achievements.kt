@@ -55,6 +55,30 @@ object Achievements {
      */
     fun unlockedIds(ctx: Context): Set<String> = unlocked(ctx).toSet()
 
+    internal fun history(ctx: Context): List<AchievementRecord> = AchievementHistory.record(
+        AchievementHistory.parse(ctx.prefs().getString(Prefs.ACH_HISTORY, null)),
+        unlocked(ctx), emptyList(), 0L
+    )
+
+    internal data class Progress(val current: Long, val target: Long) {
+        val percent: Int get() = (current.coerceAtMost(target) * 100L / target).toInt()
+    }
+
+    internal fun progress(id: String, count: Long, maxMs: Long, streakBest: Int, stage: Int): Progress =
+        when (id) {
+            "marathon" -> Progress(maxMs.coerceAtLeast(0), 3_600_000L)
+            "week" -> Progress(streakBest.toLong().coerceAtLeast(0), 7L)
+            "c100" -> Progress(count.coerceAtLeast(0), 100L)
+            "king" -> Progress(stage.toLong().coerceIn(0, 4), 4L)
+            else -> Progress(0L, 1L)
+        }
+
+    internal fun progress(ctx: Context, id: String): Progress = progress(
+        id, HistoryStore.totalCount(ctx), HistoryStore.maxSingleMs(ctx),
+        Streaks.computeFromDays(HistoryStore.listenDays(ctx)).best,
+        PetView.stageOf(EnergyStore.collectedTotal(ctx).toLong())
+    )
+
     /**
      * 解锁条件（纯函数，可单测）：依据统计算出「此刻应当点亮」的 id 集合。
      *
@@ -77,11 +101,12 @@ object Achievements {
         val should = shouldUnlock(count, maxMs, streakBest, stage)
         val got = unlocked(ctx)
         val fresh = ALL.filter { it.id in should && it.id !in got }
+        val records = AchievementHistory.record(history(ctx), got, fresh.map { it.id }, System.currentTimeMillis())
         if (fresh.isNotEmpty()) {
             got.addAll(fresh.map { it.id })
-            ctx.prefs()
-                .edit().putStringSet(Prefs.ACH_UNLOCKED, got).apply()
         }
+        ctx.prefs().edit().putStringSet(Prefs.ACH_UNLOCKED, got)
+            .putString(Prefs.ACH_HISTORY, AchievementHistory.encode(records)).apply()
         return fresh
     }
 
@@ -91,7 +116,10 @@ object Achievements {
         val sub = if (known.isEmpty()) {
             ctx.getString(R.string.ach_sub_empty)
         } else {
-            ctx.getString(R.string.ach_sub_latest, title(ctx, known.last()))
+            val latest = AchievementHistory.latestRecorded(history(ctx))
+                ?.let { record -> known.firstOrNull { it.id == record.id } }
+            if (latest == null) ctx.getString(R.string.ach_row_unlocked)
+            else ctx.getString(R.string.ach_sub_latest, title(ctx, latest))
         }
         return known.size to sub
     }

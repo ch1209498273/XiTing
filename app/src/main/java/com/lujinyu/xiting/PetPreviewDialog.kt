@@ -43,7 +43,7 @@ internal fun showPetPreview(context:Context,initialStage:Int=0):AlertDialog {
     })
     content.addView(HorizontalScrollView(context).apply { addView(row);isHorizontalScrollBarEnabled=false })
     content.addView(TextView(context).apply {
-        text=context.getString(R.string.gallery_preview_only);textSize=12f
+        text=context.getString(R.string.gallery_preview_only);textSize=13f
         setTextColor(context.getColor(R.color.text_secondary))
     })
     choose(initialStage.coerceIn(0,4))

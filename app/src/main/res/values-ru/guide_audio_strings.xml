@@ -1,0 +1,12 @@
+<resources>
+    <string name="guide_sound_help_title">Не слышно тестовый звук?</string>
+    <string name="guide_sound_help">Увеличьте громкость мультимедиа кнопками телефона. Проверьте громкость и подключение наушников, затем повторите.</string>
+    <string name="guide_retry_audio">Повторить</string>
+    <string name="guide_return_help_title">Изображение не вернулось?</string>
+    <string name="guide_return_help">Нажмите на чёрный экран и завершите проверку. При необходимости закройте помощник через уведомление.</string>
+    <string name="guide_audio_failed">Не удалось воспроизвести тестовый звук. Попробуйте ещё раз.</string>
+    <string name="guide_pause_first">Приостановите видео или музыку перед проверкой.</string>
+    <string name="guide_black_hint">Тестовый звук воспроизводится. Затем изображение вернётся.</string>
+    <string name="guide_exit">Завершить</string>
+    <string name="guide_preparing">Подготовка тестового звука…</string>
+</resources>

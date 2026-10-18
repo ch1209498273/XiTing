@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="support_title">診断と確認</string>
+    <string name="support_yes">はい</string>
+    <string name="support_no">いいえ</string>
+    <string name="support_overlay">重ねて表示する権限</string>
+    <string name="support_media_access">通知へのアクセス</string>
+    <string name="support_notifications">通知が有効</string>
+    <string name="support_battery">電池最適化の対象外</string>
+    <string name="support_session">メディアセッションを取得可能</string>
+    <string name="support_playing">再生中</string>
+    <string name="support_pause">セッションが一時停止対応を宣言</string>
+    <string name="support_seek">セッションがシーク対応を宣言</string>
+    <string name="support_service">アシスタントが動作中</string>
+    <string name="support_black">黒いカーテンを表示中</string>
+    <string name="support_scope">現在の端末の状態です。宣言された機能でも他のアプリが応答するとは限りません。戻った後に更新してください。</string>
+    <string name="support_fix_overlay">重ねて表示を許可</string>
+    <string name="support_fix_media">通知へのアクセスを許可</string>
+    <string name="support_fix_notifications">通知設定</string>
+    <string name="support_fix_player">プレーヤーを確認</string>
+    <string name="support_fix_start">アシスタントを開始</string>
+    <string name="support_fix_battery">電池最適化を確認</string>
+    <string name="support_fix_app">アプリ情報</string>
+    <string name="support_refresh">更新</string>
+    <string name="support_player_help">プレーヤーで再生を開始してから戻ってください。セッションや操作に非対応の場合は別のプレーヤーをお試しください。</string>
+    <string name="support_open_failed">この画面を開けません。システム設定でこのアプリを探してください。</string>
+    <string name="support_selected">選択済み</string>
+    <string name="support_first_title">体験の確認</string>
+    <string name="support_first_intro">内蔵音声で黒画面を試せます。動画アプリは不要です。</string>
+    <string name="support_check_result">結果を確認</string>
+    <string name="support_sound_question">テスト音声は聞こえましたか？</string>
+    <string name="support_return_question">元の画面に戻りましたか？</string>
+    <string name="support_first_success">基本体験が完了しました。動画を再生してからフローティングボタンをタップしてください。</string>
+</resources>

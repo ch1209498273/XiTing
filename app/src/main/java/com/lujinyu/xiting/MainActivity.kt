@@ -34,9 +34,12 @@ import java.util.Locale
  * 首页=主操作与服务；统计=节能统计（原StatsActivity）；关于=应用说明（原AboutActivity）。
  */
 class MainActivity : Activity() { // MARKER_TEST_9271
+    private var restoreRecoveryFailed=false
+    internal val historyManagement by lazy { HistoryManagement(this) { postRefresh() } }
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(AppLocales.wrap(newBase))
+        restoreRecoveryFailed=!RestoreSnapshot.recoverPending(newBase)
+        super.attachBaseContext(AppearanceSettings.wrap(AppLocales.wrap(newBase)))
     }
 
     companion object {
@@ -56,7 +59,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     // 应用栏与导航
     private lateinit var appbarTitle: TextView
     private lateinit var pillStatus: TextView
-    private lateinit var pageHome: View
+    internal lateinit var pageHome: View
     // ↓ internal：被 MainDialogs.kt / SkinGallery.kt / PosterFlow.kt 的扩展函数访问（单模块内=私有）
     internal lateinit var pageStats: View
     internal lateinit var pageSettings: View
@@ -64,6 +67,8 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     private lateinit var navStats: LinearLayout
     private lateinit var navSettings: LinearLayout
     internal var tab = TAB_HOME
+    private var playbackObserver:PlaybackSourceObserver?=null
+    internal var evolutionDialog:android.app.AlertDialog?=null
 
     // 首页控件
     private lateinit var cardBlack: LinearLayout
@@ -85,7 +90,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if(restoreRecoveryFailed) {
+            setContentView(TextView(this).apply { text=getString(R.string.rel_recovery_storage_fail);setPadding(32,48,32,32);textSize=18f })
+            return
+        }
         setContentView(R.layout.activity_main)
+        SessionRuntime.recover(this)
 
         appbarTitle = findViewById(R.id.appbar_title)
         pillStatus = findViewById(R.id.pill_status)
@@ -100,8 +110,12 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         navSettings.setOnClickListener { switchTab(TAB_SETTINGS) }
 
         bindHome()
+        findViewById<View>(R.id.listening_recent).setOnClickListener {
+            startActivity(Intent(this,com.lujinyu.xiting.listening.ListeningActivity::class.java))
+        }
         bindStats()
         bindSettings()
+        bindUpgradeUi()
         // 切语言时 recreate() 会重建 Activity，这里把 tab 位置恢复回去
         val lastTab = prefs().getInt(Prefs.LAST_TAB, TAB_HOME)
         switchTab(if (lastTab in 0..2) lastTab else TAB_HOME)
@@ -117,7 +131,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
             prefs().edit().putString(Prefs.UPDATE_SEEN_VERSION, BuildConfig.VERSION_NAME).apply()
             android.app.AlertDialog.Builder(this)
                 .setTitle(getString(R.string.update_log_title_fmt, BuildConfig.VERSION_NAME))
-                .setMessage(getString(R.string.update_log_body))
+                .setMessage(getString(R.string.auto_playback_update))
                 .setPositiveButton(getString(R.string.dlg_got_it), null)
                 .show()
         } else if (seenVersion == null) {
@@ -143,6 +157,9 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         tintNav(findViewById(R.id.nav_icon_home), findViewById(R.id.nav_label_home), target == TAB_HOME, sel, unsel)
         tintNav(findViewById(R.id.nav_icon_stats), findViewById(R.id.nav_label_stats), target == TAB_STATS, sel, unsel)
         tintNav(findViewById(R.id.nav_icon_settings), findViewById(R.id.nav_label_settings), target == TAB_SETTINGS, sel, unsel)
+        navHome.isSelected=target==TAB_HOME
+        navStats.isSelected=target==TAB_STATS
+        navSettings.isSelected=target==TAB_SETTINGS
         if (target == TAB_STATS) renderStats()
         // 设置页也有动态内容：「悬浮球样式」那一行显示的是**当前**的形态·配色。
         // 以前只有统计页在切回时重绘，设置页完全不管，于是用户在图鉴里换了形态、
@@ -218,9 +235,9 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
         cardBlack.setOnClickListener {
             if (OverlayService.isRunning) {
-                startService(Intent(this, OverlayService::class.java).setAction(OverlayService.ACTION_EXIT))
-                prefs().edit().putBoolean(Prefs.ASSISTANT_WANTED, false).apply()
-                Toast.makeText(this, getString(R.string.toast_assistant_stopped), Toast.LENGTH_SHORT).show()
+                startService(Intent(this,OverlayService::class.java).setAction(OverlayService.ACTION_EXIT))
+                prefs().edit().putBoolean(Prefs.ASSISTANT_WANTED,false).apply()
+                Toast.makeText(this,getString(R.string.toast_assistant_stopped),Toast.LENGTH_SHORT).show()
             } else {
                 startForegroundService(Intent(this, OverlayService::class.java))
                 prefs().edit().putBoolean(Prefs.ASSISTANT_WANTED, true).apply()
@@ -240,6 +257,9 @@ class MainActivity : Activity() { // MARKER_TEST_9271
 
     override fun onResume() {
         super.onResume()
+        if(restoreRecoveryFailed)return
+        playbackObserver?.close()
+        playbackObserver=PlaybackSourceObserver(this) { refreshUpgradeUi() }
         // 助手被系统清理后（更新/后台清理），打开App时自动恢复；
         // 用户主动停止的（assistant_wanted=false）不复活
         val prefs = prefs()
@@ -255,7 +275,9 @@ class MainActivity : Activity() { // MARKER_TEST_9271
     }
 
     override fun onStop() {
+        playbackObserver?.close();playbackObserver=null
         super.onStop()
+        if(restoreRecoveryFailed)return
         // 静默备份到公共下载目录（卸载不删除；设备ID绑定，重装可恢复）。
         // 挪到后台线程：save() 会读整个 sessions.json + 走 MediaStore
         // query/delete/insert 再写文件，每次切后台都在主线程做一遍会掉帧，
@@ -277,18 +299,27 @@ class MainActivity : Activity() { // MARKER_TEST_9271
  * 它只在启动时跑一次（save() 是每次 onStop 都跑，所以那个才需要挪出主线程）。
  */
 private fun checkRestore() {
-        if (isFinishing) return
-        if (EnergyStore.collectedTotal(this) > 0) return
-        if (BackupManager.findBackup(this) == null) return
-        android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.restore_title))
-            .setMessage(
-                getString(R.string.restore_msg)
-            )
-            .setPositiveButton(getString(R.string.restore_pick)) { _, _ -> openBackupPicker() }
-            .setNegativeButton(getString(R.string.restore_no), null)
-            .show()
+        if(!canSuggestRestore())return
+        val owner=java.lang.ref.WeakReference(this)
+        val ctx=applicationContext
+        Thread({
+            val backup=BackupManager.findBackup(ctx)
+            if(backup!=null)owner.get()?.runOnUiThread {
+                val activity=owner.get() ?: return@runOnUiThread
+                // Storage may finish after a user opens a different dialog or starts listening.
+                if(!activity.canSuggestRestore())return@runOnUiThread
+                android.app.AlertDialog.Builder(activity)
+                    .setTitle(activity.getString(R.string.restore_title))
+                    .setMessage(activity.getString(R.string.restore_msg))
+                    .setPositiveButton(activity.getString(R.string.restore_pick)) { _, _ -> activity.openBackupPicker() }
+                    .setNegativeButton(activity.getString(R.string.restore_no),null).show()
+            }
+        },"XiTing-restore-check").start()
     }
+    private fun canSuggestRestore():Boolean = !isFinishing && !isDestroyed && hasWindowFocus() &&
+        OverlayService.instance?.isAnyBlackShowing()!=true && EnergyStore.collectedTotal(this)==0 &&
+        EnergyStore.pending(this).isEmpty() && HistoryStore.totalCount(this)==0L &&
+        SessionLog.sessions(this).isEmpty() && SessionOutcomeStore.list(this).isEmpty()
 
     /** 打开系统文件选择器（初始定位到下载目录/XiTing） */
     private fun openBackupPicker() {
@@ -310,9 +341,11 @@ private fun checkRestore() {
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if(historyManagement.handleActivityResult(requestCode,resultCode,data))return
         if (requestCode == REQ_EXPORT && resultCode == RESULT_OK) {
             val uri = data?.data ?: return
             val ok = BackupManager.exportToUri(this, uri)
+            refreshUpgradeUi()
             Toast.makeText(this, if (ok) getString(R.string.toast_export_ok) else getString(R.string.toast_export_fail), Toast.LENGTH_SHORT).show()
             return
         }
@@ -323,40 +356,39 @@ private fun checkRestore() {
                 Toast.makeText(this, getString(R.string.toast_invalid_backup), Toast.LENGTH_SHORT).show()
                 return
             }
-            val gp = obj.optInt("gp", 0)
-            if (BackupManager.isSameDevice(this, obj)) {
-                doRestore(obj, gp)
-            } else {
-                android.app.AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.restore_other_title))
-                    .setMessage(getString(R.string.restore_other_msg, gp))
-                    .setPositiveButton(getString(R.string.restore_ok_btn)) { _, _ -> doRestore(obj, gp) }
-                    .setNegativeButton(getString(R.string.dlg_cancel), null)
-                    .show()
-            }
+            BackupFlow.confirmRestore(this,obj) { gp -> doRestore(obj,gp) }
         }
     }
 
     private fun doRestore(obj: org.json.JSONObject, gp: Int) {
+        if(OverlayService.isRunning) { Toast.makeText(this,R.string.rel_stop_first,Toast.LENGTH_LONG).show();return }
         if (BackupManager.restore(this, obj)) {
             Toast.makeText(this, getString(R.string.toast_restore_done, gp), Toast.LENGTH_LONG).show()
             refreshStates(); refreshHomeStats()
             if (tab == TAB_STATS) renderStats()
         } else {
             Toast.makeText(this, getString(R.string.toast_restore_fail), Toast.LENGTH_SHORT).show()
+            if(RestoreSnapshot.isPending(this))recreate()
         }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        if(restoreRecoveryFailed)return
         // 黑幕窗口盖上/拿走都会改变本窗口焦点：恰好作为状态刷新时机，
         // 否则从黑幕上解锁回来，胶囊会停留在「黑幕开启中」
-        if (hasFocus) { refreshStates();showDemoFeedback();OverlayService.instance?.showTimerResult();showPendingAchievementCelebration() }
+        if (hasFocus) { refreshStates()
+            if(ServiceRecovery.showIfNeeded(this)!=null)return
+            showDemoFeedback();OverlayService.instance?.showTimerResult()
+            if(!maybeShowEvolution(PetView.stageOf(EnergyStore.collectedTotal(this).toLong())))showPendingAchievementCelebration()
+        }
     }
 
     internal val demoFeedbackCheck=Runnable { showDemoFeedback() }
 
     override fun onDestroy() {
+        evolutionDialog?.dismiss();evolutionDialog=null
+        playbackObserver?.close();playbackObserver=null
         window.decorView.removeCallbacks(demoFeedbackCheck)
         super.onDestroy()
     }
@@ -366,6 +398,8 @@ private fun checkRestore() {
     }
 
     private fun refreshStates() {
+        pageHome.findViewById<View>(R.id.btn_first_use).visibility=
+            if(prefs().getBoolean(FirstSuccessFlow.COMPLETE,false))View.GONE else View.VISIBLE
         WidgetData.refreshAll(this) // 小部件状态同步
         val running = OverlayService.isRunning
         if (running) {
@@ -416,9 +450,11 @@ private fun checkRestore() {
 
         val remain = OverlayService.instance?.timerRemainingMs() ?: 0
         pageHome.findViewById<TextView>(R.id.timer_state).text =
-            if (remain > 0) getString(R.string.timer_mode_status_fmt,remain / 60000 + 1,
+            if(OverlayService.instance?.timerWaitsForPlayback()==true) getString(R.string.timer_episode_waiting)
+            else if (remain > 0) getString(R.string.timer_mode_status_fmt,remain / 60000 + 1,
                 getString(if(OverlayService.instance?.timerKeepsBlack()==true) R.string.timer_pause_keep_black else R.string.timer_return_video))
             else getString(R.string.timer_none)
+        refreshUpgradeUi()
     }
 
     /** 防杀保活指南：ColorOS后台限制的分步设置引导 */
@@ -485,7 +521,7 @@ private fun checkRestore() {
     }
 
     /** 听完这集再关：读取正在播放会话的进度，定时到本集片尾（个性化·定时关闭选项） */
-    internal fun finishThisEpisode() {
+    internal fun finishThisEpisode():Boolean {
         val mgr = getSystemService(Context.MEDIA_SESSION_SERVICE) as? MediaSessionManager
         val comp = ComponentName(this, NotificationListener::class.java)
         val sessions = try {
@@ -508,23 +544,21 @@ private fun checkRestore() {
                     )
                 }
                 .show()
-            return
+            return false
         }
         var bestRemaining = -1L
         var bestToken:android.media.session.MediaSession.Token?=null
-        for (c in sessions) {
-            val st = c.playbackState ?: continue
-            if (st.state != PlaybackState.STATE_PLAYING) continue
-            val dur = c.metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L
-            if (dur <= 0) continue
-            val speed = st.playbackSpeed
-            val pos = st.position + ((SystemClock.elapsedRealtime() - st.lastPositionUpdateTime) * speed).toLong()
-            val rem = dur - pos
+        val desiredToken=queryNowPlaying()?.controller?.sessionToken
+        for (c in sessions.filter { it.sessionToken==desiredToken }) {
+            val target=EpisodeTimerTarget(c)
+            val reading=target.read();target.close()
+            if(!reading.valid) continue
+            val rem=reading.remainingMs
             if (rem > 0 && (bestRemaining < 0 || rem < bestRemaining)) { bestRemaining = rem;bestToken=c.sessionToken }
         }
         if (bestRemaining <= 0) {
             Toast.makeText(this, getString(R.string.toast_no_progress), Toast.LENGTH_LONG).show()
-            return
+            return false
         }
         val endAt = System.currentTimeMillis() + bestRemaining + 4000 // 集尾缓冲4秒
         startService(
@@ -532,16 +566,18 @@ private fun checkRestore() {
                 .setAction(OverlayService.ACTION_SET_TIMER)
                 .putExtra(OverlayService.EXTRA_END_AT, endAt)
                 .putExtra(OverlayService.EXTRA_TIMER_SESSION,bestToken)
+                .putExtra(OverlayService.EXTRA_TIMER_EPISODE,true)
         )
         postRefresh()
+        return true
     }
 
     /**
-     * 「省电估算」卡片：现在只展示**置信度**与实测进度，不再引导用户去做 6 分钟测试。
+     * 「省电估算」卡片：现在只展示**样本数量等级**与采样进度，不再引导用户去做 6 分钟测试。
      *
      * 旧版是一个「开始校准」按钮，点进去要用户亮屏播 3 分钟 + 黑屏 3 分钟、
      * 不能碰手机、不能充电 —— 拿产品体验换一个估算数字，而且样本只有一次。
-     * 新版改成被动测量：正常使用就在采样，信息改成「已采集 N 次」+ 置信度分级。
+     * 新版改成被动测量：正常使用就在采样，信息改成「已采集 N 次」+ 样本数量分级。
      */
     private fun onMahCardClick() {
         val c = PowerCalib.confidence(this)
@@ -563,10 +599,10 @@ private fun checkRestore() {
             // ⚠ this@MainActivity：`this` 在 StringBuilder.apply{} 里指向 StringBuilder，
             // 直接写 this 会把 StringBuilder 当 Context 传进去
             PowerCalib.blackScreenPower(this@MainActivity)?.let { stat ->
-                val rateUwhPerMs = stat.first
+                val rateUahPerMs = stat.first
                 val n = stat.second
-                // µWh/ms 换算成每分钟多少 mW：×60000/1000
-                val mPerMin = rateUwhPerMs * 60_000.0 / 1000.0
+                // µAh/ms 换算为 mAh/min：×60000/1000
+                val mPerMin = rateUahPerMs * 60_000.0 / 1000.0
                 append("\n")
                 append(getString(R.string.meas_black_power_fmt, mPerMin.toFloat(), n))
             }
@@ -734,15 +770,7 @@ private fun checkRestore() {
         }
 
         // 进化提示（仅当上次记录的形态更低时弹一次）——按成长值算，与显示哪个形态无关
-        val seen = prefs.getInt(Prefs.LAST_SEEN_STAGE, -1)
-        if (seen in 0 until growthStage) {
-            Toast.makeText(
-                this,
-                getString(R.string.evolve_fmt, PetView.stageName(this, seen), PetView.stageName(this, growthStage)),
-                Toast.LENGTH_LONG
-            ).show()
-        }
-        if (seen != growthStage) prefs.edit().putInt(Prefs.LAST_SEEN_STAGE, growthStage).apply()
+        maybeShowEvolution(growthStage)
 
         // 设置页分享行状态：今天是否还能领
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
@@ -1030,6 +1058,18 @@ private fun checkRestore() {
         switchInfo.setOnCheckedChangeListener { _, checked ->
             prefs.edit().putBoolean(Prefs.BLACK_INFO_SHOW, checked).apply()
             OverlayService.instance?.reapplyBlack() // 黑幕显示中即时生效（无闪屏重挂）
+        }
+
+        val switchMark=page.findViewById<android.widget.Switch>(R.id.switch_listening_mark)
+        switchMark.isChecked=prefs.getBoolean(com.lujinyu.xiting.listening.ListeningStore.MARK_SHOW,false)
+        switchMark.setOnCheckedChangeListener { _,checked ->
+            prefs.edit().putBoolean(com.lujinyu.xiting.listening.ListeningStore.MARK_SHOW,checked).apply()
+        }
+        val switchBlackTimer=page.findViewById<android.widget.Switch>(R.id.switch_black_timer)
+        switchBlackTimer.isChecked=prefs.getBoolean(Prefs.BLACK_TIMER_SHOW,false)
+        switchBlackTimer.setOnCheckedChangeListener { _,checked ->
+            prefs.edit().putBoolean(Prefs.BLACK_TIMER_SHOW,checked).apply()
+            OverlayService.instance?.refreshBlackTimerDisplay()
         }
 
         // 黑幕播放控制（默认关：防误触）

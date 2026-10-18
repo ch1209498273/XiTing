@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v50_scenes">选择听剧场景</string>
+    <string name="v50_sleep">睡前定时听</string>
+    <string name="v50_episode">听完这一集</string>
+    <string name="v50_continuous">持续听</string>
+    <string name="v50_overlay_needed">请先允许悬浮窗，再准备听剧场景。</string>
+    <string name="v50_continuous_cancel">持续听会取消当前定时，需要你主动结束。确认后只启动助手，请返回播放器用悬浮球开启黑幕。</string>
+    <string name="v50_continuous_review">持续听不设定时，需要你主动结束。确认后只启动助手，请返回播放器用悬浮球开启黑幕。</string>
+    <string name="v50_ready">已准备好。请返回播放器，用悬浮球开启黑幕。</string>
+    <string name="v50_session">本次会话</string>
+    <string name="v50_idle">助手未启动</string>
+    <string name="v50_starting">助手启动中</string>
+    <string name="v50_running">助手运行中</string>
+    <string name="v50_stopping">助手停止中</string>
+    <string name="v50_interrupted">会话发生中断</string>
+    <string name="v50_curtain_off">黑幕关闭</string>
+    <string name="v50_curtain_locked">黑幕已锁定</string>
+    <string name="v50_curtain_awake">黑幕操作层</string>
+    <string name="v50_play_unknown">播放状态未知</string>
+    <string name="v50_play_playing">播放器报告播放中</string>
+    <string name="v50_play_paused">播放器报告已暂停</string>
+    <string name="v50_play_buffering">播放器报告缓冲中</string>
+    <string name="v50_play_invalid">播放器会话失效</string>
+    <string name="v50_timer_fixed">固定定时</string>
+    <string name="v50_timer_waiting">等待播放器继续播放</string>
+    <string name="v50_timer_executing">正在执行结束动作</string>
+    <string name="v50_timer_ended">定时已结束</string>
+    <string name="v50_remaining">剩余 %1$d:%2$02d</string>
+    <string name="v50_pause_requested">已发送暂停请求</string>
+    <string name="v50_pause_confirmed">播放器已报告暂停</string>
+    <string name="v50_pause_already">播放器原本已暂停</string>
+    <string name="v50_pause_unavailable">暂时无法暂停，请返回播放器操作</string>
+    <string name="v50_pause_failed">暂停执行失败</string>
+    <string name="v50_pause_unconfirmed">未能确认暂停，请返回播放器查看</string>
+    <string name="v50_recent">最近一次结果</string>
+    <string name="v50_records">会话结果记录</string>
+    <string name="v50_end_user">用户主动结束</string>
+    <string name="v50_end_timer">计划到期</string>
+    <string name="v50_end_unknown">结束原因未知</string>
+    <string name="v50_no_records">还没有会话结果</string>
+    <string name="v50_recap_enabled">显示上次会话回顾</string>
+    <string name="v50_settings_tools">数据、诊断与回顾</string>
+    <string name="v50_target_changed">播放器内容已改变。请检查新的目标与结束动作，再次确认；已填写的时长保留。</string>
+</resources>
+

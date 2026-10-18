@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="ui_backup_version_fmt">Версия копии: %1$s</string>
+    <string name="ui_backup_same_device">С этого устройства</string>
+    <string name="ui_backup_other_device">С другого или неизвестного устройства</string>
+    <string name="ui_backup_restore_effect">Восстановление заменяет рост и дату публикации. Допустимые сеансы заменяют историю и пересчитывают статистику; иначе местная история сохраняется. Допустимые настройки внешнего вида и пузыря восстанавливаются. Достижения объединяются с сохранением первых записей.</string>
+    <string name="ui_backup_unknown_version">Неизвестно</string>
+    <string name="ui_last_backup_fmt">Последняя успешная копия: %1$s</string>
+    <string name="ui_timer_review">Подтверждение сразу применяет время, действие и плеер. Пауза требует доступа к уведомлениям и поддержки плеера. Запрос получает только выбранный сеанс; плеер может его проигнорировать.</string>
+    <string name="ui_model_estimate">Оценка модели, не измеренная экономия</string>
+    <string name="ui_timer_summary_fmt">%1$s\n%2$s\n%3$s</string>
+</resources>

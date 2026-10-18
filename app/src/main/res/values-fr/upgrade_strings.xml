@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="ui_backup_version_fmt">Version de sauvegarde : %1$s</string>
+    <string name="ui_backup_same_device">De cet appareil</string>
+    <string name="ui_backup_other_device">Autre appareil ou appareil inconnu</string>
+    <string name="ui_backup_restore_effect">La restauration remplace la croissance et la date de partage. Les sessions valides remplacent les détails et recalculent les statistiques ; sinon les sessions locales restent. Les réglages valides sont restaurés. Les succès fusionnent en conservant leurs premiers enregistrements.</string>
+    <string name="ui_backup_unknown_version">Inconnue</string>
+    <string name="ui_last_backup_fmt">Dernière sauvegarde réussie : %1$s</string>
+    <string name="ui_timer_review">Confirmer applique maintenant la durée, l’action finale et le lecteur. La pause exige l’accès aux notifications et un lecteur compatible. Seule la session choisie reçoit la demande ; le lecteur peut l’ignorer.</string>
+    <string name="ui_model_estimate">Estimation par modèle, pas une économie mesurée</string>
+    <string name="ui_timer_summary_fmt">%1$s\n%2$s\n%3$s</string>
+</resources>

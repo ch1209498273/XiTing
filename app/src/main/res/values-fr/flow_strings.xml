@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flow_timer_setup">Régler la minuterie</string>
+    <string name="flow_timer_pending">Confirmation de la minuterie…</string>
+    <string name="flow_timer_unconfirmed">Le résultat n\'est pas encore confirmé. Vérifiez la minuterie actuelle.</string>
+    <string name="flow_player_lost">Le lecteur sélectionné n\'est plus disponible. Sélectionnez-le à nouveau.</string>
+    <string name="flow_player_error">Impossible de lire les informations du lecteur pour le moment. Réessayez.</string>
+    <string name="flow_player_empty">Lancez d\'abord la lecture dans votre lecteur.</string>
+    <string name="flow_player_permission">Contrôle de la lecture non autorisé</string>
+    <string name="flow_player_reselect">Sélectionner à nouveau le lecteur</string>
+    <string name="flow_timer_failed">Minuterie non appliquée. Réglages précédents conservés.</string>
+    <string name="flow_timer_ready">Minuterie réglée</string>
+    <string name="flow_end_action">Action à la fin</string>
+    <string name="flow_minutes">%1$d minutes</string>
+    <string name="flow_custom">Personnalisé</string>
+    <string name="flow_timer_review">Confirmez le lecteur, la durée et l\'action à la fin.</string>
+    <string name="flow_timer_return">Retirer le voile noir</string>
+    <string name="flow_timer_pause">Demander la pause et garder le voile noir</string>
+    <string name="flow_episode_unavailable">Le lecteur actuel ne fournit pas la progression de cet épisode.</string>
+    <string name="flow_timer_result">Résultat de la minuterie</string>
+    <string name="flow_setup_success">Essai terminé. Vous pouvez réessayer à tout moment dans l\'aide.</string>
+    <string name="flow_request_expired">La demande de réglage a expiré. Réessayez.</string>
+</resources>

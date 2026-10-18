@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extras_presets">Listening presets</string>
+    <string name="extras_save_preset">Save current preset</string>
+    <string name="extras_manage_presets">Manage presets</string>
+    <string name="extras_preset_review">Presets only fill this panel. Review the current player and end action.</string>
+    <string name="extras_preset_format">%1$d min · %2$s</string>
+    <string name="extras_delete_preset">Delete this preset?</string>
+    <string name="extras_delete">Delete</string>
+    <string name="extras_no_presets">No saved presets</string>
+    <string name="extras_preset_saved">Preset saved</string>
+    <string name="extras_preset_duplicate">Preset already saved</string>
+    <string name="extras_personalization">Personalization</string>
+    <string name="extras_appearance">Appearance</string>
+    <string name="extras_theme_system">System</string>
+    <string name="extras_theme_light">Light</string>
+    <string name="extras_theme_dark">Dark</string>
+    <string name="extras_entry_order">Home entry order</string>
+    <string name="extras_entry_order_hint">Tap an entry to move it first. The main action stays fixed.</string>
+    <string name="extras_entry_timer">Timer</string>
+    <string name="extras_entry_player">Player</string>
+    <string name="extras_entry_demo">Demo</string>
+    <string name="extras_entry_permissions">Permissions</string>
+    <string name="extras_reset_order">Reset order</string>
+    <string name="extras_use_preset">Use preset</string>
+</resources>

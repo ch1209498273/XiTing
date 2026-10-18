@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flow_timer_setup">タイマーを設定</string>
+    <string name="flow_timer_pending">タイマーを確認中…</string>
+    <string name="flow_timer_unconfirmed">設定結果を確認できていません。現在のタイマーを確認してください</string>
+    <string name="flow_player_lost">選択したプレーヤーが利用できなくなりました。選び直してください</string>
+    <string name="flow_player_error">現在プレーヤーの情報を取得できません。もう一度お試しください</string>
+    <string name="flow_player_empty">先にプレーヤーで再生を開始してください</string>
+    <string name="flow_player_permission">再生操作の権限が許可されていません</string>
+    <string name="flow_player_reselect">プレーヤーを選び直す</string>
+    <string name="flow_timer_failed">タイマーは適用されませんでした。以前の設定を保持しています</string>
+    <string name="flow_timer_ready">タイマーを設定しました</string>
+    <string name="flow_end_action">終了時の動作</string>
+    <string name="flow_minutes">%1$d 分</string>
+    <string name="flow_custom">カスタム</string>
+    <string name="flow_timer_review">プレーヤー、時間、終了時の動作を確認してください</string>
+    <string name="flow_timer_return">黒いオーバーレイを解除</string>
+    <string name="flow_timer_pause">一時停止を要求し、黒いオーバーレイを維持</string>
+    <string name="flow_episode_unavailable">現在のプレーヤーはエピソードの再生位置を提供していません</string>
+    <string name="flow_timer_result">タイマーの設定結果</string>
+    <string name="flow_setup_success">体験が完了しました。ヘルプからいつでも再試行できます</string>
+    <string name="flow_request_expired">設定リクエストの有効期限が切れました。もう一度お試しください</string>
+</resources>

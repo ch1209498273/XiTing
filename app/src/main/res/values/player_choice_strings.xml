@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_media_access_missing">未授权读取媒体控制 · 可用黑幕和定时返回</string>
+    <string name="player_choice_intro">选择配合使用的应用；暂停与片尾功能取决于应用提供的媒体会话。</string>
+    <string name="player_control_unavailable">未提供可控制媒体会话 · 可用黑幕和定时返回</string>
+    <string name="player_state_playing">播放中</string>
+    <string name="player_state_paused">已暂停</string>
+    <string name="player_state_available">媒体会话可用</string>
+    <string name="player_control_pause">可请求暂停</string>
+    <string name="player_control_no_pause">不支持暂停</string>
+    <string name="player_selected_no_session">所选应用未提供媒体控制，可使用黑幕或定时返回</string>
+    <string name="player_choice_none">请选择播放器</string>
+</resources>

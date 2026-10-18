@@ -1,0 +1,8 @@
+<resources>
+    <string name="auto_playback_source">Lecture en cours</string>
+    <string name="auto_playback_unknown">Aucune lecture contrôlable détectée</string>
+    <string name="auto_playback_unavailable">La source de lecture est incertaine. Le rideau noir et le retour programmé restent disponibles.</string>
+    <string name="auto_playback_changed">La lecture a changé. Fermez puis rouvrez la minuterie.</string>
+    <string name="auto_playback_update">Écoutés récemment · Enregistrer un lien · Marquer cet instant · Position au réglage du minuteur\n\nLes contenus identifiés sont conservés localement 90 jours par défaut. Repères et liens sauvegardés sont protégés. Gérez ou désactivez l’enregistrement dans la gestion.</string>
+    <string name="playback_source_control_in_app">Peut-être %1$s · Contrôlez la lecture dans la vidéo</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Управление историей</string>
+    <string name="history_scope">Просмотр и экспорт сохранённых записей за 60 дней (до 500 сеансов). Старые записи остаются только в сводной статистике.</string>
+    <string name="history_date">Выбрать дату</string>
+    <string name="history_all">Все даты</string>
+    <string name="history_export">Экспорт текущих записей в CSV</string>
+    <string name="history_empty">Нет записей за эту дату</string>
+    <string name="history_row">%1$s · %2$d мин · %3$s</string>
+    <string name="history_black">Чёрный экран</string>
+    <string name="history_screen_off">Экран выключен</string>
+    <string name="history_delete">Удалить</string>
+    <string name="history_delete_impact">Итог уменьшится на %1$d мин и 1 сеанс. Месяцы, самый долгий сеанс и серии обновятся. Рост, открытые достижения и история открытия сохранятся. Удалить?</string>
+    <string name="history_delete_unavailable">Часть записей месяца архивирована. Точно пересчитать самый долгий сеанс и дни прослушивания нельзя; удаление недоступно.</string>
+    <string name="history_deleted">Запись удалена; статистика обновлена</string>
+    <string name="history_delete_failed">Не удалось удалить; повторите</string>
+    <string name="history_exported">Экспорт завершён</string>
+    <string name="history_export_failed">Ошибка экспорта; выберите другое место</string>
+</resources>

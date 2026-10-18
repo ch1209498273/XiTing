@@ -1,469 +1,67 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg_stats_root"
-    android:scrollbars="none">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <!-- 电能精灵 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card"
-            android:elevation="1dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingBottom="14dp">
-
-            <com.lujinyu.xiting.PetView
-                android:id="@+id/pet_view"
-                android:layout_width="match_parent"
-                android:layout_height="180dp" />
-
-            <!-- 形态图鉴：5 个缩略图（已解锁亮色/未解锁灰暗），点击查看信息 -->
-            <LinearLayout
-                android:id="@+id/thumb_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:orientation="horizontal" />
-
-            <TextView
-                android:id="@+id/pet_interaction_hint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/pet_hint_spark"
-                android:textColor="@color/brand"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/pet_caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/pet_subtitle"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/streak_chip"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="🔥 —"
-                    android:textColor="@color/brand"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/btn_gallery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="6dp"
-                    android:text="@string/gallery_btn"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/stats_hint"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
-
-        <!-- 三个汇总卡 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/card_today"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:orientation="vertical"
-                android:padding="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_today"
-                    android:textColor="@color/text_hint"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/sum_today"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="12sp"
-                    android:autoSizeMaxTextSize="17sp"
-                    android:text="@string/dur_min_placeholder"
-                    android:textColor="@color/text_primary"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/sum_today_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/count_placeholder"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/card_week"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:orientation="vertical"
-                android:padding="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_week"
-                    android:textColor="@color/text_hint"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/sum_week"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="12sp"
-                    android:autoSizeMaxTextSize="17sp"
-                    android:text="@string/dur_min_placeholder"
-                    android:textColor="@color/text_primary"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/sum_week_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/count_placeholder"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/card_all"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card_selected"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:orientation="vertical"
-                android:padding="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_total"
-                    android:textColor="@color/text_hint"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/sum_all"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="12sp"
-                    android:autoSizeMaxTextSize="17sp"
-                    android:text="@string/dur_min_placeholder"
-                    android:textColor="@color/brand_dark"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/sum_all_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/count_placeholder"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp" />
+<?xml version='1.0' encoding='utf-8'?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg_stats_root" android:scrollbars="none">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/bg_card" android:elevation="1dp" android:gravity="center_horizontal" android:orientation="vertical" android:paddingTop="8dp" android:paddingBottom="14dp" android:id="@+id/growth_panel">
+            <com.lujinyu.xiting.PetView android:id="@+id/pet_view" android:layout_width="match_parent" android:layout_height="180dp" />
+            <LinearLayout android:id="@+id/thumb_row" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:gravity="center" android:orientation="horizontal" />
+            <TextView android:id="@+id/pet_interaction_hint" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="@string/pet_hint_spark" android:textColor="@color/brand" android:textSize="12sp" />
+            <TextView android:id="@+id/pet_caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="@string/pet_subtitle" android:textColor="@color/text_secondary" android:textSize="12sp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+                <TextView android:id="@+id/streak_chip" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="🔥 —" android:textColor="@color/brand" android:textSize="12sp" android:textStyle="bold" />
+                <TextView android:id="@+id/btn_gallery" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="?android:attr/selectableItemBackground" android:padding="6dp" android:text="@string/gallery_btn" android:textColor="@color/text_secondary" android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
-
-        <!-- 省电估算 -->
-        <LinearLayout
-            android:id="@+id/card_mah"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_row_battery" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/sum_mah"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/sum_mah_default"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/sum_extra"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="@string/sum_extra_default"
-                    android:textColor="@color/text_hint"
-                    android:textSize="11sp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="@string/stats_hint" android:textColor="@color/text_secondary" android:textSize="13sp" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:orientation="horizontal">
+            <LinearLayout android:id="@+id/card_today" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_weight="1" android:background="@drawable/bg_card" android:clickable="true" android:focusable="true" android:foreground="?android:attr/selectableItemBackground" android:orientation="vertical" android:padding="8dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/label_today" android:textColor="@color/text_hint" android:textSize="12sp" />
+                <TextView android:id="@+id/sum_today" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="12sp" android:autoSizeMaxTextSize="17sp" android:text="@string/dur_min_placeholder" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
+                <TextView android:id="@+id/sum_today_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/count_placeholder" android:textColor="@color/text_secondary" android:textSize="11sp" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/card_week" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_weight="1" android:background="@drawable/bg_card" android:clickable="true" android:focusable="true" android:foreground="?android:attr/selectableItemBackground" android:orientation="vertical" android:padding="8dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/label_week" android:textColor="@color/text_hint" android:textSize="12sp" />
+                <TextView android:id="@+id/sum_week" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="12sp" android:autoSizeMaxTextSize="17sp" android:text="@string/dur_min_placeholder" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
+                <TextView android:id="@+id/sum_week_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/count_placeholder" android:textColor="@color/text_secondary" android:textSize="11sp" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/card_all" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:background="@drawable/bg_card_selected" android:clickable="true" android:focusable="true" android:foreground="?android:attr/selectableItemBackground" android:orientation="vertical" android:padding="8dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/label_total" android:textColor="@color/text_hint" android:textSize="12sp" />
+                <TextView android:id="@+id/sum_all" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="12sp" android:autoSizeMaxTextSize="17sp" android:text="@string/dur_min_placeholder" android:textColor="@color/brand_dark" android:textSize="17sp" android:textStyle="bold" />
+                <TextView android:id="@+id/sum_all_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/count_placeholder" android:textColor="@color/text_secondary" android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
-
-        <!-- 本周小结 -->
-        <LinearLayout
-            android:id="@+id/card_week_report"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/week_report_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/week_report_body"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:lineSpacingExtra="2dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+        <LinearLayout android:id="@+id/card_mah" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/bg_card" android:foreground="?android:attr/selectableItemBackground" android:gravity="center_vertical" android:orientation="horizontal" android:padding="16dp">
+            <ImageView android:layout_width="22dp" android:layout_height="22dp" android:contentDescription="@null" android:src="@drawable/ic_row_battery" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="14dp" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/sum_mah" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/sum_mah_default" android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:id="@+id/sum_extra" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/sum_extra_default" android:textColor="@color/text_hint" android:textSize="11sp" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/btn_week_share"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="8dp"
-                android:text="@string/week_report_share"
-                android:textColor="@color/brand"
-                android:textSize="13sp"
-                android:textStyle="bold" />
         </LinearLayout>
-
-        <!-- 精灵成就 -->
-        <LinearLayout
-            android:id="@+id/card_ach"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🏆"
-                android:textSize="20sp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/ach_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/ach_progress"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/ach_sub"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="@string/ach_sub_empty"
-                    android:textColor="@color/text_hint"
-                    android:textSize="11sp" />
+        <LinearLayout android:id="@+id/card_week_report" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/bg_card" android:gravity="center_vertical" android:orientation="horizontal" android:padding="16dp">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/week_report_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:id="@+id/week_report_body" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:lineSpacingExtra="2dp" android:textColor="@color/text_secondary" android:textSize="12sp" />
             </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="›"
-                android:textColor="@color/text_hint"
-                android:textSize="16sp" />
+            <TextView android:id="@+id/btn_week_share" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:background="?android:attr/selectableItemBackground" android:padding="8dp" android:text="@string/week_report_share" android:textColor="@color/brand" android:textSize="13sp" android:textStyle="bold" />
         </LinearLayout>
-
-        <!-- 近7天柱状图 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/chart_title"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <com.lujinyu.xiting.BarChartView
-                android:id="@+id/bar_chart"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_marginTop="8dp" />
+        <LinearLayout android:id="@+id/card_ach" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/bg_card" android:foreground="?android:attr/selectableItemBackground" android:gravity="center_vertical" android:orientation="horizontal" android:padding="16dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏆" android:textSize="20sp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="14dp" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/ach_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ach_progress" android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:id="@+id/ach_sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/ach_sub_empty" android:textColor="@color/text_hint" android:textSize="11sp" />
+            </LinearLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textColor="@color/text_hint" android:textSize="16sp" />
         </LinearLayout>
-
-        <!-- 最近记录 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_card"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/recent_records"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:id="@+id/session_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="vertical" />
-
-            <LinearLayout
-                android:id="@+id/pager_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/btn_prev"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="10dp"
-                    android:text="@string/pager_prev"
-                    android:textColor="@color/brand"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/pager_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/pager_placeholder"
-                    android:textColor="@color/text_hint"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/btn_next"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="10dp"
-                    android:text="@string/pager_next"
-                    android:textColor="@color/brand"
-                    android:textSize="13sp" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/bg_card" android:orientation="vertical" android:padding="16dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/chart_title" android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+            <com.lujinyu.xiting.BarChartView android:id="@+id/bar_chart" android:layout_width="match_parent" android:layout_height="220dp" android:layout_marginTop="8dp" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_marginBottom="10dp" android:background="@drawable/bg_card" android:orientation="vertical" android:padding="16dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/recent_records" android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout android:id="@+id/session_list" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
+            <LinearLayout android:id="@+id/pager_bar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:gravity="center" android:orientation="horizontal" android:visibility="gone">
+                <TextView android:id="@+id/btn_prev" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="?android:attr/selectableItemBackground" android:padding="10dp" android:text="@string/pager_prev" android:textColor="@color/brand" android:textSize="13sp" />
+                <TextView android:id="@+id/pager_label" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/pager_placeholder" android:textColor="@color/text_hint" android:textSize="12sp" />
+                <TextView android:id="@+id/btn_next" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="?android:attr/selectableItemBackground" android:padding="10dp" android:text="@string/pager_next" android:textColor="@color/brand" android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

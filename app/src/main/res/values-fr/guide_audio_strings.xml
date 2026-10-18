@@ -1,0 +1,12 @@
+<resources>
+    <string name="guide_sound_help_title">Vous ne parvenez pas à entendre le son ?</string>
+    <string name="guide_sound_help">Augmentez le volume multimédia avec les touches du téléphone. Vérifiez le volume et la connexion du casque, puis réessayez.</string>
+    <string name="guide_retry_audio">Réessayer</string>
+    <string name="guide_return_help_title">La page ne revient pas ?</string>
+    <string name="guide_return_help">Touchez le rideau noir puis Terminer. Si nécessaire, quittez le service via la notification et réessayez.</string>
+    <string name="guide_audio_failed">Le son de test ne peut pas être lu. Veuillez réessayer.</string>
+    <string name="guide_pause_first">Mettez la vidéo ou la musique en pause avant le test.</string>
+    <string name="guide_black_hint">Le son de test est en cours. La page reviendra à la fin.</string>
+    <string name="guide_exit">Terminer</string>
+    <string name="guide_preparing">Préparation du son de test…</string>
+</resources>

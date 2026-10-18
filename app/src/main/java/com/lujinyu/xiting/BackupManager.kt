@@ -15,7 +15,7 @@ import org.json.JSONObject
 
 /**
  * 设备绑定自动备份：
- * 数据本体写入公共下载目录（卸载不删除），文件名固定；备份内含设备ID（ANDROID_ID，
+ * 数据本体写入公共下载目录（卸载不删除），变化时新增带时间戳的文件，保留旧备份；备份内含设备ID（ANDROID_ID，
  * 卸载重装不变）。重装后启动时自动发现同设备备份 → 弹窗询问恢复。
  * 完全离线、零权限（MediaStore.Downloads，Android 10+）。
  */
@@ -34,20 +34,29 @@ object BackupManager {
      * 用 `optXxx(key, 默认值)` 自然回落；只有将来真要**含义变更**时才需要
      * 区分版本。加版本号是为了将来能改语义，不是为了现在这层。
      */
-    const val CURRENT_VERSION = 2
+    const val CURRENT_VERSION = 5
 
-    /** 导入会话条数上限，与 SessionLog.MAX 对齐：超出的部分不恢复 */
-    private const val MAX_IMPORT_SESSIONS = 500
     private val REL_DIR = Environment.DIRECTORY_DOWNLOADS + "/XiTing"
+
+    /** 最近完成写入并成功关闭输出流的时间；失败/取消/空数据跳过不更新。 */
+    fun lastSuccessfulBackupAt(ctx: Context): Long? =
+        ctx.prefs().getLong(Prefs.LAST_SUCCESSFUL_BACKUP_AT, 0L).takeIf { it > 0L }
+
+    private fun recordBackupSuccess(ctx: Context) {
+        ctx.prefs().edit().putLong(Prefs.LAST_SUCCESSFUL_BACKUP_AT, System.currentTimeMillis()).putBoolean("last_backup_failed",false).apply()
+    }
 
     private fun androidId(ctx: Context): String =
         Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID) ?: "unknown"
 
     /** 组装备份 JSON（自动备份与手动导出共用同一格式） */
-    fun buildBackupJson(ctx: Context): JSONObject {
+    @Synchronized
+    fun buildBackupJson(ctx: Context): JSONObject = SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked {
+        check(RestoreSnapshot.recoverPending(ctx)) { "Pending restore must settle before backup" }
         val prefs = ctx.prefs()
+        SessionLog.sessions(ctx) // initialize lifetime aggregates before snapshotting them
         val sessText = ctx.filesDir.resolve("sessions.json").takeIf { it.exists() }?.readText() ?: "[]"
-        return JSONObject()
+        JSONObject()
             // 注意：下面是备份文件的 JSON 键，属于对外数据格式，改名会让旧备份失效。
             // 它们与 prefs 键「碰巧同名字符串」不是一回事，勿与 Prefs 常量混用。
             .put("v", CURRENT_VERSION)
@@ -55,6 +64,7 @@ object BackupManager {
             .put("gp", EnergyStore.collectedTotal(ctx))
             .put("last_share_date", prefs.getString(Prefs.LAST_SHARE_DATE, "") ?: "")
             .put("sessions", JSONArray(sessText))
+            .put("session_outcomes", SessionOutcomeStore.encode(ctx))
             .put("ts", System.currentTimeMillis())
             // ↓ v2 新增：养成进度。之前只备份了「积累了多少」，没备份「用积累换了什么」——
             // 用户换手机后成长值还在，但精灵退回默认形态、皮肤全丢、徽章清零。
@@ -64,14 +74,20 @@ object BackupManager {
             .put("skins_unlocked", JSONArray(PetSkins.unlockedIds(ctx).toList()))
             .put("bubble_uses_pet", PetForm.bubbleUsesPet(ctx))
             .put("ach_unlocked", JSONArray(Achievements.unlockedIds(ctx).toList()))
-    }
+            .put("ach_history", JSONArray(AchievementHistory.encode(Achievements.history(ctx))))
+            .put("pending_energy", CompleteBackup.pending(JSONArray(prefs.getString(Prefs.ENERGY_PENDING,"[]")),System.currentTimeMillis()))
+            .put("extras",CompleteBackup.encode(prefs))
+            .put("listening_library",com.lujinyu.xiting.listening.ListeningStore.export(ctx))
+    } }
 
     /** 导出到用户所选位置（SAF 手动备份） */
+    @Synchronized
     fun exportToUri(ctx: Context, uri: Uri): Boolean {
         return try {
             ctx.contentResolver.openOutputStream(uri, "wt")?.use {
                 it.write(buildBackupJson(ctx).toString().toByteArray())
             } ?: return false
+            recordBackupSuccess(ctx)
             Log.i(TAG, "备份已导出到所选位置")
             true
         } catch (e: Exception) {
@@ -81,85 +97,40 @@ object BackupManager {
     }
 
     /** 备份当前成长值/会话/分享状态（静默；Android 10+ 无需权限） */
+    @Synchronized
     fun save(ctx: Context) {
         if (Build.VERSION.SDK_INT < 29) return // 9 及以下分区存储不稳定，跳过自动备份
+        if(!ctx.prefs().getBoolean("auto_backup_enabled",true))return
         try {
             val prefs = ctx.prefs()
             val gp = EnergyStore.collectedTotal(ctx)
             val sessText = ctx.filesDir.resolve("sessions.json").takeIf { it.exists() }?.readText() ?: "[]"
             // 防护：本地为空（重装后未恢复）时不覆盖既有备份，避免毁掉历史数据
-            if (gp <= 0 && (sessText == "[]" || sessText.isBlank())) {
+            if (com.lujinyu.xiting.listening.ListeningStore.count(ctx)==0 && SessionOutcomeStore.list(ctx).isEmpty() && gp <= 0 && EnergyStore.pending(ctx).isEmpty() && HistoryStore.totalCount(ctx)==0L && (sessText == "[]" || sessText.isBlank())) {
                 Log.i(TAG, "本地为空，跳过备份覆盖（保护历史备份）")
                 return
             }
-            val bytes = buildBackupJson(ctx).toString().toByteArray()
+            val backup=buildBackupJson(ctx)
+            val previous=findBackup(ctx)
+            if(previous!=null) {
+                val before=JSONObject(previous.toString()).apply { remove("ts") }
+                val after=JSONObject(backup.toString()).apply { remove("ts") }
+                if(before.toString()==after.toString())return
+            }
+            val bytes = backup.toString().toByteArray()
 
             val resolver = ctx.contentResolver
-            // 先自愈命名：写入中断会留下孤儿行（media_type=0、无属主）占住正名路径，
-            // 导致 insert 被去重成 "XiTing-backup (N).json" 越堆越多、而正名文件永远陈旧
-            // （模拟器与真机均实测出现）。每次备份前释放正名路径并清掉历史去重副本。
-            healBackupNames(resolver)
-            try {
-                insertAndWrite(resolver, FILE_NAME, bytes)
-                Log.i(TAG, "备份已写入 Downloads/XiTing（gp=$gp）")
-            } catch (e: android.database.sqlite.SQLiteConstraintException) {
-                // 兜底：仍冲突则换时间戳文件名，保证数据不丢
-                val fallback = "XiTing-backup-${System.currentTimeMillis()}.json"
-                insertAndWrite(resolver, fallback, bytes)
-                Log.w(TAG, "主备份名被占用，改用 $fallback")
-            }
+            // Preserve old backups; only changed content produces a new complete file.
+            val name="XiTing-backup-${System.currentTimeMillis()}-${java.util.UUID.randomUUID().toString().take(8)}.json"
+            insertAndWrite(resolver,name,bytes)
+            recordBackupSuccess(ctx)
         } catch (e: Exception) {
+            ctx.prefs().edit().putBoolean("last_backup_failed",true).apply()
             Log.w(TAG, "备份失败: $e")
         }
     }
 
-    /** 备份命名自愈：先清历史去重副本（自有行，可删），再尝试释放正名路径
-     *  （卸载残留的无主行可能删不动——失败不影响后续写入，只是继续用去重名） */
-    /**
-     * 修补旧备份的文件名（改名为主备份 / 清理同前缀的历史件）。
-     *
-     * 唯一入口 [save] 已有 `SDK_INT < 29` 早退，这里消掉 NewApi 告警即可：
-     * 否则 lint 会在每一行报 error（MediaStore.Downloads 字段 29 才存在），
-     * 而这些常驻 error 会让人对整个 lint 报告麻本 —— 真正「新引入」的问题反而看不见了。
-     *
-     * 注：本项目零第三方依赖，没有 androidx，所以用框架自带的 @SuppressLint 而不是
-     * androidx 的 @RequiresApi。
-     */
-    @SuppressLint("NewApi")
-    private fun healBackupNames(resolver: android.content.ContentResolver) {
-        // 1) 清理本应用写出的历史去重副本（XiTing-backup (N).json 等）
-        try {
-            resolver.query(
-                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-                arrayOf(MediaStore.Downloads._ID, MediaStore.Downloads.DISPLAY_NAME),
-                "${MediaStore.Downloads.DISPLAY_NAME} LIKE ?",
-                arrayOf("XiTing-backup%.json"), null
-            )?.use { c ->
-                val idCol = c.getColumnIndexOrThrow(MediaStore.Downloads._ID)
-                val nameCol = c.getColumnIndexOrThrow(MediaStore.Downloads.DISPLAY_NAME)
-                while (c.moveToNext()) {
-                    if (c.getString(nameCol) != FILE_NAME) {
-                        resolver.delete(
-                            Uri.withAppendedPath(MediaStore.Downloads.EXTERNAL_CONTENT_URI, c.getLong(idCol).toString()),
-                            null, null
-                        )
-                    }
-                }
-            }
-        } catch (_: Exception) {
-        }
-        // 2) 尝试释放正名路径（孤儿行/旧行；无主行删不动时静默放弃）
-        try {
-            val filesUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
-            val base = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                .absolutePath
-            val canonical = "$base/$REL_DIR/$FILE_NAME"
-            resolver.delete(filesUri, "_data=?", arrayOf(canonical))
-        } catch (_: Exception) {
-        }
-    }
-
-    /** 同 [healBackupNames]：只在 [save]（已守 SDK>=29）里被调用 */
+    /** Only adds a new backup; never deletes older downloads. */
     @SuppressLint("NewApi")
     private fun insertAndWrite(resolver: android.content.ContentResolver, name: String, bytes: ByteArray) {
         val values = ContentValues().apply {
@@ -192,15 +163,14 @@ object BackupManager {
                 MediaStore.Downloads.EXTERNAL_CONTENT_URI,
                 arrayOf(MediaStore.Downloads._ID, MediaStore.Downloads.DATE_ADDED),
                 "${MediaStore.Downloads.DISPLAY_NAME} LIKE ?",
-                arrayOf("XiTing-backup%.json"), "${MediaStore.Downloads.DATE_ADDED} DESC"
+                arrayOf("XiTing-backup%.json"), "${MediaStore.Downloads.DATE_ADDED} DESC, ${MediaStore.Downloads._ID} DESC"
             )?.use { c ->
                 while (c.moveToNext()) {
                     val id = c.getLong(0)
                     val uri = Uri.withAppendedPath(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id.toString())
                     try {
-                        resolver.openInputStream(uri)?.use { input ->
-                            found = JSONObject(input.readBytes().toString(Charsets.UTF_8))
-                        }
+                        val candidate=readFromUri(ctx,uri)
+                        if(candidate!=null && isSameDevice(ctx,candidate))found=candidate
                     } catch (_: Exception) {
                     }
                     if (found != null) break
@@ -219,7 +189,16 @@ object BackupManager {
     fun readFromUri(ctx: Context, uri: Uri): JSONObject? {
         return try {
             ctx.contentResolver.openInputStream(uri)?.use { input ->
-                JSONObject(input.readBytes().toString(Charsets.UTF_8))
+                // v5 adds up to 16MiB of local library rows; bound the whole external document to 20MiB.
+                val bytes=java.io.ByteArrayOutputStream()
+                val buffer=ByteArray(8192)
+                while(true) {
+                    val count=input.read(buffer)
+                    if(count<0)break
+                    if(bytes.size()+count>20*1_048_576)return null
+                    bytes.write(buffer,0,count)
+                }
+                JSONObject(bytes.toString("UTF-8")).takeIf { isReadableBackup(it) }
             }
         } catch (e: Exception) {
             Log.w(TAG, "读取所选备份失败: $e")
@@ -232,40 +211,74 @@ object BackupManager {
         obj.optString("device") == androidId(ctx)
 
     /** 把备份数据恢复到本地（成长值/会话/分享状态/养成进度） */
-    fun restore(ctx: Context, obj: JSONObject): Boolean {
+    @Synchronized
+    fun restore(ctx: Context, obj: JSONObject): Boolean = SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked { restoreLocked(ctx,obj) } }
+
+    private fun restoreLocked(ctx: Context, obj: JSONObject): Boolean {
+        if(!isReadableBackup(obj) || OverlayService.isRunning)return false
+        if(!RestoreSnapshot.recoverPending(ctx))return false
+        SessionLog.sessions(ctx) // settle any interrupted history deletion before taking rollback state
+        val preferences=ctx.prefs()
+        val file=ctx.filesDir.resolve("sessions.json")
         return try {
+            RestoreSnapshot.capture(ctx)
             // gp 来自外部文件，不能直接写进 prefs：负数会让精灵进度异常，
             // 极大值在后续累加时溢出成负
-            val gp = obj.optInt("gp", 0).coerceIn(0, Int.MAX_VALUE)
+            val gp = backupGrowth(obj)
             val prefs = ctx.prefs()
             // 迁移标记置位，避免旧值再迁移覆盖
             val ed = prefs.edit()
                 .putInt(Prefs.ENERGY_COLLECTED, gp)
                 .putBoolean(Prefs.ENERGY_MIGRATED, true)
+                // Imported growth is a restored state, not a newly earned evolution.
+                .putInt(Prefs.LAST_SEEN_STAGE,PetView.stageOf(gp.toLong()))
                 .putString(Prefs.LAST_SHARE_DATE, obj.optString("last_share_date", ""))
             // ↓ v2：养成进度。v1 备份没有这些字段，optXxx 全返回 null →
             // 保持现状不动（绝不能因为「备份是旧的」就把用户现有数据清空）。
             applyProgress(ctx, obj, ed)
-            ed.apply()
+            CompleteBackup.apply(obj.optJSONObject("extras"),ed)
+            obj.optJSONArray("pending_energy")?.let {
+                ed.putString(Prefs.ENERGY_PENDING,CompleteBackup.pending(it,System.currentTimeMillis()).toString())
+            }
             obj.optJSONArray("sessions")?.let { arr ->
                 // 导入数据不可信：原来整段 arr.toString() 原样落盘，
                 // 一个超大或畸形的数组会在之后的 SessionLog.sessions() 里
                 // 被主线程全量解析，轻则 ANR 重则 OOM。
-                val kept = filterImportSessions(arr, MAX_IMPORT_SESSIONS)
-                if (kept.length() > 0) {
-                    ctx.filesDir.resolve("sessions.json").writeText(kept.toString())
+                val kept = validBackupSessions(arr)
+                if (kept.length() > 0 || (obj.optInt("v",1)>=3 && arr.length()==0)) {
+                    writeSessionsAtomic(file,kept.toString().toByteArray(Charsets.UTF_8))
                 }
                 Log.i(TAG, "导入会话 ${kept.length()} 条（原文件 ${arr.length()} 条，超限或结构不合法者已丢弃）")
             }
+            obj.optJSONArray("session_outcomes")?.let { SessionOutcomeStore.restore(ctx,it) }
+            if(obj.has("listening_library"))com.lujinyu.xiting.listening.ListeningStore.replace(ctx,obj.getJSONObject("listening_library"))
+            ed.putBoolean("listening_clean_confirmed_v1",false).remove("listening_last_clean_v1")
+            check(ed.commit()) { "Restored preferences could not be persisted" }
             // v4.0：聚合是明细的派生数据（累计/最长/连续天数/月口径），恢复后必须重算，
             // 否则聚合还停留在恢复前的值。备份文件本身不带聚合（派生数据不进备份）。
-            HistoryStore.rebuildFromSessions(ctx, SessionLog.sessions(ctx))
+            if(!CompleteBackup.hasAggregate(obj.optJSONObject("extras")))
+                HistoryStore.rebuildFromSessions(ctx, SessionLog.sessions(ctx))
+            // Flush aggregate apply() before removing the crash-recovery marker.
+            check(preferences.edit().putBoolean(Prefs.STATS_MIGRATED,true).commit()) { "Restored aggregates could not be persisted" }
+            RestoreSnapshot.finish(ctx)
             Log.i(TAG, "备份已恢复（gp=$gp）")
             true
         } catch (e: Exception) {
+            // Keep file and preferences from becoming a half-restored state.
+            try {
+                check(RestoreSnapshot.recoverPending(ctx)) { "Rollback could not be persisted" }
+                RestoreSnapshot.finish(ctx)
+            } catch(rollbackFailure:Exception) { Log.w(TAG,"Restore rollback failed",rollbackFailure) }
             Log.w(TAG, "恢复失败: $e")
             false
         }
+    }
+
+    private fun writeSessionsAtomic(file:java.io.File,bytes:ByteArray) {
+        val atomic=android.util.AtomicFile(file)
+        val stream=atomic.startWrite()
+        try { stream.write(bytes);atomic.finishWrite(stream) }
+        catch(t:Throwable) { atomic.failWrite(stream);throw t }
     }
 
     /**
@@ -296,9 +309,10 @@ object BackupManager {
                 if (obj.optBoolean("bubble_uses_pet", false)) "pet" else "text"
             )
         }
-        obj.optJSONArray("ach_unlocked")?.let { arr ->
-            val ids = arr.toStringSet().filter { cand -> Achievements.ALL.any { it.id == cand } }
-            if (ids.isNotEmpty()) ed.putStringSet(Prefs.ACH_UNLOCKED, ids.toSet())
+        if (obj.optJSONArray("ach_unlocked") != null || obj.optJSONArray("ach_history") != null) {
+            val restored = AchievementHistory.mergeBackup(Achievements.history(ctx), Achievements.unlockedIds(ctx), obj)
+            ed.putStringSet(Prefs.ACH_UNLOCKED, restored.unlocked)
+                .putString(Prefs.ACH_HISTORY, AchievementHistory.encode(restored.records))
         }
     }
 

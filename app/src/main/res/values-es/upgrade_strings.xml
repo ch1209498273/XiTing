@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="ui_backup_version_fmt">Versión de copia: %1$s</string>
+    <string name="ui_backup_same_device">De este dispositivo</string>
+    <string name="ui_backup_other_device">De otro dispositivo o desconocido</string>
+    <string name="ui_backup_restore_effect">Restaurar reemplaza el crecimiento y la fecha de compartir. Las sesiones válidas reemplazan los detalles y recalculan estadísticas; en otro caso se conservan las locales. Se restauran el aspecto y la burbuja válidos. Los logros se combinan y conservan sus primeros registros.</string>
+    <string name="ui_backup_unknown_version">Desconocida</string>
+    <string name="ui_last_backup_fmt">Última copia correcta: %1$s</string>
+    <string name="ui_timer_review">Confirmar aplica ahora duración, acción final y reproductor. Pausar requiere acceso a notificaciones y soporte del reproductor. Solo la sesión elegida recibe la solicitud; puede ignorarla.</string>
+    <string name="ui_model_estimate">Estimación por modelo, no ahorro medido</string>
+    <string name="ui_timer_summary_fmt">%1$s\n%2$s\n%3$s</string>
+</resources>

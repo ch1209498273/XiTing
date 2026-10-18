@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="support_title">Диагностика</string>
+    <string name="support_yes">Да</string>
+    <string name="support_no">Нет</string>
+    <string name="support_overlay">Разрешение поверх приложений</string>
+    <string name="support_media_access">Доступ к уведомлениям</string>
+    <string name="support_notifications">Уведомления включены</string>
+    <string name="support_battery">Без оптимизации батареи</string>
+    <string name="support_session">Медиасессия доступна</string>
+    <string name="support_playing">Воспроизведение активно</string>
+    <string name="support_pause">Сессия заявляет поддержку паузы</string>
+    <string name="support_seek">Сессия заявляет поддержку перемотки</string>
+    <string name="support_service">Помощник работает</string>
+    <string name="support_black">Чёрная шторка видима</string>
+    <string name="support_scope">Текущее состояние устройства. Заявленные функции не гарантируют отклик других приложений. Обновите после возврата.</string>
+    <string name="support_fix_overlay">Разрешить наложение</string>
+    <string name="support_fix_media">Разрешить доступ к уведомлениям</string>
+    <string name="support_fix_notifications">Настройки уведомлений</string>
+    <string name="support_fix_player">Проверить проигрыватель</string>
+    <string name="support_fix_start">Запустить помощника</string>
+    <string name="support_fix_battery">Оптимизация батареи</string>
+    <string name="support_fix_app">Сведения о приложении</string>
+    <string name="support_refresh">Обновить</string>
+    <string name="support_player_help">Начните воспроизведение и вернитесь. Если сессия или управление недоступны, попробуйте другой проигрыватель.</string>
+    <string name="support_open_failed">Не удалось открыть экран. Найдите приложение в системных настройках.</string>
+    <string name="support_selected">Выбрано</string>
+    <string name="support_first_title">Результат проверки</string>
+    <string name="support_first_intro">Проверьте чёрный экран со встроенной речью без видеоприложения.</string>
+    <string name="support_check_result">Проверить результат</string>
+    <string name="support_sound_question">Была слышна тестовая речь?</string>
+    <string name="support_return_question">Вернулась исходная страница?</string>
+    <string name="support_first_success">Проверка завершена. Запустите видео и нажмите плавающую кнопку.</string>
+</resources>

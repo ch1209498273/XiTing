@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rel_backup_manage">バックアップ管理</string>
+    <string name="rel_auto_backup">ダウンロードへ自動バックアップ</string>
+    <string name="rel_backup_history">バックアップ履歴</string>
+    <string name="rel_undo_restore">直前の復元を取り消す</string>
+    <string name="rel_no_snapshot">復元前のスナップショットがありません</string>
+    <string name="rel_stop_first">復元や取り消しの前にアシスタントを停止してください。</string>
+    <string name="rel_snapshot_explain">復元前に端末内へスナップショットを保存します。新形式には未回収エネルギー、元の期限、累計統計と一部設定を含みます。旧形式にない項目は端末の値を保持します。</string>
+    <string name="rel_backup_failed">前回のバックアップに失敗しました。空き容量を確認するか再度書き出してください。</string>
+    <string name="rel_backup_ok">バックアップを書き込みました</string>
+    <string name="rel_backup_none">読み取れるバックアップがありません</string>
+    <string name="rel_delete_backup">このバックアップを削除</string>
+    <string name="rel_delete_confirm">選択した公開バックアップだけを完全に削除します。取り消せません。端末の視聴データは変わりません。</string>
+    <string name="rel_saved_backups">読み取り可能なバックアップ（アクセスはシステムによります）</string>
+    <string name="rel_restore_undo_ok">復元前のデータへ戻しました</string>
+    <string name="rel_recovery_title">前回の実行が中断されました</string>
+    <string name="rel_recovery_message">アシスタントが中断されたか端末が再起動しました。フローティングボタンは再起動できます。黒幕とタイマーは自動再開しないため、タイマーを再設定してください。</string>
+    <string name="rel_recovery_timer">前回のタイマー残り目安：%1$d分。中断中に終了操作は実行していません。</string>
+    <string name="rel_recovery_episode">前回はこのエピソードの終了タイマーでした。プレーヤーを選び直してください。</string>
+    <string name="rel_ack">了解</string>
+    <string name="rel_pending_summary">有効な未回収エネルギー：%1$d。元の期限を保持します。</string>
+    <string name="rel_recovery_storage_fail">前回の復元が未完了で、ストレージへ書き込めません。元のスナップショットは保持しています。空き容量を確認してアプリを開き直してください。アシスタントと新規データ書き込みは停止中です。</string>
+</resources>

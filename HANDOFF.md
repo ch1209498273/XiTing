@@ -2,7 +2,7 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 最后更新：2026-10-12 · **v4.3.0 已发布**（versionCode 84，金色成就、解锁动画与桌面图标优化）；
+> 当前版本：2026-10-18 · **v6.0.0 / versionCode 99**。当前能力与验收范围见 [v6.0.0](docs/releases/v6.0.0.md)。以下 v4.x 内容作为历史交接资料保留。
 > v4.0 主体（10 项功能/优化 + 全量聚合数据架构）见下方清单。
 > v4.0：成就图标换肤（五枚徽章图标，ColorOS 验证）、听剧月报/年报海报 + 跨月本地推送、
 > 全量历史聚合（明细裁剪 60 天，派生数据不进备份）、摸头互动、黑幕剧名加播放 App 名、
@@ -20,9 +20,9 @@
 `D:\AI任务\zcode\息屏听剧` —— OPPO/ColorOS 的「息屏听剧」App。
 
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**黑幕遮罩并降低窗口亮度，非系统真正关屏**）而声音继续。
-纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，release 包约 369 KB。
+纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，v6.0.0 正式安装包 1,288,112 bytes。
 
-- 包名 `com.lujinyu.xiting`，versionCode 84 / versionName 4.3.0
+- 包名 `com.lujinyu.xiting`，versionCode 99 / versionName 6.0.0
 - `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节 + docs/targetsdk36_黑幕兼容预研.md）**
 - 源码约 6800 行 Kotlin，单模块
 - **路径含中文是既定事实**：用户 2026-10-11 明确拍板**不迁移**纯 ASCII 路径，

@@ -69,6 +69,7 @@ class OverlayService : Service() {
         const val EXTRA_MINUTES = "minutes"
         const val EXTRA_END_AT = "end_at"        // 听完这集：以绝对时刻（epoch ms）定时
         const val EXTRA_TIMER_SESSION = "timer_session"
+        const val EXTRA_TIMER_EPISODE = "timer_episode"
         const val ACTION_START_DEMO = "com.lujinyu.xiting.START_DEMO"
         const val ACTION_CALIB_START = "com.lujinyu.xiting.CALIB_START"   // 保留：外部 adb 调试用
         const val EXTRA_CALIB_ON_UA = "calib_on_ua"
@@ -87,6 +88,37 @@ class OverlayService : Service() {
     private lateinit var audioManager: AudioManager
     private var wakeLock: android.os.PowerManager.WakeLock? = null
     private val main = Handler(Looper.getMainLooper())
+    private val timerController=TimerController()
+    private var stopPauseObservation:(()->Unit)?=null
+    private var observedPlayer:android.media.session.MediaController?=null
+    private val playerCallback=object:android.media.session.MediaController.Callback() {
+        override fun onPlaybackStateChanged(state:android.media.session.PlaybackState?) { refreshNotification() }
+        override fun onSessionDestroyed() { refreshNotification() }
+    }
+
+    private fun publishSession() {
+        if(!::prefs.isInitialized)return
+        val player=try { queryNowPlaying()?.controller } catch(_:RuntimeException) { null }
+        if(player?.sessionToken!=observedPlayer?.sessionToken) {
+            try { observedPlayer?.unregisterCallback(playerCallback) } catch(_:RuntimeException) {}
+            observedPlayer=player
+            try { player?.registerCallback(playerCallback,main) } catch(_:RuntimeException) {}
+        }
+        val state=try { player?.playbackState } catch(_:RuntimeException) { null }
+        val phase=when {
+            timerEndAt<=0 && timerResult!=0 -> TimerPhase.ENDED
+            timerEndAt<=0 -> TimerPhase.NONE
+            episodeWaiting -> TimerPhase.WAITING
+            episodeTarget!=null -> TimerPhase.EPISODE
+            else -> TimerPhase.FIXED
+        }
+        SessionRuntime.publish(this,SessionRuntime.snapshot().copy(
+            assistant=if(instance===this)AssistantPhase.RUNNING else AssistantPhase.IDLE,
+            curtain=if(black?.isShowing==true && demoOverlay==null) {
+                if(black?.isAwake==true)CurtainPhase.AWAKE else CurtainPhase.LOCKED
+            } else CurtainPhase.OFF,playback=SessionRuntime.playback(state),timer=phase,
+            remainingMs=timerRemainingMs(),pauseKeepBlack=timerPauseKeepBlack))
+    }
 
     /** 来电检测：响铃/通话时音频模式会切换（系统标准回调，无需权限）。
      *  黑幕期间来电 → 自动解除黑幕；通话期间 → 挂起所有自动注入动作。 */
@@ -149,9 +181,12 @@ class OverlayService : Service() {
 
     /** 悬浮球是否存在（供自愈检测：服务在跑但球丢了就重建） */
     fun isBubbleVisible(): Boolean = bubble != null
+    internal fun onCurtainStateChanged() { refreshNotification() }
+    internal fun refreshSessionSnapshot() { publishSession() }
 
     private fun hideAllBlack() {
         val wasDemo=demoOverlay!=null
+        if(wasDemo){demoAudio?.close();demoAudio=null}
         if(wasDemo) { demoOverlay=null;main.removeCallbacks(demoFinish) }
         val wasShowing = black?.isShowing == true
         black?.hide()
@@ -237,7 +272,7 @@ class OverlayService : Service() {
                     it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
                     it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO
             }
-            if (headsetGone && prefs.getBoolean(Prefs.SWITCH_HEADSET, true) && black?.isShowing == true) {
+            if (headsetGone && prefs.getBoolean(Prefs.SWITCH_HEADSET, true) && (black?.isShowing == true || demoOverlay!=null)) {
                 // hideAllBlack() 内部已经 refreshNotification()（修小组件漏刷新那次加的），
                 // 不要再调一次
                 hideAllBlack()
@@ -262,7 +297,7 @@ class OverlayService : Service() {
 
                 Intent.ACTION_SCREEN_OFF -> {
                     // 电源键/自动息屏时若黑幕还开着：撤掉遮罩，唤醒后直接回到视频画面
-                    if (isAnyBlackShowing()) {
+                    if (isAnyBlackShowing() || demoOverlay!=null) {
                         hideAllBlack()   // 内部已 refreshNotification()
                     }
                 }
@@ -311,7 +346,7 @@ class OverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        instance = this
+        if(!RestoreSnapshot.recoverPending(this)) { stopSelf();return }
         wm = getSystemService(WINDOW_SERVICE) as WindowManager
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         // v4.0 建议通知（精确路径）：黑幕未开 + 有媒体在播 → 连续 10 分钟后提示。
@@ -331,6 +366,7 @@ class OverlayService : Service() {
                 .apply {
                     setReferenceCounted(false)
                     acquire(WAKE_LOCK_TIMEOUT_MS)
+                    WakeLockMetrics.acquired(SystemClock.elapsedRealtime())
                 }
         } catch (e: Exception) {
             Log.w(TAG, "唤醒锁获取失败，降级为无锁运行: $e")
@@ -346,6 +382,9 @@ class OverlayService : Service() {
     main.removeCallbacks(powerTick)
     main.postDelayed(powerTick, 60_000)
         prefs = prefs()
+        SessionRuntime.started(this)
+        instance = this
+        ServiceRecovery.started(this)
         lastLocales = resources.configuration.locales.toLanguageTags()
         prefs.edit().putBoolean(Prefs.ASSISTANT_WANTED, true).apply()
         createChannel()
@@ -376,6 +415,7 @@ class OverlayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if(!::prefs.isInitialized)return START_NOT_STICKY
         when (intent?.action) {
             ACTION_TOGGLE -> toggleOverlay()
             // 通知里的「显示/隐藏悬浮球」：把当前状态取反。
@@ -384,11 +424,28 @@ class OverlayService : Service() {
             // 两种状态都是空操作，所以这个按钮从来就没生效过。
             // 正确写法：BUBBLE_HIDDEN 同时也是切换后的目标可见性（隐藏中→显示，未隐藏→隐藏）。
             ACTION_BUBBLE -> setBubbleVisible(prefs.getBoolean(Prefs.BUBBLE_HIDDEN, false))
-            ACTION_SET_TIMER -> handleSetTimer(
+            ACTION_SET_TIMER -> {
+                val command=intent ?: return START_STICKY
+                fun applyTimerCommand() {
+                val expired=command.hasExtra(TimerRequests.SENT_AT) && SystemClock.elapsedRealtime()-command.getLongExtra(TimerRequests.SENT_AT,0)>TimerRequests.TIMEOUT_MS
+                val validation=TimerRequests.validationError(command)
+                val result=if(expired)TimerAcceptance(false,R.string.flow_request_expired)
+                else if(validation!=0)TimerAcceptance(false,validation) else handleSetTimer(
                 intent?.getLongExtra(EXTRA_MINUTES, 0) ?: 0,
                 intent?.getLongExtra(EXTRA_END_AT, 0) ?: 0,
-                @Suppress("DEPRECATION") (intent?.getParcelableExtra<android.media.session.MediaSession.Token>(EXTRA_TIMER_SESSION))
-            )
+                @Suppress("DEPRECATION") (intent?.getParcelableExtra<android.media.session.MediaSession.Token>(EXTRA_TIMER_SESSION)),
+                intent?.getBooleanExtra(EXTRA_TIMER_EPISODE,false) ?: false,
+                if(command.hasExtra(TimerRequests.PAUSE))command.getBooleanExtra(TimerRequests.PAUSE,false) else null,
+                command.getStringExtra(TimerRequests.SIGNATURE),TimerRequests.controller(command),TimerRequests.isGuarded(command),command.getStringExtra(TimerRequests.APP_PACKAGE),
+                if(command.hasExtra(TimerRequests.SELECTION_REVISION))command.getLongExtra(TimerRequests.SELECTION_REVISION,0) else null
+                )
+                TimerRequests.reply(intent,result)
+                if(!result.accepted && !command.hasExtra(TimerRequests.RESULT))Toast.makeText(this,lstr(result.errorResource),Toast.LENGTH_LONG).show()
+                }
+                // Deliver queued lifecycle callbacks before validating an acknowledged UI command.
+                // Android 8 may still return cached PLAYING state after the session has been released.
+                if(command.hasExtra(TimerRequests.RESULT))main.post { applyTimerCommand() } else applyTimerCommand()
+            }
             ACTION_START_DEMO -> startFirstUseDemo()
             // ⚠ 原来的 ACTION_CALIB_START 分支已删：省电实测改成**被动测量**，
             // 不再需要「先亮屏采 3 分钟、再黑屏采 3 分钟」的向导。
@@ -428,7 +485,18 @@ class OverlayService : Service() {
     }
 
     override fun onDestroy() {
+        if(!::prefs.isInitialized) { super.onDestroy();return }
+        if(timerEndAt>0)com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"interrupted",listeningTimerId)
+        stopPauseObservation?.invoke();stopPauseObservation=null
+        try { observedPlayer?.unregisterCallback(playerCallback) } catch(_:RuntimeException) {}
+        observedPlayer=null
+        SessionRuntime.finish(this,if(prefs.getBoolean(Prefs.ASSISTANT_WANTED,false))SessionEndReason.INTERRUPTED else SessionEndReason.USER,
+            knownTime=!prefs.getBoolean(Prefs.ASSISTANT_WANTED,false))
+        ServiceRecovery.stopped(this,prefs.getBoolean(Prefs.ASSISTANT_WANTED,false))
         instance = null
+        timerTarget?.close();timerTarget=null
+        episodeTarget?.close()
+        episodeTarget=null
         try { unregisterReceiver(screenOffReceiver) } catch (_: Exception) {}
         if (Build.VERSION.SDK_INT >= 31) {
             (modeListener as? AudioManager.OnModeChangedListener)?.let {
@@ -446,6 +514,7 @@ class OverlayService : Service() {
         // 本进程还挂着 NotificationListener + 3 个小组件，ColorOS 下进程不会立刻死，
         // 漏释放等于「退出助手后仍在耗电」——对一款卖省电的 App 是最严重的反噬。
         releaseWakeLock()
+        publishSession()
         super.onDestroy()
     }
 
@@ -458,6 +527,7 @@ class OverlayService : Service() {
             Log.w(TAG, "唤醒锁释放失败: $e")
         } finally {
             wakeLock = null
+            WakeLockMetrics.released(SystemClock.elapsedRealtime())
         }
     }
 
@@ -775,22 +845,93 @@ class OverlayService : Service() {
     // ---------- 黑屏遮罩 ----------
 
     // Monotonic deadline: changing wall clock cannot extend/expire an armed timer.
-    @Volatile
-    private var timerEndAt = 0L
+    private var timerEndAt:Long
+        get()=timerController.deadline
+        set(value) { timerController.deadline=value }
 
     fun timerRemainingMs(): Long =
-        if (timerEndAt > 0) (timerEndAt - SystemClock.elapsedRealtime()).coerceAtLeast(0) else 0
+        if (timerEndAt > 0 && episodeWaiting) episodeRemainingMs
+        else if (timerEndAt > 0) (timerEndAt - SystemClock.elapsedRealtime()).coerceAtLeast(0) else 0
 
-    private var timerPauseKeepBlack=false
-    private var timerTarget:TimerPlaybackTarget?=null
+    private var timerPauseKeepBlack:Boolean
+        get()=timerController.pauseKeepBlack
+        set(value) { timerController.pauseKeepBlack=value }
+    private var timerTarget:TimerPlaybackTarget?
+        get()=timerController.target
+        set(value) { timerController.target=value }
+    private var episodeTarget:EpisodeTimerTarget?
+        get()=timerController.episode
+        set(value) { timerController.episode=value }
+    private var episodeWaiting:Boolean
+        get()=timerController.waiting
+        set(value) { timerController.waiting=value }
+    private var episodeRemainingMs:Long
+        get()=timerController.remaining
+        set(value) { timerController.remaining=value }
+    private var episodeGraceAt:Long
+        get()=timerController.graceAt
+        set(value) { timerController.graceAt=value }
+    fun timerWaitsForPlayback()=episodeTarget!=null && episodeWaiting
     fun timerKeepsBlack()=timerPauseKeepBlack
+
+    /** Quick adjustment keeps the original pause target; episode mode becomes a fixed timer. */
+    fun extendTimer() {
+        if(timerEndAt<=0) return
+        val remaining=timerRemainingMs()
+        episodeTarget?.close();episodeTarget=null;episodeWaiting=false;episodeGraceAt=0
+        timerEndAt=SystemClock.elapsedRealtime()+(remaining+15*60_000L).coerceAtMost(SleepTimerPolicy.MAX_DURATION_MS)
+        ServiceRecovery.timer(this,timerEndAt,false)
+        main.removeCallbacks(timerTick);main.post(timerTick);refreshNotification()
+    }
+    private var listeningTimerId:String?=null
+    fun cancelTimer() {
+        com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"cancelled",listeningTimerId)
+        stopPauseObservation?.invoke();stopPauseObservation=null
+        timerController.cancel()
+        ServiceRecovery.timer(this,0,false)
+        main.removeCallbacks(timerTick);refreshNotification()
+    }
 
     private val timerTick: Runnable = Runnable {
         if (timerEndAt <= 0) return@Runnable
+        episodeTarget?.let { target ->
+            val reading=target.read()
+            if(!reading.valid) {
+                target.close();episodeTarget=null;timerTarget?.close();timerTarget=null;timerEndAt=0
+                ServiceRecovery.timer(this,0,false)
+                com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"ended",listeningTimerId)
+                episodeWaiting=false;timerResult=R.string.timer_episode_changed
+                if(!isAnyBlackShowing()) showTimerResult()
+                refreshNotification()
+                return@Runnable
+            }
+            episodeWaiting=!reading.advancing
+            episodeRemainingMs=reading.remainingMs.coerceAtMost(SleepTimerPolicy.MAX_DURATION_MS)+4_000
+            val now=SystemClock.elapsedRealtime()
+            if(episodeWaiting || reading.remainingMs>0) {
+                episodeGraceAt=0
+                timerEndAt=now+episodeRemainingMs
+                refreshNotification()
+                main.postDelayed(timerTick,1_000)
+                return@Runnable
+            }
+            if(episodeGraceAt==0L) episodeGraceAt=now+4_000
+            timerEndAt=episodeGraceAt
+        }
         if (SystemClock.elapsedRealtime() >= timerEndAt) {
             timerEndAt = 0
+            val completedListeningId=listeningTimerId
+            com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,if(timerPauseKeepBlack)"ended" else "returned",completedListeningId)
+            ServiceRecovery.timer(this,0,false)
+            episodeTarget?.close();episodeTarget=null;episodeWaiting=false
             if(timerPauseKeepBlack) {
-                val outcome=timerTarget?.pause() ?: PauseDecision.UNAVAILABLE
+                val outcome=if(hasMediaAccess())timerTarget?.pause() ?: PauseDecision.UNAVAILABLE else PauseDecision.UNAVAILABLE
+                if(outcome==PauseDecision.ALREADY_PAUSED)com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"pause_confirmed",completedListeningId)
+                SessionRuntime.pause(this,when(outcome) {
+                    PauseDecision.REQUEST->PauseReport.REQUESTED
+                    PauseDecision.ALREADY_PAUSED->PauseReport.ALREADY_PAUSED
+                    PauseDecision.UNAVAILABLE->PauseReport.UNAVAILABLE
+                })
                 // Report on return rather than lighting a Toast over a sleeping user's curtain.
                 timerResult=when(outcome) {
                     PauseDecision.REQUEST -> R.string.timer_pause_requested
@@ -798,40 +939,89 @@ class OverlayService : Service() {
                     PauseDecision.UNAVAILABLE -> R.string.timer_pause_failed
                 }
                 if(!isAnyBlackShowing()) showTimerResult()
+                if(outcome==PauseDecision.REQUEST) {
+                    stopPauseObservation?.invoke()
+                    val completedId=SessionRuntime.snapshot().id
+                    stopPauseObservation=timerTarget?.observePause(main) { report ->
+                        if(report==PauseReport.CONFIRMED || report==PauseReport.ALREADY_PAUSED)
+                            com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"pause_confirmed",completedListeningId)
+                        SessionRuntime.pause(this,report,completedId);refreshNotification()
+                    }
+                }
             } else if (isAnyBlackShowing()) {
                 hideAllBlack()
                 Toast.makeText(this, lstr(R.string.toast_timer_done), Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, lstr(R.string.toast_timer_expired), Toast.LENGTH_SHORT).show()
             }
-            timerTarget=null
+            SessionRuntime.finish(this,SessionEndReason.TIMER)
+            timerTarget?.close();timerTarget=null
             refreshNotification()
         } else {
             refreshNotification()
-            main.postDelayed(timerTick, timerRemainingMs().coerceAtMost(30_000).coerceAtLeast(1))
+            main.postDelayed(timerTick, timerRemainingMs().coerceAtMost(if(episodeTarget!=null)1_000 else 30_000).coerceAtLeast(1))
         }
     }
 
     private fun handleSetTimer(minutes: Long, endAtMs: Long = 0L,
-        token:android.media.session.MediaSession.Token?=null) {
-        val next=SleepTimerPolicy.deadline(minutes,endAtMs,System.currentTimeMillis(),SystemClock.elapsedRealtime())
+        token:android.media.session.MediaSession.Token?=null,episodeMode:Boolean=false,
+        pauseOverride:Boolean?=null,expectedSignature:String?=null,retainedController:android.media.session.MediaController?=null,validatedSource:Boolean=false,appPackage:String?=null,selectionRevision:Long?=null):TimerAcceptance {
+        if(minutes<0 || (endAtMs<=0 && minutes>600))return TimerAcceptance(false,R.string.timer_custom_hint)
+        val wallNow=System.currentTimeMillis()
+        // A stale absolute deadline is not a cancellation command. Preserve the previous timer.
+        if(endAtMs>0 && endAtMs<=wallNow)return TimerAcceptance(false,R.string.flow_request_expired)
+        var next=SleepTimerPolicy.deadline(minutes,endAtMs,wallNow,SystemClock.elapsedRealtime())
         if(next>0 && demoOverlay!=null) {
-            Toast.makeText(this,lstr(R.string.guide_busy),Toast.LENGTH_LONG).show();return
+            return TimerAcceptance(false,R.string.guide_busy)
         }
-        val pause=prefs.getBoolean(Prefs.TIMER_PAUSE_KEEP_BLACK,false)
+        val pause=pauseOverride ?: prefs.getBoolean(Prefs.TIMER_PAUSE_KEEP_BLACK,false)
+        if(next>0 && pauseOverride!=null && (pause || episodeMode) && !hasMediaAccess())return TimerAcceptance(false,R.string.flow_player_permission)
+        if(next>0 && pauseOverride!=null && !android.provider.Settings.canDrawOverlays(this))return TimerAcceptance(false,R.string.v50_overlay_needed)
+        val controller=try { if(validatedSource)retainedController else if(token!=null)android.media.session.MediaController(this,token)
+            else if(pauseOverride==null)queryNowPlaying()?.controller else null } catch(_:RuntimeException) { null }
+        if(appPackage!=null) {
+            if(controller!=null && controller.packageName!=appPackage)return TimerAcceptance(false,R.string.timer_no_target)
+            try { @Suppress("DEPRECATION") packageManager.getApplicationInfo(appPackage,0) }
+            catch(_:android.content.pm.PackageManager.NameNotFoundException) { return TimerAcceptance(false,R.string.timer_no_target) }
+        }
+        if(next>0 && (pause || episodeMode) && expectedSignature!=null &&
+            (controller==null || TimerRequests.signature(controller)!=expectedSignature))return TimerAcceptance(false,R.string.v50_target_changed)
         val target=if(next>0 && pause) {
-            val controller=try { if(token!=null)android.media.session.MediaController(this,token)
-                else queryNowPlaying()?.controller } catch(_:RuntimeException) { null }
             controller?.let { TimerPlaybackTarget(it) }
         } else null
         if(next>0 && pause && target?.canArm()!=true) {
-            Toast.makeText(this,lstr(R.string.timer_no_target),Toast.LENGTH_LONG).show()
-            return // Do not replace an existing timer with an unsupported one.
+            return TimerAcceptance(false,R.string.timer_no_target)
         }
+        val episode=if(next>0 && episodeMode && token!=null) {
+            try { EpisodeTimerTarget(android.media.session.MediaController(this,token)) } catch(_:RuntimeException) { null }
+        } else null
+        val episodeReading=episode?.read()
+        if(next>0 && episodeMode && (episodeReading==null || !episodeReading.valid || episodeReading.remainingMs<=0)) {
+            episode?.close()
+            return TimerAcceptance(false,R.string.timer_episode_changed)
+        }
+        if(episodeReading!=null)next=SystemClock.elapsedRealtime()+episodeReading.remainingMs.coerceIn(0,SleepTimerPolicy.MAX_DURATION_MS-4_000)+4_000
+        target?.watchLifetime()
+        if(target!=null && !target.canArm()) { target.close();episode?.close();return TimerAcceptance(false,R.string.timer_no_target) }
+        episodeTarget?.close()
+        timerTarget?.close()
+        episodeTarget=episode;episodeWaiting=false;episodeGraceAt=0
+        stopPauseObservation?.invoke();stopPauseObservation=null
+        SessionRuntime.begin(this)
+        SessionRuntime.pause(this,PauseReport.NONE)
         timerEndAt=next;timerPauseKeepBlack=pause;timerTarget=target;timerResult=0
+        if(pauseOverride!=null) {
+            prefs.edit().putBoolean(Prefs.TIMER_PAUSE_KEEP_BLACK,pause).apply()
+            val defaultsPackage=appPackage ?: controller?.takeIf { it.playbackState!=null && hasMediaAccess() }?.packageName
+            if(next>0 && !episodeMode && defaultsPackage!=null)
+                PlayerTimerDefaults.save(this,defaultsPackage,ListeningPreset(minutes.toInt(),pause))
+        }
+        ServiceRecovery.timer(this,next,episodeMode)
         main.removeCallbacks(timerTick)
+        episode?.observe { main.removeCallbacks(timerTick);main.post(timerTick) }
         if (timerEndAt > 0) {
-            main.postDelayed(timerTick,timerRemainingMs().coerceAtMost(15_000))
+            if(episode!=null) main.post(timerTick)
+            else main.postDelayed(timerTick,timerRemainingMs().coerceAtMost(15_000))
             if (endAtMs > 0) {
                 Toast.makeText(this, lstr(R.string.toast_timer_episode), Toast.LENGTH_SHORT).show()
             } else {
@@ -841,19 +1031,33 @@ class OverlayService : Service() {
             Toast.makeText(this, lstr(R.string.toast_timer_cancelled), Toast.LENGTH_SHORT).show()
         }
         refreshNotification()
+        if(next>0)listeningTimerId=com.lujinyu.xiting.listening.ListeningRecorder.acceptedTimer(this,
+            com.lujinyu.xiting.listening.ListeningRecorder.captureController(this,controller) ?: if(controller==null)com.lujinyu.xiting.listening.ListeningRecorder.capture(this) else null)
+        else com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"cancelled",listeningTimerId)
+        return TimerAcceptance(true)
     }
 
-    private var timerResult=0
+    private var timerResult:Int
+        get()=timerController.result
+        set(value) { timerController.result=value }
     fun showTimerResult() {
-        if(!isAnyBlackShowing() && timerResult!=0) { Toast.makeText(this,lstr(timerResult),Toast.LENGTH_LONG).show();timerResult=0 }
+        if(!isAnyBlackShowing() && timerResult!=0) {
+            val report=SessionRuntime.snapshot().pause
+            val text=if(report==PauseReport.NONE)lstr(timerResult) else SessionConsoleUi.pause(AppLocales.wrap(this),report)
+            Toast.makeText(this,text,Toast.LENGTH_LONG).show();timerResult=0
+        }
     }
 
     private var demoOverlay:BlackOverlay?=null
-    private val demoFinish=Runnable {
-        if(demoOverlay!=null && black===demoOverlay) {
-            hideAllBlack()
-            prefs.edit().putBoolean(Prefs.DEMO_FEEDBACK_PENDING,true).apply()
-        }
+    private var demoAudio:DemoAudioPlayer?=null
+    internal fun isDemoInProgress()=demoOverlay!=null
+    internal fun isDemoAudioPlaying()=demoAudio?.isPlaying==true
+    private val demoFinish=Runnable { finishDemo(true) }
+    private fun finishDemo(failed:Boolean) {
+        if(demoOverlay==null)return
+        hideAllBlack()
+        if(failed)Toast.makeText(this,lstr(R.string.guide_audio_failed),Toast.LENGTH_LONG).show()
+        else prefs.edit().putBoolean(Prefs.DEMO_FEEDBACK_PENDING,true).apply()
     }
     private fun resumeSamplingAfterDemo() {
         onSegStartUwh=null;onSegStartAt=0L
@@ -861,23 +1065,34 @@ class OverlayService : Service() {
         main.postDelayed(powerTick,60_000)
     }
     private fun startFirstUseDemo() {
-        if(isAnyBlackShowing() || timerRemainingMs()>0 || !android.provider.Settings.canDrawOverlays(this)) {
-            Toast.makeText(this,lstr(R.string.guide_busy),Toast.LENGTH_LONG).show();return
+        val audio=getSystemService(AUDIO_SERVICE) as AudioManager
+        val decision=demoStartDecision(android.provider.Settings.canDrawOverlays(this),isAnyBlackShowing() || demoOverlay!=null || timerRemainingMs()>0,
+            audio.getStreamVolume(AudioManager.STREAM_MUSIC),audio.isMusicActive)
+        if(decision!=DemoStartDecision.START) {
+            val message=when(decision){DemoStartDecision.MUTED->R.string.guide_sound_help;DemoStartDecision.PERMISSION->R.string.guide_permission;DemoStartDecision.PLAYBACK->R.string.guide_pause_first;else->R.string.guide_busy}
+            Toast.makeText(this,lstr(message),Toast.LENGTH_LONG).show();return
         }
-        val overlay=BlackOverlay(this,WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,recordSession=false)
+        prefs.edit().putBoolean(Prefs.DEMO_FEEDBACK_PENDING,false).apply()
+        val overlay=BlackOverlay(this,WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,recordSession=false,demo=true)
         onSegStartUwh=null;onSegStartAt=0L
         black=overlay;demoOverlay=overlay
-        overlay.show {
-            if(demoOverlay===overlay) {
-                demoOverlay=null;black=null;main.removeCallbacks(demoFinish)
-                resumeSamplingAfterDemo()
-                prefs.edit().putBoolean(Prefs.DEMO_FEEDBACK_PENDING,true).apply()
+        val sample=DemoAudioPlayer(this);demoAudio=sample
+        fun started() {
+            if(demoAudio!==sample || demoOverlay!==overlay)return
+            overlay.show {
+                if(demoOverlay===overlay){demoAudio?.close();demoAudio=null;demoOverlay=null;black=null;main.removeCallbacks(demoFinish);resumeSamplingAfterDemo();prefs.edit().putBoolean(Prefs.DEMO_FEEDBACK_PENDING,true).apply()}
+                setBubbleAnimating(true);refreshNotification()
             }
-            setBubbleAnimating(true);refreshNotification()
+            if(overlay.isShowing){setBubbleAnimating(false);main.removeCallbacks(demoFinish);main.postDelayed(demoFinish,15_000)}else finishDemo(true)
         }
-        if(overlay.isShowing) { setBubbleAnimating(false);main.postDelayed(demoFinish,10_000) }
-        else { demoOverlay=null;black=null }
+        main.postDelayed(demoFinish,15_000)
+        Toast.makeText(this,lstr(R.string.guide_preparing),Toast.LENGTH_SHORT).show()
+        if(!sample.start(::started,{if(demoAudio===sample && demoOverlay===overlay)finishDemo(false)},{if(demoAudio===sample && demoOverlay===overlay)finishDemo(true)}))finishDemo(true)
     }
+
+
+    /** 只刷新定时显示，不重挂黑幕或修改后台定时。 */
+    fun refreshBlackTimerDisplay() { black?.refreshTimerDisplay() }
 
     /** 黑幕显示中时重挂（设置变更即时生效；同帧先拆后挂，视觉无闪动） */
     fun reapplyBlack() {
@@ -891,12 +1106,14 @@ class OverlayService : Service() {
 
     /** 黑幕/恢复 切换（悬浮球、通知、快捷磁贴共用） */
     fun toggleOverlay() {
+        if(demoOverlay!=null){hideAllBlack();refreshNotification();return}
         Log.i(TAG, "toggleOverlay via app overlay")
         if (black?.isShowing == true) {
             hideAllBlack()
         } else {
             black = BlackOverlay(this, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
             black?.show { refreshNotification() }
+            if(black?.isShowing==true)SessionRuntime.begin(this)
             setBubbleAnimating(false)
             // 省电实测：重启常驻循环。黑幕打开时它会自动让位给 BlackOverlay 记黑屏段。
             // 先 remove 再 post，避免反复开关黑幕时排出一串重复任务。
@@ -916,6 +1133,7 @@ class OverlayService : Service() {
     }
 
     private fun buildNotification(): Notification {
+        publishSession()
         val openPi = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
@@ -933,11 +1151,12 @@ class OverlayService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val remainMin = timerRemainingMs() / 60000
-        val timerText = if (timerEndAt > 0) lstr(R.string.notif_timer_fmt, remainMin + 1) else ""
+        val timerText = if(timerWaitsForPlayback()) lstr(R.string.timer_episode_waiting)
+            else if (timerEndAt > 0) lstr(R.string.notif_timer_fmt, remainMin + 1) else ""
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
             .setContentTitle(lstr(R.string.notif_title))
-            .setContentText(lstr(R.string.notif_text, timerText))
+            .setContentText(SessionConsoleUi.summary(AppLocales.wrap(this),SessionRuntime.snapshot()))
             .setContentIntent(openPi)
             .addAction(0, lstr(R.string.notif_action_stop), exitPi)
             .addAction(0, lstr(if (isAnyBlackShowing()) R.string.notif_action_restore else R.string.notif_action_listen), togglePi)
@@ -947,6 +1166,7 @@ class OverlayService : Service() {
     }
 
     private fun refreshNotification() {
+        publishSession()
         WidgetData.refreshAll(this) // 小部件状态同步
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(NOTIF_ID, buildNotification())

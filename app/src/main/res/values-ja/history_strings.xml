@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">履歴管理</string>
+    <string name="history_scope">過去60日以内の保存済み明細（最大500件）を表示・書き出します。それ以前は累計統計のみ保持されます。</string>
+    <string name="history_date">日付を選択</string>
+    <string name="history_all">すべての日付</string>
+    <string name="history_export">表示中の記録をCSV出力</string>
+    <string name="history_empty">この日付の記録はありません</string>
+    <string name="history_row">%1$s · %2$d 分 · %3$s</string>
+    <string name="history_black">黒画面</string>
+    <string name="history_screen_off">画面オフ</string>
+    <string name="history_delete">削除</string>
+    <string name="history_delete_impact">累計から%1$d分と1回を減算し、月別・最長時間・連続日数を更新します。成長、解除済み実績と解除履歴は維持されます。削除しますか？</string>
+    <string name="history_delete_unavailable">この月の一部明細は保管期間外です。最長時間と利用日を正確に再計算できないため、削除できません。</string>
+    <string name="history_deleted">削除し、統計を更新しました</string>
+    <string name="history_delete_failed">削除できませんでした。再試行してください</string>
+    <string name="history_exported">書き出しました</string>
+    <string name="history_export_failed">書き出し失敗。別の保存先を選んでください</string>
+</resources>

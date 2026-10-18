@@ -62,6 +62,7 @@ object SessionLog {
      * 读-改-写不是原子操作，两个线程同时进入会互相覆盖。
      */
     private val lock = Any()
+    internal fun <T> withDataLock(block:()->T):T=synchronized(lock,block)
 
     // 旧版本用墙钟差算时长，时钟跳变/跨天会产生失真记录；不足1分钟属误触。
     // 两者在读取时过滤：历史秒级测试数据不再出现在统计与列表中。
@@ -74,6 +75,7 @@ object SessionLog {
     const val MODE_SCREEN_OFF = 1
 
     fun sessions(context: Context): List<ListenSession> = synchronized(lock) {
+        check(completePendingDeletion(context)) { "History deletion recovery failed" }
         val list = read(context)
         // 一次性迁移：老版本没有全量聚合，从现存明细算基线（幂等，一个 boolean 读）
         HistoryStore.ensureMigrated(context, list)
@@ -85,9 +87,9 @@ object SessionLog {
      */
     private fun read(context: Context): List<ListenSession> {
         val f = File(context.filesDir, FILE)
-        if (!f.exists()) return emptyList()
+        if (!f.exists() && !File(context.filesDir,"$FILE.bak").exists()) return emptyList()
         val parsed = try {
-            parseSessions(f.readText())
+            parseSessions(android.util.AtomicFile(f).openRead().bufferedReader().use { it.readText() })
         } catch (e: Exception) {
             // 整体语法解析不了：先把原件留底再当空存档处理。
             // 不留底的话，下一次 add() 会拿着空列表把文件覆盖掉，原始数据彻底消失。
@@ -109,11 +111,58 @@ object SessionLog {
         if (session.durationMs < 60_000) return // 不足1分钟：误触/测试无统计意义
         // 读-改-写整体在锁内完成：否则并发 add() 会各自基于同一份旧列表写回，互相覆盖
         synchronized(lock) {
+            check(completePendingDeletion(context)) { "History deletion recovery failed" }
             val list = read(context).toMutableList()
+            HistoryStore.ensureMigrated(context, list)
             list.add(0, session)
-            write(context, list)
+            if(!write(context, list)) return
             // 聚合同步累加（明细与聚合一致性的唯一写入点）
             HistoryStore.record(context, session)
+        }
+    }
+
+    fun canDelete(context: Context, session: ListenSession): Boolean = synchronized(lock) {
+        if(!completePendingDeletion(context)) return@synchronized false
+        val list=read(context)
+        HistoryStore.ensureMigrated(context,list)
+        deleteFromHistory(HistorySnapshot.read(context),list,session)!=null
+    }
+
+    /** Replayable local transaction prevents a process death from separating details and totals. */
+    fun delete(context: Context, session: ListenSession): Boolean = synchronized(lock) {
+        if(!completePendingDeletion(context)) return@synchronized false
+        val list=read(context)
+        HistoryStore.ensureMigrated(context,list)
+        val after=deleteFromHistory(HistorySnapshot.read(context),list,session) ?: return@synchronized false
+        val remaining=list.toMutableList().apply { removeAt(indexOf(session)) }
+        val journal=android.util.AtomicFile(File(context.filesDir,"history-delete.json"))
+        val payload=JSONObject().put("sessions",JSONArray(remaining.map {
+            JSONObject().put("s",it.start).put("e",it.end).put("d",it.durationMs).put("m",it.mode)
+        })).put("history",after.json()).toString().toByteArray(Charsets.UTF_8)
+        var stream: java.io.FileOutputStream? = null
+        try {
+            stream=journal.startWrite();stream.write(payload);journal.finishWrite(stream)
+        } catch(e: Exception) {
+            journal.failWrite(stream);Log.w(TAG,"Deletion transaction write failed",e)
+            return@synchronized false
+        }
+        completePendingDeletion(context)
+    }
+
+    private fun completePendingDeletion(context: Context): Boolean {
+        val journal=android.util.AtomicFile(File(context.filesDir,"history-delete.json"))
+        if(!journal.baseFile.exists() && !File(context.filesDir,"history-delete.json.bak").exists())return true
+        return try {
+            val payload=JSONObject(journal.openRead().bufferedReader().use { it.readText() })
+            val sessions=parseSessions(payload.getJSONArray("sessions").toString())
+            check(sessions.skipped==0)
+            val history=HistorySnapshot.fromJson(payload.getJSONObject("history"))
+            if(!write(context,sessions.items) || !history.persist(context))return false
+            journal.delete()
+            true
+        } catch(e: Exception) {
+            Log.w(TAG,"Deletion recovery failed; journal retained",e)
+            false
         }
     }
 
@@ -146,7 +195,7 @@ object SessionLog {
      * 下次读取解析失败返回空列表，接着 add() 就把半截内容覆盖成单条，历史全丢。
      * rename 在同一目录内是原子操作，读者要么看到旧的完整文件，要么看到新的完整文件。
      */
-    private fun write(context: Context, list: List<ListenSession>) {
+    private fun write(context: Context, list: List<ListenSession>): Boolean {
         // v4.0：明细只保留 60 天（列表/周报/月报本月够用），全量口径在 HistoryStore 聚合。
         // MAX=500 保留作条数兜底。聚合是派生数据，降级到 v3.x 会看到累计缩水（已知取舍）。
         val cutoff = System.currentTimeMillis() - 60L * 24 * 3600 * 1000
@@ -161,18 +210,17 @@ object SessionLog {
                     .put("m", it.mode)
             )
         }
-        val target = File(context.filesDir, FILE)
-        val tmp = File(context.filesDir, "$FILE.tmp")
+        val target = android.util.AtomicFile(File(context.filesDir, FILE))
+        var stream: java.io.FileOutputStream? = null
         try {
-            tmp.writeText(arr.toString())
-            if (!tmp.renameTo(target)) {
-                // 极少数文件系统 rename 失败：退回直接写，至少不留下临时文件
-                target.writeText(arr.toString())
-            }
+            stream = target.startWrite()
+            stream.write(arr.toString().toByteArray(Charsets.UTF_8))
+            target.finishWrite(stream)
+            return true
         } catch (e: Exception) {
+            target.failWrite(stream)
             Log.w(TAG, "会话存档写入失败: $e")
-        } finally {
-            tmp.delete()
+            return false
         }
     }
 }

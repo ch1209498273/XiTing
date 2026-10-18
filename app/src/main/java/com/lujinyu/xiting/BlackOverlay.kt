@@ -22,6 +22,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.Toast
 import android.widget.TextView
 
 /**
@@ -29,8 +30,8 @@ import android.widget.TextView
  *
  * 交互（两段式解锁）：
  *   锁定态：全黑 + 背光物理关闭（screenBrightness=OFF）
- *   轻点屏幕 → 解除锁定：背光恢复到用户亮度，浮现「点击返回视频」按钮
- *   点按钮 → 返回视频；5秒无操作 → 自动重新锁定（开时钟时压至最暗背光，暗态夜钟持续可见）
+ *   轻点屏幕 → 解除锁定：背光恢复到用户亮度，浮现紧凑播放面板
+ *   点返回播放器 → 返回原应用；5秒无操作 → 自动重新锁定
  *
  * 系统栏隐藏（实测重要）：insets隐藏只做一次、绝不周期性重复调用——
  * ColorOS 16上反复调用hide()反而会让系统栏重新显示（真机A/B实测结论）。
@@ -39,7 +40,7 @@ import android.widget.TextView
  *                   TYPE_ACCESSIBILITY_OVERLAY（无障碍服务层）
  */
 class BlackOverlay(private val context: Context, private val windowType: Int,
-    private val recordSession:Boolean=true) {
+    private val recordSession:Boolean=true,private val demo:Boolean=false) {
 
     companion object {
         private const val TAG = "XiTing"
@@ -56,9 +57,20 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     private var frame: FrameLayout? = null
     private var lp: WindowManager.LayoutParams? = null
     private var unlockPill: TextView? = null
+    internal val isAwake:Boolean get()=awake
     private var mediaRow: LinearLayout? = null
     private var playPauseBtn: android.widget.ImageView? = null
+    private var previousBtn:android.widget.ImageView?=null
+    private var nextBtn:android.widget.ImageView?=null
+    private var lastSeekSession:android.media.session.MediaSession.Token?=null
+    private var sourceText:TextView?=null
+    private var touchHint:TextView?=null
     private var titleText: TextView? = null        // 唤醒态剧名（需通知使用权，无则不显示）
+    private var wakePanel: android.widget.ScrollView? = null
+    private var timerStatus:TextView?=null
+    private var timerArea:View?=null
+    private var closeTimerEditor:(()->Unit)?=null
+    private var timerEditor:CurtainTimerPanel?=null
     private var captionText: TextView? = null      // 黑幕字幕（实验性，无障碍采集，居中大字）
     private var seekBackBtn: TextView? = null      // ±30s（会话声明 ACTION_SEEK_TO 才显示）
     private var seekFwdBtn: TextView? = null
@@ -80,10 +92,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     private var batteryText: TextView? = null
     private var awake = false
     private var sessionStart = 0L          // 墙钟：用于记录起始时间与按天归属
-    /** 会话开始时的剩余能量（µWh）；null = 读不到（不支持或当时在充电） */
+    /** 会话开始时的剩余电荷（µAh）；null = 读不到（不支持或当时在充电） */
     private var sessionStartUwh: Long? = null
     private var sessionStartElapsed = 0L   // 单调时钟：用于时长计算，不受时间跳变/跨天影响
-    private val relockRunnable = Runnable { sleep() }
+    private val relockRunnable = Runnable { if(timerEditor==null)sleep() }
 
     // 黑幕时钟：每15秒刷新（分钟级精度足够）
     private val clockTick: Runnable = Runnable {
@@ -127,6 +139,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
 
     fun show(onDismiss: () -> Unit) {
         if (isShowing) return
+        PlaybackSelection.beginAutomaticCurtain()
+        try { context.queryNowPlaying() } catch(_:RuntimeException) { }
 
         val density = context.resources.displayMetrics.density
         // 覆写 performClick（lint ClickableViewAccessibility）：黑幕全屏铺满，它本身
@@ -146,6 +160,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
             setTextColor(0x66FFFFFF.toInt())
             gravity = Gravity.CENTER
         }
+        touchHint=hint
         // v4.0：hint 移到顶部居中——底部已被 剧名/媒体行/返回按钮 占满（剧名两行后更挤）；
         // 顶部空旷，锁定/唤醒两态都可读，与 8 秒淡出逻辑兼容
         f.addView(
@@ -179,134 +194,179 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         )
         captionText = caption
 
+        fun dp(value:Int)=(value*density+.5f).toInt()
+        fun surface(color:Int,radius:Int)=android.graphics.drawable.GradientDrawable().apply {
+            setColor(color);cornerRadius=radius*density
+        }
         val pill = TextView(context).apply {
-            text = context.getString(R.string.black_return)
-            textSize = 16f
-            setTextColor(Color.WHITE)
-            gravity = Gravity.CENTER
-            background = unlockPillBg(context)
-            visibility = View.INVISIBLE
-            alpha = 0f
-            setPadding(
-                (30 * density).toInt(), (18 * density).toInt(),
-                (30 * density).toInt(), (18 * density).toInt()
-            )
+            id=R.id.black_return_button
+            text=context.getString(if(demo)R.string.black_demo_return else R.string.black_return)
+            textSize=15f;setTextColor(Color.WHITE);gravity=Gravity.CENTER
+            minHeight=dp(48);setPadding(dp(12),dp(10),dp(12),dp(10))
+            background=surface(0xff252b28.toInt(),14)
+            visibility=View.INVISIBLE;alpha=0f
+            setOnClickListener { hide();onDismiss() }
         }
-        pill.setOnClickListener {
-            hide()
-            onDismiss()
+        val showMedia=context.prefs().getBoolean(Prefs.BLACK_MEDIA_CONTROLS,false)
+        val media=LinearLayout(context).apply {
+            orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER
+            visibility=View.GONE;alpha=0f
         }
-        f.addView(
-            pill,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-            ).apply { bottomMargin = (110 * density).toInt() }
-        )
+        fun mediaButton(resId:Int,description:String,action:()->Unit)=android.widget.ImageView(context).apply {
+            setImageResource(resId);setColorFilter(Color.WHITE);contentDescription=description
+            scaleType=android.widget.ImageView.ScaleType.CENTER_INSIDE
+            setPadding(dp(12),dp(12),dp(12),dp(12));minimumHeight=dp(48)
+            layoutParams=LinearLayout.LayoutParams(0,dp(48),1f)
+            setOnClickListener { action() }
+        }
+        fun seekButton(label:String,description:String,delta:Long)=TextView(context).apply {
+            text=label;textSize=13f;setTextColor(0xffc6d1ca.toInt());gravity=Gravity.CENTER
+            contentDescription=description;minHeight=dp(48)
+            layoutParams=LinearLayout.LayoutParams(0,dp(48),1f)
+            setOnClickListener { nudgeSeek(delta) };visibility=View.GONE
+        }
+        val previous=mediaButton(R.drawable.ic_media_prev,context.getString(R.string.cd_prev_episode)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS) }
+        previousBtn=previous;media.addView(previous)
+        val seekBack=seekButton("−30",context.getString(R.string.cd_seek_back),-30_000)
+        seekBackBtn=seekBack;media.addView(seekBack)
+        val ppBtn=mediaButton(R.drawable.ic_media_pause,context.getString(R.string.cd_play_pause)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) }.apply {
+            id=R.id.black_play_pause
+            layoutParams=LinearLayout.LayoutParams(dp(64),dp(64))
+            background=surface(0xff246448.toInt(),32)
+            setPadding(dp(18),dp(18),dp(18),dp(18))
+        }
+        playPauseBtn=ppBtn;media.addView(ppBtn)
+        val seekFwd=seekButton("+30",context.getString(R.string.cd_seek_forward),30_000)
+        seekFwdBtn=seekFwd;media.addView(seekFwd)
+        val next=mediaButton(R.drawable.ic_media_next,context.getString(R.string.cd_next_episode)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT) }
+        nextBtn=next;media.addView(next)
 
-        // 媒体控制行（唤醒态显示）：黑幕下切集/暂停——通知栏被黑幕遮住，
-        // 这里是媒体键唯一可达的位置。默认关闭（防误触），可在设置中选择开启。
-        // ⚠ 五键一行的总宽按最窄 320dp 屏算过：主键 50dp×3 + seek 44dp×2 + 间距，
-        // 再大的按钮或间距都会溢出（布局版的坑 11）。
-        val showMedia = context.prefs()
-            .getBoolean(Prefs.BLACK_MEDIA_CONTROLS, false)
-        val media = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            visibility = View.INVISIBLE
-            alpha = 0f
+        val source=TextView(context).apply {
+            textSize=12f;setTextColor(0xffa7b6ad.toInt());maxLines=2
+            ellipsize=android.text.TextUtils.TruncateAt.END;setLineSpacing(2*density,1f)
         }
-        val mkBtn = { resId: Int, desc: String, onClick: () -> Unit ->
-            android.widget.ImageView(context).apply {
-                setImageResource(resId)
-                setColorFilter(Color.WHITE)
-                contentDescription = desc
-                val size = (50 * density).toInt()
-                val bg = android.graphics.drawable.GradientDrawable().apply {
-                    shape = android.graphics.drawable.GradientDrawable.OVAL
-                    setColor(0x66000000)
+        sourceText=source
+        val title=TextView(context).apply {
+            textSize=18f;setTextColor(0xfff1f5f2.toInt());maxLines=2
+            setTypeface(typeface,android.graphics.Typeface.BOLD)
+            ellipsize=android.text.TextUtils.TruncateAt.END;setLineSpacing(2*density,1f)
+            visibility=View.GONE
+        }
+        titleText=title
+        val information=LinearLayout(context).apply { orientation=LinearLayout.VERTICAL }
+        information.addView(source,LinearLayout.LayoutParams(-1,-2))
+        information.addView(title,LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(6) })
+        if(showMedia)information.addView(media,LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(16) })
+
+        val timerArea=LinearLayout(context).apply {
+            orientation=LinearLayout.VERTICAL
+            visibility=if(!demo && context.prefs().getBoolean(Prefs.BLACK_TIMER_SHOW,false))View.VISIBLE else View.GONE
+        }
+        this.timerArea=timerArea
+        val timing=TextView(context).apply {
+            textSize=13f;setTextColor(0xffa7b6ad.toInt());gravity=Gravity.END or Gravity.CENTER_VERTICAL
+            maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END
+        }
+        timerStatus=timing
+        val setup=LinearLayout(context).apply {
+            tag="flow_timer_setup";orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL
+            minimumHeight=dp(56);setPadding(dp(12),dp(8),dp(8),dp(8))
+            background=surface(0xff1d2420.toInt(),12)
+            isFocusable=true
+        }
+        setup.addView(TextView(context).apply {
+            text=context.getString(R.string.timer_title);textSize=14f;setTextColor(0xffe1e9e3.toInt())
+            maxLines=2;ellipsize=android.text.TextUtils.TruncateAt.END
+        },LinearLayout.LayoutParams(0,-2,1f))
+        setup.addView(timing,LinearLayout.LayoutParams(0,-2,1f))
+        setup.addView(TextView(context).apply {
+            text="›";textSize=22f;setTextColor(0xffa7b6ad.toInt());gravity=Gravity.CENTER
+            importantForAccessibility=View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        },LinearLayout.LayoutParams(dp(20),-2))
+        timerArea.addView(setup,LinearLayout.LayoutParams(-1,-2))
+        val timingActions=LinearLayout(context).apply { gravity=Gravity.CENTER }
+        for((label,action) in listOf(R.string.ui_timer_extend to { OverlayService.instance?.extendTimer() },
+            R.string.timer_cancel to { OverlayService.instance?.cancelTimer() })) {
+            timingActions.addView(TextView(context).apply {
+                id=if(label==R.string.ui_timer_extend)R.id.black_timer_extend else R.id.black_timer_cancel
+                text=context.getString(label);textSize=13f;setTextColor(0xffb7d8c5.toInt());gravity=Gravity.CENTER
+                minHeight=dp(48);setPadding(dp(6),dp(4),dp(6),dp(4));maxLines=2
+                setOnClickListener { action();refreshTimer();main.removeCallbacks(relockRunnable);main.postDelayed(relockRunnable,RELLOCK_DELAY_MS) }
+            },LinearLayout.LayoutParams(0,-2,1f))
+        }
+        timerArea.addView(timingActions);timing.tag=timingActions
+        val content=LinearLayout(context).apply { orientation=LinearLayout.VERTICAL }
+        content.addView(information,LinearLayout.LayoutParams(-1,-2))
+        content.addView(timerArea,LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(18) })
+        val stack=LinearLayout(context).apply {
+            orientation=LinearLayout.VERTICAL;setPadding(dp(16),dp(20),dp(16),dp(16))
+            background=surface(0xff111613.toInt(),24).apply { setStroke(dp(1),0xff2b3630.toInt()) }
+        }
+        stack.addView(content,LinearLayout.LayoutParams(-1,-2))
+        if(!demo && recordSession && context.prefs().getBoolean(com.lujinyu.xiting.listening.ListeningStore.MARK_SHOW,false)) {
+            stack.addView(TextView(context).apply {
+                tag="listening_mark";text=context.getString(R.string.listen_mark);textSize=14f
+                setTextColor(0xffb7d8c5.toInt());gravity=Gravity.CENTER;minHeight=dp(48)
+                setOnClickListener {
+                    if(!awake || !isShowing || !isEnabled)return@setOnClickListener
+                    isEnabled=false
+                    com.lujinyu.xiting.listening.ListeningRecorder.mark(context) {ok->
+                        isEnabled=true
+                        Toast.makeText(context,if(ok)R.string.listen_marked else R.string.listen_storage_error,Toast.LENGTH_SHORT).show()
+                    }
+                    main.removeCallbacks(relockRunnable);main.postDelayed(relockRunnable,RELLOCK_DELAY_MS)
                 }
-                background = bg
-                setPadding((13 * density).toInt(), (13 * density).toInt(), (13 * density).toInt(), (13 * density).toInt())
-                layoutParams = LinearLayout.LayoutParams(size, size).apply {
-                    marginStart = (8 * density).toInt()
-                    marginEnd = (8 * density).toInt()
-                }
-                setOnClickListener { onClick() }
+            },LinearLayout.LayoutParams(-1,-2))
+        }
+        stack.addView(pill,LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(14) })
+        setup.setOnClickListener { openTimerEditor(stack,pill) }
+        var landscape=false
+        fun arrange(wide:Boolean) {
+            landscape=wide;content.orientation=if(wide)LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
+            title.maxLines=if(wide)1 else 2
+            information.layoutParams=if(wide)LinearLayout.LayoutParams(0,-2,1.15f) else LinearLayout.LayoutParams(-1,-2)
+            timerArea.layoutParams=if(wide)LinearLayout.LayoutParams(0,-2,1f).apply { marginStart=dp(18) }
+                else LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(18) }
+        }
+        arrange(context.resources.configuration.orientation==android.content.res.Configuration.ORIENTATION_LANDSCAPE)
+        val scroll=object:android.widget.ScrollView(context) {
+            override fun onMeasure(widthSpec:Int,heightSpec:Int) {
+                val availableWidth=View.MeasureSpec.getSize(widthSpec)
+                val availableHeight=View.MeasureSpec.getSize(heightSpec)
+                val width=minOf(availableWidth,dp(if(landscape)680 else 420))
+                super.onMeasure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec((availableHeight*if(landscape).94f else .78f).toInt(),View.MeasureSpec.AT_MOST))
+            }
+        }.apply {
+            addView(stack);visibility=View.INVISIBLE;isFillViewport=false;isVerticalScrollBarEnabled=false
+            clipToPadding=false
+            setOnTouchListener { v,event ->
+                if(event.actionMasked==MotionEvent.ACTION_UP)v.performClick()
+                main.removeCallbacks(relockRunnable);main.postDelayed(relockRunnable,RELLOCK_DELAY_MS);false
             }
         }
-        // ±30s：seekTo 走 MediaSession（需通知使用权），键注入的 FAST_FORWARD 各家
-        // 视频App行为不一（±10s/±30s/忽略）。默认隐藏，快照说支持才显示。
-        val mkSeek = { label: String, desc: String, delta: Long ->
-            TextView(context).apply {
-                text = label
-                textSize = 12f
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-                setTextColor(Color.WHITE)
-                gravity = Gravity.CENTER
-                contentDescription = desc
-                val size = (44 * density).toInt()
-                background = android.graphics.drawable.GradientDrawable().apply {
-                    shape = android.graphics.drawable.GradientDrawable.OVAL
-                    setColor(0x66000000)
-                }
-                layoutParams = LinearLayout.LayoutParams(size, size).apply {
-                    marginStart = (6 * density).toInt()
-                    marginEnd = (6 * density).toInt()
-                }
-                setOnClickListener { nudgeSeek(delta) }
-            }
+        wakePanel=scroll
+        f.addView(scroll,FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply {
+            leftMargin=dp(16);rightMargin=dp(16);bottomMargin=dp(24)
+        })
+        f.addOnLayoutChangeListener { _,left,top,right,bottom,_,_,_,_ ->
+            val wide=right-left>bottom-top
+            if(wide!=landscape) { arrange(wide);scroll.requestLayout() }
         }
-        val seekBack = mkSeek("-30", context.getString(R.string.cd_seek_back), -30_000L).apply { visibility = View.GONE }
-        val seekFwd = mkSeek("+30", context.getString(R.string.cd_seek_forward), 30_000L).apply { visibility = View.GONE }
-        seekBackBtn = seekBack
-        seekFwdBtn = seekFwd
-        media.addView(mkBtn(R.drawable.ic_media_prev, context.getString(R.string.cd_prev_episode)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS) })
-        media.addView(seekBack)
-        val ppBtn = mkBtn(R.drawable.ic_media_pause, context.getString(R.string.cd_play_pause)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) }
-        playPauseBtn = ppBtn
-        media.addView(ppBtn)
-        media.addView(seekFwd)
-        media.addView(mkBtn(R.drawable.ic_media_next, context.getString(R.string.cd_next_episode)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT) })
-        if (showMedia) {
-            f.addView(
-                media,
-                FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-                ).apply { bottomMargin = (185 * density).toInt() }
-            )
+        f.setOnApplyWindowInsetsListener { _,insets ->
+            val safeBottom=if(Build.VERSION.SDK_INT>=30)insets.getInsetsIgnoringVisibility(
+                WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout()).bottom else @Suppress("DEPRECATION") insets.stableInsetBottom
+            val params=scroll.layoutParams as FrameLayout.LayoutParams
+            params.bottomMargin=safeBottom+dp(16)
+            @Suppress("DEPRECATION")
+            val sideInsets=if(Build.VERSION.SDK_INT>=30) {
+                val edges=insets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
+                edges.left to edges.right
+            } else insets.stableInsetLeft to insets.stableInsetRight
+            params.leftMargin=dp(16)+sideInsets.first;params.rightMargin=dp(16)+sideInsets.second
+            scroll.layoutParams=params
+            insets
         }
-
-        // 剧名（唤醒态，媒体控制行上方）：只读 MediaSession metadata，零打扰；
-        // 无通知使用权或会话无标题时整个隐藏（降级见 NowPlaying KDoc）。
-        // 两行 + 省略号（用户拍板）：一行截断对 B站带货长标题几乎读不出内容。
-        // 两行向上生长，底边仍锚在媒体行上方，不与下方 hint 重叠。
-        val title = TextView(context).apply {
-            textSize = 14f
-            setTextColor(0xB3FFFFFF.toInt())
-            gravity = Gravity.CENTER
-            maxLines = 2
-            ellipsize = android.text.TextUtils.TruncateAt.END
-            visibility = View.INVISIBLE
-            alpha = 0f
-        }
-        f.addView(
-            title,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-            ).apply {
-                bottomMargin = (252 * density).toInt()
-                marginStart = (56 * density).toInt()
-                marginEnd = (56 * density).toInt()
-            }
-        )
-        titleText = title
-
         // 未读通知角标（需用户授予「通知使用权」，未授权时不显示）
         val badge = TextView(context).apply {
             textSize = 12f
@@ -391,6 +451,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
 
         val gd = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                if(timerEditor!=null)return true
                 if (directUnlock) {
                     val onReturn=onDismissCallback
                     hide()
@@ -442,9 +503,11 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
             wm.addView(f, lp)
             frame = f
             this.lp = lp
+            if(demo)pill.text=context.getString(R.string.guide_exit)
             unlockPill = pill
             mediaRow = media
             isShowing = true
+            if(recordSession && !demo)com.lujinyu.xiting.listening.ListeningRecorder.start(context)
             sessionStart = if(recordSession)System.currentTimeMillis() else 0L
             sessionStartElapsed = SystemClock.elapsedRealtime()
             // 省电实测：记下会话开始时的能量计数器读数，作为差值法的起点
@@ -455,6 +518,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
                 hint.animate().alpha(0f).setStartDelay(8000).setDuration(1000).start()
             }
         } catch (e: Exception) {
+            PlaybackSelection.endAutomaticCurtain()
             Log.d(TAG, "black overlay add FAILED: $e")
         }
     }
@@ -482,6 +546,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     }
 
     fun hide() {
+        if(recordSession && !demo && isShowing)com.lujinyu.xiting.listening.ListeningRecorder.stop(context)
+        PlaybackSelection.endAutomaticCurtain()
         main.removeCallbacks(relockRunnable)
         awake = false
         if (sessionStart > 0) {
@@ -555,7 +621,10 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         unlockPill = null
         mediaRow = null
         playPauseBtn = null
-        titleText = null
+        previousBtn=null;nextBtn=null;lastSeekSession=null
+        titleText = null;sourceText=null;touchHint=null
+        timerEditor?.dispose();timerEditor=null;closeTimerEditor=null
+        wakePanel=null;timerStatus=null;timerArea=null
         seekBackBtn = null
         seekFwdBtn = null
         lastSeekTarget = -1
@@ -566,10 +635,16 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     private fun wake() {
         if (awake) return
         awake = true
+        titleText?.animate()?.withEndAction(null)?.cancel()
+        mediaRow?.animate()?.withEndAction(null)?.cancel()
+        unlockPill?.animate()?.withEndAction(null)?.cancel()
+        touchHint?.text=context.getString(R.string.black_wake_hint)
         val f = frame ?: return
         val l = lp ?: return
         l.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
         try { wm.updateViewLayout(f, l) } catch (_: Exception) {}
+        wakePanel?.visibility=View.VISIBLE
+        refreshTimer()
         unlockPill?.visibility = View.VISIBLE
         unlockPill?.animate()?.alpha(1f)?.setDuration(200)?.start()
         mediaRow?.visibility = View.VISIBLE
@@ -582,13 +657,17 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         CaptionBus.register(captionListener!!)
         main.postDelayed(relockRunnable, RELLOCK_DELAY_MS)
         Log.i(TAG, "awake: 解除锁定，背光恢复")
+        OverlayService.instance?.onCurtainStateChanged()
     }
 
     /** 重新锁定：开时钟→背光压到最暗（暗态时钟持续可见）；未开→彻底关闭纯黑 */
     private fun sleep() {
+        if(timerEditor!=null)return
         if (!awake) return
         awake = false
+        touchHint?.text=context.getString(R.string.black_hint)
         main.removeCallbacks(relockRunnable)
+        wakePanel?.visibility=View.INVISIBLE
         val f = frame ?: return
         val l = lp ?: return
         l.screenBrightness =
@@ -606,13 +685,63 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         captionListener = null
         main.removeCallbacks(nowPlayingTick)
         Log.i(TAG, "sleep: 重新锁定")
+        OverlayService.instance?.onCurtainStateChanged()
+    }
+
+    internal fun refreshTimerDisplay() {
+        if(!context.prefs().getBoolean(Prefs.BLACK_TIMER_SHOW,false))closeTimerEditor?.invoke()
+        refreshTimer()
+    }
+    private fun refreshTimer() {
+        timerArea?.visibility=if(!demo && context.prefs().getBoolean(Prefs.BLACK_TIMER_SHOW,false))View.VISIBLE else View.GONE
+        val service=OverlayService.instance
+        val remain=service?.timerRemainingMs() ?: 0
+        timerStatus?.text=if(remain<=0 && SessionRuntime.snapshot().pause!=PauseReport.NONE)SessionConsoleUi.pause(context,SessionRuntime.snapshot().pause)
+            else if(service?.timerWaitsForPlayback()==true)context.getString(R.string.timer_episode_waiting)
+            else if(remain>0) {
+                val seconds=(remain+999)/1000
+                val time=String.format(java.util.Locale.getDefault(),"%d:%02d",seconds/60,seconds%60)
+                context.getString(if(service?.timerKeepsBlack()==true)R.string.black_timer_pause_fmt else R.string.black_timer_return_fmt,time)
+            } else context.getString(R.string.black_timer_off)
+        frame?.findViewWithTag<View>("flow_timer_setup")?.contentDescription=
+            context.getString(R.string.timer_title)+", "+timerStatus?.text?.toString().orEmpty()
+        (timerStatus?.tag as? View)?.visibility=if(remain>0)View.VISIBLE else View.GONE
+    }
+    private fun openTimerEditor(stack:LinearLayout,pill:View) {
+        if(timerEditor!=null || !awake || demo || !context.prefs().getBoolean(Prefs.BLACK_TIMER_SHOW,false))return
+        main.removeCallbacks(relockRunnable);main.removeCallbacks(nowPlayingTick)
+        val visibility=(0 until stack.childCount).associate { stack.getChildAt(it) to stack.getChildAt(it).visibility }
+        fun close() {
+            val editor=timerEditor ?: return
+            editor.dispose();stack.removeView(editor);timerEditor=null;closeTimerEditor=null
+            visibility.forEach { (view,state)->view.visibility=state }
+            refreshTimer();refreshNowPlaying()
+            main.removeCallbacks(nowPlayingTick);main.postDelayed(nowPlayingTick,2_000)
+            main.removeCallbacks(relockRunnable);main.postDelayed(relockRunnable,RELLOCK_DELAY_MS)
+        }
+        visibility.keys.filter { it!==pill }.forEach { it.visibility=View.GONE }
+        if(demo)return
+        timerEditor=CurtainTimerPanel(context,{ close() },{ close();refreshTimer() })
+        closeTimerEditor={close()}
+        stack.addView(timerEditor,stack.indexOfChild(pill),LinearLayout.LayoutParams(-1,-2))
     }
 
     /** 黑幕内媒体键：注入后重置重锁计时（连续操作不被打断） */
     private fun sendMediaKey(code: Int) {
         try {
-            am.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, code))
-            am.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, code))
+            val np=context.queryNowPlaying()
+            if(np!=null && np.controlsReliable) {
+                val controls=np.controller.transportControls
+                val actions=np.controller.playbackState?.actions ?: 0L
+                fun supports(action:Long)=actions and action!=0L
+                when(code) {
+                    KeyEvent.KEYCODE_MEDIA_PREVIOUS -> if(supports(android.media.session.PlaybackState.ACTION_SKIP_TO_PREVIOUS))controls.skipToPrevious()
+                    KeyEvent.KEYCODE_MEDIA_NEXT -> if(supports(android.media.session.PlaybackState.ACTION_SKIP_TO_NEXT))controls.skipToNext()
+                    KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> if(np.playing) {
+                        if(supports(android.media.session.PlaybackState.ACTION_PAUSE) || supports(android.media.session.PlaybackState.ACTION_PLAY_PAUSE))controls.pause()
+                    } else if(supports(android.media.session.PlaybackState.ACTION_PLAY) || supports(android.media.session.PlaybackState.ACTION_PLAY_PAUSE))controls.play()
+                }
+            }
             Log.i(TAG, "black overlay media key: $code")
         } catch (e: Exception) {
             Log.w(TAG, "media key failed: $e")
@@ -651,33 +780,57 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     /**
      * 播放键图标 + 剧名 + ±30s 可见性：三个刷新点收拢在这一个入口
      * （图鉴大图不跟随选择的教训：刷新散落在各回调里必漏一处）。
-     * 无通知使用权时 np 为 null —— 标题/±30s 整体隐藏，
-     * 播放键退回 isMusicActive 旧逻辑（媒体键注入不需要权限，照常可用）。
+     * 来源识别与可控能力分开：状态不可信时显示来源，禁用媒体控制。
      */
     private fun refreshNowPlaying() {
+        refreshTimer()
+        if(demo) {
+            sourceText?.visibility=View.GONE
+            mediaRow?.visibility=View.GONE
+            timerStatus?.visibility=View.GONE
+            frame?.findViewWithTag<View>("flow_timer_setup")?.visibility=View.GONE
+            frame?.findViewById<View>(R.id.black_timer_extend)?.visibility=View.GONE
+            frame?.findViewById<View>(R.id.black_timer_cancel)?.visibility=View.GONE
+            titleText?.apply{animate().cancel();alpha=1f;text=context.getString(R.string.guide_black_hint);visibility=if(awake)View.VISIBLE else View.INVISIBLE}
+            return
+        }
         val np = context.queryNowPlaying()
+        val targetUnavailable=np==null || !np.controlsReliable
         val btn = playPauseBtn
+        val actions=np?.controller?.playbackState?.actions ?: 0L
+        fun supports(action:Long)=actions and action!=0L
+        previousBtn?.visibility=if(np==null || supports(android.media.session.PlaybackState.ACTION_SKIP_TO_PREVIOUS))View.VISIBLE else View.GONE
+        nextBtn?.visibility=if(np==null || supports(android.media.session.PlaybackState.ACTION_SKIP_TO_NEXT))View.VISIBLE else View.GONE
+        for(control in listOf(previousBtn,nextBtn))control?.apply {
+            isEnabled=!targetUnavailable;alpha=if(isEnabled)1f else .35f
+        }
         if (btn != null) {
             val playing = np?.playing ?: try { am.isMusicActive } catch (_: Exception) { false }
+            val capability=if(playing)android.media.session.PlaybackState.ACTION_PAUSE else android.media.session.PlaybackState.ACTION_PLAY
+            btn.isEnabled=!targetUnavailable && (np==null || supports(capability) || supports(android.media.session.PlaybackState.ACTION_PLAY_PAUSE))
+            btn.visibility=if(btn.isEnabled)View.VISIBLE else View.GONE
+            btn.alpha=if(btn.isEnabled)1f else .35f
             btn.setImageResource(if (playing) R.drawable.ic_media_pause else R.drawable.ic_media_play)
         }
-        val t = titleText
-        if (t != null) {
-            val s = np?.displayTitle()
-            if (s != null) {
-                t.text = s
-                if (awake && t.visibility != View.VISIBLE) {
-                    t.visibility = View.VISIBLE
-                    t.animate().alpha(1f).setDuration(200).start()
-                }
-            } else if (t.visibility != View.INVISIBLE) {
-                t.visibility = View.INVISIBLE
-                t.alpha = 0f
+        val title=np?.title?.takeIf { np.controlsReliable && it!=np.appLabel }
+        sourceText?.apply {
+            text=when {
+                np==null -> context.getString(R.string.black_control_unavailable)
+                !np.controlsReliable -> context.getString(R.string.playback_source_control_in_app,np.appLabel.orEmpty())
+                else -> np.appLabel.orEmpty()
             }
+            visibility=if(np!=null && np.controlsReliable && title==null)View.GONE else View.VISIBLE
+        }
+        titleText?.apply {
+            text=title ?: np?.appLabel.orEmpty()
+            visibility=if(awake && np?.controlsReliable==true)View.VISIBLE else View.GONE
+            alpha=1f
         }
         val on = np?.canSeek == true
         seekBackBtn?.visibility = if (on) View.VISIBLE else View.GONE
         seekFwdBtn?.visibility = if (on) View.VISIBLE else View.GONE
+        mediaRow?.visibility=if(!targetUnavailable && listOf(previousBtn,nextBtn,playPauseBtn,seekBackBtn,seekFwdBtn)
+            .any { it?.visibility==View.VISIBLE && it.isEnabled })View.VISIBLE else View.GONE
     }
 
     /**
@@ -690,8 +843,11 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         val np = context.queryNowPlaying()
         Log.i(TAG, "nudgeSeek delta=$deltaMs np=${np != null} pos=${np?.positionMs} canSeek=${np?.canSeek}")
         if (np == null) return
+        if(!np.canSeek) return
+        if(lastSeekSession!=np.controller.sessionToken)lastSeekTarget=-1L
+        lastSeekSession=np.controller.sessionToken
         val base = if (lastSeekTarget < 0) np.positionMs else lastSeekTarget
-        val target = clampSeekTarget(base + deltaMs, np.durationMs)
+        val target = PlaybackMath.offset(base,deltaMs,np.durationMs)
         try {
             np.seekTo(target)
             Log.i(TAG, "nudgeSeek -> seekTo($target) ok")

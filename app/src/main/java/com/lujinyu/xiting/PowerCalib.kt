@@ -8,7 +8,7 @@ import android.os.BatteryManager
 import android.util.Log
 
 /**
- * 省电实测：**被动测量**，用电池能量计数器的**差值**。
+ * 省电实测：**被动测量**，用电池电荷计数器的**差值**。
  *
  * ## 为什么重做
  * 旧实现要求用户「亮屏播 3 分钟 + 黑屏 3 分钟、不能碰手机、不能充电」——
@@ -16,14 +16,14 @@ import android.util.Log
  * （瞬时电流）：噪声极大，需要采样 30 次求平均才能勉强压住，部分机型还直接返回 0。
  *
  * 真机探针（ProbeBattery，2026-10-07，OPPO PME110）确认：
- * - `CHARGE_COUNTER`（剩余能量 µWh）**可用** → 差值测量成立
+ * - `CHARGE_COUNTER`（剩余电荷 µAh）**可用** → 差值测量成立
  * - `CURRENT_AVERAGE` / `ENERGY_COUNTER` 返回 Long.MIN_VALUE，不可用
  * - `CURRENT_NOW` 在本机亮屏时读到 542µA，量级与「整机耗电」不符，语义存疑
  *
  * ## 为什么差值比瞬时电流准
  * 瞬时电流每分钟跳一次，屏幕内容、CPU 负载、信号强度都在影响它，采样 30 次求平均
- * 仍是个粗糙估计。能量计数器给的是**累计消耗的绝对值**：读一次「开始」再读一次
- * 「结束」，差值就是这段时间真实消耗的电能。**一次会话 = 一个精确样本**，
+ * 仍是个粗糙估计。电荷计数器给的是**累计消耗的绝对值**：读一次「开始」再读一次
+ * 「结束」，差值就是这段时间真实消耗的电能。**一次会话 = 一个设备采样片段**，
  * 不需要攒量，也就不需要用户配合。
  *
  * ## 样本怎么来（零打扰）
@@ -45,17 +45,17 @@ object PowerCalib {
     private const val K_OFF_UA = "calib_off_ua"
     private const val K_TS = "calib_ts"
 
-    /** 黑屏段累计耗电（µWh），用于取平均 */
-    private const val K_OFF_UWH = "meas_off_uwh"
-    private const val K_OFF_MS = "meas_off_ms"
-    /** 亮屏段累计耗电（µWh）与时长 */
-    private const val K_ON_UWH = "meas_on_uwh"
-    private const val K_ON_MS = "meas_on_ms"
-    /** 各自的样本数（用于置信度展示） */
-    private const val K_OFF_N = "meas_off_n"
-    private const val K_ON_N = "meas_on_n"
+    /** 黑屏段累计耗电（µAh），用于取平均 */
+    private const val K_OFF_UWH = "meas_v2_off_uah"
+    private const val K_OFF_MS = "meas_v2_off_ms"
+    /** 亮屏段累计耗电（µAh）与时长 */
+    private const val K_ON_UWH = "meas_v2_on_uah"
+    private const val K_ON_MS = "meas_v2_on_ms"
+    /** 各自的样本数（用于样本数量等级展示） */
+    private const val K_OFF_N = "meas_v2_off_n"
+    private const val K_ON_N = "meas_v2_on_n"
     /** 已被过滤掉的样本数（诊断用） */
-    private const val K_DROPPED = "meas_dropped"
+    private const val K_DROPPED = "meas_v2_dropped"
 
     /** 样本最短时长：太短的差值会被计数器量化误差淹没，得不偿失 */
     const val MIN_SAMPLE_MS = 120_000L          // 2 分钟
@@ -64,7 +64,7 @@ object PowerCalib {
     private const val MIN_ON_SAMPLES = 3
 
     /**
-     * 单样本的功耗率上限（µWh/ms → 折算 mA）。
+     * 单样本的功耗率上限（µAh/ms → 折算 mA）。
      * 超过 1500mA 的「整机功耗」不可能是听剧场景（那是充电或高负载），
      * 判为异常样本丢弃。
      */
@@ -72,7 +72,7 @@ object PowerCalib {
 
     // ────────────────────────── 采样 ──────────────────────────
 
-    /** 读当前剩余能量（µWh）。不可用返回 null */
+    /** 读当前剩余电荷（µAh）。不可用返回 null */
     fun energyCounter(ctx: Context): Long? {
         return try {
             val bm = ctx.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager ?: return null
@@ -97,7 +97,7 @@ object PowerCalib {
     }
 
     /**
-     * 记录一个样本段。startUwh/endUwh 是同一时间轴上的两个能量读数。
+     * 记录一个样本段。startUwh/endUwh 是同一时间轴上的两个电荷读数。
      *
      * 返回是否采纳。
      */
@@ -141,7 +141,7 @@ object PowerCalib {
     // ────────────────────────── 读取与折算 ──────────────────────────
 
     data class Confidence(val offN: Int, val onN: Int, val dropped: Int) {
-        /** 样本越多越可信，UI 上照这个显示 */
+        /** 仅表示样本数量档位，不表示统计置信度或因果有效性 */
         val level: Int
             get() = when {
                 offN >= 30 && onN >= 30 -> 3
@@ -161,13 +161,12 @@ object PowerCalib {
     /**
      * 依据实测的亮屏/黑屏能耗差，折算「用本 App 息屏听剧」的累计省电（mAh）。
      *
-     * 未达最小样本返回 null（UI 回落���通用模型估算）。
+     * 未达最小样本返回 null（UI 回落通用模型估算）。
      *
-     * 数学：saveRate = onRate - offRate（µWh/ms）
-     *       savedUwh = saveRate × totalBlackMs
-     *       savedMwh = savedUwh / 1000
-     * 这里把 mWh 直接当 mA·h 报（1 mWh 在 3.7V 下约等于 1 mAh，量纲上是一致能量），
-     * 与旧版「(onUa - offUa) / 1000」同口径，数字可对照。
+     * 数学：saveRate = onRate - offRate（µAh/ms）
+     *       savedUah = saveRate × totalBlackMs
+     *       savedMah = savedUah / 1000
+     * CHARGE_COUNTER为µAh，差值除1000为mAh，无需电压换算。
      */
     fun savingMah(ctx: Context, totalBlackMs: Long): Int? {
         val p = ctx.prefs()
@@ -182,10 +181,9 @@ object PowerCalib {
     }
 
     /**
-     * 黑屏段整机能耗速率（µWh/ms）与样本数，用于「实测功耗」展示。样本不足返回 null。
+     * 黑屏段整机能耗速率（µAh/ms）与样本数，用于「实测功耗」展示。样本不足返回 null。
      *
-     * 不换算成 mA：mA 需要「功率 ÷ 电压」，而电池电压随电量在 3.5~4.4V 浮动，
-     * 换算反而引入误差。这里只保留能量速率，够用于「黑屏时每分钟消耗多少」这类展示。
+     * 返回电荷速率µAh/ms；UI可乘60000/1000展示mAh/min。
      */
     fun blackScreenPower(ctx: Context): Pair<Double, Int>? {
         val p = ctx.prefs()

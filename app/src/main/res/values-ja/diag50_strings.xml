@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diag50_title">診断の概要</string>
+    <string name="diag50_export">診断のプレビュー</string>
+    <string name="diag50_share">概要を共有</string>
+    <string name="diag50_scope">「共有」をタップした後にのみ、選択したアプリに以下の情報を渡します。端末モデル、権限、セッションの状態が含まれ、作品名、識別子、生ログは含まれません。ウェイクロックの時間はこのプロセス内の測定値であり、バッテリー消費量ではありません。</string>
+</resources>

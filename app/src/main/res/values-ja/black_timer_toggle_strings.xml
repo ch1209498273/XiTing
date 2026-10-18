@@ -1,0 +1,4 @@
+<resources>
+    <string name="switch_black_timer">黒画面にスリープタイマーを表示</string>
+    <string name="switch_black_timer_sub">操作と残り時間を非表示にしても、設定済みのタイマーは続行します</string>
+</resources>

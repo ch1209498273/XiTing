@@ -80,7 +80,7 @@
     <string name="caption_row_title">Black-Screen-Untertitel (Beta)</string>
     <string name="caption_service_desc">Liest Untertiteltexte des laufenden Videos und zeigt sie in Echtzeit auf dem schwarzen Bildschirm. Nie gespeichert, nie hochgeladen, für nichts anderes verwendet.</string>
     <string name="update_log_title_fmt">Neu in v%1$s</string>
-    <string name="update_log_body">· Vier Erfolgsabzeichen als Goldmedaillen neu gestaltet\n· Neue Erfolge mit Einblendung, Lichtring und eigenen Partikeln\n· Verdiente Medaillen ansehen und Animation wiederholen\n· Animationen beachten Systemeinstellungen und stoppen nach Abschluss oder Ausblenden</string>
+    <string name="update_log_body">· Timer direkt im schwarzen Bildschirm für den ursprünglichen Player\n· Bestätigung der Einstellung; Eingaben bei Fehlern behalten\n· Timerwahl und abgeschlossene Einführung merken</string>
     <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
     <string name="bubble_style">Blasen-Stil</string>
     <string name="settings_data">Daten</string>
@@ -101,7 +101,7 @@
     <string name="widget_growth_next">Fortschritt %1$d · noch %2$d bis zur nächsten Form</string>
     <string name="widget_growth_max">Fortschritt %1$d · Höchststand</string>
     <string name="black_hint">Bildschirm aus · Zum Entsperren antippen</string>
-    <string name="black_return">🔒 Zurück zum Video tippen</string>
+    <string name="black_return">Zurück zum Player</string>
     <string name="channel_name">Bildschirm-aus-Assistent</string>
     <string name="notif_title">Assistent läuft</string>
     <string name="notif_text">Blase antippen: Bildschirm aus, Ton läuft weiter%1$s</string>
@@ -194,15 +194,13 @@ Ohne Berechtigung funktioniert der normale Countdown genauso.</string>
     <string name="ach_king_t">Königskrönung</string>
     <string name="ach_king_d">Wesen wird zum Donnerkönig</string>
     <string name="meas_title">Energiespar-Messung</string>
-    <string name="meas_purpose">Methode: Liest den Energiezähler des Akkus und vergleicht den echten Verbrauch zwischen „normaler Nutzung" und „Zuhören mit ausgeschaltetem Bildschirm", um die Ersparnis zu berechnen.
-
-Du musst nichts tun — die Messung läuft automatisch, während du das Handy benutzt. Bei ausgeschaltetem Ladezustand wird nicht gemessen (die Daten wären meaningless).</string>
+    <string name="meas_purpose">Methode: Liest den Ladungszähler CHARGE_COUNTER (in µAh), summiert den Ladungsverbrauch bei normaler Nutzung mit eingeschaltetem Bildschirm und beim Hören mit schwarzem Bildschirm und schätzt die Einsparung aus der Differenz der mittleren Verbrauchsraten.\n\nAutomatische Erfassung bei normaler Nutzung, außer beim Laden. Dies ist kein streng kontrolliertes Kausalexperiment unter identischen Bedingungen: Player, Helligkeit, Netzwerk und Hintergrundaktivitäten beeinflussen das Ergebnis. Die Stichprobenzahl belegt keine statistische Konfidenz.</string>
     <string name="meas_progress_fmt">Gesammelt: Bildschirm aus %1$d-mal · Bildschirm an %2$d-mal</string>
-    <string name="meas_level_0">Noch zu wenige Messungen, derzeit wird ein Standardmodell verwendet. Nach ein paar Tagen normaler Nutzung wird es genauer.</string>
-    <string name="meas_level_1">Noch wenige Messungen, die Schätzung ist grob. Sie wird nach ein paar Tagen besser.</string>
-    <string name="meas_level_2">Ausreichend Messungen — die Schätzung ist recht verlässlich.</string>
-    <string name="meas_level_3">Viele Messungen — die Schätzung ist verlässlich.</string>
-    <string name="meas_black_power_fmt">Geräteverbrauch bei ausgeschaltetem Bildschirm ≈ %1$.0f mW (aus %2$d echten Sitzungen)</string>
+    <string name="meas_level_0">Zu wenige Stichproben; Schätzung anhand eines allgemeinen Modells. Das Ergebnis hängt von der Nutzung ab.</string>
+    <string name="meas_level_1">Wenige Stichproben erfasst; die Schätzung ist ein Richtwert. Die Anzahl belegt keine statistische Konfidenz.</string>
+    <string name="meas_level_2">Mehr Stichproben erfasst; das Ergebnis hängt weiterhin von der Nutzung ab. Die Anzahl belegt keine statistische Konfidenz.</string>
+    <string name="meas_level_3">Höchste Stichprobenkategorie erreicht; dies belegt weder Kausalität noch statistische Konfidenz.</string>
+    <string name="meas_black_power_fmt">Mittlerer Ladungsverbrauch des Geräts bei schwarzem Bildschirm ≈ %1$.2f mAh/min (%2$d Stichproben)</string>
     <string name="meas_note_charging">· Beim Laden wird nicht gemessen (der Zähler läuft hoch)</string>
     <string name="meas_note_screendim">· Bei ausgeschaltetem Display zählt es nicht als „Bildschirm an"</string>
     <string name="meas_note_minlen">· Abschnitte unter 2 Minuten werden verworfen</string>
@@ -242,13 +240,7 @@ Du musst nichts tun — die Messung läuft automatisch, während du das Handy be
     <string name="about_section_app">Über diese App</string>
     <string name="about_intro">Ein schwarzes Overlay dimmt das Bild und blockiert versehentliche Berührungen bei laufendem Ton. Verhalten hängt von Gerät, System und Player ab; der Systembildschirm wird nicht ausgeschaltet.\n\nTimer, Mediensteuerung, fünf Geisterformen, Icons, Widgets und Berichte.\n\nDaten bleiben lokal mit Sicherung und Wiederherstellung. Keine Internetberechtigung; andere Rechte je Funktion.</string>
     <string name="about_section_privacy">Datenschutz und Sicherheit</string>
-    <string name="about_privacy">· Keine INTERNET-Berechtigung: kann physisch nicht online gehen
-· Liest keinen Bildschirminhalt aus
-· Alle Daten bleiben auf dem Gerät (Cloud-Backup und Gerätewechsel ausdrücklich deaktiviert)
-· Das Backup wird nur beim Tippen auf Exportieren in Downloads/XiTing geschrieben und von dir verwaltet
-· Benachrichtigungen werden nur nach deiner ausdrücklichen Freigabe gezählt (für die Anzeige auf dem schwarzen Bildschirm); Titel und Inhalt werden nie gelesen, ohne Freigabe ist die Funktion völlig inaktiv
-· Die App enthält eine Build-Kennung (Build-ID und Kanal), ausschließlich zur Rückverfolgung von Raubkopien, ohne Geräteinformationen
-· Keine Werbung, kein Tracking, keine Analyse</string>
+    <string name="about_privacy">· Keine INTERNET-Berechtigung; die App lädt keine Daten hoch\n· Hörverlauf, Wachstum und Einstellungen bleiben lokal; automatische Sicherungen unter Download/XiTing und manuelle Exporte an einen gewählten Ort sind möglich\n· Die Cloud-Sicherung des Systems ist ausgeschlossen; ab Android 12 bleibt die direkte Geräteübertragung durch das System erlaubt. Ältere Versionen nutzen Dateisicherungen zur Wiederherstellung\n· Mit Benachrichtigungszugriff liest die App die Anzahl der Benachrichtigungen und Metadaten von Mediensitzungen (Titel, Player, Status und Fortschritt) für Anzeige, Steuerung und Timer. Inhalte gewöhnlicher Benachrichtigungen werden nicht gelesen\n· Die optionale experimentelle Untertitelfunktion benötigt einen separat aktivierten Bedienungshilfedienst. Dieser kann Knotentext im Vordergrundfenster lesen und Untertitel zur Live-Anzeige filtern; Textinhalte werden weder gespeichert noch hochgeladen\n· Build-ID und Kanal dienen der Versionsrückverfolgung und enthalten selbst keine Geräteinformationen; lokale Sicherungen enthalten eine Gerätekennung zur Wiederherstellungsprüfung\n· Keine Werbung, kein Tracking, keine Analyseerfassung</string>
     <string name="about_section_open">Open Source und Kontakt</string>
     <string name="about_github">GitHub: github.com/ch1209498273/XiTing
 (antippen, um die Projektseite zu öffnen)</string>
@@ -319,7 +311,7 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="notif_badge_fmt">🔔 %1$d</string>
     <string name="name_pair_fmt">%1$s · %2$s</string>
     <string name="bubble_label_plain">Aus</string>
-    <string name="notif_timer_fmt">· schaltet in %1$d Min. ab</string>
+    <string name="notif_timer_fmt"> · Timer: noch %1$d Min.</string>
     <string name="dlg_got_it">Verstanden</string>
     <string name="poster_preview_save">Speichern</string>
     <string name="poster_saved">Unter Pictures/XiTing gespeichert</string>
@@ -373,16 +365,12 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="timer_pause_explain">Gilt für den nächsten Timer, nicht den laufenden. Benachrichtigungszugriff und eine unterstützte Mediensitzung sind nötig. Nur der ursprüngliche Player erhält die Anfrage; eine Reaktion ist nicht garantiert.</string>
     <string name="timer_no_target">Kein unterstütztes Pausenziel. Zugriff und Player prüfen. Laufender Timer unverändert.</string>
     <string name="timer_pause_requested">Pause beim ursprünglichen Player angefordert; dessen Reaktion entscheidet.</string>
-    <string name="timer_already_paused">Der ursprüngliche Player spielt nicht mehr. Kein Wiedergabe-Umschaltbefehl gesendet.</string>
-    <string name="timer_pause_failed">Ursprüngliche Sitzung fehlt oder unterstützt keine Pause. Vorhang unverändert.</string>
+    <string name="timer_already_paused">Der ursprüngliche Player ist bereits pausiert. Der schwarze Bildschirm bleibt.</string>
+    <string name="timer_pause_failed">Pause derzeit nicht möglich. Bitte im Player bedienen. Der schwarze Bildschirm bleibt.</string>
     <string name="timer_mode_status_fmt">Noch %1$d Min. · %2$s</string>
-    <string name="guide_title">Zum ersten Mal? Vorhang testen</string>
-    <string name="guide_intro">Zuerst Overlay erlauben. Benachrichtigungen dienen der Steuerung; Benachrichtigungszugriff ist für Titel, Fortschritt und Timerpause nötig.
-
-Video abspielen, zurückkehren und starten. Nach 10 Sekunden kehrt das Bild zurück. Antippen und Zurück ist ebenfalls möglich.
-
-Die Demo zählt nicht zur Hörzeit oder Entwicklung.</string>
-    <string name="guide_start">10-Sekunden-Demo starten</string>
+    <string name="guide_title">Testton ausprobieren</string>
+    <string name="guide_intro">Keine Video-App nötig. Eine integrierte Stimme wird bei schwarzem Bildschirm abgespielt. Nach etwa 10 Sekunden kehrt die Seite zurück. Medienlautstärke und Kopfhörer prüfen. Die Vorschau zählt nicht zur Hörzeit.</string>
+    <string name="guide_start">Vorschau starten</string>
     <string name="guide_permission">Overlay erlauben und zum Start zurückkehren.</string>
     <string name="guide_busy">Vorhang oder Timer beenden und Overlay-Berechtigung prüfen.</string>
     <string name="guide_feedback">Lief der Ton bei schwarzem Vorhang weiter?</string>
@@ -393,4 +381,35 @@ Die Demo zählt nicht zur Hörzeit oder Entwicklung.</string>
     <string name="ach_celebration_title">Erfolg freigeschaltet</string>
     <string name="ach_medal_title">Meine Goldmedaille</string>
     <string name="ach_replay">Animation wiederholen</string>
+    <!-- Shared playback and navigation copy -->
+    <string name="timer_episode_changed">Der ursprüngliche Inhalt wurde gewechselt oder die Sitzung ist abgelaufen. Der Episodentimer wurde abgebrochen.</string>
+    <string name="timer_episode_waiting">Der Episodentimer wartet auf die Fortsetzung der Wiedergabe</string>
+    <string name="ui_home_intro">Bereit zum entspannten Zuhören</string>
+    <string name="ui_playback_source">Wiedergabequelle</string>
+    <string name="ui_no_session">Keine lesbare Wiedergabesitzung</string>
+    <string name="ui_media_permission">Benachrichtigungszugriff aktivieren, um Quelle und unterstützte Steuerung zu sehen</string>
+    <string name="ui_capabilities_fmt">Pause: %1$s · Spulen: %2$s</string>
+    <string name="ui_supported">Unterstützt</string>
+    <string name="ui_unsupported">Nicht unterstützt</string>
+    <string name="ui_growth_title">Geistwachstum</string>
+    <string name="ui_listening_title">Hörübersicht</string>
+    <string name="ui_settings_playback">Wiedergabe und schwarzer Bildschirm</string>
+    <string name="ui_settings_appearance">Darstellung</string>
+    <string name="ui_settings_permissions">Berechtigungen und Hintergrund</string>
+    <string name="ui_settings_data">Daten und Sicherungen</string>
+    <string name="ui_settings_help">Info und Hilfe</string>
+    <string name="ui_timer_extend">15 Minuten hinzufügen</string>
+    <string name="ui_unknown_date">Früher freigeschaltet, Datum unbekannt</string>
+    <string name="ui_recorded_date_fmt">Erstmals erfasst: %1$s</string>
+    <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
+    <string name="ui_timer_target_fmt">Ziel: %1$s</string>
+    <string name="ui_choose_player">Player auswählen</string>
+    <string name="ui_no_backup">Keine erfolgreiche Sicherung erfasst</string>
+    <string name="ui_backup_summary_fmt">Wachstum %1$d · %2$d Sitzungen</string>
+    <string name="ui_estimate_basis">Schätzungen hängen von der Nutzung ab; die Stichprobenzahl belegt keine statistische Konfidenz.</string>
+    <string name="ui_stop_assistant">Assistent stoppen</string>
+    <string name="ui_ready">Bereit</string>
+    <string name="ui_permission_ready">Grundlegende Berechtigungen bereit</string>
+    <string name="ui_permissions_details">Berechtigungsdetails</string>
+    <string name="ui_timer_minutes">Minuten</string>
 </resources>

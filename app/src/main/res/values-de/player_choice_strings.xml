@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_media_access_missing">Zugriff auf Mediensteuerung nicht erlaubt · Schwarzbild und zeitgesteuerte Rückkehr verfügbar</string>
+    <string name="player_choice_intro">Wähle eine App zur gemeinsamen Nutzung. Pause und Funktionen am Wiedergabeende hängen von der Mediensitzung der App ab.</string>
+    <string name="player_control_unavailable">Keine steuerbare Mediensitzung · Schwarzbild und zeitgesteuerte Rückkehr verfügbar</string>
+    <string name="player_state_playing">Wiedergabe läuft</string>
+    <string name="player_state_paused">Pausiert</string>
+    <string name="player_state_available">Mediensitzung verfügbar</string>
+    <string name="player_control_pause">Pause kann angefordert werden</string>
+    <string name="player_control_no_pause">Pause nicht unterstützt</string>
+    <string name="player_selected_no_session">Die gewählte App bietet keine Mediensteuerung. Schwarzbild oder zeitgesteuerte Rückkehr sind verfügbar.</string>
+    <string name="player_choice_none">Player auswählen</string>
+</resources>

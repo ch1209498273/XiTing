@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="v50_scenes">聴き方を選ぶ</string>
+    <string name="v50_sleep">おやすみタイマー</string>
+    <string name="v50_episode">このエピソードの最後まで</string>
+    <string name="v50_continuous">続けて聴く</string>
+    <string name="v50_overlay_needed">先に他のアプリの上に表示する権限を許可してください。</string>
+    <string name="v50_continuous_cancel">現在のタイマーを解除します。終了は手動です。アシスタントのみ起動します。プレーヤーに戻り、フローティングボタンで黒幕を開いてください。</string>
+    <string name="v50_continuous_review">タイマーは設定しません。終了は手動です。アシスタントのみ起動します。プレーヤーに戻り、フローティングボタンで黒幕を開いてください。</string>
+    <string name="v50_ready">準備できました。プレーヤーに戻り、フローティングボタンで黒幕を開いてください。</string>
+    <string name="v50_session">今回のセッション</string>
+    <string name="v50_idle">アシスタント停止中</string>
+    <string name="v50_starting">アシスタント起動中</string>
+    <string name="v50_running">アシスタント稼働中</string>
+    <string name="v50_stopping">アシスタント終了処理中</string>
+    <string name="v50_interrupted">セッションが中断されました</string>
+    <string name="v50_curtain_off">黒幕オフ</string>
+    <string name="v50_curtain_locked">黒幕ロック中</string>
+    <string name="v50_curtain_awake">黒幕操作中</string>
+    <string name="v50_play_unknown">再生状態は不明</string>
+    <string name="v50_play_playing">プレーヤーは再生中と報告</string>
+    <string name="v50_play_paused">プレーヤーは一時停止と報告</string>
+    <string name="v50_play_buffering">プレーヤーはバッファ中と報告</string>
+    <string name="v50_play_invalid">プレーヤーセッションが無効</string>
+    <string name="v50_timer_fixed">固定タイマー</string>
+    <string name="v50_timer_waiting">再生の再開を待機中</string>
+    <string name="v50_timer_executing">終了操作を実行中</string>
+    <string name="v50_timer_ended">タイマー終了</string>
+    <string name="v50_remaining">残り %1$d:%2$02d</string>
+    <string name="v50_pause_requested">一時停止を要求済み</string>
+    <string name="v50_pause_confirmed">プレーヤーの一時停止を確認</string>
+    <string name="v50_pause_already">プレーヤーは既に一時停止中</string>
+    <string name="v50_pause_unavailable">一時停止できません。プレーヤーで操作してください</string>
+    <string name="v50_pause_failed">一時停止に失敗</string>
+    <string name="v50_pause_unconfirmed">一時停止を確認できません。プレーヤーを確認してください</string>
+    <string name="v50_recent">直近の結果</string>
+    <string name="v50_records">セッション結果</string>
+    <string name="v50_end_user">ユーザーが終了</string>
+    <string name="v50_end_timer">タイマー満了</string>
+    <string name="v50_end_unknown">終了理由不明</string>
+    <string name="v50_no_records">セッション結果はまだありません</string>
+    <string name="v50_recap_enabled">前回のセッションを表示</string>
+    <string name="v50_settings_tools">データ・診断・振り返り</string>
+    <string name="v50_target_changed">再生内容が変わりました。新しい対象と終了操作を確認し、もう一度確定してください。入力した時間は保持されます。</string>
+</resources>
+

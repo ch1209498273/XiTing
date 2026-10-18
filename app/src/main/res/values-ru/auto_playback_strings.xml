@@ -1,0 +1,8 @@
+<resources>
+    <string name="auto_playback_source">Текущее воспроизведение</string>
+    <string name="auto_playback_unknown">Управляемое воспроизведение не найдено</string>
+    <string name="auto_playback_unavailable">Источник не определён. Чёрный экран и возврат по таймеру доступны.</string>
+    <string name="auto_playback_changed">Воспроизведение изменилось. Закройте и снова откройте таймер.</string>
+    <string name="auto_playback_update">Недавно прослушано · Сохранить ссылку · Отметить момент · Позиция при установке таймера\n\nРаспознанное хранится на устройстве 90 дней. Отметки и ссылки защищены. В управлении можно отключить запись или удалить данные.</string>
+    <string name="playback_source_control_in_app">Возможно, %1$s · Управление воспроизведением в видео</string>
+</resources>

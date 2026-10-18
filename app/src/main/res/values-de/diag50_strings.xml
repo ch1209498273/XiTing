@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diag50_title">Diagnoseübersicht</string>
+    <string name="diag50_export">Diagnosevorschau</string>
+    <string name="diag50_share">Übersicht teilen</string>
+    <string name="diag50_scope">Diese Felder werden erst nach dem Tippen auf Teilen an die gewählte App übergeben. Sie enthalten Gerätemodell, Berechtigungen und Sitzungsstatus, keine Titel, Kennungen oder Rohprotokolle. Die Wachhaltesperre wird nur in diesem Prozess gemessen und zeigt keinen Akkuverbrauch an.</string>
+</resources>

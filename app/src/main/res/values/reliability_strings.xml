@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rel_backup_manage">备份管理</string>
+    <string name="rel_auto_backup">自动备份到下载目录</string>
+    <string name="rel_backup_history">查看备份历史</string>
+    <string name="rel_undo_restore">撤销上次恢复</string>
+    <string name="rel_no_snapshot">没有可回退的恢复快照</string>
+    <string name="rel_stop_first">请先停止助手，再恢复或回退数据。</string>
+    <string name="rel_snapshot_explain">恢复前会在本机保存一份回退快照。新格式包含待收能量、原到期时间、长期统计与部分设置；旧备份缺失的字段保留本地值。</string>
+    <string name="rel_backup_failed">最近备份失败，请检查存储空间或重新导出。</string>
+    <string name="rel_backup_ok">备份写入成功</string>
+    <string name="rel_backup_none">暂无可用备份</string>
+    <string name="rel_delete_backup">删除这份备份</string>
+    <string name="rel_delete_confirm">仅删除所选公共备份文件，此操作无法撤销。本机听剧数据不受影响。</string>
+    <string name="rel_saved_backups">可读取的备份（文件访问范围受系统限制）</string>
+    <string name="rel_restore_undo_ok">已回退到恢复前的数据</string>
+    <string name="rel_recovery_title">上次运行中断</string>
+    <string name="rel_recovery_message">助手曾异常中断或设备已重启。悬浮球可以重新启动；原黑幕不会自动恢复，原定时不会自动执行，请重新设置。</string>
+    <string name="rel_recovery_timer">原定时参考剩余：%1$d 分钟。中断期间未执行结束动作。</string>
+    <string name="rel_recovery_episode">原定时为“听完这集”，播放器目标已失效，请重新选择。</string>
+    <string name="rel_ack">知道了</string>
+    <string name="rel_pending_summary">备份中有效待收能量：%1$d；到期时间保持原值。</string>
+    <string name="rel_recovery_storage_fail">上次数据恢复尚未完成，当前无法写入存储。原回退快照已保留。请检查可用空间后重新打开应用；暂不启动助手或写入新数据。</string>
+</resources>

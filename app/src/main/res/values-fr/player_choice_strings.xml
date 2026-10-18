@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_media_access_missing">Accès aux commandes multimédias non autorisé · Écran noir et retour programmé disponibles</string>
+    <string name="player_choice_intro">Choisissez une application à utiliser. La pause et les fonctions de fin de lecture dépendent de la session multimédia fournie par l\'application.</string>
+    <string name="player_control_unavailable">Aucune session multimédia contrôlable · Écran noir et retour programmé disponibles</string>
+    <string name="player_state_playing">Lecture en cours</string>
+    <string name="player_state_paused">En pause</string>
+    <string name="player_state_available">Session multimédia disponible</string>
+    <string name="player_control_pause">Pause possible sur demande</string>
+    <string name="player_control_no_pause">Pause non prise en charge</string>
+    <string name="player_selected_no_session">L\'application choisie ne fournit pas de commandes multimédias. Vous pouvez utiliser l\'écran noir ou le retour programmé.</string>
+    <string name="player_choice_none">Choisissez un lecteur</string>
+</resources>

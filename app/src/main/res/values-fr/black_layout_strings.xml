@@ -1,0 +1,8 @@
+<resources>
+    <string name="black_demo_return">Terminer la démo</string>
+    <string name="black_control_unavailable">Contrôlez la lecture dans le lecteur</string>
+    <string name="black_timer_off">Désactivé</string>
+    <string name="black_timer_pause_fmt">Pause dans %1$s</string>
+    <string name="black_timer_return_fmt">Retour dans %1$s</string>
+    <string name="black_wake_hint">Touchez hors du panneau pour revenir au noir</string>
+</resources>

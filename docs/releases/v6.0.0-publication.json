@@ -1,0 +1,48 @@
+{
+  "version": "6.0.0",
+  "versionCode": 99,
+  "publishedDate": "2026-10-18",
+  "timezone": "Asia/Shanghai",
+  "sourceCommit": "3b5db09dc7fb86de872b3e01715ead847c176c5d",
+  "tag": "v6.0.0",
+  "github": {
+    "url": "https://github.com/ch1209498273/XiTing/releases/tag/v6.0.0",
+    "publicDownloadVerified": true,
+    "latest": true,
+    "apk": "https://github.com/ch1209498273/XiTing/releases/download/v6.0.0/XiTing-6.0.0.apk"
+  },
+  "pgyer": {
+    "url": "https://www.pgyer.com/xipingtingju",
+    "publicPageVerified": true,
+    "build": 21,
+    "version": "6.0.0"
+  },
+  "apk": {
+    "sha256": "03f06834befa19ed63452bcfa92eb3aa46b04a899e3d5d7867876e95ce4efec0",
+    "bytes": 1288112,
+    "sameAsPhysicalUat": true,
+    "signerSha256": "cd40e01da2c2267c1076a2a56fe57cc0c4ae64f3fa56335d4b8561d44a2608ff"
+  },
+  "prepublicationChecks": {
+    "jvmPassed": 232,
+    "lintWarnings": 76,
+    "jvmFailed": 0,
+    "jvmSkipped": 0,
+    "jvmErrors": 0,
+    "releaseBuild": "passed",
+    "lintErrors": 0,
+    "i18n": "passed"
+  },
+  "physicalUat": {
+    "audibleContinuity": "user confirmed",
+    "scope": "OPPO PME110 Android16; Bilibili9.14.0",
+    "timerStopped": "user confirmed and explicit PAUSED",
+    "settingsPreserved": true,
+    "completedDate": "2026-10-17"
+  },
+  "remoteCi": {
+    "url": "https://github.com/ch1209498273/XiTing/actions/runs/39096527542",
+    "status": "completed",
+    "conclusion": "success"
+  }
+}

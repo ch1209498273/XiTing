@@ -23,6 +23,7 @@ internal object ListeningStore {
     const val MARK_SHOW="listening_mark_show_v1"
     const val DAYS="listening_retention_days_v1"
     const val INTRO="listening_intro_v1"
+    const val PAGE_SIZE=10
     private const val LAST_CLEAN="listening_last_clean_v1"
     private const val MAX_EXPORT=16*1024*1024
     private val gate=Any()
@@ -57,8 +58,8 @@ internal object ListeningStore {
     private inline fun <T> transaction(db:SQLiteDatabase,block:()->T):T {
         db.beginTransaction();return try {val result=block();db.setTransactionSuccessful();result} finally {db.endTransaction()}
     }
-    fun list(ctx:Context,offset:Int=0):List<ListeningEntry> =locked {
-        db(ctx).rawQuery("SELECT * FROM entries ORDER BY updated DESC,id LIMIT 50 OFFSET ?",arrayOf(offset.toString())).use { c->buildList {while(c.moveToNext())add(entry(c))} }
+    fun list(ctx:Context,offset:Int=0,limit:Int=PAGE_SIZE):List<ListeningEntry> =locked {
+        db(ctx).rawQuery("SELECT * FROM entries ORDER BY updated DESC,id LIMIT ? OFFSET ?",arrayOf(limit.toString(),offset.toString())).use { c->buildList {while(c.moveToNext())add(entry(c))} }
     }
     fun get(ctx:Context,id:String):ListeningEntry?=locked {
         db(ctx).rawQuery("SELECT * FROM entries WHERE id=?",arrayOf(id)).use { if(it.moveToFirst())entry(it) else null }

@@ -50,10 +50,14 @@ internal object RestoreSnapshot {
         write(journal(ctx),bytes)
     }
     fun finish(ctx:Context) { val marker=journal(ctx);AtomicFile(marker).delete();check(!exists(marker));cleanLibrarySnapshots(ctx) }
-    fun recoverPending(ctx:Context):Boolean = synchronized(BackupManager) { SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked {
-        val marker=journal(ctx)
-        if(!exists(marker))true else try { applyPayload(ctx,JSONObject(String(read(marker),Charsets.UTF_8)));finish(ctx);true } catch(_:Exception) { false }
-    } } }
+    fun recoverPending(ctx:Context):Boolean {
+        // 正常启动没有待恢复日志；不能为了确认这一点去等 onStop 的自动备份放锁。
+        if(!isPending(ctx))return true
+        return synchronized(BackupManager) { SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked {
+            val marker=journal(ctx)
+            if(!exists(marker))true else try { applyPayload(ctx,JSONObject(String(read(marker),Charsets.UTF_8)));finish(ctx);true } catch(_:Exception) { false }
+        } } }
+    }
     fun undo(ctx:Context):Boolean = synchronized(BackupManager) { SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked { undoLocked(ctx) } } }
     private fun undoLocked(ctx:Context):Boolean {
         if(OverlayService.isRunning)return false

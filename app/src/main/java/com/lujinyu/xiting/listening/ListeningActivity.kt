@@ -138,8 +138,8 @@ class ListeningActivity:Activity() {
                     }
                     minHeight=dp(84);setTextColor(getColor(R.color.text_primary));setOnClickListener{if(!busy)detail(entry.id)}
                 },LinearLayout.LayoutParams(-1,-2))
-                offset+=entries.size;more.visibility=if(entries.size==50)View.VISIBLE else View.GONE
-                if(offset<=50)maybeClean()
+                offset+=entries.size;more.visibility=if(entries.size==ListeningStore.PAGE_SIZE)View.VISIBLE else View.GONE
+                if(offset<=ListeningStore.PAGE_SIZE)maybeClean()
             }
         }
         more.setOnClickListener{if(!busy)next()};next();intro()

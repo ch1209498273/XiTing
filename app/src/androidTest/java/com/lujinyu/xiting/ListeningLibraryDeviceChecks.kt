@@ -88,16 +88,50 @@ internal class ListeningLibraryDeviceChecks(private val i:Instrumentation) {
         check(ListeningStore.marks(ctx,protected).size==1){"Explicit merge lost a mark"}
     }
     private fun performance() {
-        val rows=org.json.JSONArray();val marks=org.json.JSONArray();val now=System.currentTimeMillis()
+        // 先删陈旧结果：失败的一轮不能留下上一轮的 JSON 冒充成功证据。
+        ctx.filesDir.resolve("listening-perf-result.json").delete()
+        // 首屏 = 打开列表页到 PAGE_SIZE 行全部挂上且可点，每行还要取播放器图标。
+        // 500ms 是 OPPO 真机目标；模拟器只记录同口径基线，不在这里断言手机指标。
+        val visible=ctx.packageManager.getInstalledApplications(0).map{it.packageName}.distinct()
+        val iconPkgs=(visible+listOf(ctx.packageName)).take(8)
+        val now=System.currentTimeMillis()
+        val out=ctx.filesDir.resolve("listening-perf-result.json")
+        fun report(f:(JSONObject)->Unit) { val j=JSONObject().put("entries",10000).put("pageSize",ListeningStore.PAGE_SIZE).put("iconPackageCount",iconPkgs.size).put("targetMs",500).put("targetDevice","OPPO").put("phoneTargetMeasured",false).put("environment","emulator").put("metric","warm list first screen, median of 3").put("model",android.os.Build.MODEL).put("hardware",android.os.Build.HARDWARE).put("sdkInt",android.os.Build.VERSION.SDK_INT);f(j);out.writeText(j.toString()) }
+        val rows=org.json.JSONArray();val marks=org.json.JSONArray()
         for(n in 0 until 10000) {
-            rows.put(JSONObject().put("id","perf-$n").put("pkg","any.platform").put("app","Any platform").put("title","Public sample $n").put("url",JSONObject.NULL).put("created",now).put("updated",now+n).put("kept",0).put("saved",0))
+            rows.put(JSONObject().put("id","perf-$n").put("pkg",iconPkgs[n%iconPkgs.size]).put("app","Any platform").put("title","Public sample $n").put("url",JSONObject.NULL).put("created",now).put("updated",now+n).put("kept",0).put("saved",0))
             for(m in 0..1)marks.put(JSONObject().put("id","mark-$n-$m").put("entry_id","perf-$n").put("at",now).put("title","Public sample $n").put("pkg","any.platform").put("position",1000).put("kind","manual").put("note","").put("timer_id",JSONObject.NULL).put("status",""))
         }
         ListeningStore.replace(ctx,JSONObject().put("schema",1).put("entries",rows).put("segments",org.json.JSONArray()).put("marks",marks))
-        val start=SystemClock.elapsedRealtime();check(ListeningStore.list(ctx).size==50)
-        val elapsed=SystemClock.elapsedRealtime()-start
-        ctx.filesDir.resolve("listening-perf-result.json").writeText(JSONObject().put("entries",10000).put("marks",20000).put("firstPageQueryMs",elapsed).put("environment","emulator").toString())
-        check(elapsed<500){"First page query exceeded 500ms: $elapsed"}
+        // onStop 会提交整库自动备份；10k 条时它会排在列表查询前，隔离掉才能测列表本身。
+        ctx.prefs().edit().putBoolean(ListeningStore.INTRO,true).putBoolean("auto_backup_enabled",false).commit()
+        val queryStart=SystemClock.elapsedRealtime();check(ListeningStore.list(ctx).size==ListeningStore.PAGE_SIZE){"Seeded first page is not ${ListeningStore.PAGE_SIZE} rows"}
+        val queryMs=SystemClock.elapsedRealtime()-queryStart
+        fun launch():Long {
+            val start=SystemClock.elapsedRealtime()
+            val list=i.startActivitySync(Intent(ctx,ListeningActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as ListeningActivity
+            var rendered=0;var timedOut=true
+            while(SystemClock.elapsedRealtime()-start<20000) {
+                main{rendered=countTag(list.window.decorView,"listen_entry_")}
+                if(rendered>=ListeningStore.PAGE_SIZE){timedOut=false;break}
+                SystemClock.sleep(50)
+            }
+            val ms=SystemClock.elapsedRealtime()-start
+            main{list.finish()}
+            check(!timedOut){"First screen rendered only $rendered of ${ListeningStore.PAGE_SIZE} rows in 20s"}
+            return ms
+        }
+        val cold=launch()
+        SystemClock.sleep(300)
+        val samples=List(3){launch().also{SystemClock.sleep(300)}}
+        val warm=samples.sorted()[1]
+        report{it.put("marks",20000).put("firstPageQueryMs",queryMs).put("coldFirstScreenMs",cold).put("warmSamplesMs",org.json.JSONArray(samples)).put("firstScreenInteractiveMs",warm)}
+        check(queryMs<500){"First page query exceeded 500ms: $queryMs"}
+    }
+    private fun countTag(root:View,prefix:String):Int {
+        var n=if(root.tag?.toString()?.startsWith(prefix)==true)1 else 0
+        if(root is ViewGroup)for(index in 0 until root.childCount)n+=countTag(root.getChildAt(index),prefix)
+        return n
     }
     private fun find(root:View,tag:String):View? {
         if(root.tag==tag)return root

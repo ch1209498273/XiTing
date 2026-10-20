@@ -101,7 +101,8 @@ class ListeningActivity:Activity() {
             busy=false;result.onSuccess(done).onFailure{toast(R.string.listen_storage_error)}
         }
     }
-    private fun date(at:Long)=DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT).format(Date(at))
+    private val dateFormat by lazy{DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT)}
+    private fun date(at:Long)=dateFormat.format(Date(at))
     private fun position(at:Long)=String.format(java.util.Locale.ROOT,"%d:%02d",at/60000,at/1000%60)
     private fun displayTitle(entry:ListeningEntry)=entry.title?.takeIf{it.isNotBlank()} ?: getString(R.string.listen_unknown)
     private fun confirm(message:String,action:()->Unit) {
@@ -125,11 +126,16 @@ class ListeningActivity:Activity() {
         fun next() {
             load({ListeningStore.list(this,offset)}) {entries->
                 if(offset==0 && entries.isEmpty())rows.addView(text(getString(R.string.listen_empty)).apply{tag="listen_empty"})
+                // 一个 View 同一时刻只能挂一个 Drawable 回调，所以缓存取包动作、每行仍克隆实例。
+                val icons=HashMap<String,android.graphics.drawable.Drawable?>()
                 for(entry in entries)rows.addView(Button(this).apply {
                     text=listOf(displayTitle(entry),entry.app.takeIf{it.isNotBlank()},date(entry.updated)).filterNotNull().joinToString("\n")
                     tag="listen_entry_${entry.id}";isAllCaps=false;gravity=Gravity.START or Gravity.CENTER_VERTICAL
                     setBackgroundResource(R.drawable.bg_card);setPadding(dp(14),dp(12),dp(14),dp(12))
-                    if(entry.pkg.isNotBlank())playerIcon(entry.pkg)?.let {icon->icon.setBounds(0,0,dp(28),dp(28));setCompoundDrawables(icon,null,null,null);compoundDrawablePadding=dp(12)}
+                    if(entry.pkg.isNotBlank()){
+                        val base=if(icons.containsKey(entry.pkg))icons[entry.pkg] else playerIcon(entry.pkg).also{icons[entry.pkg]=it}
+                        (base?.constantState?.newDrawable(resources,null)?:base)?.let {icon->icon.setBounds(0,0,dp(28),dp(28));setCompoundDrawables(icon,null,null,null);compoundDrawablePadding=dp(12)}
+                    }
                     minHeight=dp(84);setTextColor(getColor(R.color.text_primary));setOnClickListener{if(!busy)detail(entry.id)}
                 },LinearLayout.LayoutParams(-1,-2))
                 offset+=entries.size;more.visibility=if(entries.size==50)View.VISIBLE else View.GONE

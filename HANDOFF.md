@@ -35,6 +35,10 @@
 
 **v6.0.0 / code99 是当前版本**（2026-10-18 公开发布 GitHub latest 与蒲公英 build21）。本版交付「接着听与随手标记」：SQLite 内容库与旧时长统计分离、最近听过、系统分享接收与显式粘贴、黑幕标记与备注、睡前定时起点、90 天期限与清理预览、备份 v5。验收范围**只覆盖 OPPO PME110 + 哔哩哔哩 9.14.0**，抖音本轮未重新验证，手机首屏 ≤500ms 未实测——详见 `docs/uat-continue-listening-20261017/RESULTS.md` 与第八节。
 
+**2026-10-21 黑幕防误触（工作区，未发布）**：新增「设置 → 防误触锁定」（`Prefs.MISTOUCH_GUARD`，默认关 = 旧版轻点解锁/单击返回/熄屏撤幕）；开启后锁定态单击不再点亮背光，改为**双击解锁**；「返回播放器」改为**长按退出**（单击无动作）。开启防误触后 `ACTION_SCREEN_OFF` 不再撤黑幕：保留黑幕、收回锁定态，锁屏时长从听剧会话扣除，跨锁屏的功耗样本不采；亮屏到锁屏界面不算回来（`KeyguardManager` 仍锁着就继续暂停），`ACTION_USER_PRESENT` 解锁即恢复计时；另加**锁定态每秒一次 `KeyguardManager` 轮询兜底**（仅亮屏且黑幕在时运行，熄屏立即停），防 ColorOS 等 ROM 漏发 `USER_PRESENT`。默认关时熄屏直接撤幕，时长照旧全算。8 语言文案同步为「双击解锁 / 长按返回」，并保留旧版「轻点解锁 / 返回播放器」文案供默认档使用；`MISTOUCH_GUARD` 已加入备份白名单与键名守卫。验证：232 项 JVM 单测通过；模拟器 api35 的 `guard_default`（默认档文案 + 单击返回 + 熄屏撤幕）、`lost_controls`、`episode`、`expiry`、`panels`、`black_layout` 夹具通过（`expiry` 注入 8 秒锁屏，断言黑幕仍在、界面回到锁定态、记录时长扣除了该段）。模拟器 api35 另走了一遍真实电源键路径：开启防误触 → 黑幕 → 熄屏（`screen off: curtain kept, session clock paused`）→ 亮屏停在锁屏（未提前恢复计时）→ 解锁（`unlocked: session clock resumed`，由轮询兜底触发，证明不依赖 ROM 是否送达 `USER_PRESENT`）；证据留在 `build/emu-shot/emu_unlock_resume.log`。真机 PME110 已 `install -r` 覆盖安装（数据保留），设置项默认关、开关切换正常；开启后按电源键实测 `screen off: curtain kept, session clock paused`，亮屏停在锁屏时未提前恢复计时。**未验**：真机解锁后的恢复日志（手机有安全锁，adb 不能代为解锁；轮询兜底已消除对 ROM 广播的依赖）；真息屏后第三方播放器是否继续出声仍取决于播放器自身，App 无法代其续播。
+
+**2026-10-22 README 竞争位重写（工作区，未发布）**：首屏从版本更新改为「为什么选它」，用可复核事实对照 Black Screen 2.0.7（1.2 MB vs 11 MB；清单无 `INTERNET`/计费/广告权限 vs 含 `INTERNET`、Firebase、`AD_ID`；防误触闭环；来电自动撤幕；夜钟默认关+每 45 秒微移），并新增「适合/不适合」与三条边界。数字取自 `AndroidManifest.xml`、`app/build.gradle.kts`（运行时零依赖）、v6.0.0 官方 Release 资产 1,288,112 字节与 232 项 `@Test`；未改代码。
+
 v4.3.0 已发布 GitHub 与蒲公英 build19，PME110 已覆盖安装 code84 并成功启动；保留用户图标选择，不自动改为未解锁图标。发布源 cd0f2e6，标签 v4.3.0。134项JVM、11项API33原生检查、Lint与八语言校验通过；记录见 docs/v4.3发布记录_20261012.md。
 
 v4.2.0 已发布 GitHub 与蒲公英，实体手机 PME110 已覆盖安装 code83 并成功启动。源码 8124476，标签 v4.2.0。131 项 JVM、8 项 API33 原生检查及 Lint/i18n 通过；真机第三方播放器暂停/续播仍需体验。记录见 docs/v4.2发布记录_20261012.md。

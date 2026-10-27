@@ -46,6 +46,8 @@
     <string name="pager_next">다음 ›</string>
     <string name="settings_personal">개인화</string>
     <string name="switch_direct">화면을 가볍게 눌러 바로 해제</string>
+    <string name="switch_mistouch_guard">오조작 방지 잠금</string>
+    <string name="switch_mistouch_guard_sub">두 번 탭하여 해제, 길게 눌러 돌아가기, 전원 잠금 시 검은 화면 유지</string>
     <string name="switch_info">화면 꺼짐 상태에 시간·배터리 표시</string>
     <string name="switch_media">화면 꺼짐 상태에 재생 컨트롤</string>
     <string name="switch_media_sub">제목·±30초는 알림 접근 권한이 필요합니다</string>
@@ -100,8 +102,10 @@
     <string name="widget_today_fmt">오늘 %1$s</string>
     <string name="widget_growth_next">성장값 %1$d · 다음 형태까지 %2$d</string>
     <string name="widget_growth_max">성장값 %1$d · 최고 도달</string>
-    <string name="black_hint">스크린 오프 듣기 중 · 화면을 가볍게 누르면 잠금 해제</string>
-    <string name="black_return">플레이어로 돌아가기</string>
+    <string name="black_hint">스크린 오프 듣기 중 · 두 번 탭하여 잠금 해제</string>
+    <string name="black_return">길게 눌러 플레이어로 돌아가기</string>
+    <string name="black_hint_tap">스크린 오프 듣기 중 · 화면을 가볍게 누르면 잠금 해제</string>
+    <string name="black_return_tap">플레이어로 돌아가기</string>
     <string name="channel_name">스크린 오프 듣기 도우미</string>
     <string name="notif_title">스크린 오프 듣기 도우미 실행 중</string>
     <string name="notif_text">버블을 누르면 화면이 꺼지고 소리는 계속됩니다%1$s</string>

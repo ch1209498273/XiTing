@@ -46,6 +46,8 @@
     <string name="pager_next">Next ›</string>
     <string name="settings_personal">Personalize</string>
     <string name="switch_direct">Single-tap unlock</string>
+    <string name="switch_mistouch_guard">Anti-mistouch lock</string>
+    <string name="switch_mistouch_guard_sub">Double-tap to unlock, hold to return; keep the curtain after power lock</string>
     <string name="switch_info">Show clock &amp; battery on black screen</string>
     <string name="switch_media">Media controls on black screen</string>
     <string name="switch_media_sub">Title and ±30s need notification access</string>
@@ -100,8 +102,10 @@
     <string name="widget_today_fmt">Today %1$s</string>
     <string name="widget_growth_next">Growth %1$d · %2$d to next</string>
     <string name="widget_growth_max">Growth %1$d · Maxed</string>
-    <string name="black_hint">Screen-off listening · Tap to unlock</string>
-    <string name="black_return">Return to player</string>
+    <string name="black_hint">Screen-off listening · Double-tap to unlock</string>
+    <string name="black_return">Hold to return to player</string>
+    <string name="black_hint_tap">Screen-off listening · Tap to unlock</string>
+    <string name="black_return_tap">Return to player</string>
     <string name="channel_name">XiTing assistant</string>
     <string name="notif_title">XiTing assistant running</string>
     <string name="notif_text">Tap the bubble to black the screen — sound keeps playing%1$s</string>

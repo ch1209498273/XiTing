@@ -31,6 +31,7 @@ class PrefsKeysTest {
     @Test
     fun `黑幕行为键名不变`() {
         assertEquals("direct_unlock", Prefs.DIRECT_UNLOCK)
+        assertEquals("mistouch_guard", Prefs.MISTOUCH_GUARD)
         assertEquals("black_info_show", Prefs.BLACK_INFO_SHOW)
         assertEquals("black_media_controls", Prefs.BLACK_MEDIA_CONTROLS)
         assertEquals("switch_headset", Prefs.SWITCH_HEADSET)
@@ -80,7 +81,7 @@ class PrefsKeysTest {
         val values = listOf(
             Prefs.ASSISTANT_WANTED, Prefs.BUBBLE_PERM_ERROR, Prefs.BUBBLE_HIDDEN,
             Prefs.BUBBLE_STYLE, Prefs.BUBBLE_X, Prefs.BUBBLE_Y,
-            Prefs.DIRECT_UNLOCK, Prefs.BLACK_INFO_SHOW, Prefs.BLACK_MEDIA_CONTROLS,
+            Prefs.DIRECT_UNLOCK, Prefs.MISTOUCH_GUARD, Prefs.BLACK_INFO_SHOW, Prefs.BLACK_MEDIA_CONTROLS,
             Prefs.SWITCH_HEADSET, Prefs.ENERGY_PENDING, Prefs.ENERGY_COLLECTED,
             Prefs.ENERGY_MIGRATED, Prefs.ENERGY_CARRY_MS, Prefs.LAST_RARE_DATE,
             Prefs.SHARE_BONUS_GP_LEGACY, Prefs.ACH_UNLOCKED, Prefs.SKINS_UNLOCKED,

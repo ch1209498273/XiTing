@@ -198,11 +198,53 @@ internal class ListeningLibraryDeviceChecks(private val i:Instrumentation) {
                 session.setMetadata(android.media.MediaMetadata.Builder().putString(android.media.MediaMetadata.METADATA_KEY_TITLE,"Same title without identity").build())
                 check(ListeningRecorder.capture(ctx)?.identity==null) {"Title was promoted into content identity"}
             }
-            SystemClock.sleep(3500)
-            check(ListeningStore.count(ctx)==2){"Missing identity was automatically merged or recorded"}
+            // 只给标题、不给 media id 的播放器是多数；不记就等于「最近听过」只有 B 站能用。
+            await("Title without identity was not recorded"){ListeningStore.count(ctx)==3}
+            main { session.setMetadata(android.media.MediaMetadata.Builder().putString(android.media.MediaMetadata.METADATA_KEY_TITLE,"Same title without identity").putLong(android.media.MediaMetadata.METADATA_KEY_DURATION,300_000).build()) }
+            SystemClock.sleep(3_500)
+            check(ListeningStore.count(ctx)==3){"Repeated title without identity split into extra entries"}
+            // 播放器谎报状态时仍然记录标题，只是不把可疑进度写进去。
+            main {
+                session.setPlaybackState(android.media.session.PlaybackState.Builder().setState(android.media.session.PlaybackState.STATE_REWINDING,0,1f).build())
+                session.setMetadata(android.media.MediaMetadata.Builder().putString(android.media.MediaMetadata.METADATA_KEY_TITLE,"Unreliable state title").build())
+            }
+            await("Unreliable playback state dropped the title entirely"){ListeningStore.count(ctx)==4}
+            check(ListeningStore.list(ctx).any{it.title=="Unreliable state title"}) {"Unreliable state title was stored under another name"}
+            check(ListeningStore.latest(ctx,ListeningStore.list(ctx).first{it.title=="Unreliable state title"}.id)?.position==null) {"Suspicious position was recorded as a resume point"}
             marked=false;main{ListeningRecorder.mark(ctx){marked=it}}
             await("Unknown identity manual mark failed"){marked}
-            check(ListeningStore.count(ctx)==3){"Manual mark attached to stale content"}
+            check(ListeningStore.count(ctx)==4){"Manual mark created an entry the recorder already made"}
+            check(ListeningStore.list(ctx).sumOf{ListeningStore.marks(ctx,it.id).size}==2)
+            // 档 2：在播但系统不给可用标题（或标题只是 App 自己名字）→ 记一条「未识别内容」来源条目，同一个 App 只滚动一条。
+            main {
+                session.setPlaybackState(android.media.session.PlaybackState.Builder().setState(android.media.session.PlaybackState.STATE_PLAYING,0,1f).build())
+                session.setMetadata(android.media.MediaMetadata.Builder().putLong(android.media.MediaMetadata.METADATA_KEY_DURATION,300_000).build())
+            }
+            val sourceBase=ListeningStore.count(ctx)
+            await("Playing session without any title produced no source row"){ListeningStore.count(ctx)==sourceBase+1}
+            val source=ListeningStore.list(ctx).first{it.title==null}
+            SystemClock.sleep(3_500)
+            check(ListeningStore.count(ctx)==sourceBase+1){"Title-less playback added a new row on every poll"}
+            main { session.setMetadata(android.media.MediaMetadata.Builder().putString(android.media.MediaMetadata.METADATA_KEY_TITLE,ctx.playerLabel(ctx.packageName)).build()) }
+            SystemClock.sleep(3_500)
+            check(ListeningStore.count(ctx)==sourceBase+1){"App-name-only title became a content row"}
+            check(ListeningStore.get(ctx,source.id)!!.title==null){"Source row stored the app name as content"}
+            // 会话闪断（广告、缓冲、切后台）后同一条内容续写原条目，不得记成两行（真机 YouTube 已复现）。
+            val base=ListeningStore.count(ctx)
+            fun episode(show:Boolean)=android.media.MediaMetadata.Builder()
+                .putString(android.media.MediaMetadata.METADATA_KEY_TITLE,if(show)"Episode across ad break" else "")
+                .putString(android.media.MediaMetadata.METADATA_KEY_MEDIA_ID,"ad-break").build()
+            main { session.setMetadata(episode(true)) }
+            await("New episode was not recorded"){ListeningStore.count(ctx)==base+1}
+            main { session.setMetadata(episode(false)) }
+            SystemClock.sleep(3_500)
+            main { session.setMetadata(episode(true)) }
+            SystemClock.sleep(3_500)
+            check(ListeningStore.count(ctx)==base+1){"Session dropout split one episode into two rows"}
+            val resumed=ListeningStore.list(ctx).first{it.title=="Episode across ad break"}
+            val segs=ListeningStore.export(ctx).getJSONArray("segments")
+            var segments=0;for(k in 0 until segs.length())if(segs.getJSONObject(k).getString("entry_id")==resumed.id)segments+=1
+            check(segments>=2){"Resumed content did not append a new segment"}
             val timerSnapshot=ContentSnapshot("any.platform","Any platform","Timer sample","id",5000,60000)
             var first="";var second=""
             main {first=ListeningRecorder.acceptedTimer(ctx,timerSnapshot);ListeningRecorder.timerEnded(ctx,"ended",first);second=ListeningRecorder.acceptedTimer(ctx,timerSnapshot);ListeningRecorder.timerEnded(ctx,"pause_confirmed",first)}

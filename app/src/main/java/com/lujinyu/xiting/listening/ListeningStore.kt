@@ -15,7 +15,7 @@ internal data class ListeningMark(val id:String,val entryId:String,val at:Long,v
     val position:Long?,val kind:String,val note:String,val timerId:String?,val status:String)
 internal data class ListeningPosition(val position:Long?,val duration:Long?,val at:Long)
 internal data class ContentSnapshot(val pkg:String,val app:String,val title:String?,val identity:String?,
-    val position:Long?,val duration:Long?,val at:Long=System.currentTimeMillis())
+    val position:Long?,val duration:Long?,val at:Long=System.currentTimeMillis(),val playing:Boolean=true)
 
 /** All database access is serialized; never calls backup/session locks. No open cursor escapes. */
 internal object ListeningStore {

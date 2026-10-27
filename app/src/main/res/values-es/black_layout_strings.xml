@@ -4,5 +4,6 @@
     <string name="black_timer_off">Desactivado</string>
     <string name="black_timer_pause_fmt">Pausa en %1$s</string>
     <string name="black_timer_return_fmt">Volver en %1$s</string>
-    <string name="black_wake_hint">Toca fuera del panel para volver a la pantalla negra</string>
+    <string name="black_wake_hint">Mantén el botón inferior para volver · Toca fuera para seguir en negro</string>
+    <string name="black_wake_hint_tap">Toca fuera del panel para volver a la pantalla negra</string>
 </resources>

@@ -42,7 +42,7 @@ import android.widget.Toast
  * 1. 常驻一个可拖动的悬浮球（点击 = 黑屏/恢复切换）
  * 2. 黑屏遮罩：开了无障碍就用 TYPE_ACCESSIBILITY_OVERLAY（连手势条一起盖黑），
  *    否则退回 TYPE_APPLICATION_OVERLAY（可能被系统手势条压住一条）
- * 3. 真息屏续播：电源键真熄屏后自动注入"播放"媒体键，让视频App后台恢复出声
+ * 3. 防误触开启时电源键锁屏保留黑幕，只暂停会话计时；默认关=旧行为熄屏撤幕
  */
 class OverlayService : Service() {
 
@@ -282,25 +282,27 @@ class OverlayService : Service() {
     }
 
     /**
-     * 真息屏续播：按电源键真熄屏后，视频App会自己暂停；
-     * 向系统注入"播放"媒体键，视频App的MediaSession收到后在息屏+后台状态恢复出声。
-     * 不能用"熄屏瞬间isMusicActive"判断——广播到达时App往往已暂停；
-     * 改用"熄屏前15秒内有声音在播"判定，避免平时锁屏误触发。
+     * 电源键/自动熄屏：防误触开时黑幕保留，只把界面收回锁定态，锁屏时长不计入听剧；
+     * 默认关时沿用旧行为撤掉黑幕。demo 仍按原逻辑取消，避免演示音频在锁屏后继续。
      */
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-        when (intent?.action) {
-            ACTION_TEST_TOGGLE -> {
-                Log.i(TAG, "TEST_TOGGLE broadcast received")
-                toggleOverlay()
-            }
-
-                Intent.ACTION_SCREEN_OFF -> {
-                    // 电源键/自动息屏时若黑幕还开着：撤掉遮罩，唤醒后直接回到视频画面
-                    if (isAnyBlackShowing() || demoOverlay!=null) {
-                        hideAllBlack()   // 内部已 refreshNotification()
-                    }
+            when (intent?.action) {
+                ACTION_TEST_TOGGLE -> {
+                    Log.i(TAG, "TEST_TOGGLE broadcast received")
+                    toggleOverlay()
                 }
+                Intent.ACTION_SCREEN_OFF -> {
+                    val curtain=black
+                    if(curtain?.isShowing==true) {
+                        // 防误触关（默认）：旧行为，熄屏撤幕，亮屏回到视频画面。
+                        if(prefs.getBoolean(Prefs.MISTOUCH_GUARD,false))curtain.onScreenOff()
+                        else hideAllBlack()   // 内部已 refreshNotification()
+                    }
+                    else if(demoOverlay!=null)hideAllBlack()   // 内部已 refreshNotification()
+                }
+                Intent.ACTION_SCREEN_ON -> black?.onScreenOn()
+                Intent.ACTION_USER_PRESENT -> black?.onUserPresent()
             }
         }
     }
@@ -394,11 +396,12 @@ class OverlayService : Service() {
         showBubble()
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_USER_PRESENT)
             // UAT 测试钩子只在 debug 包注册。release 包必须收不到：
             // 否则同机任意 App 一条广播就能强制开关用户的黑幕
-            // （ACTION_SCREEN_ON / UNLOCK_SKINS / WEAR / RUN_MODE 这几条在
-            //   screenOffReceiver 里其实已无处理分支，属「真息屏续播」移除后的残留，
-            //   一并收进 debug 门禁，不改变任何对外行为）
+            // （UNLOCK_SKINS / WEAR / RUN_MODE 这几条在 screenOffReceiver 里
+            //   其实已无处理分支，一并收进 debug 门禁，不改变任何对外行为）
             if (BuildConfig.DEBUG) {
                 addAction(ACTION_TEST_TOGGLE)
                 addAction(ACTION_TEST_RUN_MODE)
@@ -1032,7 +1035,9 @@ class OverlayService : Service() {
         }
         refreshNotification()
         if(next>0)listeningTimerId=com.lujinyu.xiting.listening.ListeningRecorder.acceptedTimer(this,
-            com.lujinyu.xiting.listening.ListeningRecorder.captureController(this,controller) ?: if(controller==null)com.lujinyu.xiting.listening.ListeningRecorder.capture(this) else null)
+            com.lujinyu.xiting.listening.ListeningRecorder.captureController(this,controller,
+                controller?.playbackState?.let{playbackControlsReliable(it.state)} ?: false)
+                ?: if(controller==null)com.lujinyu.xiting.listening.ListeningRecorder.capture(this) else null)
         else com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"cancelled",listeningTimerId)
         return TimerAcceptance(true)
     }

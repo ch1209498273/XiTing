@@ -1052,6 +1052,13 @@ private fun checkRestore() {
             prefs.edit().putBoolean(Prefs.DIRECT_UNLOCK, checked).apply()
         }
 
+        // 防误触锁定（默认关 = 旧行为）：开=双击解锁/长按返回/锁屏保留黑幕
+        val switchGuard = page.findViewById<android.widget.Switch>(R.id.switch_mistouch_guard)
+        switchGuard.isChecked = prefs.getBoolean(Prefs.MISTOUCH_GUARD, false)
+        switchGuard.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean(Prefs.MISTOUCH_GUARD, checked).apply()
+        }
+
         // 黑幕显示时间与电量（默认关；开启后重锁保持暗态夜钟）
         val switchInfo = page.findViewById<android.widget.Switch>(R.id.switch_info)
         switchInfo.isChecked = prefs.getBoolean(Prefs.BLACK_INFO_SHOW, false)

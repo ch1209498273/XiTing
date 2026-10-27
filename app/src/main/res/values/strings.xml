@@ -55,6 +55,8 @@
     <!-- 设置页 -->
     <string name="settings_personal">个性化</string>
     <string name="switch_direct">黑幕轻点直接解锁</string>
+    <string name="switch_mistouch_guard">防误触锁定</string>
+    <string name="switch_mistouch_guard_sub">双击解锁、长按返回；电源键锁屏后保留黑幕</string>
     <string name="switch_info">黑幕显示时间与电量</string>
     <string name="switch_media">黑幕播放控制</string>
     <string name="switch_media_sub">剧名与±30秒需开启「通知使用权」</string>
@@ -113,8 +115,10 @@
     <string name="widget_growth_max">成长值 %1$d · 已至巅峰</string>
 
     <!-- 黑幕 -->
-    <string name="black_hint">息屏听剧中 · 轻点屏幕解除锁定</string>
-    <string name="black_return">返回播放器</string>
+    <string name="black_hint">息屏听剧中 · 双击屏幕解除锁定</string>
+    <string name="black_return">长按返回播放器</string>
+    <string name="black_hint_tap">息屏听剧中 · 轻点屏幕解除锁定</string>
+    <string name="black_return_tap">返回播放器</string>
 
     <!-- 通知 -->
     <string name="channel_name">息屏听剧助手</string>

@@ -37,6 +37,11 @@ object Prefs {
     // ---- 黑幕行为 ----
     /** 轻点直接解锁，跳过两段式确认 */
     const val DIRECT_UNLOCK = "direct_unlock"
+    /**
+     * 防误触锁定：双击解锁、长按返回、电源键锁屏后保留黑幕。
+     * 默认关 = 旧行为（轻点解锁、单击返回、熄屏撤幕），升级用户不改变肌肉记忆。
+     */
+    const val MISTOUCH_GUARD = "mistouch_guard"
     /** 黑幕上显示暗色夜钟与电量 */
     const val BLACK_INFO_SHOW = "black_info_show"
     /** 黑幕定时入口与倒计时；默认隐藏，避免误触。独立于后台定时执行。 */

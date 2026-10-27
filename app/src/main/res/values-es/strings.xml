@@ -46,6 +46,8 @@
     <string name="pager_next">Siguiente ›</string>
     <string name="settings_personal">Personalización</string>
     <string name="switch_direct">Desbloquear con un toque</string>
+    <string name="switch_mistouch_guard">Bloqueo anti-toques</string>
+    <string name="switch_mistouch_guard_sub">Doble toque para desbloquear, mantén para volver; conserva el telón al bloquear</string>
     <string name="switch_info">Mostrar hora y batería en la pantalla negra</string>
     <string name="switch_media">Controles de reproducción en pantalla negra</string>
     <string name="switch_media_sub">El título y ±30 s requieren acceso a notificaciones</string>
@@ -100,8 +102,10 @@
     <string name="widget_today_fmt">Hoy %1$s</string>
     <string name="widget_growth_next">Progreso %1$d · faltan %2$d para la siguiente forma</string>
     <string name="widget_growth_max">Progreso %1$d · Máximo alcanzado</string>
-    <string name="black_hint">Escuchando con pantalla apagada · Toca para desbloquear</string>
-    <string name="black_return">Volver al reproductor</string>
+    <string name="black_hint">Escuchando con pantalla apagada · Toca dos veces para desbloquear</string>
+    <string name="black_return">Mantén para volver al reproductor</string>
+    <string name="black_hint_tap">Escuchando con pantalla apagada · Toca para desbloquear</string>
+    <string name="black_return_tap">Volver al reproductor</string>
     <string name="channel_name">Asistente de pantalla apagada</string>
     <string name="notif_title">Asistente en marcha</string>
     <string name="notif_text">Toca la burbuja: pantalla apagada, el sonido sigue%1$s</string>

@@ -8,7 +8,7 @@ import org.json.JSONObject
 internal object CompleteBackup {
     private fun integer(v:Any?):Long?=when(v) { is Int->v.toLong();is Long->v;else->null }
     private val booleans=setOf(com.lujinyu.xiting.listening.ListeningStore.AUTO,com.lujinyu.xiting.listening.ListeningStore.MARK_SHOW,
-        com.lujinyu.xiting.listening.ListeningStore.INTRO,"listening_clean_confirmed_v1",Prefs.DIRECT_UNLOCK,Prefs.BLACK_INFO_SHOW,Prefs.BLACK_TIMER_SHOW,Prefs.BLACK_MEDIA_CONTROLS,
+        com.lujinyu.xiting.listening.ListeningStore.INTRO,"listening_clean_confirmed_v1",Prefs.DIRECT_UNLOCK,Prefs.MISTOUCH_GUARD,Prefs.BLACK_INFO_SHOW,Prefs.BLACK_TIMER_SHOW,Prefs.BLACK_MEDIA_CONTROLS,
         Prefs.SWITCH_HEADSET,Prefs.TIMER_PAUSE_KEEP_BLACK,Prefs.SUGGEST_NOTIFY,"auto_backup_enabled","session_recap_enabled",FirstSuccessFlow.COMPLETE)
     private val strings=setOf(Prefs.LANG,"appearance_mode_v1","home_entry_order_v1","listening_presets_v1")
     private val longs=setOf(Prefs.STATS_TOTAL_MS,Prefs.STATS_TOTAL_COUNT,Prefs.STATS_MAX_SINGLE,Prefs.LAST_RARE_DAY)

@@ -4,5 +4,6 @@
     <string name="black_timer_off">Выключен</string>
     <string name="black_timer_pause_fmt">Пауза через %1$s</string>
     <string name="black_timer_return_fmt">Возврат через %1$s</string>
-    <string name="black_wake_hint">Нажмите вне панели, чтобы вернуться к чёрному экрану</string>
+    <string name="black_wake_hint">Удерживайте кнопку ниже для возврата · Коснитесь вне панели, чтобы остаться в чёрном</string>
+    <string name="black_wake_hint_tap">Нажмите вне панели, чтобы вернуться к чёрному экрану</string>
 </resources>

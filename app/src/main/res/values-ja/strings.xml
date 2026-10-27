@@ -46,6 +46,8 @@
     <string name="pager_next">次へ ›</string>
     <string name="settings_personal">パーソナライズ</string>
     <string name="switch_direct">画面を軽くタップで解除</string>
+    <string name="switch_mistouch_guard">誤操作ロック</string>
+    <string name="switch_mistouch_guard_sub">ダブルタップで解除・長押しで戻る・電源キーのロック中も黒幕を維持</string>
     <string name="switch_info">画面オフ中に時刻とバッテリーを表示</string>
     <string name="switch_media">画面オフ中に再生コントロールを表示</string>
     <string name="switch_media_sub">タイトルと±30秒には通知アクセス権が必要です</string>
@@ -100,8 +102,10 @@
     <string name="widget_today_fmt">今日 %1$s</string>
     <string name="widget_growth_next">成長値 %1$d · 次の形態まで %2$d</string>
     <string name="widget_growth_max">成長値 %1$d · 最高到達</string>
-    <string name="black_hint">画面オフ再生中 · 軽くタップするとロック解除</string>
-    <string name="black_return">プレーヤーに戻る</string>
+    <string name="black_hint">画面オフ再生中 · ダブルタップでロック解除</string>
+    <string name="black_return">長押しでプレーヤーに戻る</string>
+    <string name="black_hint_tap">画面オフ再生中 · 軽くタップするとロック解除</string>
+    <string name="black_return_tap">プレーヤーに戻る</string>
     <string name="channel_name">画面オフ再生アシスタント</string>
     <string name="notif_title">画面オフ再生アシスタント 実行中</string>
     <string name="notif_text">バブルをタップすると画面が消え音は再生し続けます%1$s</string>

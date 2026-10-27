@@ -4,5 +4,6 @@
     <string name="black_timer_off">꺼짐</string>
     <string name="black_timer_pause_fmt">%1$s 후 일시정지</string>
     <string name="black_timer_return_fmt">%1$s 후 돌아가기</string>
-    <string name="black_wake_hint">패널 밖을 누르면 검은 화면으로 돌아갑니다</string>
+    <string name="black_wake_hint">아래 버튼을 길게 눌러 돌아가기 · 바깥을 누르면 검은 화면</string>
+    <string name="black_wake_hint_tap">패널 밖을 누르면 검은 화면으로 돌아갑니다</string>
 </resources>

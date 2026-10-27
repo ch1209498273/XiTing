@@ -19,10 +19,32 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
         while (!test() && SystemClock.elapsedRealtime() < until) SystemClock.sleep(40)
         check(test()) { message }
     }
+    private fun tap(root:android.view.View) {
+        val time=SystemClock.uptimeMillis()
+        for(action in listOf(android.view.MotionEvent.ACTION_DOWN,android.view.MotionEvent.ACTION_UP)) {
+            val event=android.view.MotionEvent.obtain(time,time+20,action,100f,100f,0)
+            root.dispatchTouchEvent(event);event.recycle()
+        }
+    }
+    /** 防误触后只有双击能解锁：两次点击相隔 60ms，落在系统双击窗口内。 */
+    private fun doubleTap(root:android.view.View) {
+        val start=SystemClock.uptimeMillis()
+        for(offset in listOf(0L,100L)) {
+            for(action in listOf(android.view.MotionEvent.ACTION_DOWN,android.view.MotionEvent.ACTION_UP)) {
+                val event=android.view.MotionEvent.obtain(start+offset,start+offset+40,action,100f,100f,0)
+                root.dispatchTouchEvent(event);event.recycle()
+            }
+        }
+    }
     private fun withTimerVisible(action:()->Unit) {
         val p=ctx.prefs();val existed=p.contains(Prefs.BLACK_TIMER_SHOW);val previous=p.getBoolean(Prefs.BLACK_TIMER_SHOW,false)
         p.edit().putBoolean(Prefs.BLACK_TIMER_SHOW,true).commit()
         try {action()} finally {p.edit().apply {if(existed)putBoolean(Prefs.BLACK_TIMER_SHOW,previous) else remove(Prefs.BLACK_TIMER_SHOW)}.commit()}
+    }
+    private fun withMistouchGuard(action:()->Unit) {
+        val p=ctx.prefs();val existed=p.contains(Prefs.MISTOUCH_GUARD);val previous=p.getBoolean(Prefs.MISTOUCH_GUARD,false)
+        p.edit().putBoolean(Prefs.MISTOUCH_GUARD,true).commit()
+        try {action()} finally {p.edit().apply {if(existed)putBoolean(Prefs.MISTOUCH_GUARD,previous) else remove(Prefs.MISTOUCH_GUARD)}.commit()}
     }
     fun run(part:String?=null) {
         check(android.os.Build.HARDWARE in listOf("ranchu","goldfish")) { "Listening flow fixtures are emulator-only" }
@@ -35,7 +57,7 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
         if(part=="black_layout") { withTimerVisible { BlackLayoutDeviceChecks(i).run() };return }
         if(part=="black_timer_layout") { withTimerVisible { BlackLayoutDeviceChecks(i).runActiveTimer() };return }
         if(part=="playback_boundaries") { PlaybackBoundaryDeviceChecks(i).run();return }
-        if(part=="lost_controls") { selectedPlayerLossMustNotSwitch();return }
+        if(part=="lost_controls") { withMistouchGuard { selectedPlayerLossMustNotSwitch() };return }
         if(part=="guide_audio") { GuideAudioDeviceChecks(i).run();return }
         if(part=="app_choices") { PlaybackAppDeviceChecks(i).run();return }
         ctx.prefs().edit().putString(Prefs.UPDATE_SEEN_VERSION,BuildConfig.VERSION_NAME).commit()
@@ -44,13 +66,18 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
         try {
             i.waitForIdleSync()
             when(part) {
-                "lost_controls" -> selectedPlayerLossMustNotSwitch()
+                "lost_controls" -> withMistouchGuard { selectedPlayerLossMustNotSwitch() }
                 "onboard" -> firstSuccessIsRemembered(activity)
-                "panels" -> withTimerVisible { ListeningPanelChecks(i).run() }
+                "panels" -> withMistouchGuard { withTimerVisible { ListeningPanelChecks(i).run() } }
                 "contracts" -> TimerContractDeviceChecks(i).run(activity)
-                "expiry" -> actualOneMinuteFlow(activity)
-                "episode" -> curtainEntryIsAvailable()
-                else -> { selectedPlayerLossMustNotSwitch();inactivePlayerIsRetained();rejectedRequestHasReceipt();curtainEntryIsAvailable();firstSuccessIsRemembered(activity);actualOneMinuteFlow(activity) }
+                "expiry" -> withMistouchGuard { withTimerVisible { actualOneMinuteFlow(activity) } }
+                "episode" -> withMistouchGuard { withTimerVisible { curtainEntryIsAvailable() } }
+                "guard_default" -> guardDefaultsToLegacy()
+                else -> withMistouchGuard {
+                    selectedPlayerLossMustNotSwitch();inactivePlayerIsRetained();rejectedRequestHasReceipt()
+                    withTimerVisible { curtainEntryIsAvailable() };firstSuccessIsRemembered(activity)
+                    withTimerVisible { actualOneMinuteFlow(activity) }
+                }
             }
         }
         finally { main { activity.finish() } }
@@ -81,25 +108,23 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
             }
             try {
                 SystemClock.sleep(350)
+                val root=BlackOverlay::class.java.getDeclaredField("frame").apply { isAccessible=true }.get(overlay) as android.view.View
                 main {
-                    val root=BlackOverlay::class.java.getDeclaredField("frame").apply { isAccessible=true }.get(overlay) as android.view.View
                     check(root.width>0 && root.height>0) { "Curtain fixture was not laid out" }
-                    val now=SystemClock.uptimeMillis()
-                    for(action in listOf(android.view.MotionEvent.ACTION_DOWN,android.view.MotionEvent.ACTION_UP)) {
-                        val event=android.view.MotionEvent.obtain(now,now+20,action,100f,100f,0)
-                        root.dispatchTouchEvent(event);event.recycle()
-                    }
+                    tap(root)
                 }
-                // GestureDetector confirms a single tap after its double-tap interval.
-                SystemClock.sleep(350)
+                // 单击要等双击窗口关闭才判定，确认它只给提示、不恢复背光。
+                SystemClock.sleep(400)
+                main { check(!overlay.isAwake) { "Single tap woke the curtain" };doubleTap(root) }
+                await("Curtain fixture did not wake after double tap") { overlay.isAwake }
                 main {
-                    check(overlay.isAwake) { "Curtain fixture did not wake before checking controls" }
                     for(field in listOf("playPauseBtn","previousBtn","nextBtn")) {
                         val button=BlackOverlay::class.java.getDeclaredField(field).apply { isAccessible=true }.get(overlay) as android.view.View
                         check(!button.isEnabled) { "Lost target leaves $field falsely enabled" }
                     }
-                    val title=BlackOverlay::class.java.getDeclaredField("titleText").apply { isAccessible=true }.get(overlay) as android.widget.TextView
-                    check(title.text.toString()==ctx.getString(R.string.flow_player_lost)) { "Lost target has no actionable curtain feedback" }
+                    val source=BlackOverlay::class.java.getDeclaredField("sourceText").apply { isAccessible=true }.get(overlay) as android.widget.TextView
+                    check(source.text.toString()==ctx.getString(R.string.black_control_unavailable)) { "Lost target has no actionable curtain feedback" }
+                    check(source.isShown) { "Lost target feedback is hidden" }
                 }
             } finally { main { overlay.hide() } }
         } finally { main { selected.release(); other.release(); PlaybackSelection.token = previous } }
@@ -160,14 +185,12 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
             overlay=BlackOverlay(ctx,android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,recordSession=false)
             overlay.show { }
             root=BlackOverlay::class.java.getDeclaredField("frame").apply { isAccessible=true }.get(overlay) as android.view.View
-            val time=SystemClock.uptimeMillis()
-            for(action in listOf(android.view.MotionEvent.ACTION_DOWN,android.view.MotionEvent.ACTION_UP)) {
-                val event=android.view.MotionEvent.obtain(time,time+20,action,100f,100f,0)
-                root.dispatchTouchEvent(event);event.recycle()
-            }
+            tap(root)
         }
         try {
-            await("Curtain did not wake") { overlay.isAwake }
+            SystemClock.sleep(400)
+            main { check(!overlay.isAwake) { "Single tap woke the curtain" };doubleTap(root) }
+            await("Curtain did not wake after double tap") { overlay.isAwake }
             main {
                 val button=root.findViewWithTag<android.view.View>("flow_timer_setup")
                 check(button!=null && button.visibility==android.view.View.VISIBLE) { "No timer setup entry inside curtain" }
@@ -178,6 +201,46 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
                 }
             }
         } finally { main { overlay.hide() } }
+    }
+    /** 默认（不配置）= 旧行为：轻点解锁、单击返回、熄屏撤幕。 */
+    private fun guardDefaultsToLegacy() {
+        val p=ctx.prefs();val existed=p.contains(Prefs.MISTOUCH_GUARD);val previous=p.getBoolean(Prefs.MISTOUCH_GUARD,false)
+        p.edit().remove(Prefs.MISTOUCH_GUARD).commit()
+        try {
+            lateinit var overlay:BlackOverlay
+            lateinit var root:android.view.View
+            main {
+                overlay=BlackOverlay(ctx,android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,recordSession=false)
+                overlay.show { }
+                root=BlackOverlay::class.java.getDeclaredField("frame").apply { isAccessible=true }.get(overlay) as android.view.View
+                val hint=BlackOverlay::class.java.getDeclaredField("touchHint").apply { isAccessible=true }.get(overlay) as android.widget.TextView
+                check(hint.text.toString()==ctx.getString(R.string.black_hint_tap)) { "Default mode hint still describes double-tap" }
+                val back=root.findViewById<android.widget.TextView>(R.id.black_return_button)
+                check(back.text.toString()==ctx.getString(R.string.black_return_tap)) { "Default mode return copy still asks for long press" }
+                tap(root)
+            }
+            await("Default mode single tap did not wake") { overlay.isAwake }
+            main { root.findViewById<android.widget.TextView>(R.id.black_return_button).performClick() }
+            await("Default mode single click did not return") { !overlay.isShowing }
+
+            if(OverlayService.isRunning) {
+                main { ctx.startService(Intent(ctx,OverlayService::class.java).setAction(OverlayService.ACTION_EXIT)) }
+                await("Previous service still stopping") { !OverlayService.isRunning }
+            }
+            main { ctx.startForegroundService(Intent(ctx,OverlayService::class.java)) }
+            await("Service did not start for default-mode check") { OverlayService.instance!=null }
+            SystemClock.sleep(300)
+            main { OverlayService.instance?.toggleOverlay() }
+            await("Default mode curtain did not open") { OverlayService.instance?.isAnyBlackShowing()==true }
+            val receiver=OverlayService::class.java.getDeclaredField("screenOffReceiver")
+                .apply { isAccessible=true }.get(OverlayService.instance) as android.content.BroadcastReceiver
+            main { receiver.onReceive(ctx,Intent(Intent.ACTION_SCREEN_OFF)) }
+            await("Default screen-off kept the curtain") { OverlayService.instance?.isAnyBlackShowing()!=true }
+            main { ctx.startService(Intent(ctx,OverlayService::class.java).setAction(OverlayService.ACTION_EXIT)) }
+            await("Service cleanup failed") { !OverlayService.isRunning }
+        } finally {
+            p.edit().apply {if(existed)putBoolean(Prefs.MISTOUCH_GUARD,previous) else remove(Prefs.MISTOUCH_GUARD)}.commit()
+        }
     }
     private fun firstSuccessIsRemembered(activity:MainActivity) {
         val key="first_success_confirmed_v1";val old=ctx.prefs().getBoolean(key,false)
@@ -210,12 +273,7 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
         fun state(kind:Int)=PlaybackState.Builder().setActions(PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY or PlaybackState.ACTION_SEEK_TO)
             .setState(kind,1_000,if(kind==PlaybackState.STATE_PLAYING)1f else 0f,SystemClock.elapsedRealtime()).build()
         fun wake(overlay:BlackOverlay) {
-            main {
-                val time=SystemClock.uptimeMillis()
-                for(action in listOf(android.view.MotionEvent.ACTION_DOWN,android.view.MotionEvent.ACTION_UP)) {
-                    val e=android.view.MotionEvent.obtain(time,time+20,action,100f,100f,0);root.dispatchTouchEvent(e);e.recycle()
-                }
-            }
+            main { doubleTap(root) }
             await("Real service curtain failed to wake") { overlay.isAwake }
         }
         try {
@@ -244,6 +302,7 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
                 }
             }
             await("Bubble did not open curtain") { OverlayService.instance?.isAnyBlackShowing()==true }
+            val shownAt=SystemClock.elapsedRealtime()
             val overlay=OverlayService::class.java.getDeclaredField("black").apply { isAccessible=true }.get(OverlayService.instance) as BlackOverlay
             root=BlackOverlay::class.java.getDeclaredField("frame").apply { isAccessible=true }.get(overlay) as android.view.View
             main { selected.isActive=false }
@@ -259,11 +318,29 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
             clickTag(root,"flow_timer_confirm")
             await("One minute timer not accepted") { OverlayService.instance?.timerRemainingMs() in 55_000L..60_000L && root.findViewWithTag<android.view.View>("flow_timer_editor")==null }
             check(selectedPauses==0 && otherPauses==0)
+            // 电源键锁屏：黑幕必须保留、界面收回锁定态；锁屏时长不计入听剧。
+            val screenReceiver=OverlayService::class.java.getDeclaredField("screenOffReceiver")
+                .apply { isAccessible=true }.get(OverlayService.instance) as android.content.BroadcastReceiver
+            val offAt=SystemClock.elapsedRealtime()
+            main { screenReceiver.onReceive(ctx,Intent(Intent.ACTION_SCREEN_OFF)) }
+            main {
+                check(overlay.isShowing) { "Screen off removed the curtain" }
+                check(!overlay.isAwake) { "Screen off left the curtain awake" }
+            }
+            SystemClock.sleep(8_000)
+            main {
+                screenReceiver.onReceive(ctx,Intent(Intent.ACTION_SCREEN_ON))
+                screenReceiver.onReceive(ctx,Intent(Intent.ACTION_USER_PRESENT))
+            }
+            main { check(overlay.isShowing && !overlay.isAwake) { "Screen on lost the curtain/lock state" } }
+            val offMs=SystemClock.elapsedRealtime()-offAt
             val until=SystemClock.elapsedRealtime()+66_000
             while(selectedPauses==0 && SystemClock.elapsedRealtime()<until)SystemClock.sleep(100)
             check(selectedPauses==1 && otherPauses==0) { "Expiry did not pause exactly the original target" }
             await("Pause confirmation not recorded") { SessionRuntime.snapshot().pause==PauseReport.CONFIRMED }
             check(overlay.isShowing && OverlayService.instance!!.timerRemainingMs()==0L)
+            // 起记线 60 秒：注入的锁屏时长会吃掉富余，先在锁定态多留 12 秒，别让夹具卡在门槛上抖。
+            SystemClock.sleep(12_000)
             wake(overlay)
             SystemClock.sleep(350)
             main {
@@ -277,13 +354,25 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
                 check(back.getGlobalVisibleRect(rect) && rect.height()==back.height && back.alpha>.9f) { "Return video exit is clipped/invisible" }
                 back.performClick()
             }
-            await("Return button did not remove curtain") { !OverlayService.instance!!.isAnyBlackShowing() }
+            SystemClock.sleep(300)
+            main { check(OverlayService.instance!!.isAnyBlackShowing()) { "Single click returned despite anti-mistouch" } }
+            main { root.findViewById<android.view.View>(R.id.black_return_button).performLongClick() }
+            await("Long press return did not remove curtain") { !OverlayService.instance!!.isAnyBlackShowing() }
+            val recorded=SessionLog.sessions(ctx).firstOrNull { it.mode==SessionLog.MODE_BLACK }
+            val heldMs=SystemClock.elapsedRealtime()-shownAt
+            check(recorded!=null) { "Curtain session was not recorded (held=${heldMs}ms screenOff=${offMs}ms → 有效=${heldMs-offMs}ms，起记线 60000ms)" }
+            val curtainWall=recorded!!.end-recorded.start
+            check(kotlin.math.abs(curtainWall-recorded.durationMs-offMs)<=2_000) {
+                "Screen-off time leaked into listening duration: wall=${curtainWall}ms recorded=${recorded.durationMs}ms off=${offMs}ms"
+            }
             main { activity.findViewById<android.view.View>(R.id.card_black).performClick() }
             await("Home stop did not stop assistant") { !OverlayService.isRunning }
             java.io.File(ctx.cacheDir,"flow-uat/expiry.json").apply { parentFile!!.mkdirs() }.writeText(
                 org.json.JSONObject().put("uiStarted",true).put("bubbleOpened",true).put("inactiveTargetRetained",true)
                     .put("editorHeldBeyondFiveSeconds",true).put("acceptedOneMinute",true).put("originalPauseCount",selectedPauses)
-                    .put("otherPauseCount",otherPauses).put("pauseConfirmed",true).put("curtainKept",true).put("returned",true).put("stopped",true).toString())
+                    .put("otherPauseCount",otherPauses).put("pauseConfirmed",true).put("curtainKept",true).put("returned",true).put("stopped",true)
+                    .put("screenOffKeptCurtain",true).put("singleClickKeptCurtain",true)
+                    .put("screenOffExcludedMs",curtainWall-recorded.durationMs).toString())
         } finally {
             main {
                 runCatching { selected.release() };runCatching { other.release() };PlaybackSelection.clear()

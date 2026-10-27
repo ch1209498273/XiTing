@@ -46,6 +46,8 @@
     <string name="pager_next">Вперёд ›</string>
     <string name="settings_personal">Персонализация</string>
     <string name="switch_direct">Разблокировать касанием</string>
+    <string name="switch_mistouch_guard">Защита от случайных нажатий</string>
+    <string name="switch_mistouch_guard_sub">Двойное касание для разблокировки, удержание для возврата; чёрный экран при блокировке</string>
     <string name="switch_info">Показывать время и заряд на чёрном экране</string>
     <string name="switch_media">Управление воспроизведением на чёрном экране</string>
     <string name="switch_media_sub">Название и ±30 с требуют доступ к уведомлениям</string>
@@ -100,8 +102,10 @@
     <string name="widget_today_fmt">Сегодня %1$s</string>
     <string name="widget_growth_next">Прогресс %1$d · до следующей формы %2$d</string>
     <string name="widget_growth_max">Прогресс %1$d · Максимум</string>
-    <string name="black_hint">Слушание с выключенным экраном · Коснитесь, чтобы разблокировать</string>
-    <string name="black_return">Вернуться к плееру</string>
+    <string name="black_hint">Слушание с выключенным экраном · Дважды коснитесь, чтобы разблокировать</string>
+    <string name="black_return">Удерживайте, чтобы вернуться к плееру</string>
+    <string name="black_hint_tap">Слушание с выключенным экраном · Коснитесь, чтобы разблокировать</string>
+    <string name="black_return_tap">Вернуться к плееру</string>
     <string name="channel_name">Помощник</string>
     <string name="notif_title">Помощник запущен</string>
     <string name="notif_text">Коснитесь пузырька: экран погаснет, звук продолжится%1$s</string>

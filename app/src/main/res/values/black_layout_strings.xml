@@ -4,5 +4,6 @@
     <string name="black_timer_off">未开启</string>
     <string name="black_timer_pause_fmt">%1$s 后暂停</string>
     <string name="black_timer_return_fmt">%1$s 后撤幕</string>
-    <string name="black_wake_hint">轻点空白处继续黑屏</string>
+    <string name="black_wake_hint">长按下方按钮返回 · 轻点空白处继续黑屏</string>
+    <string name="black_wake_hint_tap">轻点空白处继续黑屏</string>
 </resources>

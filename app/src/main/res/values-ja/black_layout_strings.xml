@@ -4,5 +4,6 @@
     <string name="black_timer_off">オフ</string>
     <string name="black_timer_pause_fmt">%1$s 後に一時停止</string>
     <string name="black_timer_return_fmt">%1$s 後に戻る</string>
-    <string name="black_wake_hint">パネルの外をタップすると黒画面に戻ります</string>
+    <string name="black_wake_hint">下のボタンを長押しで戻る · 外側をタップで黒画面</string>
+    <string name="black_wake_hint_tap">パネルの外をタップすると黒画面に戻ります</string>
 </resources>

@@ -8,6 +8,14 @@
                 <Switch android:id="@+id/switch_direct" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </LinearLayout>
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider_soft" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="76dp" android:gravity="center_vertical" android:orientation="horizontal">
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="12dp" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/switch_mistouch_guard" android:textColor="@color/text_primary" android:textSize="15sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/switch_mistouch_guard_sub" android:textColor="@color/text_hint" android:textSize="12sp" />
+                </LinearLayout>
+                <Switch android:id="@+id/switch_mistouch_guard" android:layout_width="wrap_content" android:layout_height="wrap_content" android:contentDescription="@string/switch_mistouch_guard" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider_soft" />
             <LinearLayout android:layout_width="match_parent" android:layout_height="52dp" android:gravity="center_vertical" android:orientation="horizontal">
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/switch_info" android:textColor="@color/text_primary" android:textSize="15sp" />
                 <Switch android:id="@+id/switch_info" android:layout_width="wrap_content" android:layout_height="wrap_content" />

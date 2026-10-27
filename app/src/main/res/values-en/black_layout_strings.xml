@@ -4,5 +4,6 @@
     <string name="black_timer_off">Off</string>
     <string name="black_timer_pause_fmt">Pause in %1$s</string>
     <string name="black_timer_return_fmt">Return in %1$s</string>
-    <string name="black_wake_hint">Tap outside the panel to return to black</string>
+    <string name="black_wake_hint">Hold the button below to return · Tap outside to stay black</string>
+    <string name="black_wake_hint_tap">Tap outside the panel to return to black</string>
 </resources>

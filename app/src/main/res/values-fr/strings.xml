@@ -46,6 +46,8 @@
     <string name="pager_next">Suivant ›</string>
     <string name="settings_personal">Personnalisation</string>
     <string name="switch_direct">Déverrouiller d\'un toucher</string>
+    <string name="switch_mistouch_guard">Verrouillage anti-fausses manips</string>
+    <string name="switch_mistouch_guard_sub">Double toucher pour déverrouiller, maintien pour revenir ; garde le rideau en veille</string>
     <string name="switch_info">Afficher heure et batterie sur l\'écran noir</string>
     <string name="switch_media">Commandes de lecture sur l\'écran noir</string>
     <string name="switch_media_sub">Titre et ±30 s : accès notifications requis</string>
@@ -100,8 +102,10 @@
     <string name="widget_today_fmt">Aujourd\'hui %1$s</string>
     <string name="widget_growth_next">Progression %1$d · %2$d avant la forme suivante</string>
     <string name="widget_growth_max">Progression %1$d · Au sommet</string>
-    <string name="black_hint">Écoute écran off · Touchez pour déverrouiller</string>
-    <string name="black_return">Retour au lecteur</string>
+    <string name="black_hint">Écoute écran off · Touchez deux fois pour déverrouiller</string>
+    <string name="black_return">Maintenez pour revenir au lecteur</string>
+    <string name="black_hint_tap">Écoute écran off · Touchez pour déverrouiller</string>
+    <string name="black_return_tap">Retour au lecteur</string>
     <string name="channel_name">Assistant Écran off</string>
     <string name="notif_title">Assistant écran off en marche</string>
     <string name="notif_text">Touchez la bulle : l\'écran s\'éteint, le son continue%1$s</string>

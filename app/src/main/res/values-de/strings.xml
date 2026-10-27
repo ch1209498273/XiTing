@@ -46,6 +46,8 @@
     <string name="pager_next">Weiter ›</string>
     <string name="settings_personal">Personalisierung</string>
     <string name="switch_direct">Durch Antippen direkt entsperren</string>
+    <string name="switch_mistouch_guard">Schutz vor Fehlbedienung</string>
+    <string name="switch_mistouch_guard_sub">Doppeltippen zum Entsperren, gedrückt halten zum Zurückkehren; Vorhang bleibt bei Sperre</string>
     <string name="switch_info">Uhrzeit und Akku im schwarzen Bildschirm anzeigen</string>
     <string name="switch_media">Wiedergabesteuerung im schwarzen Bildschirm</string>
     <string name="switch_media_sub">Titel und ±30 s benötigen Benachrichtigungszugriff</string>
@@ -100,8 +102,10 @@
     <string name="widget_today_fmt">Heute %1$s</string>
     <string name="widget_growth_next">Fortschritt %1$d · noch %2$d bis zur nächsten Form</string>
     <string name="widget_growth_max">Fortschritt %1$d · Höchststand</string>
-    <string name="black_hint">Bildschirm aus · Zum Entsperren antippen</string>
-    <string name="black_return">Zurück zum Player</string>
+    <string name="black_hint">Bildschirm aus · Zum Entsperren doppeltippen</string>
+    <string name="black_return">Zum Player: gedrückt halten</string>
+    <string name="black_hint_tap">Bildschirm aus · Zum Entsperren antippen</string>
+    <string name="black_return_tap">Zurück zum Player</string>
     <string name="channel_name">Bildschirm-aus-Assistent</string>
     <string name="notif_title">Assistent läuft</string>
     <string name="notif_text">Blase antippen: Bildschirm aus, Ton läuft weiter%1$s</string>

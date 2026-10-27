@@ -29,9 +29,11 @@ internal class ListeningPanelChecks(private val i:Instrumentation) {
                 overlay=BlackOverlay(ctx,android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,recordSession=false)
                 overlay.show { }
                 root=BlackOverlay::class.java.getDeclaredField("frame").apply { isAccessible=true }.get(overlay) as View
-                val time=SystemClock.uptimeMillis()
-                for(action in listOf(MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP)) {
-                    val event=MotionEvent.obtain(time,time+20,action,100f,100f,0);root.dispatchTouchEvent(event);event.recycle()
+                val start=SystemClock.uptimeMillis()
+                for(offset in listOf(0L,100L)) {
+                    for(action in listOf(MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP)) {
+                        val event=MotionEvent.obtain(start+offset,start+offset+40,action,100f,100f,0);root.dispatchTouchEvent(event);event.recycle()
+                    }
                 }
             }
             try {

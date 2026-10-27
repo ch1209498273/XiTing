@@ -27,3 +27,20 @@ object ContentIdentityPolicy {
     fun same(pkg:String,id:String?,otherPkg:String,otherId:String?)=
         pkg==otherPkg && !id.isNullOrBlank() && id==otherId
 }
+internal object ListeningCapturePolicy {
+    /**
+     * 「最近听过」的准入与合并键，返回（合并键 → 要写库的快照）。
+     * 1) 给了可用标题：有 media id 用 media id，没有就退回标题键；
+     *    [ContentIdentityPolicy.same] 另要求同包名，历史条目仍不因标题相同而合并。
+     * 2) 没给可用标题（或标题只是 App 自己名字）但确实在播：只记一条「来源」条目，
+     *    标题写空，列表按现有口径显示「未识别内容」。抖音、直播一类靠这条不至于全空。
+     * 3) 既没可用标题又没在播：不记——挂着暂停会话的 App 不该产出记录。
+     */
+    fun resolve(s:ContentSnapshot):Pair<String,ContentSnapshot>? {
+        if(s.pkg.isBlank())return null
+        val t=s.title?.takeIf{it.isNotBlank()}
+        if(t!=null && (s.identity!=null || t!=s.app))
+            return (s.identity?.takeIf{it.isNotBlank()} ?: "\u0000t$t") to s
+        return if(s.playing)"\u0000p${s.pkg}" to s.copy(title=null) else null
+    }
+}

@@ -1,6 +1,7 @@
 // XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/trace.json
 package com.lujinyu.xiting
 
+import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,6 +11,7 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.os.SystemClock
 import android.util.Log
 import android.view.Gravity
@@ -28,10 +30,12 @@ import android.widget.TextView
 /**
  * 黑屏遮罩：全屏纯黑窗口，吞掉所有触摸防误触。
  *
- * 交互（两段式解锁）：
+ * 交互（防误触开，[Prefs.MISTOUCH_GUARD]）：
  *   锁定态：全黑 + 背光物理关闭（screenBrightness=OFF）
- *   轻点屏幕 → 解除锁定：背光恢复到用户亮度，浮现紧凑播放面板
- *   点返回播放器 → 返回原应用；5秒无操作 → 自动重新锁定
+ *   双击屏幕 → 解除锁定：背光恢复到用户亮度，浮现紧凑播放面板
+ *   长按「返回播放器」→ 返回原应用；5秒无操作 → 自动重新锁定
+ *   电源键锁屏时保留黑幕，锁屏时长不计入听剧会话
+ * 防误触关（默认）：轻点解锁、单击返回、熄屏撤幕——与旧版一致。
  *
  * 系统栏隐藏（实测重要）：insets隐藏只做一次、绝不周期性重复调用——
  * ColorOS 16上反复调用hide()反而会让系统栏重新显示（真机A/B实测结论）。
@@ -87,6 +91,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     private var badgeListener: ((Int) -> Unit)? = null
     private var onDismissCallback: (() -> Unit)? = null
     private var directUnlock = false          // 轻点直接解锁（跳过两段式）
+    private var mistouchGuard = false         // 防误触：双击解锁/长按返回/锁屏保留黑幕
     private var showInfo = false              // 黑幕时钟/电量显示（默认关，首页可开）
     private var clockText: TextView? = null
     private var batteryText: TextView? = null
@@ -95,7 +100,21 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     /** 会话开始时的剩余电荷（µAh）；null = 读不到（不支持或当时在充电） */
     private var sessionStartUwh: Long? = null
     private var sessionStartElapsed = 0L   // 单调时钟：用于时长计算，不受时间跳变/跨天影响
+    private var screenOffAt = 0L           // 本次锁屏开始（单调时钟）；0 = 当前不在锁屏
+    private var screenOffTotal = 0L        // 本次会话累计锁屏时长，记录时扣除
     private val relockRunnable = Runnable { if(timerEditor==null)sleep() }
+    /**
+     * 解锁兜底：少数 ROM 不把 USER_PRESENT 送到后台进程。
+     * 只在「亮屏且仍锁屏」期间每秒看一次 Keyguard；真正解锁即恢复计时。
+     */
+    private val unlockWatch = object : Runnable {
+        override fun run() {
+            if(!isShowing || screenOffAt == 0L)return
+            if(!isInteractive())return
+            if(isKeyguardLocked()) { main.postDelayed(this,1_000);return }
+            resumeSessionClock("unlocked")
+        }
+    }
 
     // 黑幕时钟：每15秒刷新（分钟级精度足够）
     private val clockTick: Runnable = Runnable {
@@ -139,6 +158,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
 
     fun show(onDismiss: () -> Unit) {
         if (isShowing) return
+        mistouchGuard = context.prefs().getBoolean(Prefs.MISTOUCH_GUARD, false)
         PlaybackSelection.beginAutomaticCurtain()
         try { context.queryNowPlaying() } catch(_:RuntimeException) { }
 
@@ -155,7 +175,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         f.setBackgroundColor(Color.BLACK)
 
         val hint = TextView(context).apply {
-            text = context.getString(R.string.black_hint)
+            text = context.getString(if(mistouchGuard) R.string.black_hint else R.string.black_hint_tap)
             textSize = 15f
             setTextColor(0x66FFFFFF.toInt())
             gravity = Gravity.CENTER
@@ -200,12 +220,21 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         }
         val pill = TextView(context).apply {
             id=R.id.black_return_button
-            text=context.getString(if(demo)R.string.black_demo_return else R.string.black_return)
+            text=context.getString(when {
+                demo -> R.string.black_demo_return
+                mistouchGuard -> R.string.black_return
+                else -> R.string.black_return_tap
+            })
             textSize=15f;setTextColor(Color.WHITE);gravity=Gravity.CENTER
             minHeight=dp(48);setPadding(dp(12),dp(10),dp(12),dp(10))
             background=surface(0xff252b28.toInt(),14)
             visibility=View.INVISIBLE;alpha=0f
-            setOnClickListener { hide();onDismiss() }
+            if(demo)setOnClickListener { hide();onDismiss() }
+            else {
+                // 防误触开：单击不退出，必须长按；关：沿用旧版单击返回（长按也返回）。
+                setOnClickListener { if(!mistouchGuard){ hide();onDismiss() } }
+                setOnLongClickListener { hide();onDismiss();true }
+            }
         }
         val showMedia=context.prefs().getBoolean(Prefs.BLACK_MEDIA_CONTROLS,false)
         val media=LinearLayout(context).apply {
@@ -450,13 +479,22 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         onDismissCallback = onDismiss
 
         val gd = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                if(timerEditor!=null)return true
+                if(directUnlock) {
+                    val onReturn=onDismissCallback
+                    hide()
+                    onReturn?.invoke()
+                } else if (!awake) wake()
+                return true
+            }
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 if(timerEditor!=null)return true
                 if (directUnlock) {
                     val onReturn=onDismissCallback
                     hide()
                     onReturn?.invoke()
-                } else if (awake) sleep() else wake()
+                } else if (awake) sleep() else if(mistouchGuard) showLockedHint() else wake()
                 return true
             }
         })
@@ -510,6 +548,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
             if(recordSession && !demo)com.lujinyu.xiting.listening.ListeningRecorder.start(context)
             sessionStart = if(recordSession)System.currentTimeMillis() else 0L
             sessionStartElapsed = SystemClock.elapsedRealtime()
+            screenOffAt = 0L;screenOffTotal = 0L
             // 省电实测：记下会话开始时的能量计数器读数，作为差值法的起点
             sessionStartUwh = if(recordSession)PowerCalib.energyCounter(context) else null
             Log.i(TAG, "black overlay added, type=$windowType, backlight override OFF")
@@ -555,12 +594,16 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
             // 时长用单调时钟：就算系统时间被改/跨天，记录的也是真实经过的时间。
             // 只有设备中途重启（elapsed回绕为负）才退回墙钟差。
             val elapsed = SystemClock.elapsedRealtime() - sessionStartElapsed
-            val dur = if (elapsed >= 0) elapsed else now - sessionStart
+            val raw = if (elapsed >= 0) elapsed else now - sessionStart
+            // 锁屏期间不算听剧：否则按电源键锁一夜会被记成整夜播放。
+            val screenOff = screenOffTotal + if(screenOffAt > 0) (SystemClock.elapsedRealtime() - screenOffAt).coerceAtLeast(0) else 0
+            val dur = (raw - screenOff).coerceAtLeast(0)
             SessionLog.add(context, ListenSession(sessionStart, now, dur, SessionLog.MODE_BLACK))
             // 省电实测：用能量计数器的**差值**记录本次黑屏段真实能耗。
             // 零打扰 —— 用户什么都没做，一次会话就是一个精确样本。
+            // 跨过锁屏的样本不采：能量差值包含熄屏段，会把黑幕的单位时间功耗算低。
             val startUwh = sessionStartUwh
-            if (startUwh != null && !PowerCalib.isCharging(context)) {
+            if (screenOff == 0L && startUwh != null && !PowerCalib.isCharging(context)) {
                 PowerCalib.energyCounter(context)?.let { endUwh ->
                     PowerCalib.recordSegment(context, startUwh, endUwh, dur, black = true)
                 }
@@ -599,6 +642,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
             }
             sessionStart = 0
             sessionStartUwh = null
+            screenOffAt = 0L
+            screenOffTotal = 0L
         }
         badgeListener?.let { NotificationBadge.unregister(it) }
         badgeListener = null
@@ -611,6 +656,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         main.removeCallbacks(burnInTick)
         main.removeCallbacks(nowPlayingTick)
         main.removeCallbacks(seekReset)
+        main.removeCallbacks(unlockWatch)
         captionListener?.let { CaptionBus.unregister(it) }
         captionListener = null
         captionText = null
@@ -638,7 +684,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         titleText?.animate()?.withEndAction(null)?.cancel()
         mediaRow?.animate()?.withEndAction(null)?.cancel()
         unlockPill?.animate()?.withEndAction(null)?.cancel()
-        touchHint?.text=context.getString(R.string.black_wake_hint)
+        showHint(if(mistouchGuard) R.string.black_wake_hint else R.string.black_wake_hint_tap,8_000)
         val f = frame ?: return
         val l = lp ?: return
         l.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
@@ -665,7 +711,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         if(timerEditor!=null)return
         if (!awake) return
         awake = false
-        touchHint?.text=context.getString(R.string.black_hint)
+        showHint(if(mistouchGuard) R.string.black_hint else R.string.black_hint_tap,3_000)
         main.removeCallbacks(relockRunnable)
         wakePanel?.visibility=View.INVISIBLE
         val f = frame ?: return
@@ -686,6 +732,65 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         main.removeCallbacks(nowPlayingTick)
         Log.i(TAG, "sleep: 重新锁定")
         OverlayService.instance?.onCurtainStateChanged()
+    }
+
+    /** 锁定态单击只给一次暗提示，不恢复背光；避免被被子/手指碰亮。 */
+    private fun showLockedHint()=showHint(R.string.black_hint,2_500)
+
+    private fun showHint(res:Int,holdMs:Long) {
+        val h=touchHint?:return
+        h.animate().cancel()
+        h.text=context.getString(res)
+        h.visibility=View.VISIBLE
+        h.alpha=1f
+        h.animate().alpha(0f).setStartDelay(holdMs).setDuration(1_000).start()
+    }
+
+    /** 电源键/自动熄屏：保留黑幕，只收回锁定态；锁屏时长不计入会话。 */
+    internal fun onScreenOff() {
+        if(!isShowing || demo)return
+        main.removeCallbacks(unlockWatch)
+        if(screenOffAt == 0L)screenOffAt = SystemClock.elapsedRealtime()
+        closeTimerEditor?.invoke()
+        if(awake)sleep()
+        Log.i(TAG, "screen off: curtain kept, session clock paused")
+    }
+
+    /** 亮屏不等于人回来了：ColorOS 按电源键会先亮到锁屏/AOD，此时继续暂停计时。 */
+    internal fun onScreenOn() {
+        if(!isShowing || screenOffAt == 0L)return
+        if(isKeyguardLocked()) {
+            main.removeCallbacks(unlockWatch)
+            main.postDelayed(unlockWatch,1_000)
+            return
+        }
+        resumeSessionClock("screen on")
+    }
+
+    /** 解锁（USER_PRESENT）才算真正回来；防 ROM 漏发 SCREEN_ON 时也能恢复计时。 */
+    internal fun onUserPresent() {
+        if(!isShowing || screenOffAt == 0L)return
+        if(isKeyguardLocked())return   // 广播早于锁屏真正解除：留给 unlockWatch
+        resumeSessionClock("user present")
+    }
+
+    private fun isKeyguardLocked():Boolean = try {
+        (context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager).isKeyguardLocked
+    } catch (_:Exception) {
+        false   // 读不到就按未锁屏处理，宁可恢复计时也不把时长吞掉
+    }
+
+    private fun isInteractive():Boolean = try {
+        (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
+    } catch (_:Exception) {
+        true
+    }
+
+    private fun resumeSessionClock(why:String) {
+        main.removeCallbacks(unlockWatch)
+        screenOffTotal += (SystemClock.elapsedRealtime() - screenOffAt).coerceAtLeast(0)
+        screenOffAt = 0L
+        Log.i(TAG, "$why: session clock resumed")
     }
 
     internal fun refreshTimerDisplay() {

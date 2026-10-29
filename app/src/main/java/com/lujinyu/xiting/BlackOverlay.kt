@@ -49,6 +49,8 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     companion object {
         private const val TAG = "XiTing"
         private const val RELLOCK_DELAY_MS = 5000L
+        /** 注入媒体键后等多久判一次内容有没有变：太短会把慢切集误判成不支持 */
+        private const val SKIP_PROBE_MS = 800L
     }
 
     private val wm =
@@ -78,6 +80,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
     private var captionText: TextView? = null      // 黑幕字幕（实验性，无障碍采集，居中大字）
     private var seekBackBtn: TextView? = null      // ±30s（会话声明 ACTION_SEEK_TO 才显示）
     private var seekFwdBtn: TextView? = null
+    private var skipHintText: TextView? = null     // 播控行在、但会话没声明切集能力时的一行说明
     /** ±30s 连点防抖基准：-1 = 窗口外（下一次点按从真实位置起算） */
     private var lastSeekTarget = -1L
     private val seekReset = Runnable { lastSeekTarget = -1 }
@@ -254,7 +257,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
             layoutParams=LinearLayout.LayoutParams(0,dp(48),1f)
             setOnClickListener { nudgeSeek(delta) };visibility=View.GONE
         }
-        val previous=mediaButton(R.drawable.ic_media_prev,context.getString(R.string.cd_prev_episode)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS) }
+        val previous=mediaButton(R.drawable.ic_media_prev,context.getString(R.string.cd_prev_episode)) { skipPressed(SkipProbePolicy.DIRECTION_PREVIOUS) }
         previousBtn=previous;media.addView(previous)
         val seekBack=seekButton("−30",context.getString(R.string.cd_seek_back),-30_000)
         seekBackBtn=seekBack;media.addView(seekBack)
@@ -267,7 +270,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         playPauseBtn=ppBtn;media.addView(ppBtn)
         val seekFwd=seekButton("+30",context.getString(R.string.cd_seek_forward),30_000)
         seekFwdBtn=seekFwd;media.addView(seekFwd)
-        val next=mediaButton(R.drawable.ic_media_next,context.getString(R.string.cd_next_episode)) { sendMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT) }
+        val next=mediaButton(R.drawable.ic_media_next,context.getString(R.string.cd_next_episode)) { skipPressed(SkipProbePolicy.DIRECTION_NEXT) }
         nextBtn=next;media.addView(next)
 
         val source=TextView(context).apply {
@@ -286,6 +289,15 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         information.addView(source,LinearLayout.LayoutParams(-1,-2))
         information.addView(title,LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(6) })
         if(showMedia)information.addView(media,LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(16) })
+        // 切集键被隐藏时唯一的解释入口：没有这一行，用户只能看到「按钮凭空少了两个」。
+        val skipHint=TextView(context).apply {
+            text=context.getString(R.string.black_no_skip_hint)
+            textSize=12f;setTextColor(0xffa7b6ad.toInt());maxLines=2
+            ellipsize=android.text.TextUtils.TruncateAt.END;setLineSpacing(2*density,1f)
+            visibility=View.GONE
+        }
+        skipHintText=skipHint
+        if(showMedia)information.addView(skipHint,LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(6) })
 
         val timerArea=LinearLayout(context).apply {
             orientation=LinearLayout.VERTICAL
@@ -668,6 +680,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         mediaRow = null
         playPauseBtn = null
         previousBtn=null;nextBtn=null;lastSeekSession=null
+        skipHintText=null
         titleText = null;sourceText=null;touchHint=null
         timerEditor?.dispose();timerEditor=null;closeTimerEditor=null
         wakePanel=null;timerStatus=null;timerArea=null
@@ -839,10 +852,9 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
                 val controls=np.controller.transportControls
                 val actions=np.controller.playbackState?.actions ?: 0L
                 fun supports(action:Long)=actions and action!=0L
-                when(code) {
-                    KeyEvent.KEYCODE_MEDIA_PREVIOUS -> if(supports(android.media.session.PlaybackState.ACTION_SKIP_TO_PREVIOUS))controls.skipToPrevious()
-                    KeyEvent.KEYCODE_MEDIA_NEXT -> if(supports(android.media.session.PlaybackState.ACTION_SKIP_TO_NEXT))controls.skipToNext()
-                    KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> if(np.playing) {
+                // 切集不走这里：声明判断、媒体键注入与探针都在 skipPressed
+                if(code==KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
+                    if(np.playing) {
                         if(supports(android.media.session.PlaybackState.ACTION_PAUSE) || supports(android.media.session.PlaybackState.ACTION_PLAY_PAUSE))controls.pause()
                     } else if(supports(android.media.session.PlaybackState.ACTION_PLAY) || supports(android.media.session.PlaybackState.ACTION_PLAY_PAUSE))controls.play()
                 }
@@ -857,6 +869,62 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         }
         // 媒体键生效后刷新播放/暂停图标（音频状态更新有延迟）
         main.postDelayed({ refreshNowPlaying() }, 400)
+    }
+
+    /**
+     * 切集。三条路（[SkipProbePolicy.route]）：
+     *   会话声明了该方向 → 直接 transportControls；
+     *   没声明但没判死 → 注入媒体键赌一次（短视频类 App 常只处理按键不写能力位），
+     *                    800ms 后按内容签名判定，没变就判死；
+     *   已判死 → 什么都不做（键此时是灰的、不可点，走不到这里）。
+     * 任何一路都重置重锁计时：按了就该亮着，别让人以为没反应又误触一次。
+     */
+    private fun skipPressed(direction:Int) {
+        val np=context.queryNowPlaying()
+        if(np==null || !np.controlsReliable) { Log.i(TAG,"skip: no reliable session"); return }
+        val now=SystemClock.elapsedRealtime()
+        val bit=if(direction==SkipProbePolicy.DIRECTION_NEXT) android.media.session.PlaybackState.ACTION_SKIP_TO_NEXT
+            else android.media.session.PlaybackState.ACTION_SKIP_TO_PREVIOUS
+        val actions=np.controller.playbackState?.actions ?: 0L
+        when(SkipProbePolicy.route(actions and bit != 0L, SkipProbe.isDead(np.pkg,direction,now))) {
+            SkipRoute.NOTHING -> Log.i(TAG,"skip: dead dir=$direction ignored")
+            SkipRoute.TRANSPORT -> try {
+                if(direction==SkipProbePolicy.DIRECTION_NEXT) np.controller.transportControls.skipToNext()
+                else np.controller.transportControls.skipToPrevious()
+                Log.i(TAG,"skip: transport dir=$direction")
+            } catch(e:RuntimeException) { Log.w(TAG,"skip transport failed: $e") }
+            SkipRoute.INJECT -> {
+                val before=SkipProbePolicy.signature(np.title,np.mediaId)
+                val code=if(direction==SkipProbePolicy.DIRECTION_NEXT) KeyEvent.KEYCODE_MEDIA_NEXT
+                    else KeyEvent.KEYCODE_MEDIA_PREVIOUS
+                try {
+                    am.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN,code))
+                    am.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP,code))
+                } catch(e:RuntimeException) { Log.w(TAG,"skip inject failed: $e") }
+                Log.i(TAG,"skip: inject dir=$direction awaiting probe")
+                main.postDelayed({ judgeSkip(np.pkg,direction,before) },SKIP_PROBE_MS)
+            }
+        }
+        if(awake) {
+            main.removeCallbacks(relockRunnable)
+            main.postDelayed(relockRunnable,RELLOCK_DELAY_MS)
+        }
+        main.postDelayed({ refreshNowPlaying() },400)
+    }
+
+    /** 探针结论：只有「前后都拿到可比签名且一模一样」才判死；读不到签名保持可点，不把「我们读不到」说成「它不行」。 */
+    private fun judgeSkip(pkg:String,direction:Int,before:String?) {
+        val np=context.queryNowPlaying()
+        val after=if(np==null) null else SkipProbePolicy.signature(np.title,np.mediaId)
+        when(SkipProbePolicy.verdict(before,after)) {
+            SkipVerdict.DEAD -> {
+                SkipProbe.markDead(pkg,direction,SystemClock.elapsedRealtime())
+                Log.i(TAG,"skip: dead dir=$direction (no content change in ${SKIP_PROBE_MS}ms)")
+                refreshNowPlaying()
+            }
+            SkipVerdict.WORKED -> Log.i(TAG,"skip: inject worked dir=$direction")
+            SkipVerdict.INCONCLUSIVE -> Log.i(TAG,"skip: no comparable signature dir=$direction")
+        }
     }
 
     private var captionListener: ((String) -> Unit)? = null
@@ -892,6 +960,7 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         if(demo) {
             sourceText?.visibility=View.GONE
             mediaRow?.visibility=View.GONE
+            skipHintText?.visibility=View.GONE
             timerStatus?.visibility=View.GONE
             frame?.findViewWithTag<View>("flow_timer_setup")?.visibility=View.GONE
             frame?.findViewById<View>(R.id.black_timer_extend)?.visibility=View.GONE
@@ -904,11 +973,17 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         val btn = playPauseBtn
         val actions=np?.controller?.playbackState?.actions ?: 0L
         fun supports(action:Long)=actions and action!=0L
-        previousBtn?.visibility=if(np==null || supports(android.media.session.PlaybackState.ACTION_SKIP_TO_PREVIOUS))View.VISIBLE else View.GONE
-        nextBtn?.visibility=if(np==null || supports(android.media.session.PlaybackState.ACTION_SKIP_TO_NEXT))View.VISIBLE else View.GONE
-        for(control in listOf(previousBtn,nextBtn))control?.apply {
-            isEnabled=!targetUnavailable;alpha=if(isEnabled)1f else .35f
-        }
+        // 切集键常驻：短视频类 App 常在 onMediaButtonEvent 里响应上一集/下一集却不声明
+        // ACTION_SKIP_TO_*，只看能力位会把它们误杀成「按钮凭空消失」（2026-10-29 报障）。
+        // 只有实测注入没反应（判死）才转灰不可点；两向都判死才补一行说明。
+        val probeNow=SystemClock.elapsedRealtime()
+        SkipProbe.noteContent(SkipProbePolicy.signature(np?.title,np?.mediaId))
+        val previousDead=np!=null && SkipProbe.isDead(np.pkg,SkipProbePolicy.DIRECTION_PREVIOUS,probeNow)
+        val nextDead=np!=null && SkipProbe.isDead(np.pkg,SkipProbePolicy.DIRECTION_NEXT,probeNow)
+        previousBtn?.visibility=View.VISIBLE
+        nextBtn?.visibility=View.VISIBLE
+        previousBtn?.apply { isEnabled=!targetUnavailable && !previousDead;alpha=if(isEnabled)1f else .35f }
+        nextBtn?.apply { isEnabled=!targetUnavailable && !nextDead;alpha=if(isEnabled)1f else .35f }
         if (btn != null) {
             val playing = np?.playing ?: try { am.isMusicActive } catch (_: Exception) { false }
             val capability=if(playing)android.media.session.PlaybackState.ACTION_PAUSE else android.media.session.PlaybackState.ACTION_PLAY
@@ -934,8 +1009,11 @@ class BlackOverlay(private val context: Context, private val windowType: Int,
         val on = np?.canSeek == true
         seekBackBtn?.visibility = if (on) View.VISIBLE else View.GONE
         seekFwdBtn?.visibility = if (on) View.VISIBLE else View.GONE
-        mediaRow?.visibility=if(!targetUnavailable && listOf(previousBtn,nextBtn,playPauseBtn,seekBackBtn,seekFwdBtn)
-            .any { it?.visibility==View.VISIBLE && it.isEnabled })View.VISIBLE else View.GONE
+        val rowVisible=!targetUnavailable && listOf(previousBtn,nextBtn,playPauseBtn,seekBackBtn,seekFwdBtn)
+            .any { it?.visibility==View.VISIBLE && it.isEnabled }
+        mediaRow?.visibility=if(rowVisible)View.VISIBLE else View.GONE
+        // 整排都不可用时上面已有「请返回播放器」；这一行只回答「切集键为什么按不动」
+        skipHintText?.visibility=if(rowVisible && previousDead && nextDead)View.VISIBLE else View.GONE
     }
 
     /**

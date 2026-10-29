@@ -19,11 +19,13 @@ import android.media.session.PlaybackState
  */
 data class NowPlaying(
     val title: String?,       // 会话标题（剧名/集名）；缺或空为 null
+    val mediaId: String?,     // 内容标识；缺为 null。与 title 一起构成切集探针的内容签名
     val appLabel: String?,    // 播放来源 App 的展示名；读不到时显示本地化「播放器」
     val pkg: String,          // 会话所属包名（字幕采集的前台过滤用）
     val positionMs: Long,     // 当前进度（playbackState.position 已按 lastUpdateTime 折算到当前）
     val durationMs: Long,     // 总时长；读不到为 0
     val canSeek: Boolean,     // 会话是否声明支持 seekTo（±30s 按钮的兼容性探测依据）
+    val canSkip: Boolean,     // 会话是否声明支持上一集/下一集（任一即可；切集键与提示的判据）
     val playing: Boolean,
     internal val controller: android.media.session.MediaController,
     val controlsReliable:Boolean=true
@@ -63,9 +65,11 @@ fun Context.queryNowPlaying(): NowPlaying? {
     val md = pick.metadata
     val reliable=playbackControlsReliable(ps.state)
     val title = md?.getString(MediaMetadata.METADATA_KEY_TITLE)?.takeIf { reliable && it.isNotBlank() }
+    val mediaId = md?.getString(MediaMetadata.METADATA_KEY_MEDIA_ID)?.takeIf { it.isNotBlank() }
     val appLabel = playerLabel(pick.packageName)
     return NowPlaying(
         title = title,
+        mediaId = mediaId,
         appLabel = appLabel,
         pkg = pick.packageName,
         positionMs = PlaybackMath.position(ps.position, ps.lastPositionUpdateTime,
@@ -74,6 +78,8 @@ fun Context.queryNowPlaying(): NowPlaying? {
             md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L),
         durationMs = md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L,
         canSeek = reliable && (md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L)>0 && ps.actions and PlaybackState.ACTION_SEEK_TO != 0L,
+        canSkip = reliable && ps.actions and
+            (PlaybackState.ACTION_SKIP_TO_PREVIOUS or PlaybackState.ACTION_SKIP_TO_NEXT) != 0L,
         playing = ps.state == PlaybackState.STATE_PLAYING || (!reliable && lookup.audioActive && pick.sessionToken==lookup.systemToken),
         controller = pick,
         controlsReliable = reliable

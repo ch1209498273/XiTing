@@ -17,11 +17,20 @@ internal object SupportDiagnostics {
         val media = try { context.queryNowPlaying() } catch (_: RuntimeException) { null }
         val service = OverlayService.instance
         val actions = try { media?.controller?.playbackState?.actions ?: 0L } catch (_: RuntimeException) { 0L }
+        // 判死是进程内的经验值，导出这一位才能远程分辨「没声明」与「声明了但注入没响」
+        val probeNow = android.os.SystemClock.elapsedRealtime()
+        val skipProbe = media?.let { m ->
+            listOf(
+                if (SkipProbe.isDead(m.pkg, SkipProbePolicy.DIRECTION_PREVIOUS, probeNow)) "prev" else null,
+                if (SkipProbe.isDead(m.pkg, SkipProbePolicy.DIRECTION_NEXT, probeNow)) "next" else null
+            ).filterNotNull().joinToString("+").ifEmpty { "none" }
+        } ?: "no_session"
         return SupportSnapshot(Settings.canDrawOverlays(context), context.hasMediaAccess(),
             (context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.areNotificationsEnabled() == true,
             (context.getSystemService(Context.POWER_SERVICE) as? PowerManager)?.isIgnoringBatteryOptimizations(context.packageName) == true,
             media != null, media?.playing == true, actions and PlaybackState.ACTION_PAUSE != 0L,
-            media?.canSeek == true, service != null, service?.isAnyBlackShowing() == true)
+            media?.canSeek == true, media?.canSkip == true, service != null, service?.isAnyBlackShowing() == true,
+            skipProbe)
     }
 
     fun show(activity: Activity): AlertDialog {
@@ -31,6 +40,7 @@ internal object SupportDiagnostics {
             R.string.support_notifications to snapshot.notifications, R.string.support_battery to snapshot.batteryExempt,
             R.string.support_session to snapshot.session, R.string.support_playing to snapshot.playing,
             R.string.support_pause to snapshot.pause, R.string.support_seek to snapshot.seek,
+            R.string.support_skip to snapshot.skip,
             R.string.support_service to snapshot.assistant, R.string.support_black to snapshot.black)
             .joinToString("\n") { (label, value) -> "${activity.getString(label)}: ${state(value)}" }
         val repair = snapshot.suggestedRepair()

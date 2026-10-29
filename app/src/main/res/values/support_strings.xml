@@ -10,6 +10,7 @@
     <string name="support_session">可读取媒体会话</string>
     <string name="support_playing">媒体正在播放</string>
     <string name="support_pause">会话声明支持暂停</string>
+    <string name="support_skip">会话声明支持切集</string>
     <string name="support_seek">会话声明支持快进后退</string>
     <string name="support_service">助手服务运行中</string>
     <string name="support_black">黑幕正在显示</string>

@@ -10,6 +10,7 @@
     <string name="support_session">Session média lisible</string>
     <string name="support_playing">Lecture en cours</string>
     <string name="support_pause">La session déclare la pause</string>
+    <string name="support_skip">La session déclare le changement d’épisode</string>
     <string name="support_seek">La session déclare la navigation</string>
     <string name="support_service">Assistant en cours</string>
     <string name="support_black">Rideau noir visible</string>

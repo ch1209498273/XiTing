@@ -10,6 +10,7 @@
     <string name="support_session">Media session readable</string>
     <string name="support_playing">Media playing</string>
     <string name="support_pause">Session declares pause support</string>
+    <string name="support_skip">Session declares episode switching</string>
     <string name="support_seek">Session declares seek support</string>
     <string name="support_service">Assistant service running</string>
     <string name="support_black">Black curtain visible</string>

@@ -10,6 +10,7 @@
     <string name="support_session">Медиасессия доступна</string>
     <string name="support_playing">Воспроизведение активно</string>
     <string name="support_pause">Сессия заявляет поддержку паузы</string>
+    <string name="support_skip">Сессия сообщает о переключении серий</string>
     <string name="support_seek">Сессия заявляет поддержку перемотки</string>
     <string name="support_service">Помощник работает</string>
     <string name="support_black">Чёрная шторка видима</string>

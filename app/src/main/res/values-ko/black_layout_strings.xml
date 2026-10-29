@@ -1,5 +1,6 @@
 <resources>
     <string name="black_demo_return">체험 종료</string>
+    <string name="black_no_skip_hint">이 플레이어는 편 이동을 지원하지 않습니다 · 앱에서 편을 선택하세요</string>
     <string name="black_control_unavailable">플레이어에서 재생을 조작하세요</string>
     <string name="black_timer_off">꺼짐</string>
     <string name="black_timer_pause_fmt">%1$s 후 일시정지</string>

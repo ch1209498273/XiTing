@@ -21,6 +21,10 @@ internal fun diagnosticText(version: String, api: Int, model: String, permission
         "permission.media_access" to permissions.mediaAccess,
         "permission.notifications" to permissions.notifications,
         "permission.battery_exempt" to permissions.batteryExempt,
+        // 切集键是「能力缺失就隐藏」，界面上没有痕迹；导出这一位才能在远程分辨
+        // 「播放器没声明」与「黑幕读不到会话」。
+        "player.skip" to permissions.skip,
+        "player.skip_probe" to permissions.skipProbe,
         "session.assistant" to session.assistant.value(),
         "session.curtain" to session.curtain.value(),
         "session.playback" to session.playback.value(),

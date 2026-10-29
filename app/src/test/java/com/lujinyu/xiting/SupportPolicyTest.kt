@@ -4,7 +4,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SupportPolicyTest {
-    private val ready = SupportSnapshot(true,true,true,true,true,true,true,true,true,false)
+    private val ready = SupportSnapshot(true,true,true,true,true,true,true,true,true,true,false)
     @Test fun missingOverlayWinsOverOtherIssues() {
         assertEquals(SupportRepair.OVERLAY, ready.copy(overlay=false,mediaAccess=false,session=false).suggestedRepair())
     }

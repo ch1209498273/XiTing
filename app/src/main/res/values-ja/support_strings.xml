@@ -10,6 +10,7 @@
     <string name="support_session">メディアセッションを取得可能</string>
     <string name="support_playing">再生中</string>
     <string name="support_pause">セッションが一時停止対応を宣言</string>
+    <string name="support_skip">セッションが話数切り替えを宣言</string>
     <string name="support_seek">セッションがシーク対応を宣言</string>
     <string name="support_service">アシスタントが動作中</string>
     <string name="support_black">黒いカーテンを表示中</string>

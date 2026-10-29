@@ -10,6 +10,7 @@
     <string name="support_session">Sesión multimedia legible</string>
     <string name="support_playing">Reproduciendo</string>
     <string name="support_pause">La sesión declara soporte de pausa</string>
+    <string name="support_skip">La sesión admite cambio de episodio</string>
     <string name="support_seek">La sesión declara soporte de búsqueda</string>
     <string name="support_service">Asistente en ejecución</string>
     <string name="support_black">Cortina negra visible</string>

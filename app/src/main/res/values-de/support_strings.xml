@@ -10,6 +10,7 @@
     <string name="support_session">Mediensitzung lesbar</string>
     <string name="support_playing">Medienwiedergabe aktiv</string>
     <string name="support_pause">Sitzung meldet Pause-Unterstützung</string>
+    <string name="support_skip">Sitzung meldet Folgenwechsel</string>
     <string name="support_seek">Sitzung meldet Suchlauf-Unterstützung</string>
     <string name="support_service">Assistent läuft</string>
     <string name="support_black">Schwarzer Vorhang sichtbar</string>

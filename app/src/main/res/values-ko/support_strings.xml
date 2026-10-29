@@ -10,6 +10,7 @@
     <string name="support_session">미디어 세션 읽기 가능</string>
     <string name="support_playing">미디어 재생 중</string>
     <string name="support_pause">세션이 일시정지 지원을 선언</string>
+    <string name="support_skip">세션이 편 이동 지원 알림</string>
     <string name="support_seek">세션이 탐색 지원을 선언</string>
     <string name="support_service">도우미 서비스 실행 중</string>
     <string name="support_black">검은 화면 표시 중</string>

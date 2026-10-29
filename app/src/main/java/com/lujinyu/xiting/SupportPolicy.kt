@@ -4,7 +4,9 @@ internal enum class SupportRepair { OVERLAY, MEDIA_ACCESS, NOTIFICATIONS, PLAYER
 internal data class SupportSnapshot(
     val overlay: Boolean, val mediaAccess: Boolean, val notifications: Boolean,
     val batteryExempt: Boolean, val session: Boolean, val playing: Boolean,
-    val pause: Boolean, val seek: Boolean, val assistant: Boolean, val black: Boolean
+    val pause: Boolean, val seek: Boolean, val skip: Boolean, val assistant: Boolean, val black: Boolean,
+    /** 切集探针判死情况（"none" / "prev" / "next" / "prev+next" / "no_session"）；只进导出文本 */
+    val skipProbe: String = "none"
 )
 internal fun SupportSnapshot.suggestedRepair(): SupportRepair = when {
     !overlay -> SupportRepair.OVERLAY

@@ -14,7 +14,7 @@
     <string name="pill_on">On</string>
     <string name="pill_off">Enable</string>
     <string name="pill_battery_on">Exempted</string>
-    <string name="pill_battery_off">Exempt</string>
+    <string name="pill_battery_off">Not exempted</string>
     <string name="pill_abnormal">Broken · Tap to fix</string>
     <string name="hero_title_start">Start Screen-Off Listening</string>
     <string name="hero_title_stop">Screen-Off Listening Active</string>

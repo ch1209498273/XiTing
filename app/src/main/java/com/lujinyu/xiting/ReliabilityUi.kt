@@ -29,4 +29,6 @@ internal fun MainActivity.bindReliabilityUi() {
     }
     addAfter(R.id.row_lang,R.string.fix_theme,"setting_theme") { showAppearanceSettings() }
     addAfter(R.id.row_restore,R.string.rel_backup_manage,"setting_backups") { BackupManagement.show(this) { postRefresh();recreate() } }
+    // 自检面板早已写好但没有入口：报「未授权」时用户看不到到底是哪一项没通，这里给一个能显示「通知使用权：否」并一键修复的地方
+    addAfter(R.id.row_restore,R.string.support_title,"setting_diagnostics") { SupportDiagnostics.show(this) }
 }

@@ -42,6 +42,7 @@
     <color name="icon_blue_bg">#FFEAF1FF</color>
     <color name="icon_green_bg">#FFE6F5EE</color>
     <color name="icon_orange_bg">#FFFFF3E0</color>
+    <color name="icon_purple_bg">#FFF3E8FF</color>
     <color name="card_selected">#FFF0F9F4</color>
     <color name="thumb_sel_bg">#FFEAF7F0</color>
     <color name="thumb_sel_ring">#FF1E8E5A</color>

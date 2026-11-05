@@ -44,8 +44,13 @@ internal fun MainActivity.showTimerOptions(initialPreset:ListeningPreset?=null, 
     modes.check(if(remembered?.pauseKeepBlack ?: prefs().getBoolean(Prefs.TIMER_PAUSE_KEEP_BLACK,false))keepBlack.id else returnVideo.id)
     body.addView(modes)
     val playerHeading=label(getString(R.string.auto_playback_source))
-    val nowPlaying=queryNowPlaying()
-    val sources=nowPlaying?.let { listOf(PlaybackApp(it.pkg,it.appLabel.orEmpty(),it.controller)) }.orEmpty()
+    // 会话原本只在打开弹窗那一刻读一次：授权完、或换了播放器回来，它还是空的（2026-11-05 报障后补）
+    fun liveNowPlaying():NowPlaying?=try { if(hasMediaAccess()) queryNowPlaying() else null } catch(_:RuntimeException) { null }
+    fun appsOf(np:NowPlaying?)=np?.let { listOf(PlaybackApp(it.pkg,it.appLabel.orEmpty(),it.controller)) }.orEmpty()
+    fun headingText(np:NowPlaying?)=if(np!=null && !np.controlsReliable)getString(R.string.playback_source_control_in_app,np.appLabel.orEmpty())
+        else appsOf(np).firstOrNull()?.label ?: getString(R.string.auto_playback_unknown)
+    val initialNowPlaying=liveNowPlaying()
+    var sources=appsOf(initialNowPlaying)
     fun signature(source:android.media.session.MediaController):String {
         val metadata=source.metadata
         return listOf(metadata?.getString(android.media.MediaMetadata.METADATA_KEY_MEDIA_ID),
@@ -60,17 +65,32 @@ internal fun MainActivity.showTimerOptions(initialPreset:ListeningPreset?=null, 
         if(selected>=0)setSelection(selected)
     }
     targets.visibility=View.GONE
-    label(if(nowPlaying!=null && !nowPlaying.controlsReliable)getString(R.string.playback_source_control_in_app,nowPlaying.appLabel.orEmpty())
-        else sources.firstOrNull()?.label ?: getString(R.string.auto_playback_unknown))
+    val sourceHeading=label(headingText(initialNowPlaying))
     val capability=label("")
-    fun updateCapability() {
+    // 未授权时 sources 恒空，这里只会显示「暂时无法确定播放来源」，把人推向挨个换播放器；
+    // 而弹窗里那个灰掉的单选原本没有任何出口（App 内两处能跳系统设置的入口都没有调用点）。
+    val grantMediaAccess=Button(this).apply {
+        tag="timer_grant_media_access";visibility=View.GONE
+        text=getString(R.string.locale_dlg_go);minHeight=(48*resources.displayMetrics.density).toInt()
+        setOnClickListener {
+            try { startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
+            catch(_:RuntimeException) { Toast.makeText(this@showTimerOptions,getString(R.string.support_open_failed),Toast.LENGTH_LONG).show() }
+        }
+    }
+    body.addView(grantMediaAccess)
+    fun updateCapability(live:NowPlaying?=liveNowPlaying()) {
+        val access=hasMediaAccess()
+        sources=appsOf(live)
         val source=sources.getOrNull(targets.selectedItemPosition)
-        val supported=hasMediaAccess() && source?.canPause==true
+        val supported=access && source?.canPause==true
         keepBlack.isEnabled=supported
         if(!supported && modes.checkedRadioButtonId==keepBlack.id)modes.check(returnVideo.id)
-        capability.text=source?.description(this) ?: getString(R.string.auto_playback_unavailable)
+        sourceHeading.text=headingText(live)
+        capability.text=if(!access)getString(R.string.player_media_access_missing)
+            else source?.description(this) ?: getString(R.string.auto_playback_unavailable)
+        grantMediaAccess.visibility=if(access)View.GONE else View.VISIBLE
     }
-    updateCapability()
+    updateCapability(initialNowPlaying)
     if(initialEpisode)label(getString(R.string.timer_episode_changed))
     val summary=label("")
     fun updateSummary() {
@@ -86,7 +106,8 @@ internal fun MainActivity.showTimerOptions(initialPreset:ListeningPreset?=null, 
         val mode=if(modes.checkedRadioButtonId==keepBlack.id)keepBlack.text else returnVideo.text
         summary.text=getString(R.string.ui_timer_summary_fmt,duration,mode,targets.selectedItem ?: getString(R.string.ui_no_session))
     }
-    refreshSummary=::updateSummary
+    // 改时长时也重读一遍：窗口焦点刷新是主路，这里是它没触发时的兜底
+    refreshSummary={ updateCapability();updateSummary() }
     input.addTextChangedListener(object:android.text.TextWatcher {
         override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int) {}
         override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int)=updateSummary()
@@ -134,6 +155,8 @@ internal fun MainActivity.showTimerOptions(initialPreset:ListeningPreset?=null, 
         .setView(ScrollView(this).apply { addView(body) })
         .setPositiveButton(R.string.dlg_ok,null).setNegativeButton(R.string.dlg_cancel,null)
         .setNeutralButton(R.string.timer_cancel) { _,_ -> OverlayService.instance?.cancelTimer();postRefresh() }.create()
+    // 从系统授权页或播放器那边回到仍开着的弹窗时重读一次，不必关掉重开
+    dialog.window?.decorView?.viewTreeObserver?.addOnWindowFocusChangeListener { hasFocus -> if(hasFocus) updateCapability() }
     var cancelPending:(()->Unit)?=null
     dialog.setOnDismissListener { cancelPending?.invoke();cancelPending=null }
     dialog.setOnShowListener {

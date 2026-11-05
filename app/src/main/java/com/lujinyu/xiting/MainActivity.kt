@@ -188,6 +188,7 @@ class MainActivity : Activity() { // MARKER_TEST_9271
         val rowOverlay = pageHome.findViewById<LinearLayout>(R.id.row_overlay)
         val rowBattery = pageHome.findViewById<LinearLayout>(R.id.row_battery)
         val rowNotify = pageHome.findViewById<LinearLayout>(R.id.row_notify)
+        val rowMedia = pageHome.findViewById<LinearLayout>(R.id.row_media)
 
         // 「查看明细」与统计条 → 切到统计页签
         pageHome.findViewById<View>(R.id.stats_more).setOnClickListener { switchTab(TAB_STATS) }
@@ -226,6 +227,15 @@ class MainActivity : Activity() { // MARKER_TEST_9271
                 requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
             } else {
                 Toast.makeText(this, getString(R.string.toast_notify_granted), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 上一行是「本App能否弹通知」，这一行是「能否读取别的App在放什么」，两者常被当成同一个
+        rowMedia.setOnClickListener {
+            try {
+                startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            } catch (e: Exception) {
+                Toast.makeText(this, getString(R.string.support_open_failed), Toast.LENGTH_LONG).show()
             }
         }
 
@@ -447,6 +457,7 @@ private fun checkRestore() {
         }
         setPill(pageHome.findViewById(R.id.pill_battery), batteryOk, getString(R.string.pill_battery_on), getString(R.string.pill_battery_off))
         setPill(pageHome.findViewById(R.id.pill_notify), notifyOk, getString(R.string.pill_on), getString(R.string.pill_off))
+        setPill(pageHome.findViewById(R.id.pill_media), hasMediaAccess(), getString(R.string.pill_on), getString(R.string.pill_off))
 
         val remain = OverlayService.instance?.timerRemainingMs() ?: 0
         pageHome.findViewById<TextView>(R.id.timer_state).text =

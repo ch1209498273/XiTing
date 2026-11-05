@@ -70,6 +70,12 @@
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="@string/perm_notify" android:textColor="@color/text_primary" android:textSize="14sp" />
                 <TextView android:id="@+id/pill_notify" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/bg_pill_off" android:paddingStart="10dp" android:paddingTop="3dp" android:paddingEnd="10dp" android:paddingBottom="3dp" android:text="@string/pill_off" android:textColor="@color/text_secondary" android:textSize="11sp" />
             </LinearLayout>
+            <!-- 与上一行「通知权限」相邻但语义相反：一个是本App能否弹通知，一个是能否读取别的App在放什么 -->
+            <LinearLayout android:id="@+id/row_media" android:layout_width="match_parent" android:layout_height="50dp" android:background="?android:attr/selectableItemBackground" android:gravity="center_vertical" android:orientation="horizontal">
+                <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/bg_icon_purple" android:contentDescription="@null" android:padding="7dp" android:src="@drawable/ic_media_play" android:tint="@color/brand" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="@string/support_media_access" android:textColor="@color/text_primary" android:textSize="14sp" />
+                <TextView android:id="@+id/pill_media" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/bg_pill_off" android:paddingStart="10dp" android:paddingTop="3dp" android:paddingEnd="10dp" android:paddingBottom="3dp" android:text="@string/pill_off" android:textColor="@color/text_secondary" android:textSize="11sp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

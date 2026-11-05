@@ -32,6 +32,15 @@
     "diagnosticsFixButtonOpensSystemPage": true,
     "dialogSelfHealsOnRefocusWithoutTouchingControls": true,
     "timerHappyPathStillWritesTimer": true,
+    "chineseLocalePass": {
+      "switchMethod": "App 内设置→语言（不改系统 locale）",
+      "scriptReplayableAfter": "3 次修正（滚动才可见语言行 / recreate 记住页签 / cygpath 转换中文路径）",
+      "grantButtonVisible": true,
+      "grantButtonOpensSystemPage": true,
+      "dialogSelfHeals": true,
+      "homePillFlips": true,
+      "diagnosticsReportsNo": true
+    },
     "assembleDebug": true,
     "unitTestClasses": 39,
     "unitTestCaseCount": 244,
@@ -42,8 +51,13 @@
   },
   "unverified": [
     "会话刷新后半条（新播放器出现→单选变亮）：模拟器造不出后台 PLAYING 会话，夹具 onStop 自动暂停且 Android 15 禁止后台起音频；需真机开播放器后台播放补验",
-    "中文界面未截图（模拟器系统语言为英文；本轮中文侧未改文案）",
+    "中文补证只在模拟器完成，未覆盖报障用户的 ColorOS 机型；本轮中文侧未改文案",
     "真机未连接、未做耗电实验"
+  ],
+  "evidenceCaveats": [
+    "environment.log 与 install.log 为清理旧证据时误删后补采，文件首行标了补采时间",
+    "run-zh-locale.sh 有一次失败重放把 grant-jump-focus-zh.log 与 permission-state-zh.log 写成错误内容，已从备份还原并以成功那一遍重新生成",
+    "*.log 被 .gitignore 全局排除，日志只在本地；xml/png/json/sh 已入库"
   ],
   "contractPreserved": "定时确认仍重查 session token 并比对内容签名，签名变化时要求二次确认；未把定时设到另一播放器的路径未开放",
   "judgementRetracted": "上一轮判 EN 电池状态位『翻译反了』不成立：8 语言包一致遵循 on=过去分词/off=动词原形 的全库约定，仅 EN 选词歧义，故只改 EN 一处",

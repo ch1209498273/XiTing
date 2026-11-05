@@ -49,17 +49,31 @@
 | 自愈后单选仍为 enabled=false（当时无可暂停会话，判据正确） | PASS | 同上 |
 | 授权后首页 `pill_media` 由 "Enable" 翻转为 "On" | PASS | `home-permissions-on.xml` / `.png` |
 | 回归：选「撤掉黑幕」点 OK 仍能写入定时 | PASS | `home-timer-set.xml` / `.png`（首页显示 "30 min left · Remove black curtain"） |
+| 中文界面：未授权弹窗出现「去授权」且单选仍禁用 | PASS | `timer-dialog-no-access-zh.xml/.png` |
+| 中文界面：点「去授权」落到 `Settings$NotificationAccessSettingsActivity` | PASS | `grant-jump-focus-zh.log` |
+| 中文界面：授权返回后弹窗自愈（「去授权」消失，提示回到已授权分支） | PASS | `timer-dialog-selfheal-zh.xml/.png` |
+| 中文界面：首页第四行状态位「去开启」→「已开启」 | PASS | `home-permissions-off-zh.xml/.png`、`home-permissions-on-zh.xml/.png` |
+| 中文界面：设置页数据组有「诊断与自检」，面板显示「通知使用权: 否」+「开启通知使用权」 | PASS | `settings-diagnostics-row-zh.xml/.png`、`diagnostics-no-access-zh.xml/.png` |
 | assembleDebug 通过 | PASS | `build.log` |
 | JVM 单元测试：39 个测试类 / 244 个用例 / 失败 0 / 错误 0 | PASS | `unit-tests.log`（`tools/run_tests.ps1` 在 ASCII 镜像目录执行，逐类表格全 PASS） |
 | `lintDebug`：错误 0，警告 76，且无一条指向本轮改动的文件 | PASS | `lint.log`、`app/build/reports/lint-results-debug.txt` |
 
+## 中文界面补证
+
+模拟器系统语言是英文，而报障用户用的是中文界面，所以补了一轮：把 **App 内语言**切到简体中文（设置→语言，不改系统 locale），重取同样的六个画面。`run-zh-locale.sh` 可重放，最后一遍零 MISS。
+
+结果与英文轮一致：弹窗未授权时显示「未授权读取媒体控制 · 可用黑幕和定时返回」并出现「去授权」，点它前台窗口是 `Settings$NotificationAccessSettingsActivity`；授权返回后弹窗自愈，「去授权」消失、提示回到「暂时无法确定播放来源，可用黑幕和定时返回」；首页第四行状态位由「去开启」翻转为「已开启」；自检面板列出「通知使用权: 否」并给「开启通知使用权」按钮。
+
+其中一张 `timer-dialog-no-access-zh.png` 与报障截图是同一个弹窗，可直接对照：报障时那里只有「暂时无法确定播放来源」，现在多了一句归因和一个出口。
+
+这一轮脚本改了三遍才跑通，坑记在脚本头部以免重犯：语言行在设置页折线以下（按 id 也找不到，必须先滚动）；`recreate()` 后 App 记住原页签（必须先显点回目标页签，且用 resource-id 而非文字，避免受语言影响）；切语言触发重启会弹「恢复历史数据」引导；Windows 版 Python 既解不了 Git-Bash 风格的中文绝对路径（需 `cygpath -w`），控制台默认 GBK 也会吞中文输出。中途有一次失败的重放把 `grant-jump-focus-zh.log` 与 `permission-state-zh.log` 写成了错误内容，已从备份还原后以成功那一遍重新生成。
+
 ## 未验到与边界
 
-1. **会话刷新的后半条未能在模拟器证明**：「新播放器出现 → 单选变亮」。`devtools/SessionTest` 夹具在 `onStop` 里故意自动暂停（模拟真实视频 App），Android 15 又禁止后台起音频，`cmd media_session dispatch play` 也没能唤醒它，因此造不出「后台仍在 PLAYING 的会话」。权限与会话走的是同一次重读，权限半条已实测通过。真机补验方法：腾讯视频/优酷/爱奇艺开「听视频/后台播放」让声音继续 → 打开睡前定时 → 从别处切回来或按一下时长下拉，单选应变亮。
+1. **会话刷新的后半条未能在模拟器证明**：「新播放器出现 → 单选变亮」。`devtools/SessionTest` 夹具在 `onStop` 里故意自动暂停（模拟真实视频 App），Android 15 又禁止后台起音频，`cmd media_session dispatch play` 也没能唤醒它，因此造不出「后台仍在 PLAYING 的会话」。权限与会话走的是同一次重读，权限半条已在英文与中文两轮分别实测。真机补验方法：腾讯视频/优酷/爱奇艺开「听视频/后台播放」让声音继续 → 打开睡前定时 → 从别处切回来或按一下时长下拉，单选应变亮。
 2. **自愈依赖窗口焦点回调**。若某些 ROM 返回时不触发焦点变化，兜底刷新点是「改时长下拉」（`refreshSummary` 内已接 `updateCapability()`）；再兜底是关掉重开弹窗，行为与改造前一致。
 3. **弹窗内会话列表的语义未改**：只认「正在播放」或「已被选为黑幕目标的暂停会话」，暂停过的历史会话不提升——这是 `CurrentPlaybackPolicy.chooseCurrentPlayback` 的既有设计，本轮不动。
-4. 模拟器系统语言为英文，中文界面未截图；本轮中文侧未改动任何文案（只改 EN 一处）。
-5. 未连真机、未做耗电实验、未发布版本；`acceptance.json` 中 `release` 记为 `not_published`。
+4. 中文补证只在模拟器完成，未连真机；报障用户的 ColorOS 机型未覆盖。未做耗电实验、未发布版本；`acceptance.json` 中 `release` 记为 `not_published`。
 
 ## 给报障用户的口径
 
@@ -71,17 +85,19 @@
 
 已入库：
 
-- `run-sequence.sh`：本轮全部操作的脚本，坐标从 dump 反查，可重放。
+- `run-sequence.sh`：英文轮全部操作的脚本，坐标从 dump 反查，可重放。
+- `run-zh-locale.sh`：中文补证脚本，头部记了三遍踩坑的原因。日志用 `bash run-zh-locale.sh 2>&1 | tee sequence-zh.log` 生成，最后一遍零 MISS、零异常。
 - `acceptance.json`：结构化结论与未验项。
 - `home-permissions-off.xml/.png`、`home-permissions-on.xml/.png`、`home-timer-set.xml/.png`
 - `timer-dialog-no-access.xml/.png`、`timer-dialog-selfheal.xml/.png`
 - `diagnostics-no-access.xml/.png`、`settings-diagnostics-row.xml`
+- 以上六组各有一份 `-zh` 版（中文界面）：`home-permissions-off-zh`、`home-permissions-on-zh`、`timer-dialog-no-access-zh`、`timer-dialog-selfheal-zh`、`diagnostics-no-access-zh`、`settings-diagnostics-row-zh`
 - `apk-sha256.txt`
 
 仅本地（`*.log` 被忽略）：
 
-- `sequence.log`：执行时序与每步点击结果（含一次预期内的 `MISS CANCEL`，因返回键已顺带关掉自检面板）。
-- `permission-state.log`：两次 `enabled_notification_listeners` 原文与本App是否在其中。
-- `grant-jump-focus.log`、`diagnostics-fix-focus.log`：两处跳转后的前台窗口。
+- `sequence.log`、`sequence-zh.log`：执行时序与每步点击结果（英文轮含一次预期内的 `MISS CANCEL`，因返回键已顺带关掉自检面板）。
+- `permission-state.log`、`permission-state-zh.log`：`enabled_notification_listeners` 原文与本App是否在其中。
+- `grant-jump-focus.log`、`grant-jump-focus-zh.log`、`diagnostics-fix-focus.log`：跳转后的前台窗口。
 - `environment.log`、`install.log`、`build.log`、`unit-tests.log`、`lint.log`
 - 说明：`environment.log` 与 `install.log` 是在证据序列跑完后补采的（清理旧证据时被一并删除），同一 AVD、同一 APK，文件首行标了补采时间。

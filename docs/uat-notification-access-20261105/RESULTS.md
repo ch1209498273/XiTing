@@ -67,11 +67,21 @@
 
 ## 证据索引
 
+`.gitignore` 第 37 行全局排除 `*.log`，因此日志只存在于本地同目录、未入库；界面 dump（xml）与截图（png）已随本记录提交，与仓库既有的 `docs/*.png` 惯例一致。
+
+已入库：
+
 - `run-sequence.sh`：本轮全部操作的脚本，坐标从 dump 反查，可重放。
-- `sequence.log`：执行时序与每步点击结果（含一次预期内的 `MISS CANCEL`，因返回键已顺带关掉自检面板）。
-- `permission-state.log`：两次 `enabled_notification_listeners` 原文与本App是否在其中。
+- `acceptance.json`：结构化结论与未验项。
 - `home-permissions-off.xml/.png`、`home-permissions-on.xml/.png`、`home-timer-set.xml/.png`
 - `timer-dialog-no-access.xml/.png`、`timer-dialog-selfheal.xml/.png`
 - `diagnostics-no-access.xml/.png`、`settings-diagnostics-row.xml`
-- `grant-jump-focus.log`、`diagnostics-fix-focus.log`：两处跳转后的前台窗口
-- `environment.log`、`install.log`、`apk-sha256.txt`、`build.log`、`unit-tests.log`
+- `apk-sha256.txt`
+
+仅本地（`*.log` 被忽略）：
+
+- `sequence.log`：执行时序与每步点击结果（含一次预期内的 `MISS CANCEL`，因返回键已顺带关掉自检面板）。
+- `permission-state.log`：两次 `enabled_notification_listeners` 原文与本App是否在其中。
+- `grant-jump-focus.log`、`diagnostics-fix-focus.log`：两处跳转后的前台窗口。
+- `environment.log`、`install.log`、`build.log`、`unit-tests.log`、`lint.log`
+- 说明：`environment.log` 与 `install.log` 是在证据序列跑完后补采的（清理旧证据时被一并删除），同一 AVD、同一 APK，文件首行标了补采时间。

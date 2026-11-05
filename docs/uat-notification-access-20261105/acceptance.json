@@ -1,0 +1,52 @@
+{
+  "version": "6.0.0",
+  "code": 99,
+  "branch": "codex/v43-achievement-medals",
+  "baseCommit": "3e4875d",
+  "date": "2026-11-05",
+  "environment": "AVD api35 / Android 15 / x86_64 / 1080x2340 / system language en / install -r -g",
+  "apkSha256EvidenceRun": "5829630737f6cf11d8028492251dbe8a163b88b929bf19bc853c6439a9fac836",
+  "apkSha256AfterRecord": "b6206123b177cb1acc2fffc59363632788d9bf3d55c6f146bdc363bc20810c6a",
+  "hashNote": "两次之间源码无改动；debug 包非字节可复现，差异不代表内容变化",
+  "changes": [
+    "page_home.xml: 权限区新增 row_media/pill_media 第四行（通知使用权）",
+    "MainActivity.kt: 新行跳 ACTION_NOTIFICATION_LISTENER_SETTINGS；pill 随 hasMediaAccess() 翻转",
+    "TimerDialogs.kt: 未授权提示改口 + 弹窗内「去授权」按钮；sources 改实时重读；窗口重获焦点自动刷新",
+    "ReliabilityUi.kt: 设置页数据组接入 SupportDiagnostics.show()",
+    "colors.xml + drawable/bg_icon_purple.xml: 新行图标底色",
+    "values-en/strings.xml: pill_battery_off 由 Exempt 改 Not exempted"
+  ],
+  "newStringResources": 0,
+  "inAppPathsToNotificationAccess": {
+    "before": 0,
+    "after": 3
+  },
+  "checks": {
+    "homeRowPresentWhenRevoked": true,
+    "homePillFlipsAfterGrant": true,
+    "dialogShowsNotGrantedTextAndGrantButton": true,
+    "dialogRadioStaysDisabledWhenRevoked": true,
+    "grantButtonOpensSystemPage": true,
+    "settingsDiagnosticsRowPresent": true,
+    "diagnosticsReportsAccessNo": true,
+    "diagnosticsFixButtonOpensSystemPage": true,
+    "dialogSelfHealsOnRefocusWithoutTouchingControls": true,
+    "timerHappyPathStillWritesTimer": true,
+    "assembleDebug": true,
+    "unitTestClasses": 39,
+    "unitTestCaseCount": 244,
+    "unitTestFailures": 0,
+    "lintErrors": 0,
+    "lintWarnings": 76,
+    "lintWarningsInChangedFiles": 0
+  },
+  "unverified": [
+    "会话刷新后半条（新播放器出现→单选变亮）：模拟器造不出后台 PLAYING 会话，夹具 onStop 自动暂停且 Android 15 禁止后台起音频；需真机开播放器后台播放补验",
+    "中文界面未截图（模拟器系统语言为英文；本轮中文侧未改文案）",
+    "真机未连接、未做耗电实验"
+  ],
+  "contractPreserved": "定时确认仍重查 session token 并比对内容签名，签名变化时要求二次确认；未把定时设到另一播放器的路径未开放",
+  "judgementRetracted": "上一轮判 EN 电池状态位『翻译反了』不成立：8 语言包一致遵循 on=过去分词/off=动词原形 的全库约定，仅 EN 选词歧义，故只改 EN 一处",
+  "release": "not_published",
+  "physicalDevice": "not_tested"
+}

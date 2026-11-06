@@ -28,6 +28,8 @@ internal fun MainActivity.bindReliabilityUi() {
         parent.addView(row,parent.indexOfChild(old)+1)
     }
     addAfter(R.id.row_lang,R.string.fix_theme,"setting_theme") { showAppearanceSettings() }
+    // 「常用入口顺序」这套机制此前只有对话框和存储，没有任何消费者，也没有入口
+    addAfter(R.id.row_lang,R.string.extras_entry_order,"setting_entry_order") { showHomeEntryOrder() }
     addAfter(R.id.row_restore,R.string.rel_backup_manage,"setting_backups") { BackupManagement.show(this) { postRefresh();recreate() } }
     // 自检面板早已写好但没有入口：报「未授权」时用户看不到到底是哪一项没通，这里给一个能显示「通知使用权：否」并一键修复的地方
     addAfter(R.id.row_restore,R.string.support_title,"setting_diagnostics") { SupportDiagnostics.show(this) }

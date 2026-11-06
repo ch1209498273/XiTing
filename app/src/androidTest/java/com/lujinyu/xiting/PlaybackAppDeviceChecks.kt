@@ -44,6 +44,12 @@ internal class PlaybackAppDeviceChecks(private val i:Instrumentation) {
             }
             passed.add("no player selection in home or timer; paused old sessions never masquerade as current")
             main {state(a,3)};await("Did not follow A"){ctx.queryNowPlaying()?.controller?.sessionToken==a.sessionToken}
+            // 卡片按状态显示：有可读会话时必须出现，且不能退回「选择配合使用的应用」那句 chooser 文案
+            main {
+                activity!!.refreshUpgradeUi()
+                check(activity!!.findViewById<View>(R.id.playback_source_card).visibility==View.VISIBLE) {"Source card stayed hidden while a session is readable"}
+                check(activity!!.findViewById<TextView>(R.id.playback_capabilities).text.toString()!=ctx.getString(R.string.player_choice_intro)) {"Source card fell back to the chooser blurb"}
+            }
             main {state(b,3)};await("Multiple playing sessions did not disable control"){ctx.queryNowPlaying()==null}
             main {state(a,2)};await("Did not follow B"){ctx.queryNowPlaying()?.controller?.sessionToken==b.sessionToken}
             check(!PlaybackSelection.hasSelection)

@@ -37,6 +37,14 @@
 
 发布符号（逐项外部核对，不采信脚本 stdout）：标签 `v6.1.0` → `f701a37`（`git ls-remote` 与本地 HEAD 一致，符合"标签打在 release 提交"的惯例）；GitHub Release id 436500792，非 draft、非 prerelease、latest=true，资产 `XiTing-6.1.0.apk` **1,316,376 bytes**，sha256 `225e290b21e8…`；签名者 `CN=XiTing Release, O=ch1209498273`，证书摘要与 v6.0.0 相同（同一把发布键，非 debug）；蒲公英 build 22 / 6.1.0，公开页已核。release 包内直接 `aapt dump` 检索到 `row_media`/`pill_media` 与「未授权读取媒体控制」「通知使用权」——即新入口确实在发出去的包里，而不只在源码里。CI run 42221354903 completed/success。全部字段见 `docs/releases/v6.1.0-publication.json`。
 
+**2026-11-06 接上「常用入口排序」与「播放来源」卡片（工作区，未发布，属 v6.1.0 之后）**：起因是报障用户那条链暴露的同类缺陷——代码写了、测试调了、生产界面进不去。用户知情后仍选最重档，故本轮接线。
+
+- **先纠正一处误判**：`playback_source_card` 被无条件 GONE **不是漏接**。它当时的文案是「请选择播放器」「选择配合使用的应用」，服务的是 v5.0.1 已撤掉的播放器选择流程；留着就是指向不存在界面的死入口。所以本轮不是把可见性翻过来，而是把内容改成不承担"选择"语义：`np!=null` 显示来源与能力，`hasSelection` 显示"所选来源现在怎么了"，两者都不成立仍 GONE。`PlaybackSelection` 是 memory-only 且 `select()` 无生产调用点，故 `hasSelection` 分支目前只由测试与黑幕自动目标路径触发，属防御分支，已如实标注。
+- **契约只退役一半**：`PlaybackAppDeviceChecks` 里"定时弹窗内不出现选择播放器文案"（`ui_choose_player`）原样保留；只把卡片可见性扩成新断言。断言承重已实测：装**旧包**（无卡片逻辑）跑 → FAIL `Source card stayed hidden while a session is readable`；装新包 → `PASS: listening flow device checks`。这条红不是刻意造的，是我漏跑 `assembleDebug` 只跑了 `compileDebugKotlin` 撞出来的，正好当反向证据留下。
+- **入口排序补上真正的消费者**：`applyHomeEntryOrder()` 只在参与排序的槽位之间重排（黑幕卡、最近听过、节能统计原地不动），权限按"标题+面板"两个节点成组搬；插入索引用原槽位，因为第 i 个位置前恰有 `slots[i]-i` 个未参与节点和 `i` 个已插回的参与节点。`showHomeEntryOrder()` 挂进设置页外观组。实测：提升「演示」后 "Try a test sound" 移到 Sleep timer 之上，点「恢复默认顺序」回到原位。
+- **删掉一个死可点**：卡片 XML 原本 `clickable=true` + 水波前景，但监听器被显式设为 null。本轮改为不可点并去掉前景——它只报信息，不假装能点开什么。
+- **未做**：卡片没有点击动作（若要加，"回到来源 App"是最不骗人的候选）；`finishThisEpisode()` 与 `ListeningScenes.show()` 仍是遗留死代码（前者功能已由定时预设「听完这集」上线，后者属 v5.0.1 撤掉的设计，未擅自恢复）；`SessionUiDeviceChecks` 仍断言 `v50_scene_*` 标签存在，那是被回退的设计，本轮未动它，需单独决定。
+
 **发版脚本踩到一件事，别再犯**：`release.ps1` 第 2 步用 `powershell -File tools\run_tests.ps1 *> 文件` 调子进程，子进程已写完全绿日志并退出主逻辑，但 **Gradle 守护进程继承了重定向句柄**，父进程等管道关闭而长时间不返回（这次卡了一个多小时，日志停在"== 单测 =="）。处置办法：卡住时先看 `release_tests.txt` 的时间戳与结论行判断是"没跑完"还是"没返回"；确认全绿后停掉进程，还原已被 step 1 改写但未提交的 `build.gradle.kts`，单独补跑 `lint` 与 `i18n check` 两道门禁，再用 `-SkipTests` 重跑脚本完成发布。根治办法（未做）：脚本改用 `cmd /c` 或直接内联调用，或跑完显式 `--stop` 守护进程。
 
 **v6.0.0 / code99 是上一版**（2026-10-18 公开发布 GitHub latest 与蒲公英 build21）。本版交付「接着听与随手标记」：SQLite 内容库与旧时长统计分离、最近听过、系统分享接收与显式粘贴、黑幕标记与备注、睡前定时起点、90 天期限与清理预览、备份 v5。验收范围**只覆盖 OPPO PME110 + 哔哩哔哩 9.14.0**，抖音本轮未重新验证，手机首屏 ≤500ms 未实测——详见 `docs/uat-continue-listening-20261017/RESULTS.md` 与第八节。

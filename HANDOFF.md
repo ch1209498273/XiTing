@@ -45,6 +45,16 @@
 - **删掉一个死可点**：卡片 XML 原本 `clickable=true` + 水波前景，但监听器被显式设为 null。本轮改为不可点并去掉前景——它只报信息，不假装能点开什么。
 - **未做**：卡片没有点击动作（若要加，"回到来源 App"是最不骗人的候选）；`finishThisEpisode()` 与 `ListeningScenes.show()` 仍是遗留死代码（前者功能已由定时预设「听完这集」上线，后者属 v5.0.1 撤掉的设计，未擅自恢复）；`SessionUiDeviceChecks` 仍断言 `v50_scene_*` 标签存在，那是被回退的设计，本轮未动它，需单独决定。
 
+**2026-11-06 测试面的量：一个从没跑过的检查类，且两半断言都对着旧实现**：先做零代码测量——androidTest 内 19 个类，无调用点的只有 2 个，其中 `PetDeviceTest` 是 instrumentation 入口本身（`testInstrumentationRunner` 指向它），所以真正的孤儿恰好一个：`SessionUiDeviceChecks`。它不是"红了没人看见"，而是**从来没被执行过**。
+
+进一步查被测对象，发现两半都是死断言：`bindSessionConsole()` 的定义就是 `= Unit`（v5.0.1 撤控制台时留的空壳），所以"卡片标识前后一致"那条比较的是 `null===null`，恒真；`v50_scene_*` 标签在 main 里从不创建，那条一旦跑必红；而 `summary` 含 `v50_play_unknown` 这条更早就废了——`pause()` 开头 `if(report==NONE) "" return`，`NONE` 分支里那个 `v50_play_unknown` 永远取不到，当前实现不可能输出该措辞。
+
+但同一段里有一条**活覆盖被一起埋着**：`SessionConsoleUi.summary/pause` 确实在线上跑（`OverlayService` 通知正文、`WidgetData` 桌面小组件、`BlackOverlay` 定时状态都调它），而它没有任何测试。所以处理不是删文件，是摘死断言、留活断言并补强：新增按 8 语言核对 `summary` 的定时三形态（无定时=恰好等于 notif_text、90 秒向上折算 2 分钟、WAITING 走等待措辞、助手未运行不得播报剩余）、`pause` 六个取值与空串的对应、以及未确认不得写成已暂停；保留原文件里对现行实现仍成立的两条（取消定时不写偏好、听完这集预设选中第 5 项）。挂成新 part `session_text`（`am instrument -e flowOnly true -e flowPart session_text`）。
+
+承重实测：新断言首跑 PASS；把 `summary` 的分钟折算从 `(ms+59999)/60000` 改成 `ms/60000` 一行 → FAIL `zh: 90 秒应向上折算成 2 分钟并出现在正文，实际「…定时剩余1分钟」`；还原后回到 PASS，`git diff` 确认产品文件无残留。门禁：单测 39 类 244 例 0 失败。
+
+**留给下一次的同类问题**：`ListeningScenes`、`finishThisEpisode`、`HomeEntryOrder` 之外，还要不要再给 `SessionConsoleUi.card/label`（控制台已撤，但 `card()` 仍在 main 里）做一次去留判定，本轮没动。
+
 **发版脚本踩到一件事，别再犯**：`release.ps1` 第 2 步用 `powershell -File tools\run_tests.ps1 *> 文件` 调子进程，子进程已写完全绿日志并退出主逻辑，但 **Gradle 守护进程继承了重定向句柄**，父进程等管道关闭而长时间不返回（这次卡了一个多小时，日志停在"== 单测 =="）。处置办法：卡住时先看 `release_tests.txt` 的时间戳与结论行判断是"没跑完"还是"没返回"；确认全绿后停掉进程，还原已被 step 1 改写但未提交的 `build.gradle.kts`，单独补跑 `lint` 与 `i18n check` 两道门禁，再用 `-SkipTests` 重跑脚本完成发布。根治办法（未做）：脚本改用 `cmd /c` 或直接内联调用，或跑完显式 `--stop` 守护进程。
 
 **v6.0.0 / code99 是上一版**（2026-10-18 公开发布 GitHub latest 与蒲公英 build21）。本版交付「接着听与随手标记」：SQLite 内容库与旧时长统计分离、最近听过、系统分享接收与显式粘贴、黑幕标记与备注、睡前定时起点、90 天期限与清理预览、备份 v5。验收范围**只覆盖 OPPO PME110 + 哔哩哔哩 9.14.0**，抖音本轮未重新验证，手机首屏 ≤500ms 未实测——详见 `docs/uat-continue-listening-20261017/RESULTS.md` 与第八节。

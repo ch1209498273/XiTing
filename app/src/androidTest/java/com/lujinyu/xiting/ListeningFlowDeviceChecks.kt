@@ -60,6 +60,7 @@ internal class ListeningFlowDeviceChecks(private val i: Instrumentation) {
         if(part=="lost_controls") { withMistouchGuard { selectedPlayerLossMustNotSwitch() };return }
         if(part=="guide_audio") { GuideAudioDeviceChecks(i).run();return }
         if(part=="app_choices") { PlaybackAppDeviceChecks(i).run();return }
+        if(part=="session_text") { SessionUiDeviceChecks(i).run();return }
         ctx.prefs().edit().putString(Prefs.UPDATE_SEEN_VERSION,BuildConfig.VERSION_NAME).commit()
         val activity = i.startActivitySync(Intent(ctx, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as MainActivity

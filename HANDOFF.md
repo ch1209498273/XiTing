@@ -20,7 +20,7 @@
 `D:\AI任务\zcode\息屏听剧` —— OPPO/ColorOS 的「息屏听剧」App。
 
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**黑幕遮罩并降低窗口亮度，非系统真正关屏**）而声音继续。
-纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，v6.0.0 正式安装包 1,288,112 bytes。
+纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，v6.1.0 正式安装包 1,316,376 bytes。
 
 - 包名 `com.lujinyu.xiting`，versionCode 100 / versionName 6.1.0
 - `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节 + docs/targetsdk36_黑幕兼容预研.md）**
@@ -34,6 +34,10 @@
 ## 二、当前状态
 
 **2026-11-06 v6.1.0 / code100 公开发布**：本版累计 v6.0.0 之后 12 个提交，主体是「通知使用权引导改造」——起因是用户报障「提示需要开启通知权限，但已经开启通知了，还是不行」，挨个换浏览器/腾讯/优酷/爱奇艺。定位不是功能 bug 而是引导缺失：报错要的是「通知使用权」（读别的 App 在放什么），首页显示的却是「通知权限」（本 App 能否弹通知），且改造前 App 内没有任何一条调用点能打开那个系统开关（`SupportDiagnostics.show`、`finishThisEpisode`、`ListeningScenes.show` 都只在 androidTest 里被调用）。改后入口 0 条→3 条：首页权限区第四行、定时弹窗内「去授权」、设置页「诊断与自检」；定时弹窗的会话与权限改实时重读并在窗口重获焦点时自动刷新。验收见 `docs/uat-notification-access-20261105/RESULTS.md`（api35 英文+中文两轮，13 项检查，244 项单测，lint 错误 0，i18n 392/392）。**未验**：真机（报障用户是 ColorOS）；「新播放器出现→单选变亮」这半条模拟器造不出条件（夹具 onStop 自动暂停 + Android 15 禁后台起音频），需真机开播放器后台播放补验。
+
+发布符号（逐项外部核对，不采信脚本 stdout）：标签 `v6.1.0` → `f701a37`（`git ls-remote` 与本地 HEAD 一致，符合"标签打在 release 提交"的惯例）；GitHub Release id 436500792，非 draft、非 prerelease、latest=true，资产 `XiTing-6.1.0.apk` **1,316,376 bytes**，sha256 `225e290b21e8…`；签名者 `CN=XiTing Release, O=ch1209498273`，证书摘要与 v6.0.0 相同（同一把发布键，非 debug）；蒲公英 build 22 / 6.1.0，公开页已核。release 包内直接 `aapt dump` 检索到 `row_media`/`pill_media` 与「未授权读取媒体控制」「通知使用权」——即新入口确实在发出去的包里，而不只在源码里。CI run 42221354903 completed/success。全部字段见 `docs/releases/v6.1.0-publication.json`。
+
+**发版脚本踩到一件事，别再犯**：`release.ps1` 第 2 步用 `powershell -File tools\run_tests.ps1 *> 文件` 调子进程，子进程已写完全绿日志并退出主逻辑，但 **Gradle 守护进程继承了重定向句柄**，父进程等管道关闭而长时间不返回（这次卡了一个多小时，日志停在"== 单测 =="）。处置办法：卡住时先看 `release_tests.txt` 的时间戳与结论行判断是"没跑完"还是"没返回"；确认全绿后停掉进程，还原已被 step 1 改写但未提交的 `build.gradle.kts`，单独补跑 `lint` 与 `i18n check` 两道门禁，再用 `-SkipTests` 重跑脚本完成发布。根治办法（未做）：脚本改用 `cmd /c` 或直接内联调用，或跑完显式 `--stop` 守护进程。
 
 **v6.0.0 / code99 是上一版**（2026-10-18 公开发布 GitHub latest 与蒲公英 build21）。本版交付「接着听与随手标记」：SQLite 内容库与旧时长统计分离、最近听过、系统分享接收与显式粘贴、黑幕标记与备注、睡前定时起点、90 天期限与清理预览、备份 v5。验收范围**只覆盖 OPPO PME110 + 哔哩哔哩 9.14.0**，抖音本轮未重新验证，手机首屏 ≤500ms 未实测——详见 `docs/uat-continue-listening-20261017/RESULTS.md` 与第八节。
 
@@ -82,7 +86,7 @@ v4.1.0：PetRenderer 共享五阶轮廓，PetMotion 独立动作时序；统计�
 `tools/i18n_shot.ps1`（7 语言 × 3 页面截图巡检，cmd locale 免前台切换）、
 `tools/i18n.py`（多语言同步 / 校验）。
 
-**APK 体积：v6.0.0 = 1,288,112 bytes（约 1.26 MB）**。历史轨迹 159 KB（图标矢量化后）→ 304 KB → 505 KB（v5.1.3）→ **1,221,152（v5.1.4，一次性 +715 KB，原因是内置离线中英引导语音，见第八节）**。别再用「约 304 KB」这个数。
+**APK 体积：v6.1.0 = 1,316,376 bytes（1,285.5 KiB，十进制约 1.32 MB；GitHub 资产显示 1285KB）**，比 v6.0.0 的 1,288,112 bytes 多 28,264 bytes（+2.2%，来自首页第四行布局、新图标底色与两处新入口）。历史轨迹 159 KB（图标矢量化后）→ 304 KB → 505 KB（v5.1.3）→ 1,221,152（v5.1.4，一次性 +715 KB，原因是内置离线中英引导语音，见第八节）→ 1,288,112（v6.0.0）→ **1,316,376（v6.1.0）**。别再用「约 304 KB」这个数。
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1

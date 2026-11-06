@@ -1,0 +1,66 @@
+{
+  "version": "6.1.0",
+  "versionCode": 100,
+  "publishedDate": "2026-11-06",
+  "timezone": "Asia/Shanghai",
+  "sourceCommit": "f701a3775fa4b54b9cedc76177a87e9c299967a6",
+  "tag": "v6.1.0",
+  "tagLandingVerified": "git ls-remote --tags origin 返回 f701a37，与本地 HEAD 一致；符合惯例（标签打在 release 提交）",
+  "github": {
+    "url": "https://github.com/ch1209498273/XiTing/releases/tag/v6.1.0",
+    "releaseId": 436500792,
+    "draft": false,
+    "prerelease": false,
+    "latest": true,
+    "publishedAt": "2026-11-06T12:55:28Z",
+    "apk": "https://github.com/ch1209498273/XiTing/releases/download/v6.1.0/XiTing-6.1.0.apk",
+    "assetBytesReportedByApi": 1316376
+  },
+  "pgyer": {
+    "url": "https://www.pgyer.com/xipingtingju",
+    "publicPageVerified": true,
+    "build": 22,
+    "version": "6.1.0"
+  },
+  "apk": {
+    "sha256": "225e290b21e862f97b3c1bbd41cc75723f7696e7929cbbcd9bbe7dd123a1151d",
+    "bytes": 1316376,
+    "deltaFromV600": "+28264 bytes (+2.2%)",
+    "signerDn": "CN=XiTing Release, OU=XiTing, O=ch1209498273, C=CN",
+    "signerSha256": "cd40e01da2c2267c1076a2a56fe57cc0c4ae64f3fa56335d4b8561d44a2608ff",
+    "sameSignerAsV600": true,
+    "notDebugSigned": true
+  },
+  "shippedSymbolsVerifiedInApk": {
+    "resourceIdsPresent": ["row_media", "pill_media"],
+    "stringsPresent": ["未授权读取媒体控制", "通知使用权"],
+    "method": "aapt dump resources / dump strings 对 release 包直接检索，不采信构建日志"
+  },
+  "prepublicationChecks": {
+    "jvmPassed": 244,
+    "jvmFailed": 0,
+    "jvmErrors": 0,
+    "jvmClasses": 39,
+    "lintErrors": 0,
+    "lintWarnings": 76,
+    "i18n": "passed (392/392 x 8 locales)",
+    "releaseBuild": "passed",
+    "emulatorUat": "docs/uat-notification-access-20261105/RESULTS.md（api35 英文+中文两轮，13 项）"
+  },
+  "remoteCi": {
+    "url": "https://github.com/ch1209498273/XiTing/actions/runs/42221354903",
+    "headSha": "f701a37",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "physicalUat": {
+    "status": "not_tested",
+    "reason": "本版发布前未连真机；报障用户为 ColorOS 机型，模拟器不能替代",
+    "pendingItems": [
+      "真机装 v6.1.0 走三个入口",
+      "「新播放器出现→单选变亮」这半条（模拟器造不出后台 PLAYING 会话）",
+      "抖音对注入 KEYCODE_MEDIA_PREVIOUS 是否响应（由探针在真机自行给答案）"
+    ]
+  },
+  "releaseProcessNote": "首次运行时 tools/release.ps1 卡在第 2 步：run_tests.ps1 的子 powershell 已结束并写出全绿日志，但 Gradle 守护进程占住 *> 重定向管道，父进程不返回，一个多小时未进入构建。处理：停掉该进程，bump 已落文件但未提交，故先还原 build.gradle.kts，再单独跑 lint 与 i18n 门禁，最后以 -SkipTests 重跑脚本完成发布。"
+}

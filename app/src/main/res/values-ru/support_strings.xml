@@ -27,8 +27,6 @@
     <string name="support_open_failed">Не удалось открыть экран. Найдите приложение в системных настройках.</string>
     <string name="support_selected">Выбрано</string>
     <string name="support_first_title">Результат проверки</string>
-    <string name="support_first_intro">Проверьте чёрный экран со встроенной речью без видеоприложения.</string>
-    <string name="support_check_result">Проверить результат</string>
     <string name="support_sound_question">Была слышна тестовая речь?</string>
     <string name="support_return_question">Вернулась исходная страница?</string>
     <string name="support_first_success">Проверка завершена. Запустите видео и нажмите плавающую кнопку.</string>

@@ -27,8 +27,6 @@
     <string name="support_open_failed">Impossible d’ouvrir cet écran. Recherchez cette appli dans les réglages système.</string>
     <string name="support_selected">Sélectionné</string>
     <string name="support_first_title">Vérifier votre essai</string>
-    <string name="support_first_intro">Essayez le rideau noir avec une voix intégrée, sans autre application vidéo.</string>
-    <string name="support_check_result">Vérifier résultat</string>
     <string name="support_sound_question">Avez-vous entendu la voix de test ?</string>
     <string name="support_return_question">La page précédente est-elle revenue ?</string>
     <string name="support_first_success">Cet essai est terminé. Lancez une vidéo, puis touchez la bulle flottante.</string>

@@ -10,8 +10,6 @@
     <string name="extras_no_presets">保存済みの設定はありません</string>
     <string name="extras_preset_saved">保存しました</string>
     <string name="extras_preset_duplicate">保存済みです</string>
-    <string name="extras_personalization">カスタマイズ</string>
-    <string name="extras_appearance">外観</string>
     <string name="extras_theme_system">システム設定</string>
     <string name="extras_theme_light">ライト</string>
     <string name="extras_theme_dark">ダーク</string>

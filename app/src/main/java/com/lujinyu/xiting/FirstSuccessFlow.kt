@@ -2,8 +2,6 @@ package com.lujinyu.xiting
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Intent
-import android.provider.Settings
 
 /** Success is reported only from two explicit user answers; no timer infers it. */
 internal object FirstSuccessFlow {

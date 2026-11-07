@@ -10,8 +10,6 @@
     <string name="extras_no_presets">Aucun préréglage</string>
     <string name="extras_preset_saved">Préréglage enregistré</string>
     <string name="extras_preset_duplicate">Déjà enregistré</string>
-    <string name="extras_personalization">Personnalisation</string>
-    <string name="extras_appearance">Apparence</string>
     <string name="extras_theme_system">Système</string>
     <string name="extras_theme_light">Clair</string>
     <string name="extras_theme_dark">Sombre</string>

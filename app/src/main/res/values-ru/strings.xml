@@ -44,7 +44,6 @@
     <string name="recent_records">Недавние сессии · только 30 дней</string>
     <string name="pager_prev">‹ Назад</string>
     <string name="pager_next">Вперёд ›</string>
-    <string name="settings_personal">Персонализация</string>
     <string name="switch_direct">Разблокировать касанием</string>
     <string name="switch_mistouch_guard">Защита от случайных нажатий</string>
     <string name="switch_mistouch_guard_sub">Двойное касание для разблокировки, удержание для возврата; чёрный экран при блокировке</string>
@@ -82,7 +81,6 @@
     <string name="caption_row_title">Субтитры на чёрном экране (бета)</string>
     <string name="caption_service_desc">Читает текст субтитров играющего видео и показывает его на чёрном экране в реальном времени. Не сохраняется, не отправляется, не используется иначе.</string>
     <string name="update_log_title_fmt">Новое в v%1$s</string>
-    <string name="update_log_body">· Настройка таймера в чёрном экране для выбранного проигрывателя\n· Подтверждение настройки и сохранение ввода при отказе\n· Сохранение настроек и завершённого знакомства с приложением</string>
     <string name="switch_headset">Возврат к видео при отключении наушников</string>
     <string name="bubble_style">Вид пузырька</string>
     <string name="settings_data">Данные</string>
@@ -97,7 +95,6 @@
     <string name="row_about">О приложении</string>
     <string name="row_about_sub">Использование / Приватность / Код</string>
     <string name="widget_black">Погасить</string>
-    <string name="widget_active">Работает</string>
     <string name="widget_idle">Остановлено</string>
     <string name="widget_today_fmt">Сегодня %1$s</string>
     <string name="widget_growth_next">Прогресс %1$d · до следующей формы %2$d</string>
@@ -151,8 +148,6 @@
     <string name="restore_pick">Выбрать файл копии</string>
     <string name="restore_no">Не нужно</string>
     <string name="toast_invalid_backup">Некорректный файл копии</string>
-    <string name="restore_other_title">Копия с другого устройства</string>
-    <string name="restore_other_msg">В этой копии %1$d прогресса, но идентификатор устройства не совпадает (смена телефона или переход со старой подписанной версии). Всё равно восстановить?</string>
     <string name="restore_ok_btn">Восстановить</string>
     <string name="dlg_cancel">Отмена</string>
     <string name="toast_restore_done">Данные восстановлены ✓ (прогресс %1$d)</string>
@@ -249,7 +244,6 @@
 Проект не связан с YouTube, Google и любыми видеоплатформами. Только для обучения и обмена — поддерживайте оригиналы.</string>
     <string name="about_version_fmt">Версия %1$s · Build ID %2$s</string>
     <string name="about_crash">Журнал последнего сбоя (нажмите для копирования, удерживайте для очистки)</string>
-    <string name="toast_copied">Скопировано в буфер обмена</string>
     <string name="gallery_title">Бестиарий</string>
     <string name="count_placeholder">0 раз</string>
     <string name="dur_min_placeholder">0 мин</string>
@@ -327,8 +321,6 @@
     <string name="poster_row_mah">Сэкономлено энергии</string>
     <string name="poster_row_streak">Самая длинная серия</string>
     <string name="poster_row_gp">Прогресс за неделю</string>
-    <string name="poster_footer_all">Каждое прослушивание с закрытыми глазами считается</string>
-    <string name="poster_footer_week">Спасибо, что слушали вместе на этой неделе</string>
     <string name="fmt_mah">%1$d мА·ч</string>
     <string name="fmt_days">%1$d дн.</string>
     <string name="fmt_days_sessions">%1$d дн. / %2$d сессий</string>
@@ -359,7 +351,6 @@
     <string name="timer_end_action">Действие в конце таймера</string>
     <string name="timer_return_video">Убрать чёрную шторку</string>
     <string name="timer_pause_keep_black">Запросить паузу, оставить шторку</string>
-    <string name="timer_pause_explain">Для следующего таймера, текущий не меняется. Нужны доступ к уведомлениям и совместимый сеанс. Запрос отправляется только исходному плееру; ответ не гарантирован.</string>
     <string name="timer_no_target">Нет совместимого сеанса для паузы. Проверьте доступ и плеер. Текущий таймер не изменён.</string>
     <string name="timer_pause_requested">Пауза запрошена у исходного плеера; результат зависит от его ответа.</string>
     <string name="timer_already_paused">Исходный плеер уже на паузе. Чёрный экран остаётся.</string>
@@ -370,43 +361,21 @@
     <string name="guide_start">Начать проверку</string>
     <string name="guide_permission">Разрешите наложение и вернитесь для начала.</string>
     <string name="guide_busy">Завершите шторку или таймер и проверьте разрешение наложения.</string>
-    <string name="guide_feedback">Продолжался ли звук при чёрной шторке?</string>
-    <string name="guide_yes">Звук продолжался</string>
-    <string name="guide_no">Звук остановился</string>
-    <string name="guide_success">Демо завершено. Начните прослушивание плавающей кнопкой.</string>
-    <string name="guide_retry">Проверьте воспроизведение. Если звук прерывается, проверьте фоновые ограничения и удержание активности, затем попробуйте другой плеер.</string>
     <string name="ach_celebration_title">Достижение открыто</string>
     <string name="ach_medal_title">Моя золотая медаль</string>
     <string name="ach_replay">Повторить анимацию</string>
     <!-- Shared playback and navigation copy -->
     <string name="timer_episode_changed">Исходное содержимое изменилось или сеанс завершился. Таймер эпизода отменён.</string>
     <string name="timer_episode_waiting">Таймер эпизода ожидает возобновления воспроизведения</string>
-    <string name="ui_home_intro">Всё готово для спокойного прослушивания</string>
-    <string name="ui_playback_source">Источник воспроизведения</string>
     <string name="ui_no_session">Нет доступного для чтения сеанса воспроизведения</string>
     <string name="ui_media_permission">Разрешите доступ к уведомлениям, чтобы видеть источник и поддерживаемые команды</string>
-    <string name="ui_capabilities_fmt">Пауза: %1$s · Перемотка: %2$s</string>
-    <string name="ui_supported">Поддерживается</string>
-    <string name="ui_unsupported">Не поддерживается</string>
     <string name="ui_growth_title">Рост духа</string>
-    <string name="ui_listening_title">Обзор прослушивания</string>
-    <string name="ui_settings_playback">Воспроизведение и чёрный экран</string>
-    <string name="ui_settings_appearance">Оформление</string>
-    <string name="ui_settings_permissions">Разрешения и фоновая работа</string>
-    <string name="ui_settings_data">Данные и резервные копии</string>
-    <string name="ui_settings_help">О приложении и помощь</string>
     <string name="ui_timer_extend">Добавить 15 минут</string>
     <string name="ui_unknown_date">Открыто ранее, дата неизвестна</string>
     <string name="ui_recorded_date_fmt">Первая запись: %1$s</string>
     <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
-    <string name="ui_timer_target_fmt">Цель: %1$s</string>
     <string name="ui_choose_player">Выбрать проигрыватель</string>
     <string name="ui_no_backup">Успешных резервных копий не зарегистрировано</string>
     <string name="ui_backup_summary_fmt">Рост %1$d · Сеансов: %2$d</string>
-    <string name="ui_estimate_basis">Оценки зависят от условий использования; число образцов не означает статистической достоверности.</string>
-    <string name="ui_stop_assistant">Остановить помощник</string>
-    <string name="ui_ready">Готово</string>
-    <string name="ui_permission_ready">Основные разрешения предоставлены</string>
-    <string name="ui_permissions_details">Сведения о разрешениях</string>
     <string name="ui_timer_minutes">Минуты</string>
 </resources>

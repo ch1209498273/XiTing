@@ -44,7 +44,6 @@
     <string name="recent_records">最近のセッション記録 · 最近30日分のみ保持</string>
     <string name="pager_prev">‹ 前へ</string>
     <string name="pager_next">次へ ›</string>
-    <string name="settings_personal">パーソナライズ</string>
     <string name="switch_direct">画面を軽くタップで解除</string>
     <string name="switch_mistouch_guard">誤操作ロック</string>
     <string name="switch_mistouch_guard_sub">ダブルタップで解除・長押しで戻る・電源キーのロック中も黒幕を維持</string>
@@ -82,7 +81,6 @@
     <string name="caption_row_title">黒幕字幕（実験的）</string>
     <string name="caption_service_desc">再生中の動画の字幕テキストを読み取り、息屏听劇の黒幕にリアルタイム表示します。保存・アップロードは一切行いません。</string>
     <string name="update_log_title_fmt">v%1$s の更新内容</string>
-    <string name="update_log_body">· 黒幕内で元のプレーヤーを対象にタイマーを設定\n· 設定結果を確認し失敗時は入力と元のタイマーを保持\n· タイマー設定と初回体験の完了を記憶</string>
     <string name="switch_headset">イヤホン抜去で自動的に動画へ戻る</string>
     <string name="bubble_style">バブル表示</string>
     <string name="settings_data">データ</string>
@@ -97,7 +95,6 @@
     <string name="row_about">画面オフ再生について</string>
     <string name="row_about_sub">使い方 / プライバシー / オープンソース</string>
     <string name="widget_black">画面オフ</string>
-    <string name="widget_active">実行中</string>
     <string name="widget_idle">停止中</string>
     <string name="widget_today_fmt">今日 %1$s</string>
     <string name="widget_growth_next">成長値 %1$d · 次の形態まで %2$d</string>
@@ -151,8 +148,6 @@
     <string name="restore_pick">バックアップファイルを選択</string>
     <string name="restore_no">不要</string>
     <string name="toast_invalid_backup">有効なバックアップファイルではありません</string>
-    <string name="restore_other_title">バックアップは別の端末からのものです</string>
-    <string name="restore_other_msg">このバックアップの成長値は %1$d です。端末ID が本機と一致しません（機種変更、または旧署名の版からの移行）。復元しますか？</string>
     <string name="restore_ok_btn">復元</string>
     <string name="dlg_cancel">キャンセル</string>
     <string name="toast_restore_done">データを復元しました ✓（成長値 %1$d）</string>
@@ -249,7 +244,6 @@
 本プロジェクトは YouTube、Google およびあらゆる動画プラットフォームとは一切関係ありません。学習・交流目的のみを指了指し、正版の支援をお願いします。</string>
     <string name="about_version_fmt">バージョン %1$s · ビルドID %2$s</string>
     <string name="about_crash">前回のクラッシュログ（タップでコピー、長押しで消去）</string>
-    <string name="toast_copied">クリップボードにコピーしました</string>
     <string name="gallery_title">精霊図鑑</string>
     <string name="count_placeholder">0 回</string>
     <string name="dur_min_placeholder">0分</string>
@@ -327,8 +321,6 @@
     <string name="poster_row_mah">削減電力</string>
     <string name="poster_row_streak">最長連続</string>
     <string name="poster_row_gp">今週の成長値</string>
-    <string name="poster_footer_all">目を閉じて聴くたびに、精霊は育っていきます</string>
-    <string name="poster_footer_week">今週も一緒に聴いてくれてありがとう</string>
     <string name="fmt_mah">%1$d mAh</string>
     <string name="fmt_days">%1$d 日</string>
     <string name="fmt_days_sessions">%1$d 日 / %2$d 回</string>
@@ -359,7 +351,6 @@
     <string name="timer_end_action">タイマー終了時の動作</string>
     <string name="timer_return_video">黒い画面を解除</string>
     <string name="timer_pause_keep_black">一時停止を要求し黒い画面を維持</string>
-    <string name="timer_pause_explain">次に設定するタイマーに適用します。現在のタイマーは変わりません。通知へのアクセスと対応する再生セッションが必要です。設定時のプレーヤーだけに要求し、応答しない場合もあります。</string>
     <string name="timer_no_target">一時停止できるセッションがありません。通知へのアクセスとプレーヤーの対応を確認してください。既存タイマーは変更していません。</string>
     <string name="timer_pause_requested">元のプレーヤーに一時停止を要求しました。停止するかはプレーヤーの応答によります。</string>
     <string name="timer_already_paused">元のプレーヤーは一時停止中です。黒画面はそのままです。</string>
@@ -370,43 +361,21 @@
     <string name="guide_start">体験開始</string>
     <string name="guide_permission">重ねて表示する権限を許可してから戻ってください。</string>
     <string name="guide_busy">現在の黒い画面やタイマーを終了し、表示権限を確認してください。</string>
-    <string name="guide_feedback">画面が黒い間も音声は続いていましたか？</string>
-    <string name="guide_yes">音声は続いた</string>
-    <string name="guide_no">音声が止まった</string>
-    <string name="guide_success">デモが完了しました。フローティングボタンで開始できます。</string>
-    <string name="guide_retry">動画の再生を確認してください。停止する場合はバックグラウンド制限と常駐設定を確認し、別のプレーヤーでも試してください。</string>
     <string name="ach_celebration_title">実績を達成</string>
     <string name="ach_medal_title">ゴールドメダル</string>
     <string name="ach_replay">アニメーションを再生</string>
     <!-- Shared playback and navigation copy -->
     <string name="timer_episode_changed">元の再生内容が変わったか、セッションが無効になったため、この回のタイマーを解除しました。</string>
     <string name="timer_episode_waiting">この回のタイマーは再生の再開を待っています</string>
-    <string name="ui_home_intro">準備できたら、ゆっくり聴こう</string>
-    <string name="ui_playback_source">再生元</string>
     <string name="ui_no_session">読み取れる再生セッションはありません</string>
     <string name="ui_media_permission">通知へのアクセスを許可すると、再生元と対応する操作を確認できます</string>
-    <string name="ui_capabilities_fmt">一時停止：%1$s · シーク：%2$s</string>
-    <string name="ui_supported">対応</string>
-    <string name="ui_unsupported">非対応</string>
     <string name="ui_growth_title">精霊の成長</string>
-    <string name="ui_listening_title">視聴の概要</string>
-    <string name="ui_settings_playback">再生と黒画面</string>
-    <string name="ui_settings_appearance">外観</string>
-    <string name="ui_settings_permissions">権限とバックグラウンド</string>
-    <string name="ui_settings_data">データとバックアップ</string>
-    <string name="ui_settings_help">アプリ情報とヘルプ</string>
     <string name="ui_timer_extend">15分延長</string>
     <string name="ui_unknown_date">過去に解除済み・日付不明</string>
     <string name="ui_recorded_date_fmt">初回記録：%1$s</string>
     <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
-    <string name="ui_timer_target_fmt">対象：%1$s</string>
     <string name="ui_choose_player">プレーヤーを選択</string>
     <string name="ui_no_backup">成功したバックアップの記録はありません</string>
     <string name="ui_backup_summary_fmt">成長値 %1$d · セッション %2$d 件</string>
-    <string name="ui_estimate_basis">推定値は使用状況に左右されます。サンプル数は統計的な信頼度を示しません。</string>
-    <string name="ui_stop_assistant">アシスタントを停止</string>
-    <string name="ui_ready">準備完了</string>
-    <string name="ui_permission_ready">基本権限の準備完了</string>
-    <string name="ui_permissions_details">権限の詳細</string>
     <string name="ui_timer_minutes">分</string>
 </resources>

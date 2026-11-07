@@ -27,8 +27,6 @@
     <string name="support_open_failed">Unable to open this screen. Find this app in system settings.</string>
     <string name="support_selected">Selected</string>
     <string name="support_first_title">Check your preview</string>
-    <string name="support_first_intro">Try a built-in voice sample with the black curtain, then check sound and return. No other video app is needed.</string>
-    <string name="support_check_result">Check result</string>
     <string name="support_sound_question">Did you hear the test voice?</string>
     <string name="support_return_question">Did the preview return to the previous page?</string>
     <string name="support_first_success">The basic preview is complete. For listening, play a video and tap the floating bubble.</string>

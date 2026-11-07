@@ -27,8 +27,6 @@
     <string name="support_open_failed">화면을 열 수 없습니다. 시스템 설정에서 이 앱을 찾으세요.</string>
     <string name="support_selected">선택됨</string>
     <string name="support_first_title">체험 확인</string>
-    <string name="support_first_intro">다른 동영상 앱 없이 내장 음성으로 검은 화면을 체험합니다.</string>
-    <string name="support_check_result">결과 확인</string>
     <string name="support_sound_question">테스트 음성이 들렸나요?</string>
     <string name="support_return_question">원래 화면으로 돌아왔나요?</string>
     <string name="support_first_success">기본 체험이 완료되었습니다. 동영상을 재생한 후 플로팅 버튼을 누르세요.</string>

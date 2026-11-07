@@ -27,8 +27,6 @@
     <string name="support_open_failed">この画面を開けません。システム設定でこのアプリを探してください。</string>
     <string name="support_selected">選択済み</string>
     <string name="support_first_title">体験の確認</string>
-    <string name="support_first_intro">内蔵音声で黒画面を試せます。動画アプリは不要です。</string>
-    <string name="support_check_result">結果を確認</string>
     <string name="support_sound_question">テスト音声は聞こえましたか？</string>
     <string name="support_return_question">元の画面に戻りましたか？</string>
     <string name="support_first_success">基本体験が完了しました。動画を再生してからフローティングボタンをタップしてください。</string>

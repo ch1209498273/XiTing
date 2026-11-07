@@ -44,7 +44,6 @@
     <string name="recent_records">Sessions récentes · 30 derniers jours uniquement</string>
     <string name="pager_prev">‹ Précédent</string>
     <string name="pager_next">Suivant ›</string>
-    <string name="settings_personal">Personnalisation</string>
     <string name="switch_direct">Déverrouiller d\'un toucher</string>
     <string name="switch_mistouch_guard">Verrouillage anti-fausses manips</string>
     <string name="switch_mistouch_guard_sub">Double toucher pour déverrouiller, maintien pour revenir ; garde le rideau en veille</string>
@@ -82,7 +81,6 @@
     <string name="caption_row_title">Sous-titres écran noir (bêta)</string>
     <string name="caption_service_desc">Lit le texte des sous-titres de la vidéo en cours et laffiche en temps réel sur l\'écran noir. Jamais stocké, jamais envoyé, rien dautre.</string>
     <string name="update_log_title_fmt">Nouveautés de v%1$s</string>
-    <string name="update_log_body">· Régler le minuteur dans le rideau pour le lecteur sélectionné\n· Confirmer le réglage et conserver la saisie en cas de refus\n· Mémoriser les choix et la fin de la prise en main</string>
     <string name="switch_headset">Retour vidéo au débranchement</string>
     <string name="bubble_style">Style de bulle</string>
     <string name="settings_data">Données</string>
@@ -97,7 +95,6 @@
     <string name="row_about">À propos de l\'app</string>
     <string name="row_about_sub">Utilisation / Confidentialité / Open source</string>
     <string name="widget_black">Éteindre</string>
-    <string name="widget_active">En marche</string>
     <string name="widget_idle">Arrêté</string>
     <string name="widget_today_fmt">Aujourd\'hui %1$s</string>
     <string name="widget_growth_next">Progression %1$d · %2$d avant la forme suivante</string>
@@ -151,8 +148,6 @@ Si vous êtes nouveau, appuyez sur « Non merci ».</string>
     <string name="restore_pick">Choisir le fichier de sauvegarde</string>
     <string name="restore_no">Non merci</string>
     <string name="toast_invalid_backup">Fichier de sauvegarde invalide</string>
-    <string name="restore_other_title">Sauvegarde provenant d\'un autre appareil</string>
-    <string name="restore_other_msg">Cette sauvegarde contient %1$d de progression, mais l\'identifiant d\'appareil diffère du vôtre (changement de téléphone ou migration depuis une ancienne version signée). Restaurer quand même ?</string>
     <string name="restore_ok_btn">Restaurer</string>
     <string name="dlg_cancel">Annuler</string>
     <string name="toast_restore_done">Données restaurées ✓ (progression %1$d)</string>
@@ -249,7 +244,6 @@ Si vous êtes nouveau, appuyez sur « Non merci ».</string>
 Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vidéo. Usage éducatif uniquement, merci de soutenir les œuvres originales.</string>
     <string name="about_version_fmt">Version %1$s · Build ID %2$s</string>
     <string name="about_crash">Journal du dernier plantage (appuyer pour copier, maintenir pour effacer)</string>
-    <string name="toast_copied">Copié dans le presse-papiers</string>
     <string name="gallery_title">Bestiaire</string>
     <string name="count_placeholder">0 fois</string>
     <string name="dur_min_placeholder">0 min</string>
@@ -327,8 +321,6 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="poster_row_mah">Énergie économisée</string>
     <string name="poster_row_streak">Plus longue série</string>
     <string name="poster_row_gp">Progression de la semaine</string>
-    <string name="poster_footer_all">Chaque écoute les yeux fermés compte</string>
-    <string name="poster_footer_week">Merci d\'avoir écouté avec lui cette semaine</string>
     <string name="fmt_mah">%1$d mAh</string>
     <string name="fmt_days">%1$d jours</string>
     <string name="fmt_days_sessions">%1$d jours / %2$d sessions</string>
@@ -359,7 +351,6 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="timer_end_action">Action en fin de minuterie</string>
     <string name="timer_return_video">Retirer le rideau noir</string>
     <string name="timer_pause_keep_black">Demander la pause, garder le rideau</string>
-    <string name="timer_pause_explain">Pour la prochaine minuterie, sans modifier celle en cours. Accès aux notifications et session compatible requis. Seul le lecteur initial reçoit la demande, sans garantie de réponse.</string>
     <string name="timer_no_target">Aucune cible de pause compatible. Vérifiez les autorisations et le lecteur. Minuterie existante inchangée.</string>
     <string name="timer_pause_requested">Pause demandée au lecteur initial ; sa réponse détermine le résultat.</string>
     <string name="timer_already_paused">Le lecteur initial est déjà en pause. Le rideau reste inchangé.</string>
@@ -370,43 +361,21 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="guide_start">Commencer</string>
     <string name="guide_permission">Autorisez la superposition puis revenez démarrer.</string>
     <string name="guide_busy">Arrêtez le rideau ou la minuterie en cours et vérifiez la superposition.</string>
-    <string name="guide_feedback">Le son a-t-il continué pendant le rideau noir ?</string>
-    <string name="guide_yes">Le son a continué</string>
-    <string name="guide_no">Le son a cessé</string>
-    <string name="guide_success">Démo terminée. Utilisez le bouton flottant pour commencer.</string>
-    <string name="guide_retry">Vérifiez la lecture vidéo. Si le son cesse, vérifiez les restrictions en arrière-plan et le maintien actif, puis essayez un autre lecteur.</string>
     <string name="ach_celebration_title">Succès débloqué</string>
     <string name="ach_medal_title">Ma médaille dorée</string>
     <string name="ach_replay">Rejouer l’animation</string>
     <!-- Shared playback and navigation copy -->
     <string name="timer_episode_changed">Le contenu initial a changé ou la session a expiré. Le minuteur de cet épisode a été annulé.</string>
     <string name="timer_episode_waiting">Le minuteur de cet épisode attend la reprise de la lecture</string>
-    <string name="ui_home_intro">Prêt pour une écoute tranquille</string>
-    <string name="ui_playback_source">Source de lecture</string>
     <string name="ui_no_session">Aucune session de lecture lisible</string>
     <string name="ui_media_permission">Autorisez l’accès aux notifications pour voir la source et les commandes prises en charge</string>
-    <string name="ui_capabilities_fmt">Pause : %1$s · Recherche : %2$s</string>
-    <string name="ui_supported">Pris en charge</string>
-    <string name="ui_unsupported">Non pris en charge</string>
     <string name="ui_growth_title">Croissance de l’esprit</string>
-    <string name="ui_listening_title">Aperçu de l’écoute</string>
-    <string name="ui_settings_playback">Lecture et écran noir</string>
-    <string name="ui_settings_appearance">Apparence</string>
-    <string name="ui_settings_permissions">Autorisations et arrière-plan</string>
-    <string name="ui_settings_data">Données et sauvegardes</string>
-    <string name="ui_settings_help">À propos et aide</string>
     <string name="ui_timer_extend">Ajouter 15 minutes</string>
     <string name="ui_unknown_date">Débloqué auparavant, date inconnue</string>
     <string name="ui_recorded_date_fmt">Premier enregistrement : %1$s</string>
     <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
-    <string name="ui_timer_target_fmt">Cible : %1$s</string>
     <string name="ui_choose_player">Choisir un lecteur</string>
     <string name="ui_no_backup">Aucune sauvegarde réussie enregistrée</string>
     <string name="ui_backup_summary_fmt">Croissance %1$d · %2$d sessions</string>
-    <string name="ui_estimate_basis">Les estimations dépendent de l’utilisation ; le nombre d’échantillons ne représente pas une confiance statistique.</string>
-    <string name="ui_stop_assistant">Arrêter l’assistant</string>
-    <string name="ui_ready">Prêt</string>
-    <string name="ui_permission_ready">Autorisations de base prêtes</string>
-    <string name="ui_permissions_details">Détails des autorisations</string>
     <string name="ui_timer_minutes">Minutes</string>
 </resources>

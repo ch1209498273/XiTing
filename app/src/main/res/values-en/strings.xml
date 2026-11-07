@@ -44,7 +44,6 @@
     <string name="recent_records">Recent sessions · last 30 days</string>
     <string name="pager_prev">‹ Prev</string>
     <string name="pager_next">Next ›</string>
-    <string name="settings_personal">Personalize</string>
     <string name="switch_direct">Single-tap unlock</string>
     <string name="switch_mistouch_guard">Anti-mistouch lock</string>
     <string name="switch_mistouch_guard_sub">Double-tap to unlock, hold to return; keep the curtain after power lock</string>
@@ -82,7 +81,6 @@
     <string name="caption_row_title">Black-screen captions (Beta)</string>
     <string name="caption_service_desc">Reads subtitle text of the playing video and shows it on the black screen in real time. Never stored, never uploaded, used for nothing else.</string>
     <string name="update_log_title_fmt">What\'s new in v%1$s</string>
-    <string name="update_log_body">· Set timers inside the curtain with the original player\n· Confirm timer acceptance and preserve inputs on failure\n· Remember timer choices and completed first-use guidance</string>
     <string name="switch_headset">Return to video when headphones unplug</string>
     <string name="bubble_style">Bubble style</string>
     <string name="settings_data">Data</string>
@@ -97,7 +95,6 @@
     <string name="row_about">About XiTing</string>
     <string name="row_about_sub">Guide / Privacy / Open source</string>
     <string name="widget_black">Black</string>
-    <string name="widget_active">Active</string>
     <string name="widget_idle">Idle</string>
     <string name="widget_today_fmt">Today %1$s</string>
     <string name="widget_growth_next">Growth %1$d · %2$d to next</string>
@@ -149,8 +146,6 @@
     <string name="restore_pick">Choose backup file</string>
     <string name="restore_no">No thanks</string>
     <string name="toast_invalid_backup">Not a valid backup file</string>
-    <string name="restore_other_title">Backup from another device</string>
-    <string name="restore_other_msg">This backup holds %1$d growth but the device ID differs (new device, or migrated signature). Restore anyway?</string>
     <string name="restore_ok_btn">Restore</string>
     <string name="dlg_cancel">Cancel</string>
     <string name="toast_restore_done">Restored ✓ (growth %1$d)</string>
@@ -234,7 +229,6 @@
     <string name="about_license">Non-commercial license (see LICENSE): free to use and share for personal learning with attribution; any commercial use prohibited; removing or altering attribution/tracing marks forbidden.\n\nThis project is not affiliated with YouTube, Google or any video platform. For study only — please support official releases.</string>
     <string name="about_version_fmt">Version %1$s · Build %2$s</string>
     <string name="about_crash">Last crash log (tap to copy, long-press to clear)</string>
-    <string name="toast_copied">Copied to clipboard</string>
     <string name="gallery_title">Skin Gallery</string>
     <string name="count_placeholder">0 times</string>
     <string name="dur_min_placeholder">0 min</string>
@@ -312,8 +306,6 @@
     <string name="poster_row_mah">Power saved</string>
     <string name="poster_row_streak">Longest streak</string>
     <string name="poster_row_gp">Growth this week</string>
-    <string name="poster_footer_all">Every listen with closed eyes counts</string>
-    <string name="poster_footer_week">Thanks for listening with it this week</string>
     <string name="fmt_mah">%1$d mAh</string>
     <string name="fmt_days">%1$d days</string>
     <string name="fmt_days_sessions">%1$d days / %2$d sessions</string>
@@ -344,7 +336,6 @@
     <string name="timer_end_action">When the timer ends</string>
     <string name="timer_return_video">Remove black curtain</string>
     <string name="timer_pause_keep_black">Request pause, keep curtain</string>
-    <string name="timer_pause_explain">Applies to the next timer you set, not the current timer. Pause needs notification access and a supported media session. Only the original player receives the request; it may not respond.</string>
     <string name="timer_no_target">No supported pause target. Check notification access and player support. Existing timer unchanged.</string>
     <string name="timer_pause_requested">Pause requested from the original player; its response determines whether playback stops.</string>
     <string name="timer_already_paused">The original player is already paused. The curtain stays unchanged.</string>
@@ -355,43 +346,21 @@
     <string name="guide_start">Start preview</string>
     <string name="guide_permission">Allow overlay permission, then return to start.</string>
     <string name="guide_busy">End the existing curtain or timer and check overlay permission before the demo.</string>
-    <string name="guide_feedback">Did the audio keep playing while the curtain was black?</string>
-    <string name="guide_yes">Audio continued</string>
-    <string name="guide_no">Audio stopped</string>
-    <string name="guide_success">Demo completed. Use the floating button to start listening.</string>
-    <string name="guide_retry">Check that the video is playing. If audio stops, check background restrictions and keep-alive settings, then try another player.</string>
     <string name="ach_celebration_title">Achievement unlocked</string>
     <string name="ach_medal_title">My gold medal</string>
     <string name="ach_replay">Replay animation</string>
     <!-- Shared playback and navigation copy -->
     <string name="timer_episode_changed">The original content changed or the session expired. The episode timer was cancelled.</string>
     <string name="timer_episode_waiting">Episode timer is waiting for playback to resume</string>
-    <string name="ui_home_intro">Ready to relax and listen</string>
-    <string name="ui_playback_source">Playback source</string>
     <string name="ui_no_session">No readable playback session</string>
     <string name="ui_media_permission">Enable Notification Access to see playback sources and supported controls</string>
-    <string name="ui_capabilities_fmt">Pause: %1$s · Seek: %2$s</string>
-    <string name="ui_supported">Supported</string>
-    <string name="ui_unsupported">Unsupported</string>
     <string name="ui_growth_title">Spirit growth</string>
-    <string name="ui_listening_title">Listening overview</string>
-    <string name="ui_settings_playback">Playback and black screen</string>
-    <string name="ui_settings_appearance">Appearance</string>
-    <string name="ui_settings_permissions">Permissions and background</string>
-    <string name="ui_settings_data">Data and backups</string>
-    <string name="ui_settings_help">About and help</string>
     <string name="ui_timer_extend">Add 15 minutes</string>
     <string name="ui_unknown_date">Previously unlocked; date unknown</string>
     <string name="ui_recorded_date_fmt">First recorded: %1$s</string>
     <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
-    <string name="ui_timer_target_fmt">Target: %1$s</string>
     <string name="ui_choose_player">Choose a player</string>
     <string name="ui_no_backup">No successful backup recorded</string>
     <string name="ui_backup_summary_fmt">Growth %1$d · %2$d sessions</string>
-    <string name="ui_estimate_basis">Estimates depend on usage conditions; sample count does not indicate statistical confidence.</string>
-    <string name="ui_stop_assistant">Stop assistant</string>
-    <string name="ui_ready">Ready</string>
-    <string name="ui_permission_ready">Basic permissions ready</string>
-    <string name="ui_permissions_details">Permission details</string>
     <string name="ui_timer_minutes">Minutes</string>
 </resources>

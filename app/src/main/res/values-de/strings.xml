@@ -44,7 +44,6 @@
     <string name="recent_records">Letzte Sitzungen · nur 30 Tage</string>
     <string name="pager_prev">‹ Zurück</string>
     <string name="pager_next">Weiter ›</string>
-    <string name="settings_personal">Personalisierung</string>
     <string name="switch_direct">Durch Antippen direkt entsperren</string>
     <string name="switch_mistouch_guard">Schutz vor Fehlbedienung</string>
     <string name="switch_mistouch_guard_sub">Doppeltippen zum Entsperren, gedrückt halten zum Zurückkehren; Vorhang bleibt bei Sperre</string>
@@ -82,7 +81,6 @@
     <string name="caption_row_title">Black-Screen-Untertitel (Beta)</string>
     <string name="caption_service_desc">Liest Untertiteltexte des laufenden Videos und zeigt sie in Echtzeit auf dem schwarzen Bildschirm. Nie gespeichert, nie hochgeladen, für nichts anderes verwendet.</string>
     <string name="update_log_title_fmt">Neu in v%1$s</string>
-    <string name="update_log_body">· Timer direkt im schwarzen Bildschirm für den ursprünglichen Player\n· Bestätigung der Einstellung; Eingaben bei Fehlern behalten\n· Timerwahl und abgeschlossene Einführung merken</string>
     <string name="switch_headset">Beim Abziehen der Kopfhörer zurück zum Video</string>
     <string name="bubble_style">Blasen-Stil</string>
     <string name="settings_data">Daten</string>
@@ -97,7 +95,6 @@
     <string name="row_about">Über die App</string>
     <string name="row_about_sub">Anleitung / Datenschutz / Open Source</string>
     <string name="widget_black">Aus</string>
-    <string name="widget_active">Läuft</string>
     <string name="widget_idle">Gestoppt</string>
     <string name="widget_today_fmt">Heute %1$s</string>
     <string name="widget_growth_next">Fortschritt %1$d · noch %2$d bis zur nächsten Form</string>
@@ -151,8 +148,6 @@ Für neue Nutzer: « Nein danke » antippen.</string>
     <string name="restore_pick">Backup-Datei wählen</string>
     <string name="restore_no">Nein danke</string>
     <string name="toast_invalid_backup">Ungültige Backup-Datei</string>
-    <string name="restore_other_title">Backup von einem anderen Gerät</string>
-    <string name="restore_other_msg">Diese Sicherung enthält %1$d Fortschritt, die Geräte-ID stimmt aber nicht (Gerätewechsel oder Umstieg von einer älteren signierten Version). Trotzdem wiederherstellen?</string>
     <string name="restore_ok_btn">Wiederherstellen</string>
     <string name="dlg_cancel">Abbrechen</string>
     <string name="toast_restore_done">Daten wiederhergestellt ✓ (Fortschritt %1$d)</string>
@@ -249,7 +244,6 @@ Für neue Nutzer: « Nein danke » antippen.</string>
 Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Plattform. Nur zum Lernen und Austreiben — bitte unterstützt Originale.</string>
     <string name="about_version_fmt">Version %1$s · Build-ID %2$s</string>
     <string name="about_crash">Letztes Absturzprotokoll (tippen zum Kopieren, lange drücken zum Löschen)</string>
-    <string name="toast_copied">In die Zwischenablage kopiert</string>
     <string name="gallery_title">Wesen-Lexikon</string>
     <string name="count_placeholder">0 Mal</string>
     <string name="dur_min_placeholder">0 Min.</string>
@@ -327,8 +321,6 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="poster_row_mah">Strom gespart</string>
     <string name="poster_row_streak">Längste Serie</string>
     <string name="poster_row_gp">Fortschritt diese Woche</string>
-    <string name="poster_footer_all">Jedes Zuhören mit geschlossenen Augen zählt</string>
-    <string name="poster_footer_week">Danke, dass du diese Woche dabei warst</string>
     <string name="fmt_mah">%1$d mAh</string>
     <string name="fmt_days">%1$d Tage</string>
     <string name="fmt_days_sessions">%1$d Tage / %2$d Sitzungen</string>
@@ -359,7 +351,6 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="timer_end_action">Aktion am Timerende</string>
     <string name="timer_return_video">Schwarzen Vorhang entfernen</string>
     <string name="timer_pause_keep_black">Pause anfordern, Vorhang behalten</string>
-    <string name="timer_pause_explain">Gilt für den nächsten Timer, nicht den laufenden. Benachrichtigungszugriff und eine unterstützte Mediensitzung sind nötig. Nur der ursprüngliche Player erhält die Anfrage; eine Reaktion ist nicht garantiert.</string>
     <string name="timer_no_target">Kein unterstütztes Pausenziel. Zugriff und Player prüfen. Laufender Timer unverändert.</string>
     <string name="timer_pause_requested">Pause beim ursprünglichen Player angefordert; dessen Reaktion entscheidet.</string>
     <string name="timer_already_paused">Der ursprüngliche Player ist bereits pausiert. Der schwarze Bildschirm bleibt.</string>
@@ -370,43 +361,21 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="guide_start">Vorschau starten</string>
     <string name="guide_permission">Overlay erlauben und zum Start zurückkehren.</string>
     <string name="guide_busy">Vorhang oder Timer beenden und Overlay-Berechtigung prüfen.</string>
-    <string name="guide_feedback">Lief der Ton bei schwarzem Vorhang weiter?</string>
-    <string name="guide_yes">Ton lief weiter</string>
-    <string name="guide_no">Ton stoppte</string>
-    <string name="guide_success">Demo abgeschlossen. Über die schwebende Taste starten.</string>
-    <string name="guide_retry">Videowiedergabe prüfen. Bei Tonstopp Hintergrundbeschränkungen und Keep-alive prüfen, dann anderen Player testen.</string>
     <string name="ach_celebration_title">Erfolg freigeschaltet</string>
     <string name="ach_medal_title">Meine Goldmedaille</string>
     <string name="ach_replay">Animation wiederholen</string>
     <!-- Shared playback and navigation copy -->
     <string name="timer_episode_changed">Der ursprüngliche Inhalt wurde gewechselt oder die Sitzung ist abgelaufen. Der Episodentimer wurde abgebrochen.</string>
     <string name="timer_episode_waiting">Der Episodentimer wartet auf die Fortsetzung der Wiedergabe</string>
-    <string name="ui_home_intro">Bereit zum entspannten Zuhören</string>
-    <string name="ui_playback_source">Wiedergabequelle</string>
     <string name="ui_no_session">Keine lesbare Wiedergabesitzung</string>
     <string name="ui_media_permission">Benachrichtigungszugriff aktivieren, um Quelle und unterstützte Steuerung zu sehen</string>
-    <string name="ui_capabilities_fmt">Pause: %1$s · Spulen: %2$s</string>
-    <string name="ui_supported">Unterstützt</string>
-    <string name="ui_unsupported">Nicht unterstützt</string>
     <string name="ui_growth_title">Geistwachstum</string>
-    <string name="ui_listening_title">Hörübersicht</string>
-    <string name="ui_settings_playback">Wiedergabe und schwarzer Bildschirm</string>
-    <string name="ui_settings_appearance">Darstellung</string>
-    <string name="ui_settings_permissions">Berechtigungen und Hintergrund</string>
-    <string name="ui_settings_data">Daten und Sicherungen</string>
-    <string name="ui_settings_help">Info und Hilfe</string>
     <string name="ui_timer_extend">15 Minuten hinzufügen</string>
     <string name="ui_unknown_date">Früher freigeschaltet, Datum unbekannt</string>
     <string name="ui_recorded_date_fmt">Erstmals erfasst: %1$s</string>
     <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
-    <string name="ui_timer_target_fmt">Ziel: %1$s</string>
     <string name="ui_choose_player">Player auswählen</string>
     <string name="ui_no_backup">Keine erfolgreiche Sicherung erfasst</string>
     <string name="ui_backup_summary_fmt">Wachstum %1$d · %2$d Sitzungen</string>
-    <string name="ui_estimate_basis">Schätzungen hängen von der Nutzung ab; die Stichprobenzahl belegt keine statistische Konfidenz.</string>
-    <string name="ui_stop_assistant">Assistent stoppen</string>
-    <string name="ui_ready">Bereit</string>
-    <string name="ui_permission_ready">Grundlegende Berechtigungen bereit</string>
-    <string name="ui_permissions_details">Berechtigungsdetails</string>
     <string name="ui_timer_minutes">Minuten</string>
 </resources>

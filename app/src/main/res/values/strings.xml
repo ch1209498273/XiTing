@@ -53,7 +53,6 @@
     <string name="pager_next">下一页 ›</string>
 
     <!-- 设置页 -->
-    <string name="settings_personal">个性化</string>
     <string name="switch_direct">黑幕轻点直接解锁</string>
     <string name="switch_mistouch_guard">防误触锁定</string>
     <string name="switch_mistouch_guard_sub">双击解锁、长按返回；电源键锁屏后保留黑幕</string>
@@ -91,7 +90,6 @@
     <string name="caption_row_title">黑幕字幕（实验性）</string>
     <string name="caption_service_desc">采集正在播放视频的字幕文本，仅实时显示在息屏听剧的黑幕上。不存储、不上传、不用于其他用途。</string>
     <string name="update_log_title_fmt">v%1$s 更新内容</string>
-    <string name="update_log_body">· 黑幕内直接设置定时，保留播放器目标\n· 定时生效后反馈，失败保留输入与原定时\n· 记住常用时长，首次体验完成后收起提示</string>
     <string name="switch_headset">耳机拔出自动返回视频</string>
     <string name="bubble_style">悬浮球样式</string>
     <string name="settings_data">数据</string>
@@ -108,7 +106,6 @@
 
     <!-- 小部件 -->
     <string name="widget_black">息屏</string>
-    <string name="widget_active">运行中</string>
     <string name="widget_idle">未运行</string>
     <string name="widget_today_fmt">今日 %1$s</string>
     <string name="widget_growth_next">成长值 %1$d · 距下一形态 %2$d</string>
@@ -172,8 +169,6 @@
     <string name="restore_pick">选择备份文件</string>
     <string name="restore_no">不用了</string>
     <string name="toast_invalid_backup">不是有效的备份文件</string>
-    <string name="restore_other_title">备份来自其他设备</string>
-    <string name="restore_other_msg">该备份成长值 %1$d，设备ID与本机不一致（换机，或从旧签名版本迁移）。确定恢复吗？</string>
     <string name="restore_ok_btn">恢复</string>
     <string name="dlg_cancel">取消</string>
     <string name="toast_restore_done">数据已恢复 ✓（成长值 %1$d）</string>
@@ -274,7 +269,6 @@
     <string name="about_license">非商业许可（详见LICENSE）：个人学习交流可自由使用与分享（需保留署名）；任何商业用途均被禁止；禁止移除或篡改署名与溯源标识。\n\n本项目与 YouTube、Google 及任何视频平台无关联。仅供学习交流，请支持正版。</string>
     <string name="about_version_fmt">版本 %1$s · 构建ID %2$s</string>
     <string name="about_crash">上次崩溃日志（点按复制，长按清除）</string>
-    <string name="toast_copied">已复制到剪贴板</string>
 
     <!-- v3.5 精灵图鉴与streak -->
     <string name="gallery_title">精灵图鉴</string>
@@ -362,8 +356,6 @@
     <string name="poster_row_mah">省电估算</string>
     <string name="poster_row_streak">最长连续</string>
     <string name="poster_row_gp">本周成长值</string>
-    <string name="poster_footer_all">每一次闭上眼睛的聆听，都算数</string>
-    <string name="poster_footer_week">这一周，谢谢你陪它听</string>
     <string name="fmt_mah">%1$d mAh</string>
     <string name="fmt_days">%1$d 天</string>
     <string name="fmt_days_sessions">%1$d 天 / %2$d 次</string>
@@ -396,7 +388,6 @@
     <string name="timer_end_action">结束时做什么</string>
     <string name="timer_return_video">撤掉黑幕</string>
     <string name="timer_pause_keep_black">请求暂停，保持黑幕</string>
-    <string name="timer_pause_explain">保存后对下次设置的定时生效，当前定时不变。暂停需要通知使用权和支持暂停的媒体会话，仅向设置时的播放器发送请求；第三方播放器可能不响应。</string>
     <string name="timer_no_target">未找到可暂停的播放会话。请检查通知使用权和播放器支持，原定时未改变。</string>
     <string name="timer_pause_requested">已向原播放器请求暂停；是否暂停以播放器实际响应为准。</string>
     <string name="timer_already_paused">原播放器已暂停，黑幕保持原状。</string>
@@ -407,43 +398,21 @@
     <string name="guide_start">开始体验</string>
     <string name="guide_permission">请先开启悬浮窗权限，再回来开始演示。</string>
     <string name="guide_busy">请先结束现有黑幕或定时，并确认悬浮窗权限后再试演示。</string>
-    <string name="guide_feedback">刚才画面黑下来时，声音是否还在继续？</string>
-    <string name="guide_yes">声音还在</string>
-    <string name="guide_no">声音停了</string>
-    <string name="guide_success">这次黑幕与恢复体验已完成，可用悬浮球开始听剧。</string>
-    <string name="guide_retry">先确认视频在正常播放。若声音仍会中断，请检查后台运行限制和保活设置，并换另一个播放器确认兼容性。</string>
     <string name="ach_celebration_title">成就达成</string>
     <string name="ach_medal_title">我的金色勋章</string>
     <string name="ach_replay">重播动画</string>
     <!-- Shared playback and navigation copy -->
     <string name="timer_episode_changed">原播放内容已更换或会话失效，本集定时已取消</string>
     <string name="timer_episode_waiting">本集定时等待播放继续</string>
-    <string name="ui_home_intro">准备好，安心听</string>
-    <string name="ui_playback_source">播放来源</string>
     <string name="ui_no_session">暂无可读播放会话</string>
     <string name="ui_media_permission">开启通知使用权以查看播放来源与控制支持</string>
-    <string name="ui_capabilities_fmt">暂停：%1$s · 进度跳转：%2$s</string>
-    <string name="ui_supported">支持</string>
-    <string name="ui_unsupported">不支持</string>
     <string name="ui_growth_title">精灵成长</string>
-    <string name="ui_listening_title">听剧概览</string>
-    <string name="ui_settings_playback">播放与黑幕</string>
-    <string name="ui_settings_appearance">外观</string>
-    <string name="ui_settings_permissions">权限与后台</string>
-    <string name="ui_settings_data">数据与备份</string>
-    <string name="ui_settings_help">关于与帮助</string>
     <string name="ui_timer_extend">延长15分钟</string>
     <string name="ui_unknown_date">历史解锁，日期未知</string>
     <string name="ui_recorded_date_fmt">首次记录：%1$s</string>
     <string name="ui_achievement_progress_fmt">%1$s / %2$s</string>
-    <string name="ui_timer_target_fmt">目标：%1$s</string>
     <string name="ui_choose_player">选择播放器</string>
     <string name="ui_no_backup">暂无成功备份记录</string>
     <string name="ui_backup_summary_fmt">成长值 %1$d · 会话 %2$d 条</string>
-    <string name="ui_estimate_basis">估算受使用场景影响；样本数量不代表统计置信度。</string>
-    <string name="ui_stop_assistant">停止助手</string>
-    <string name="ui_ready">已就绪</string>
-    <string name="ui_permission_ready">基础权限已就绪</string>
-    <string name="ui_permissions_details">权限详情</string>
     <string name="ui_timer_minutes">分钟</string>
 </resources>

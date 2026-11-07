@@ -10,8 +10,6 @@
     <string name="extras_no_presets">Sin ajustes guardados</string>
     <string name="extras_preset_saved">Ajuste guardado</string>
     <string name="extras_preset_duplicate">Ya está guardado</string>
-    <string name="extras_personalization">Personalización</string>
-    <string name="extras_appearance">Apariencia</string>
     <string name="extras_theme_system">Sistema</string>
     <string name="extras_theme_light">Claro</string>
     <string name="extras_theme_dark">Oscuro</string>

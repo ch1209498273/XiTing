@@ -28,7 +28,6 @@
 
     <!-- 状态 -->
     <color name="warn_red">#FFFF8A65</color>
-    <color name="crash_row">#FFE0A080</color>
 
     <!-- 胶囊 / 圆底 -->
     <color name="pill_off_bg">#FF262A31</color>

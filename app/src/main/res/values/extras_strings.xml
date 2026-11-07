@@ -10,8 +10,6 @@
     <string name="extras_no_presets">暂无保存方案</string>
     <string name="extras_preset_saved">已保存方案</string>
     <string name="extras_preset_duplicate">该方案已保存</string>
-    <string name="extras_personalization">个性化</string>
-    <string name="extras_appearance">外观</string>
     <string name="extras_theme_system">跟随系统</string>
     <string name="extras_theme_light">浅色</string>
     <string name="extras_theme_dark">深色</string>

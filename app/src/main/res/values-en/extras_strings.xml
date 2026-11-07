@@ -10,8 +10,6 @@
     <string name="extras_no_presets">No saved presets</string>
     <string name="extras_preset_saved">Preset saved</string>
     <string name="extras_preset_duplicate">Preset already saved</string>
-    <string name="extras_personalization">Personalization</string>
-    <string name="extras_appearance">Appearance</string>
     <string name="extras_theme_system">System</string>
     <string name="extras_theme_light">Light</string>
     <string name="extras_theme_dark">Dark</string>

@@ -27,8 +27,6 @@
     <string name="support_open_failed">No se pudo abrir esta pantalla. Busca esta app en los ajustes del sistema.</string>
     <string name="support_selected">Seleccionado</string>
     <string name="support_first_title">Comprobar la prueba</string>
-    <string name="support_first_intro">Prueba la pantalla negra con una voz integrada, sin otra aplicación de vídeo.</string>
-    <string name="support_check_result">Comprobar resultado</string>
     <string name="support_sound_question">¿Has oído la voz de prueba?</string>
     <string name="support_return_question">¿Has vuelto a la página anterior?</string>
     <string name="support_first_success">La prueba básica ha terminado. Reproduce un vídeo y toca la burbuja flotante.</string>

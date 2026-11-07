@@ -27,8 +27,6 @@
     <string name="support_open_failed">无法打开此入口，请在系统设置中查找本应用。</string>
     <string name="support_selected">已选中</string>
     <string name="support_first_title">体验确认</string>
-    <string name="support_first_intro">播放一段内置测试语音并体验黑幕，结束后确认声音和返回画面。无需打开其他视频应用。</string>
-    <string name="support_check_result">检查结果</string>
     <string name="support_sound_question">刚才有没有听到测试语音？</string>
     <string name="support_return_question">体验结束后，是否正常回到了原来的页面？</string>
     <string name="support_first_success">基础体验已完成。实际听剧时，先播放视频，再点悬浮球开启黑幕。</string>

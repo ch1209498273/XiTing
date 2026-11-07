@@ -10,8 +10,6 @@
     <string name="extras_no_presets">저장된 프리셋 없음</string>
     <string name="extras_preset_saved">저장됨</string>
     <string name="extras_preset_duplicate">이미 저장된 프리셋</string>
-    <string name="extras_personalization">개인 설정</string>
-    <string name="extras_appearance">화면 모드</string>
     <string name="extras_theme_system">시스템 설정</string>
     <string name="extras_theme_light">밝게</string>
     <string name="extras_theme_dark">어둡게</string>

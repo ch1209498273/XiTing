@@ -27,8 +27,6 @@
     <string name="support_open_failed">Diese Seite konnte nicht geöffnet werden. Die App in den Systemeinstellungen suchen.</string>
     <string name="support_selected">Ausgewählt</string>
     <string name="support_first_title">Vorschau prüfen</string>
-    <string name="support_first_intro">Schwarzen Bildschirm mit integrierter Stimme ausprobieren. Keine Video-App nötig.</string>
-    <string name="support_check_result">Ergebnis prüfen</string>
     <string name="support_sound_question">War die Teststimme hörbar?</string>
     <string name="support_return_question">Ist die vorherige Seite wieder sichtbar?</string>
     <string name="support_first_success">Die Grundfunktion wurde getestet. Ein Video starten und die schwebende Schaltfläche antippen.</string>

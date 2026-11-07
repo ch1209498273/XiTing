@@ -62,4 +62,3 @@ internal object SessionConsoleUi {
         builder.show()
     }
 }
-internal fun MainActivity.bindSessionConsole() = Unit

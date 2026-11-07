@@ -12,7 +12,8 @@ import java.util.Locale
  * 通知栏正文与桌面小组件共用的状态文案，以及定时弹窗取消后的残留检查。
  *
  * 本类原先没有任何调用点，等于从没跑过；且断言对着 v5.0.1 之前的实现：
- * 控制台卡片（`bindSessionConsole` 现为空壳）、场景标签 `v50_scene_*`（已撤掉的堆叠）、
+ * 控制台卡片（当时的 `bindSessionConsole` 已退化成 `= Unit` 空壳，2026-11-06 已删）、
+ * 场景标签 `v50_scene_*`（已撤掉的堆叠）、
  * 以及「summary 含 v50_play_unknown」——而 `pause()` 把 `NONE` 提前判成空串，
  * 当前实现不可能输出那句措辞。
  *

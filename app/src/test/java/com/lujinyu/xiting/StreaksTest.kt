@@ -85,34 +85,31 @@ class StreaksTest {
         assertEquals(sh, la + 1)
     }
 
-    // ── distinctListenDays ──
+    // ── epochDayOf：同一天与跨天边界 ──
+    // 这三条原先测的是 distinctListenDays，而生产走的是各处内联的
+    // sessions.mapTo(HashSet) { epochDayOf(it.start) }（HistoryStore/WeekReport/MonthReport）。
+    // 转守 epochDayOf 之后，用例落在用户真正经过的那条路上。
 
     @Test
-    fun `同一天的多条会话只算一天`() {
+    fun `同一天的多条会话落在同一天号`() {
         inTz("Asia/Shanghai") {
-            val s = listOf(
-                sessionAt(ms(2026, 10, 7, 8)),
-                sessionAt(ms(2026, 10, 7, 12)),
-                sessionAt(ms(2026, 10, 7, 23))
+            val days = setOf(
+                Streaks.epochDayOf(ms(2026, 10, 7, 8)),
+                Streaks.epochDayOf(ms(2026, 10, 7, 12)),
+                Streaks.epochDayOf(ms(2026, 10, 7, 23))
             )
-            assertEquals(1, Streaks.distinctListenDays(s))
+            assertEquals(1, days.size)
         }
     }
 
     @Test
-    fun `跨天分别计数`() {
+    fun `跨零点算作两天且天号相差一`() {
         inTz("Asia/Shanghai") {
-            val s = listOf(
-                sessionAt(ms(2026, 10, 6, 23, 50)),
-                sessionAt(ms(2026, 10, 7, 0, 10))
-            )
-            assertEquals(2, Streaks.distinctListenDays(s))
+            val before = Streaks.epochDayOf(ms(2026, 10, 6, 23, 50))
+            val after = Streaks.epochDayOf(ms(2026, 10, 7, 0, 10))
+            assertEquals(2, setOf(before, after).size)
+            assertEquals(1L, after - before)
         }
-    }
-
-    @Test
-    fun `空列表为 0 天`() {
-        assertEquals(0, Streaks.distinctListenDays(emptyList()))
     }
 
     // ── compute：连续性 ──

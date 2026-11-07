@@ -30,7 +30,7 @@ internal class IncrementDialogChecks(private val i:Instrumentation) {
                             "diagnostics"->SupportDiagnostics.show(activity)
                             "first-success"->FirstSuccessFlow.confirm(activity)
                             "appearance"->activity.showAppearanceSettings()
-                            else ->activity.showListeningPresets()
+                            else ->activity.showManageListeningPresets()   // 生产真正会走的那条（定时弹窗内的方案选择器调它）
                         } }
                         i.waitForIdleSync()
                         main {

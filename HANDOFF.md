@@ -69,6 +69,24 @@
 
 两处如实挂账：其一，警告数从 v6.1.0 的 76 变成 77，那 +1 **我没能归因**——发布时的逐条清单没存，无法比对；已实测确认本轮删除没有新增任何孤儿资源（63 条 `UnusedResources` 与 HEAD 代码引用逐个对过，命中 0）。其二，扫描器只认静态引用，靠反射或按名字拼出来的引用它看不见，所以删除清单仍需以编译与三组设备检查为准，本轮均为绿。
 
+**2026-11-06 「仅测试在用」的定性与覆盖搬家（工作区，未发布）**：上一轮留下 8 条"生产不调、测试在守"的，本轮逐个定性。判据要干净：`git log -S"名字("` 会被定义行本身污染（`fun MainActivity.bindSessionConsole()` 里就含 `bindSessionConsole(`），所以改成在指定版本树里 grep 后**剔除定义行**再数——结果是这 7 条在 `3b5db09`（把它们发布出去的提交）和 HEAD 的非定义引用都是 0。也就是说它们不是回退残骸，是**生下来就没接线**：用户从来没拿到过这些行为，而测试把它们算作已覆盖。
+
+分三种处置。
+
+一、**覆盖搬家**（不是删测试，是把用例从没人走的路挪到有人走的路）：
+- `BackupImportTest` 7 条改守 `validBackupSessions`——恢复路径与摘要真正共用的那条，此前**一条用例都没有**；补齐它特有的判据后 7→14 条（时长区间、`backupInteger` 只认 Long/Int、多余字段不带入、墙钟倒走仍保留、null 输入）。
+- `StreaksTest` 3 条改守 `epochDayOf`（HistoryStore/WeekReport/MonthReport 都在用它，`distinctListenDays` 只是把内联写法又包一层）；其中"空列表为 0 天"那条转过去后等于断言空集合大小，删掉。
+- `IncrementDialogChecks` 的 presets 用例改调 `showManageListeningPresets`——那才是定时弹窗内方案选择器真会走的路。
+- `applyHomeEntryOrder` 改吃 `HomeEntryOrder.orderedIds`：设备检查 `PersonalizationDeviceChecks:47` 守的就是这个映射，实现绕开它等于测试守一条用户不走的路。
+
+二、**删除**：`filterImportSessions`（被更强的 `validBackupSessions` 取代）、`distinctListenDays`、`showListeningPresets`、`bindSessionConsole`（`= Unit` 空壳）、`PlayerCatalogPolicy.kt` 整文件与 `PlayerCatalogPolicyTest`（生产零引用，且没有任何别处调用它的对象）。
+
+三、**保留**：`isDemoAudioPlaying`——它是测试探针，生产直接读 `demoOverlay` 判空，删它要改 6 处测试且没有收益。
+
+**我自己的错**：写分类时把 `showListeningPresets` 列进"保留"，动手时却删了它，是编译把这条自相矛盾抓出来的（`IncrementDialogChecks:33` 仍在调）。教训：分类结论和执行清单必须同一轮对账，不能凭上一段的说法写下一段的代码。
+
+承重实测：把 `validBackupSessions` 的时长下限从 `60_000L` 放到 `1L` → 恰好 `BackupImportTest 时长不足一分钟被丢弃` 与 `BackupSummaryTest` 各红 1 条，还原后全绿。门禁：单测 38 类 247 例 0 失败（-3 无用例、+7 导入新用例、-1 空集合用例）；lint 错误 0/警告 77，无一条指向本轮文件；i18n 通过；设备检查 `incrementDialogs`（96 个对话框 × 8 语言 × 2 主题）、`session_text`、`app_choices`、默认全流程全 PASS；二阶孤儿扫描归零。
+
 **发版脚本踩到一件事，别再犯**：`release.ps1` 第 2 步用 `powershell -File tools\run_tests.ps1 *> 文件` 调子进程，子进程已写完全绿日志并退出主逻辑，但 **Gradle 守护进程继承了重定向句柄**，父进程等管道关闭而长时间不返回（这次卡了一个多小时，日志停在"== 单测 =="）。处置办法：卡住时先看 `release_tests.txt` 的时间戳与结论行判断是"没跑完"还是"没返回"；确认全绿后停掉进程，还原已被 step 1 改写但未提交的 `build.gradle.kts`，单独补跑 `lint` 与 `i18n check` 两道门禁，再用 `-SkipTests` 重跑脚本完成发布。根治办法（未做）：脚本改用 `cmd /c` 或直接内联调用，或跑完显式 `--stop` 守护进程。
 
 **v6.0.0 / code99 是上一版**（2026-10-18 公开发布 GitHub latest 与蒲公英 build21）。本版交付「接着听与随手标记」：SQLite 内容库与旧时长统计分离、最近听过、系统分享接收与显式粘贴、黑幕标记与备注、睡前定时起点、90 天期限与清理预览、备份 v5。验收范围**只覆盖 OPPO PME110 + 哔哩哔哩 9.14.0**，抖音本轮未重新验证，手机首屏 ≤500ms 未实测——详见 `docs/uat-continue-listening-20261017/RESULTS.md` 与第八节。

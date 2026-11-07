@@ -25,18 +25,6 @@ object ListeningPresets {
         item.minutes, ctx.getString(if (item.pauseKeepBlack) R.string.timer_pause_keep_black else R.string.timer_return_video))
 }
 
-internal fun MainActivity.showListeningPresets(): AlertDialog {
-    val items = ListeningPresets.load(this)
-    val builder = AlertDialog.Builder(this).setTitle(R.string.extras_presets)
-        .setNegativeButton(R.string.dlg_cancel, null)
-        .setNeutralButton(R.string.extras_manage_presets) { _, _ -> showManageListeningPresets() }
-    if (items.isEmpty()) builder.setMessage(R.string.extras_no_presets)
-    else builder.setItems(items.map { ListeningPresets.label(this, it) }.toTypedArray()) { _, index ->
-        showTimerOptions(items[index])
-    }
-    return builder.show()
-}
-
 internal fun MainActivity.showManageListeningPresets(): AlertDialog {
     val items = ListeningPresets.load(this)
     val builder = AlertDialog.Builder(this).setTitle(R.string.extras_manage_presets)

@@ -343,12 +343,3 @@ internal fun JSONArray.toStringSet(): Set<String> {
     return out
 }
 
-internal fun filterImportSessions(arr: JSONArray, max: Int): JSONArray {
-    val kept = JSONArray()
-    val limit = minOf(arr.length(), max)
-    for (i in 0 until limit) {
-        val o = arr.optJSONObject(i) ?: continue
-        if (o.has("s") && o.has("e") && o.has("d") && o.has("m")) kept.put(o)
-    }
-    return kept
-}

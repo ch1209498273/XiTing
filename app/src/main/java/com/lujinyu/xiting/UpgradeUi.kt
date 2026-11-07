@@ -27,12 +27,11 @@ internal fun MainActivity.applyHomeEntryOrder() {
         while(v!=null && v.parent!==container) v=v.parent as? android.view.View
         return v
     }
-    val groups=HomeEntryOrder.keys(this).map { key -> when(key) {
-        "timer" -> listOfNotNull(topOf(R.id.timer_chip))
-        "player" -> listOfNotNull(topOf(R.id.playback_source_card))
-        "demo" -> listOfNotNull(topOf(R.id.btn_first_use))
-        else -> listOfNotNull(topOf(R.id.home_permissions_title),topOf(R.id.home_permissions_panel))
-    } }.filter { it.isNotEmpty() }
+    // 走 orderedIds 而不是自己再映射一遍：设备检查守的就是这个映射，实现绕开它等于测试守着一条没人走的路
+    val groups=HomeEntryOrder.orderedIds(this).mapNotNull { id ->
+        val head=topOf(id) ?: return@mapNotNull null
+        if(id==R.id.home_permissions_title) listOf(head)+listOfNotNull(topOf(R.id.home_permissions_panel)) else listOf(head)
+    }.filter { it.isNotEmpty() }
     val moving=groups.flatten().distinct()
     if(moving.size<2) return
     val slots=moving.map { container.indexOfChild(it) }

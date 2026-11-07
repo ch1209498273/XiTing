@@ -29,10 +29,6 @@ object Streaks {
         return (ms + tz.getOffset(ms)) / 86_400_000L
     }
 
-    /** 不同的「听剧日」数量（用于「累计 N 天」类统计，不看连续性） */
-    fun distinctListenDays(sessions: List<ListenSession>): Int =
-        sessions.mapTo(HashSet()) { epochDayOf(it.start) }.size
-
     fun compute(sessions: List<ListenSession>): Info =
         computeFromDays(sessions.mapTo(HashSet()) { epochDayOf(it.start) })
 

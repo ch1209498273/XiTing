@@ -1,0 +1,44 @@
+[
+  {
+    "text": "",
+    "content-desc": "上一集",
+    "bounds": "[291,1580][441,1730]",
+    "enabled": "true"
+  },
+  {
+    "text": "",
+    "content-desc": "播放/暂停",
+    "bounds": "[465,1580][615,1730]",
+    "enabled": "true"
+  },
+  {
+    "text": "",
+    "content-desc": "下一集",
+    "bounds": "[639,1580][789,1730]",
+    "enabled": "true"
+  },
+  {
+    "text": "· 定时剩余1分钟",
+    "content-desc": "",
+    "bounds": "[36,1730][1044,1811]",
+    "enabled": "true"
+  },
+  {
+    "text": "设置定时",
+    "content-desc": "",
+    "bounds": "[36,1811][1044,1955]",
+    "enabled": "true"
+  },
+  {
+    "text": "取消定时",
+    "content-desc": "",
+    "bounds": "[540,1955][1044,2099]",
+    "enabled": "true"
+  },
+  {
+    "text": "🔒 点击返回视频",
+    "content-desc": "",
+    "bounds": "[36,2099][1044,2272]",
+    "enabled": "true"
+  }
+]

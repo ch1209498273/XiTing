@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-17",
+  "device": "OPPO PME110",
+  "android": "16",
+  "api": 36,
+  "from": "5.1.9/code98",
+  "installed": "6.0.0/code99",
+  "bilibili": "9.14.0",
+  "sha256": "03f06834befa19ed63452bcfa92eb3aa46b04a899e3d5d7867876e95ce4efec0",
+  "rotationBefore": {
+    "font_scale": "1.0",
+    "user_rotation": "0",
+    "accelerometer_rotation": "0"
+  },
+  "upgrade": "adb install -r Success; existing accumulated statistics retained",
+  "blackPlayback": "actual OverlayService and floating ball; current Bili public title correct; user confirmed continuous sound",
+  "defaultTimerDisplay": false,
+  "defaultMarkDisplay": false,
+  "automaticHistory": "public Bili title and 1:00 position visible",
+  "share": "real Android chooser -> production preview -> save -> titled detail with open original content",
+  "shareAutomationIssue": "OPPO floating mini-window exposes unscaled UI coordinates; initial automation hit cancel; screenshot-based tap saved successfully",
+  "openOriginal": "saved Bili public link -> Edge web -> system per-use confirmation -> Bili same public title",
+  "manualMark": "actual black mark 28:18 and UAT-v6-public-sample note verified after reopening; mark display restored false",
+  "cleanup": "90 days default; preview 0 eligible records; cancel preserved records",
+  "timer": "passed: home acceptance showed 1 minute/pause and keep black; Bili PLAYING(3) -> PAUSED(2); curtain retained; origin detail 2:12 showed player confirmed pause",
+  "rotationAfter": {
+    "user_rotation": "0",
+    "accelerometer_rotation": "0",
+    "font_scale": "1.0"
+  },
+  "limitations": [
+    "physical tests cover this OPPO and Bili version; no universal platform claim",
+    "database replace/rollback and destructive cleanup validated on isolated emulator, not real phone data",
+    "initial timer attempt lacked acceptance evidence and is not a pass"
+  ],
+  "timerAudibleConfirmation": "user confirmed: sound stopped at deadline"
+}

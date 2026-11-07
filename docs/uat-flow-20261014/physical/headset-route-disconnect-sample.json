@@ -1,0 +1,9 @@
+{
+  "connectedTypes": null,
+  "selectedTypes": [
+    "AUDIO_DEVICE_OUT_EARPIECE",
+    "AUDIO_DEVICE_OUT_SPEAKER",
+    "AUDIO_DEVICE_OUT_TELEPHONY_TX"
+  ],
+  "time": "2026-10-14T22:02:11.6961318+08:00"
+}

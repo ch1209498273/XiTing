@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.PetPaletteTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-13T03:05:55.078Z" hostname="DESKTOP-4AAHQ1P" time="0.004">
+  <properties/>
+  <testcase name="色相在 0-360 内" classname="com.lujinyu.xiting.PetPaletteTest" time="0.002"/>
+  <testcase name="六款皮肤的色相两两不同" classname="com.lujinyu.xiting.PetPaletteTest" time="0.0"/>
+  <testcase name="经典配色下各形态用各自的基准色相" classname="com.lujinyu.xiting.PetPaletteTest" time="0.0"/>
+  <testcase name="越界的 stage 不会崩，退回默认色相" classname="com.lujinyu.xiting.PetPaletteTest" time="0.0"/>
+  <testcase name="皮肤色相直接取代基准色相而不是叠加偏移" classname="com.lujinyu.xiting.PetPaletteTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

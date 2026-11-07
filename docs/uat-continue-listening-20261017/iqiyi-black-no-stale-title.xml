@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hierarchy rotation="0">
+  <node index="0" text="" resource-id="" class="android.widget.FrameLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[0,0][1080,2340]">
+    <node index="0" text="🔔 1" resource-id="" class="android.widget.TextView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[968,99][1036,143]" />
+    <node index="1" text="轻点空白处继续黑屏" resource-id="" class="android.widget.TextView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[0,165][1080,225]" />
+    <node index="2" text="" resource-id="" class="android.widget.ScrollView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="true" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[44,1779][1036,2230]">
+      <node index="0" text="" resource-id="" class="android.widget.LinearLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[44,1779][1036,2230]">
+        <node index="0" text="" resource-id="" class="android.widget.LinearLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[88,1834][992,1883]">
+          <node index="0" text="" resource-id="" class="android.widget.LinearLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[88,1834][992,1883]">
+            <node index="0" text="播放操作请返回播放器" resource-id="" class="android.widget.TextView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[88,1834][992,1883]" />
+          </node>
+        </node>
+        <node index="1" text="记住这里" resource-id="" class="android.widget.TextView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="true" enabled="true" focusable="true" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[88,1883][992,2015]" />
+        <node index="2" text="返回播放器" resource-id="com.lujinyu.xiting:id/black_return_button" class="android.widget.TextView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="true" enabled="true" focusable="true" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[88,2054][992,2186]" />
+      </node>
+    </node>
+  </node>
+</hierarchy>

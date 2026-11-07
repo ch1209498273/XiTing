@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.PlayerCatalogPolicyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-14T15:49:02.290Z" hostname="DESKTOP-4AAHQ1P" time="0.007">
+  <properties/>
+  <testcase name="unsupportedInstalledPlayerRemainsVisibleBesidePausedSession" classname="com.lujinyu.xiting.PlayerCatalogPolicyTest" time="0.006"/>
+  <testcase name="sessionAddsCapabilityWithoutReplacingInstalledAppName" classname="com.lujinyu.xiting.PlayerCatalogPolicyTest" time="0.001"/>
+  <testcase name="selectedAppStaysExplicitEvenWhenAnotherAppIsPlaying" classname="com.lujinyu.xiting.PlayerCatalogPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

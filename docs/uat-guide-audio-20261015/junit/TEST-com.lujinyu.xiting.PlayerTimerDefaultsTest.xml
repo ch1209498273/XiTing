@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.PlayerTimerDefaultsTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-14T17:31:42.082Z" hostname="DESKTOP-4AAHQ1P" time="0.019">
+  <properties/>
+  <testcase name="malformed and wrongly typed fields cannot become defaults" classname="com.lujinyu.xiting.PlayerTimerDefaultsTest" time="0.002"/>
+  <testcase name="backup import normalizes valid optional JSON and preserves local on damaged or absent field" classname="com.lujinyu.xiting.PlayerTimerDefaultsTest" time="0.003"/>
+  <testcase name="backup export includes validated defaults and omits damaged defaults" classname="com.lujinyu.xiting.PlayerTimerDefaultsTest" time="0.004"/>
+  <testcase name="player defaults round trip independently" classname="com.lujinyu.xiting.PlayerTimerDefaultsTest" time="0.001"/>
+  <testcase name="oversized payloads and excess entries are rejected" classname="com.lujinyu.xiting.PlayerTimerDefaultsTest" time="0.005"/>
+  <testcase name="updating a player retains others and evicts oldest only when full" classname="com.lujinyu.xiting.PlayerTimerDefaultsTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

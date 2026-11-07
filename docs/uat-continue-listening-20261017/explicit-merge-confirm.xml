@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hierarchy rotation="0">
+  <node index="0" text="" resource-id="" class="android.widget.FrameLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[27,903][1053,1506]">
+    <node index="0" text="" resource-id="" class="android.widget.FrameLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,947][1009,1462]">
+      <node index="0" text="" resource-id="android:id/content" class="android.widget.FrameLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,947][1009,1462]">
+        <node index="0" text="" resource-id="android:id/parentPanel" class="android.widget.LinearLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,947][1009,1462]">
+          <node index="0" text="" resource-id="android:id/topPanel" class="android.widget.LinearLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,947][1009,1099]">
+            <node index="0" text="" resource-id="android:id/title_template" class="android.widget.LinearLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,947][1009,1077]">
+              <node index="0" text="请确认" resource-id="android:id/alertTitle" class="android.widget.TextView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[137,997][943,1077]" />
+            </node>
+            <node index="1" text="" resource-id="android:id/titleDividerNoCustom" class="android.view.View" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,1077][1009,1099]" />
+          </node>
+          <node index="1" text="" resource-id="android:id/contentPanel" class="android.widget.FrameLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,1099][1009,1291]">
+            <node index="0" text="" resource-id="android:id/scrollView" class="android.widget.ScrollView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,1099][1009,1291]">
+              <node index="0" text="" resource-id="" class="android.widget.LinearLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,1099][1009,1291]">
+                <node index="0" text="链接已保存到另一条记录。是否将那条记录的标记和备注合并到当前记录？此操作由你明确关联，不会自动匹配内容。" resource-id="android:id/message" class="android.widget.TextView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,1099][1009,1291]" />
+              </node>
+            </node>
+          </node>
+          <node index="2" text="" resource-id="android:id/buttonPanel" class="android.widget.ScrollView" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="true" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,1291][1009,1462]">
+            <node index="0" text="" resource-id="" class="android.widget.LinearLayout" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[71,1291][1009,1462]">
+              <node index="0" text="取消" resource-id="android:id/button2" class="android.widget.Button" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="true" enabled="true" focusable="true" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[624,1302][800,1451]" />
+              <node index="1" text="好的" resource-id="android:id/button1" class="android.widget.Button" package="com.lujinyu.xiting" content-desc="" checkable="false" checked="false" clickable="true" enabled="true" focusable="true" focused="false" scrollable="false" long-clickable="false" password="false" selected="false" bounds="[800,1302][976,1451]" />
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</hierarchy>

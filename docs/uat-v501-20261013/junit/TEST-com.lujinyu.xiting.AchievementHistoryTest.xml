@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.AchievementHistoryTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-13T15:38:23.915Z" hostname="DESKTOP-4AAHQ1P" time="0.055">
+  <properties/>
+  <testcase name="latest follows recording order rather than badge order or clock" classname="com.lujinyu.xiting.AchievementHistoryTest" time="0.035"/>
+  <testcase name="malformed history skips invalid ids duplicates and non objects" classname="com.lujinyu.xiting.AchievementHistoryTest" time="0.008"/>
+  <testcase name="backup merge keeps local first record imports order and unknown legacy" classname="com.lujinyu.xiting.AchievementHistoryTest" time="0.006"/>
+  <testcase name="old or malformed backup preserves local history and unrelated unlocks" classname="com.lujinyu.xiting.AchievementHistoryTest" time="0.002"/>
+  <testcase name="legacy unlock dates stay unknown and rerecord never changes first time" classname="com.lujinyu.xiting.AchievementHistoryTest" time="0.0"/>
+  <testcase name="progress exposes actual values and clamps only percentage" classname="com.lujinyu.xiting.AchievementHistoryTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

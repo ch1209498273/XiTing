@@ -1,0 +1,8 @@
+{
+  "phase": "recovery-playback-precondition",
+  "state": [
+    "active=true",
+    "state=PlaybackState {state=PLAYING(3), position=404200, buffered position=0, speed=1.0, updated=1975768751, actions=775, custom actions=[Action:mName='rewind, mIcon=2131236675, mExtras=null, Action:mName='forward, mIcon=2131236663, mExtras=null, Action:mName='like, mIcon=2131236666, mExtras=null, Action:mName='close, mIcon=2131236660, mExtras=null], active item id=-1, error=null}"
+  ],
+  "time": "2026-10-14T22:03:26.7097381+08:00"
+}

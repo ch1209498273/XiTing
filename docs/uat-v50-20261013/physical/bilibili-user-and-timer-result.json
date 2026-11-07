@@ -1,0 +1,8 @@
+{
+  "timer_configured": false,
+  "selected_bilibili": false,
+  "other_player_pause_sent": false,
+  "reason": "Bilibili not exposed in active-session picker after foreground switch",
+  "audio_continued_user_confirmed": true,
+  "video_return_normal_user_confirmed": true
+}

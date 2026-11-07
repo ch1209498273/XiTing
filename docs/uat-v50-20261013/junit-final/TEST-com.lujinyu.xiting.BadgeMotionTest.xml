@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.BadgeMotionTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-13T14:38:22.303Z" hostname="DESKTOP-4AAHQ1P" time="0.002">
+  <properties/>
+  <testcase name="celebration settles and never loops" classname="com.lujinyu.xiting.BadgeMotionTest" time="0.001"/>
+  <testcase name="system disabled animations show complete medal immediately" classname="com.lujinyu.xiting.BadgeMotionTest" time="0.0"/>
+  <testcase name="all frames stay finite and within drawing bounds" classname="com.lujinyu.xiting.BadgeMotionTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

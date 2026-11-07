@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.BackupSummaryTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-13T15:38:24.008Z" hostname="DESKTOP-4AAHQ1P" time="0.005">
+  <properties/>
+  <testcase name="summary counts exactly restorable sessions and supports v1" classname="com.lujinyu.xiting.BackupSummaryTest" time="0.003"/>
+  <testcase name="invalid mode timestamps and duration are skipped independently" classname="com.lujinyu.xiting.BackupSummaryTest" time="0.0"/>
+  <testcase name="wall clock rollback preserves a valid monotonic listening duration" classname="com.lujinyu.xiting.BackupSummaryTest" time="0.0"/>
+  <testcase name="preview and restore use the same first 500 entry limit" classname="com.lujinyu.xiting.BackupSummaryTest" time="0.001"/>
+  <testcase name="unrelated json cannot clear local growth through restore" classname="com.lujinyu.xiting.BackupSummaryTest" time="0.0"/>
+  <testcase name="malformed optional fields do not invent a version or negative growth" classname="com.lujinyu.xiting.BackupSummaryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

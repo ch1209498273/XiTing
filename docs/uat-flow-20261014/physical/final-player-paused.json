@@ -1,0 +1,8 @@
+{
+  "phase": "final-cleanup",
+  "time": "2026-10-14T22:33:29.0559827+08:00",
+  "state": [
+    "active=true",
+    "state=PlaybackState {state=PAUSED(2), position=361862, buffered position=0, speed=1.0, updated=1977567023, actions=823, custom actions=[Action:mName='like, mIcon=2131236666, mExtras=null, Action:mName='close, mIcon=2131236660, mExtras=null], active item id=-1, error=null}"
+  ]
+}

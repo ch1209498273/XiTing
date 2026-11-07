@@ -1,0 +1,26 @@
+{
+  "version": "5.1.7",
+  "code": 96,
+  "sha256": "50E427C3718158F3CAEE598F4844FCA8168F005B118D4B5948AB5D5FD4E7917A",
+  "device": "OPPO PME110",
+  "api": 36,
+  "jvmTests": 227,
+  "jvmFailures": 0,
+  "nativeParts": [
+    "playback_boundaries",
+    "app_choices",
+    "system_playback"
+  ],
+  "lintErrors": 0,
+  "lintWarnings": 74,
+  "physicalMusicTimer": "verified: real one minute; PLAYING to PAUSED; curtain remains; user confirmed continuous then stopped",
+  "physicalDouyin": "verified: source follows music to Douyin; tentative identity; unsupported controls hidden; return works",
+  "powerExperiment": "removed by user",
+  "release": "not_published",
+  "pending": [
+    "current candidate Bili and iQiyi content matrix",
+    "multi OEM",
+    "real incoming call",
+    "long duration background"
+  ]
+}

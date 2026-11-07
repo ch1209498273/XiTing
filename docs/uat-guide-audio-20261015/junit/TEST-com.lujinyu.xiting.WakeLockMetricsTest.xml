@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.WakeLockMetricsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-14T17:31:42.207Z" hostname="DESKTOP-4AAHQ1P" time="0.006">
+  <properties/>
+  <testcase name="systemTimeoutStopsReportingHeldWithoutAReleaseCallback" classname="com.lujinyu.xiting.WakeLockMetricsTest" time="0.0"/>
+  <testcase name="activeHoldIsIncludedInProcessTotal" classname="com.lujinyu.xiting.WakeLockMetricsTest" time="0.001"/>
+  <testcase name="simultaneousCallsKeepTotalConsistent" classname="com.lujinyu.xiting.WakeLockMetricsTest" time="0.004"/>
+  <testcase name="earlierTimestampsCannotCreateNegativeDurations" classname="com.lujinyu.xiting.WakeLockMetricsTest" time="0.001"/>
+  <testcase name="duplicateAcquireAndReleaseDoNotDoubleCount" classname="com.lujinyu.xiting.WakeLockMetricsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

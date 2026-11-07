@@ -1,0 +1,56 @@
+[
+  {
+    "evidence": "verified-flow-api26.log",
+    "api": 26,
+    "status": "PASS",
+    "category": "flow"
+  },
+  {
+    "evidence": "verified-core-api26.log",
+    "api": 26,
+    "status": "PASS",
+    "category": "core"
+  },
+  {
+    "evidence": "verified-v50-api26.log",
+    "api": 26,
+    "status": "PASS",
+    "category": "v50"
+  },
+  {
+    "evidence": "verified-flow-api33.log",
+    "api": 33,
+    "status": "PASS",
+    "category": "flow"
+  },
+  {
+    "evidence": "verified-core-api33.log",
+    "api": 33,
+    "status": "PASS",
+    "category": "core"
+  },
+  {
+    "evidence": "verified-v50-api33.log",
+    "api": 33,
+    "status": "PASS",
+    "category": "v50"
+  },
+  {
+    "evidence": "settled-flow-api35.log",
+    "api": 35,
+    "status": "PASS",
+    "category": "flow"
+  },
+  {
+    "evidence": "settled-core-api35.log",
+    "api": 35,
+    "status": "PASS",
+    "category": "core"
+  },
+  {
+    "evidence": "settled-v50-api35.log",
+    "api": 35,
+    "status": "PASS",
+    "category": "v50"
+  }
+]

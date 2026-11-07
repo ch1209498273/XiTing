@@ -1,0 +1,9 @@
+{
+  "activeAudioPlayer": true,
+  "serviceForeground": true,
+  "audioPlayerStates": [
+    "state:started"
+  ],
+  "fullCurtainWindowPresent": true,
+  "time": "2026-10-14T22:29:42.6054511+08:00"
+}

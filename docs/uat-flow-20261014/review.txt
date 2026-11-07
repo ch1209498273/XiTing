@@ -1,0 +1,12 @@
+2026-10-14 independent read-only review
+
+Final conclusion: no blocking issue found in the reviewed timer command validation,
+fixed-return target independence, target lifetime, and timer cancellation cleanup.
+
+Reviewer identified an intermediate regression: destroyed optional targets must not
+reject fixed curtain removal. Parent reproduced it in fixed-return-red-api26.log
+and separated requiresTarget for pause/episode from optional preference targets.
+The reviewer then checked the correction and found no blocking issue.
+
+This is code-review evidence, not an independent execution of Gradle, ADB, or real
+player UAT. Execution evidence is recorded separately in the native/JUnit logs.

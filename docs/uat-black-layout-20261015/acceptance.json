@@ -1,0 +1,18 @@
+{
+  "version": "5.1.6",
+  "code": 95,
+  "lintErrors": 0,
+  "jvmTests": 225,
+  "sha256": "127ED49A538726E2FC3E7F0AEC13B0C8C0FF5230996061DCD2EA45549B10C04B",
+  "lintWarnings": 74,
+  "layoutAndTimerVariants": 64,
+  "deviceInstall": "verified_OPPO_PME110_API36",
+  "physicalUat": {
+    "douyinAudioAndDisplay": "user_confirmed",
+    "timerExtendCancel": "verified",
+    "physicalLandscapeAndLargeFont": "not_retested_on_phone_simulator_matrix_passed",
+    "versionVerified": "5.1.6/code95",
+    "portraitLayout": "verified",
+    "musicPauseResume": "verified_session_PAUSED_then_PLAYING"
+  }
+}

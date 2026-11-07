@@ -1,0 +1,6 @@
+{
+  "power": "mWakefulness=Dozing",
+  "trigger": "Android KEYCODE_SLEEP; actual display sleep, not simulated broadcast",
+  "fullCurtainWindowPresent": false,
+  "time": "2026-10-14T22:06:02.1280050+08:00"
+}

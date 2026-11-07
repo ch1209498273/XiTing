@@ -1,0 +1,14 @@
+[
+  {
+    "text": "未运行",
+    "id": "com.lujinyu.xiting:id/pill_status"
+  },
+  {
+    "text": "未设置",
+    "id": "com.lujinyu.xiting:id/timer_state"
+  },
+  {
+    "text": "37时28分",
+    "id": "com.lujinyu.xiting:id/home_all"
+  }
+]

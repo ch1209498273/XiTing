@@ -1,0 +1,26 @@
+[
+  {
+    "row": 0,
+    "detail_and_replay_available": true,
+    "list_retained": false,
+    "window_path_verified": true
+  },
+  {
+    "row": 1,
+    "detail_and_replay_available": true,
+    "list_retained": false,
+    "window_path_verified": true
+  },
+  {
+    "row": 2,
+    "detail_and_replay_available": false,
+    "list_retained": false,
+    "window_path_verified": false
+  },
+  {
+    "row": 3,
+    "detail_and_replay_available": true,
+    "list_retained": false,
+    "window_path_verified": true
+  }
+]

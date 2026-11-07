@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.WeekReportTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-14T17:31:42.218Z" hostname="DESKTOP-4AAHQ1P" time="0.019">
+  <properties/>
+  <testcase name="本周成长值跨过门槛则起止形态不同" classname="com.lujinyu.xiting.WeekReportTest" time="0.004"/>
+  <testcase name="同一天多次只算一天" classname="com.lujinyu.xiting.WeekReportTest" time="0.001"/>
+  <testcase name="本周成长值按时长换算 每分钟一点" classname="com.lujinyu.xiting.WeekReportTest" time="0.001"/>
+  <testcase name="上周的时长计入 prevWeek 而非本周" classname="com.lujinyu.xiting.WeekReportTest" time="0.001"/>
+  <testcase name="上周为零时不报百分比（否则除零）" classname="com.lujinyu.xiting.WeekReportTest" time="0.001"/>
+  <testcase name="本周与上周的会话分开计数" classname="com.lujinyu.xiting.WeekReportTest" time="0.0"/>
+  <testcase name="比上周少时 delta 为负且比率为负" classname="com.lujinyu.xiting.WeekReportTest" time="0.0"/>
+  <testcase name="周一零点就是本周起点" classname="com.lujinyu.xiting.WeekReportTest" time="0.001"/>
+  <testcase name="本周未进化时起止形态相同" classname="com.lujinyu.xiting.WeekReportTest" time="0.002"/>
+  <testcase name="周日的本周只回溯到本周一而不是七天前" classname="com.lujinyu.xiting.WeekReportTest" time="0.002"/>
+  <testcase name="空记录不炸且全为 0" classname="com.lujinyu.xiting.WeekReportTest" time="0.001"/>
+  <testcase name="起点总是零点整" classname="com.lujinyu.xiting.WeekReportTest" time="0.001"/>
+  <testcase name="本周时长不足一分钟不给成长值" classname="com.lujinyu.xiting.WeekReportTest" time="0.001"/>
+  <testcase name="比上周多时 delta 为正" classname="com.lujinyu.xiting.WeekReportTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,57 @@
+[
+  {
+    "enabled": "true",
+    "text": "睡前定时",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "30分钟",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "结束时做什么",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "撤掉黑幕",
+    "checked": "true"
+  },
+  {
+    "enabled": "true",
+    "text": "请求暂停，保持黑幕",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "当前播放内容",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "哔哩哔哩",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "播放中 · 可请求暂停",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "取消定时",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "取消",
+    "checked": "false"
+  },
+  {
+    "enabled": "true",
+    "text": "好的",
+    "checked": "false"
+  }
+]

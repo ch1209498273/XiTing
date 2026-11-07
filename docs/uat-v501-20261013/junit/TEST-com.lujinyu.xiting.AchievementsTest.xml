@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.AchievementsTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-13T15:38:23.973Z" hostname="DESKTOP-4AAHQ1P" time="0.004">
+  <properties/>
+  <testcase name="砍掉旧成就后残留集合不会让统计虚高" classname="com.lujinyu.xiting.AchievementsTest" time="0.001"/>
+  <testcase name="其余三条阈值锚定 马拉松1小时 百次 王者阶段4" classname="com.lujinyu.xiting.AchievementsTest" time="0.0"/>
+  <testcase name="badgeList 按 id 点亮，不受残留 id 影响" classname="com.lujinyu.xiting.AchievementsTest" time="0.001"/>
+  <testcase name="badgeList 顺序与 ALL 一致" classname="com.lujinyu.xiting.AchievementsTest" time="0.0"/>
+  <testcase name="badgeList 全解锁时全部点亮" classname="com.lujinyu.xiting.AchievementsTest" time="0.0"/>
+  <testcase name="每条成就都有徽章且四枚互不重复" classname="com.lujinyu.xiting.AchievementsTest" time="0.001"/>
+  <testcase name="持之以恒按历史最长连续解锁 边界在 7 天" classname="com.lujinyu.xiting.AchievementsTest" time="0.0"/>
+  <testcase name="全是残留 id 时返回空列表而非抛异常" classname="com.lujinyu.xiting.AchievementsTest" time="0.0"/>
+  <testcase name="保持 ALL 的声明顺序，latest 取最后一条" classname="com.lujinyu.xiting.AchievementsTest" time="0.0"/>
+  <testcase name="全部解锁时数量等于 ALL 大小" classname="com.lujinyu.xiting.AchievementsTest" time="0.0"/>
+  <testcase name="残留与正常 id 混合时只保留正常 id" classname="com.lujinyu.xiting.AchievementsTest" time="0.001"/>
+  <testcase name="全空时返回空列表" classname="com.lujinyu.xiting.AchievementsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,4 @@
+Signer #1 certificate DN: CN=XiTing Release, OU=XiTing, O=ch1209498273, C=CN
+Signer #1 certificate SHA-256 digest: cd40e01da2c2267c1076a2a56fe57cc0c4ae64f3fa56335d4b8561d44a2608ff
+Signer #1 certificate SHA-1 digest: 2e54bced7d7addcdb45f06316cb8916427bbb75a
+Signer #1 certificate MD5 digest: c2ba54c90fc7a3f854abb7701975b8c4

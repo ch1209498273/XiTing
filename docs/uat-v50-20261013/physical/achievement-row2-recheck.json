@@ -1,0 +1,7 @@
+{
+  "row": 2,
+  "detail_and_replay_available": false,
+  "list_retained": true,
+  "window_path_verified": true,
+  "note": "Initial dump captured transient toast; independent recheck confirms locked list retained"
+}

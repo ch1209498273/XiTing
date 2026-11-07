@@ -1,0 +1,12 @@
+[
+  {
+    "package": "tv.danmaku.bili",
+    "state": "PAUSED(2)",
+    "positionMs": 1237908
+  },
+  {
+    "package": "com.qiyi.video",
+    "state": "NONE(0)",
+    "positionMs": 0
+  }
+]

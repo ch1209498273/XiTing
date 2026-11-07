@@ -1,0 +1,22 @@
+{
+  "version": "5.1.9",
+  "code": 98,
+  "sha256": "BB27F0D3DD75FE45133CE8ACAD7CBCEF1E608091F22D34735C18FC0C7F648CD7",
+  "defaultTimerDisplay": false,
+  "settingsClickVerified": true,
+  "nativeParts": [
+    "black_timer_visibility",
+    "black_layout",
+    "black_timer_layout"
+  ],
+  "activeTimerSurvivesHiding": true,
+  "hiddenEntryCannotOpenEditor": true,
+  "lintErrors": 0,
+  "lintWarnings": 74,
+  "physicalInstall": "verified: OPPO PME110, v5.1.9 code98, install -r successful",
+  "rotationRestored": "verified: accelerometer_rotation=0; user_rotation unchanged at 0",
+  "rotationPolicy": "preserve physical device settings; matrix on emulator only",
+  "release": "not_published",
+  "physicalSettingsClickVerified": true,
+  "physicalBlackTimerHiddenVerified": true
+}

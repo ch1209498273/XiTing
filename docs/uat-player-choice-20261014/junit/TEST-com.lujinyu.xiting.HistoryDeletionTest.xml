@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.HistoryDeletionTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-14T15:49:02.205Z" hostname="DESKTOP-4AAHQ1P" time="0.011">
+  <properties/>
+  <testcase name="partialLegacyMonthCannotInventUnknownRunnerUpOrDayCounts" classname="com.lujinyu.xiting.HistoryDeletionTest" time="0.008"/>
+  <testcase name="duplicateRowsDeleteExactlyOneAndRetainDay" classname="com.lujinyu.xiting.HistoryDeletionTest" time="0.001"/>
+  <testcase name="deletionPreservesArchivedMonthsAndRecomputesMaximum" classname="com.lujinyu.xiting.HistoryDeletionTest" time="0.001"/>
+  <testcase name="lastSessionRemovesDayButKeepsArchivedDays" classname="com.lujinyu.xiting.HistoryDeletionTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

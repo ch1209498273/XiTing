@@ -1,0 +1,273 @@
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\PlayerTimerDefaults.kt:30: Warning: Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background [ApplySharedPref]
+            prefs.edit().putString(KEY, raw).commit()
+                                             ~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\ServiceRecovery.kt:23: Warning: Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background [ApplySharedPref]
+        p.edit().putBoolean(ACTIVE,true).putBoolean(NOTICE,p.getBoolean(NOTICE,false)||interrupted).commit()
+                                                                                                    ~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\ServiceRecovery.kt:30: Warning: Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background [ApplySharedPref]
+            .apply { if(!wanted)putLong(DEADLINE,0).putBoolean(EPISODE,false) }.commit()
+                                                                                ~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\SessionRuntime.kt:18: Warning: Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background [ApplySharedPref]
+            try { ctx.prefs().edit().putString(CHECKPOINT,JSONObject(saved).put("scene",scene).toString()).commit() }
+                                                                                                           ~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\SessionRuntime.kt:31: Warning: Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background [ApplySharedPref]
+            ctx.prefs().edit().remove(CHECKPOINT).commit()
+                                                  ~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\SessionRuntime.kt:47: Warning: Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background [ApplySharedPref]
+        ctx.prefs().edit().putString(CHECKPOINT,checkpoint.toString()).commit()
+                                                                       ~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\SessionRuntime.kt:67: Warning: Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background [ApplySharedPref]
+            ctx.prefs().edit().remove(CHECKPOINT).commit()
+                                                  ~~~~~~~~
+
+   Explanation for issues of type "ApplySharedPref":
+   Consider using apply() instead of commit on shared preferences. Whereas
+   commit blocks and writes its data to persistent storage immediately, apply
+   will handle it in the background.
+
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\MainDialogs.kt:36: Warning: Avoid passing null as the view root (needed to resolve layout parameters on the inflated layout's root element) [InflateParams]
+        val view = layoutInflater.inflate(R.layout.dialog_achievements, null)
+                                                                        ~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\SkinGallery.kt:41: Warning: Avoid passing null as the view root (needed to resolve layout parameters on the inflated layout's root element) [InflateParams]
+        val view = layoutInflater.inflate(R.layout.dialog_skin_picker, null)
+                                                                       ~~~~
+
+   Explanation for issues of type "InflateParams":
+   When inflating a layout, avoid passing in null as the parent view, since
+   otherwise any layout parameters on the root of the inflated layout will be
+   ignored.
+
+   https://www.bignerdranch.com/blog/understanding-androids-layoutinflater-inflate/
+
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\SessionRuntime.kt:72: Warning: Don't use a constant here; expected one of: PlaybackState.STATE_BUFFERING, PlaybackState.STATE_CONNECTING, PlaybackState.STATE_ERROR, PlaybackState.STATE_FAST_FORWARDING, PlaybackState.STATE_NONE, PlaybackState.STATE_PAUSED, PlaybackState.STATE_PLAYING, PlaybackState.STATE_REWINDING, PlaybackState.STATE_SKIPPING_TO_NEXT, PlaybackState.STATE_SKIPPING_TO_PREVIOUS, PlaybackState.STATE_SKIPPING_TO_QUEUE_ITEM, PlaybackState.STATE_STOPPED [SwitchIntDef]
+        null->PlaybackReport.UNKNOWN
+        ~~~~
+
+   Explanation for issues of type "SwitchIntDef":
+   This check warns if a switch statement does not explicitly include all the
+   values declared by the typedef @IntDef declaration.
+
+D:\AI任务\zcode\息屏听剧\app\src\main\res\drawable\bg_nav_item.xml:2: Warning: The resource R.drawable.bg_nav_item appears to be unused [UnusedResources]
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+^
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\extras_strings.xml:13: Warning: The resource R.string.extras_personalization appears to be unused [UnusedResources]
+    <string name="extras_personalization">个性化</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\extras_strings.xml:14: Warning: The resource R.string.extras_appearance appears to be unused [UnusedResources]
+    <string name="extras_appearance">外观</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\flow_strings.xml:10: Warning: The resource R.string.flow_player_reselect appears to be unused [UnusedResources]
+    <string name="flow_player_reselect">重新选择播放器</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\flow_strings.xml:12: Warning: The resource R.string.flow_timer_ready appears to be unused [UnusedResources]
+    <string name="flow_timer_ready">定时已设置</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\flow_strings.xml:16: Warning: The resource R.string.flow_timer_review appears to be unused [UnusedResources]
+    <string name="flow_timer_review">请确认播放器、时长和结束动作</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\flow_strings.xml:20: Warning: The resource R.string.flow_timer_result appears to be unused [UnusedResources]
+    <string name="flow_timer_result">定时结果</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\flow_strings.xml:21: Warning: The resource R.string.flow_setup_success appears to be unused [UnusedResources]
+    <string name="flow_setup_success">体验已完成，可随时在帮助中重试</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:56: Warning: The resource R.string.settings_personal appears to be unused [UnusedResources]
+    <string name="settings_personal">个性化</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:109: Warning: The resource R.string.widget_active appears to be unused [UnusedResources]
+    <string name="widget_active">运行中</string>
+            ~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:171: Warning: The resource R.string.restore_other_title appears to be unused [UnusedResources]
+    <string name="restore_other_title">备份来自其他设备</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:172: Warning: The resource R.string.restore_other_msg appears to be unused [UnusedResources]
+    <string name="restore_other_msg">该备份成长值 %1$d，设备ID与本机不一致（换机，或从旧签名版本迁移）。确定恢复吗？</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:364: Warning: The resource R.string.poster_footer_all appears to be unused [UnusedResources]
+    <string name="poster_footer_all">每一次闭上眼睛的聆听，都算数</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:365: Warning: The resource R.string.poster_footer_week appears to be unused [UnusedResources]
+    <string name="poster_footer_week">这一周，谢谢你陪它听</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:399: Warning: The resource R.string.timer_pause_explain appears to be unused [UnusedResources]
+    <string name="timer_pause_explain">保存后对下次设置的定时生效，当前定时不变。暂停需要通知使用权和支持暂停的媒体会话，仅向设置时的播放器发送请求；第三方播放器可能不响应。</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:414: Warning: The resource R.string.guide_feedback appears to be unused [UnusedResources]
+    <string name="guide_feedback">刚才画面黑下来时，声音是否还在继续？</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:415: Warning: The resource R.string.guide_yes appears to be unused [UnusedResources]
+    <string name="guide_yes">声音还在</string>
+            ~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:416: Warning: The resource R.string.guide_no appears to be unused [UnusedResources]
+    <string name="guide_no">声音停了</string>
+            ~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:417: Warning: The resource R.string.guide_success appears to be unused [UnusedResources]
+    <string name="guide_success">这次黑幕与恢复体验已完成，可用悬浮球开始听剧。</string>
+            ~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:425: Warning: The resource R.string.ui_home_intro appears to be unused [UnusedResources]
+    <string name="ui_home_intro">准备好，安心听</string>
+            ~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:429: Warning: The resource R.string.ui_capabilities_fmt appears to be unused [UnusedResources]
+    <string name="ui_capabilities_fmt">暂停：%1$s · 进度跳转：%2$s</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:430: Warning: The resource R.string.ui_supported appears to be unused [UnusedResources]
+    <string name="ui_supported">支持</string>
+            ~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:431: Warning: The resource R.string.ui_unsupported appears to be unused [UnusedResources]
+    <string name="ui_unsupported">不支持</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:433: Warning: The resource R.string.ui_listening_title appears to be unused [UnusedResources]
+    <string name="ui_listening_title">听剧概览</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:434: Warning: The resource R.string.ui_settings_playback appears to be unused [UnusedResources]
+    <string name="ui_settings_playback">播放与黑幕</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:435: Warning: The resource R.string.ui_settings_appearance appears to be unused [UnusedResources]
+    <string name="ui_settings_appearance">外观</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:436: Warning: The resource R.string.ui_settings_permissions appears to be unused [UnusedResources]
+    <string name="ui_settings_permissions">权限与后台</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:437: Warning: The resource R.string.ui_settings_data appears to be unused [UnusedResources]
+    <string name="ui_settings_data">数据与备份</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:438: Warning: The resource R.string.ui_settings_help appears to be unused [UnusedResources]
+    <string name="ui_settings_help">关于与帮助</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:443: Warning: The resource R.string.ui_timer_target_fmt appears to be unused [UnusedResources]
+    <string name="ui_timer_target_fmt">目标：%1$s</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:447: Warning: The resource R.string.ui_estimate_basis appears to be unused [UnusedResources]
+    <string name="ui_estimate_basis">估算受使用场景影响；样本数量不代表统计置信度。</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:448: Warning: The resource R.string.ui_stop_assistant appears to be unused [UnusedResources]
+    <string name="ui_stop_assistant">停止助手</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:449: Warning: The resource R.string.ui_ready appears to be unused [UnusedResources]
+    <string name="ui_ready">已就绪</string>
+            ~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:450: Warning: The resource R.string.ui_permission_ready appears to be unused [UnusedResources]
+    <string name="ui_permission_ready">基础权限已就绪</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\strings.xml:451: Warning: The resource R.string.ui_permissions_details appears to be unused [UnusedResources]
+    <string name="ui_permissions_details">权限详情</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\upgrade_colors.xml:2: Warning: The resource R.color.on_brand appears to be unused [UnusedResources]
+<resources><color name="on_brand">#FFFFFFFF</color></resources>
+                  ~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\upgrade_strings.xml:9: Warning: The resource R.string.ui_timer_review appears to be unused [UnusedResources]
+    <string name="ui_timer_review">确认后立即应用此处的时长、结束动作和播放器。暂停需要通知使用权及播放器支持；仅向选定会话发送请求，第三方播放器可能不响应。</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:3: Warning: The resource R.string.v50_scenes appears to be unused [UnusedResources]
+    <string name="v50_scenes">选择听剧场景</string>
+            ~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:12: Warning: The resource R.string.v50_idle appears to be unused [UnusedResources]
+    <string name="v50_idle">助手未启动</string>
+            ~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:13: Warning: The resource R.string.v50_starting appears to be unused [UnusedResources]
+    <string name="v50_starting">助手启动中</string>
+            ~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:14: Warning: The resource R.string.v50_running appears to be unused [UnusedResources]
+    <string name="v50_running">助手运行中</string>
+            ~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:15: Warning: The resource R.string.v50_stopping appears to be unused [UnusedResources]
+    <string name="v50_stopping">助手停止中</string>
+            ~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:17: Warning: The resource R.string.v50_curtain_off appears to be unused [UnusedResources]
+    <string name="v50_curtain_off">黑幕关闭</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:18: Warning: The resource R.string.v50_curtain_locked appears to be unused [UnusedResources]
+    <string name="v50_curtain_locked">黑幕已锁定</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:19: Warning: The resource R.string.v50_curtain_awake appears to be unused [UnusedResources]
+    <string name="v50_curtain_awake">黑幕操作层</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:22: Warning: The resource R.string.v50_play_paused appears to be unused [UnusedResources]
+    <string name="v50_play_paused">播放器报告已暂停</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:23: Warning: The resource R.string.v50_play_buffering appears to be unused [UnusedResources]
+    <string name="v50_play_buffering">播放器报告缓冲中</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:24: Warning: The resource R.string.v50_play_invalid appears to be unused [UnusedResources]
+    <string name="v50_play_invalid">播放器会话失效</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:25: Warning: The resource R.string.v50_timer_fixed appears to be unused [UnusedResources]
+    <string name="v50_timer_fixed">固定定时</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:26: Warning: The resource R.string.v50_timer_waiting appears to be unused [UnusedResources]
+    <string name="v50_timer_waiting">等待播放器继续播放</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:27: Warning: The resource R.string.v50_timer_executing appears to be unused [UnusedResources]
+    <string name="v50_timer_executing">正在执行结束动作</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:28: Warning: The resource R.string.v50_timer_ended appears to be unused [UnusedResources]
+    <string name="v50_timer_ended">定时已结束</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:29: Warning: The resource R.string.v50_remaining appears to be unused [UnusedResources]
+    <string name="v50_remaining">剩余 %1$d:%2$02d</string>
+            ~~~~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:36: Warning: The resource R.string.v50_recent appears to be unused [UnusedResources]
+    <string name="v50_recent">最近一次结果</string>
+            ~~~~~~~~~~~~~~~~~
+D:\AI任务\zcode\息屏听剧\app\src\main\res\values\v50_strings.xml:43: Warning: The resource R.string.v50_settings_tools appears to be unused [UnusedResources]
+    <string name="v50_settings_tools">数据、诊断与回顾</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+   Available options:
+
+   **skip-libraries** (default is true):
+   Whether the unused resource check should skip reporting unused resources in libraries.
+
+   Many libraries will declare resources that are part of the library surface; other modules depending on the library will also reference the resources. To avoid reporting all these resources as unused (in the context of a library), the unused resource check normally skips reporting unused resources in libraries. Instead, run the unused resource check on the consuming app module (along with `checkDependencies=true`).
+
+   However, there are cases where you want to check that all the resources declared in a library are used; in that case, you can disable the skip option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UnusedResources">
+           <option name="skip-libraries" value="true" />
+       </issue>
+   </lint>
+   ```
+
+D:\AI任务\zcode\息屏听剧\app\src\main\res\layout\widget_compact.xml:32: Warning: This LinearLayout view is unnecessary (no children, no background, no id, no style) [UselessLeaf]
+    <LinearLayout
+     ~~~~~~~~~~~~
+
+   Explanation for issues of type "UselessLeaf":
+   A layout that has no children or no background can often be removed (since
+   it is invisible) for a flatter and more efficient layout hierarchy.
+
+D:\AI任务\zcode\息屏听剧\app\src\main\java\com\lujinyu\xiting\CurtainTimerPanel.kt:18: Warning: Custom view CurtainTimerPanel is missing constructor used by tools: (Context) or (Context,AttributeSet) or (Context,AttributeSet,int) [ViewConstructor]
+internal class CurtainTimerPanel(ctx:Context,private val onClose:()->Unit,private val onAccepted:()->Unit):LinearLayout(ctx) {
+               ~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ViewConstructor":
+   Some layout tools (such as the Android layout editor) need to find a
+   constructor with one of the following signatures:
+   * View(Context context)
+   * View(Context context, AttributeSet attrs)
+   * View(Context context, AttributeSet attrs, int defStyle)
+
+   If your custom view needs to perform initialization which does not apply
+   when used in a layout editor, you can surround the given code with a check
+   to see if View#isInEditMode() is false, since that method will return false
+   at runtime but true within a user interface editor.
+
+0 errors, 67 warnings

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.BadgesTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-13T15:38:24.022Z" hostname="DESKTOP-4AAHQ1P" time="0.007">
+  <properties/>
+  <testcase name="只有一枚时正好居中" classname="com.lujinyu.xiting.BadgesTest" time="0.006"/>
+  <testcase name="格数为零时返回空数组" classname="com.lujinyu.xiting.BadgesTest" time="0.0"/>
+  <testcase name="第一格在最下、向上递增递进" classname="com.lujinyu.xiting.BadgesTest" time="0.001"/>
+  <testcase name="相邻圆心距恒为两倍半径加间隙" classname="com.lujinyu.xiting.BadgesTest" time="0.0"/>
+  <testcase name="整列不会超出给定半径加间隙的包络" classname="com.lujinyu.xiting.BadgesTest" time="0.0"/>
+  <testcase name="整列关于 centerY 对称" classname="com.lujinyu.xiting.BadgesTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

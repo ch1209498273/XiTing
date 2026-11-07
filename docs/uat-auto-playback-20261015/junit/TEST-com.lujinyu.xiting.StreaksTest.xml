@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.StreaksTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-14T16:56:29.777Z" hostname="DESKTOP-4AAHQ1P" time="0.015">
+  <properties/>
+  <testcase name="无记录时全为 0" classname="com.lujinyu.xiting.StreaksTest" time="0.001"/>
+  <testcase name="今天听了则 current 含今天" classname="com.lujinyu.xiting.StreaksTest" time="0.001"/>
+  <testcase name="日界线是本地零点而不是 UTC 零点" classname="com.lujinyu.xiting.StreaksTest" time="0.005"/>
+  <testcase name="今天还没听时 从昨天往前数且不算今天" classname="com.lujinyu.xiting.StreaksTest" time="0.0"/>
+  <testcase name="同一天的早晚时刻归为同一天" classname="com.lujinyu.xiting.StreaksTest" time="0.0"/>
+  <testcase name="跨天分别计数" classname="com.lujinyu.xiting.StreaksTest" time="0.001"/>
+  <testcase name="相邻两天是不同的天" classname="com.lujinyu.xiting.StreaksTest" time="0.0"/>
+  <testcase name="best 记录历史最长 即使已中断" classname="com.lujinyu.xiting.StreaksTest" time="0.001"/>
+  <testcase name="同一天的多条会话只算一天" classname="com.lujinyu.xiting.StreaksTest" time="0.001"/>
+  <testcase name="中断一天则连续计数断开" classname="com.lujinyu.xiting.StreaksTest" time="0.0"/>
+  <testcase name="时区不同会得到不同的天号 - 因此实现不能硬编码 UTC" classname="com.lujinyu.xiting.StreaksTest" time="0.004"/>
+  <testcase name="空列表为 0 天" classname="com.lujinyu.xiting.StreaksTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.PetMotionTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:26:36.725Z" hostname="DESKTOP-4AAHQ1P" time="0.006">
+  <properties/>
+  <testcase name="stormRespondsToHorizontalSwipeButNotVerticalScroll" classname="com.lujinyu.xiting.PetMotionTest" time="0.002"/>
+  <testcase name="motionSettlesAndStaysWithinBounds" classname="com.lujinyu.xiting.PetMotionTest" time="0.002"/>
+  <testcase name="holdingBallChargesButShortTapStillResponds" classname="com.lujinyu.xiting.PetMotionTest" time="0.001"/>
+  <testcase name="helpAndCollectionTakePriorityOverPet" classname="com.lujinyu.xiting.PetMotionTest" time="0.001"/>
+  <testcase name="tapsAndLongPressesHaveStageSpecificResponses" classname="com.lujinyu.xiting.PetMotionTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

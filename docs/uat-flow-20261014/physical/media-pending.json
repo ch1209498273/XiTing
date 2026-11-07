@@ -1,0 +1,9 @@
+{
+  "phase": "black-curtain-timer-pending",
+  "player": "tv.danmaku.bili",
+  "time": "2026-10-14T21:43:01.8094079+08:00",
+  "state": [
+    "active=true",
+    "state=PlaybackState {state=PLAYING(3), position=73, buffered position=0, speed=1.0, updated=1974446829, actions=823, custom actions=[Action:mName='like, mIcon=2131236666, mExtras=null, Action:mName='close, mIcon=2131236660, mExtras=null], active item id=-1, error=null}"
+  ]
+}

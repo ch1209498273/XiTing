@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.EnergyStoreTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-10-14T15:49:02.187Z" hostname="DESKTOP-4AAHQ1P" time="0.015">
+  <properties/>
+  <testcase name="空对象与非对象元素只丢自己" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.01"/>
+  <testcase name="累加溢出饱和到 Int MAX 而不是负数" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="超量时 room 不会变成负数" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="已用一半时 room 为剩余" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="负向累加不会跌破 0" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="空数组" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="单条脏 value 接近 Int MAX 时不会溢出成负" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.001"/>
+  <testcase name="空列表时 room 等于上限" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="满格时 room 为 0" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="正常累加" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="从 0 开始加脏数据中的 Int MAX" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.001"/>
+  <testcase name="单条脏记录只丢自己，其余能量球保住" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.0"/>
+  <testcase name="语法级非法交给调用方" classname="com.lujinyu.xiting.EnergyStoreTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

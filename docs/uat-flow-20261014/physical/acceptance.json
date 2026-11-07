@@ -1,0 +1,21 @@
+{
+  "finalApkSha256": "BE916DD0D1CFB8044EBB041E2A7F1528F65DEC9117B1A74422E5D9BB97B52368",
+  "serviceStopped": true,
+  "textFixVerified": true,
+  "timerCancelled": true,
+  "playerStateBefore": "PLAYING",
+  "installInPlace": true,
+  "player": "tv.danmaku.bili",
+  "visibleStatsPreserved": true,
+  "userReturnedPictureNormal": true,
+  "version": "5.1.0",
+  "physicalFlowCount": 1,
+  "actualCurtainOpened": true,
+  "api": 36,
+  "code": 89,
+  "oneMinuteAccepted": true,
+  "published": false,
+  "playerStateAfter": "PAUSED",
+  "userAudioStoppedAtExpiry": true,
+  "userAudioContinuous": true
+}

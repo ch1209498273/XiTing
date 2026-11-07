@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.PetGlowTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-14T17:31:42.036Z" hostname="DESKTOP-4AAHQ1P" time="0.002">
+  <properties/>
+  <testcase name="光晕半径按体型递增，与形态尺寸单调对应" classname="com.lujinyu.xiting.PetGlowTest" time="0.002"/>
+  <testcase name="各形态光晕半径单调递增且都在合法范围" classname="com.lujinyu.xiting.PetGlowTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

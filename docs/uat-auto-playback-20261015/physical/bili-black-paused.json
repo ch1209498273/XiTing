@@ -1,0 +1,8 @@
+{
+  "state": [
+    "active=true",
+    "state=PlaybackState {state=PAUSED(2), position=70734, buffered position=0, speed=1.0, updated=1986954941, actions=823, custom actions=[Action:mName='like, mIcon=2131236666, mExtras=null, Action:mName='close, mIcon=2131236660, mExtras=null], active item id=-1, error=null}"
+  ],
+  "time": "2026-10-15T01:09:55.1337492+08:00",
+  "phase": "black-paused"
+}

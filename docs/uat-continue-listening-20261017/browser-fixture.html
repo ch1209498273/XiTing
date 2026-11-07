@@ -1,0 +1,4 @@
+<!doctype html><html><meta name="viewport" content="width=device-width"><title>XiTing browser UAT</title><body><h1>Public browser audio sample</h1><p>Controlled compatibility fixture, not a streaming service.</p><audio id="audio" loop controls src="sample.wav"></audio><button onclick="play()">Play sample</button><script>
+const a=document.getElementById('audio');
+function play(){a.play();if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:'Public browser audio sample',artist:'XiTing UAT'});navigator.mediaSession.setActionHandler('play',()=>a.play());navigator.mediaSession.setActionHandler('pause',()=>a.pause());navigator.mediaSession.setActionHandler('seekto',e=>{a.currentTime=e.seekTime});}}
+</script><button onclick="navigator.clipboard.writeText('https://b23.tv/T2d0FzY').then(()=>this.textContent='Copied public link').catch(()=>this.textContent='Copy failed')">Copy public link</button></body></html>

@@ -1,0 +1,19 @@
+{
+  "id": 416227046,
+  "commit": "3b5db09dc7fb86de872b3e01715ead847c176c5d",
+  "url": "https://github.com/ch1209498273/XiTing/releases/tag/v6.0.0",
+  "tag": "v6.0.0",
+  "draft": false,
+  "assets": [
+    {
+      "name": "XiTing-6.0.0.apk",
+      "size": 1288112,
+      "digest": "sha256:03f06834befa19ed63452bcfa92eb3aa46b04a899e3d5d7867876e95ce4efec0"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 83,
+      "digest": "sha256:2d54b1a4c3845dc7de0b034227732d64b713e50048b7a7ed3e934374e01b08d8"
+    }
+  ]
+}

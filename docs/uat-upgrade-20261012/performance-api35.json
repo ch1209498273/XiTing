@@ -1,0 +1,16 @@
+{
+  "isolated_storage": true,
+  "archived_month_preserved": true,
+  "growth_unlocks_preserved": true,
+  "duplicate_delete_rejected": true,
+  "journal_recovery": true,
+  "performance": {
+    "sample_count": 500,
+    "rounds": 9,
+    "clock": "thread_cpu_ns",
+    "legacy_median_ns": 101719093,
+    "optimized_median_ns": 6947975,
+    "results_equal": true,
+    "scope": "month-key computation only; not whole-app latency or battery consumption"
+  }
+}

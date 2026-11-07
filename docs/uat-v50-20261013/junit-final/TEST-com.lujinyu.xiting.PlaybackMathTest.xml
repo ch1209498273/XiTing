@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.PlaybackMathTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-13T14:38:22.407Z" hostname="DESKTOP-4AAHQ1P" time="0.002">
+  <properties/>
+  <testcase name="unavailableOrFutureTimestampDoesNotInventProgress" classname="com.lujinyu.xiting.PlaybackMathTest" time="0.001"/>
+  <testcase name="clipsToStartAndEndAndSaturates" classname="com.lujinyu.xiting.PlaybackMathTest" time="0.0"/>
+  <testcase name="invalidSpeedsDoNotCreatePositionsOrDeadlines" classname="com.lujinyu.xiting.PlaybackMathTest" time="0.001"/>
+  <testcase name="extrapolatesOnlyWhileAdvancing" classname="com.lujinyu.xiting.PlaybackMathTest" time="0.0"/>
+  <testcase name="episodeTimeUsesSpeedAndRoundsUp" classname="com.lujinyu.xiting.PlaybackMathTest" time="0.0"/>
+  <testcase name="seekOffsetsSaturateRatherThanWrap" classname="com.lujinyu.xiting.PlaybackMathTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

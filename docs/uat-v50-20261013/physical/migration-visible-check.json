@@ -1,0 +1,9 @@
+{
+  "sum_all": true,
+  "sum_all_count": true,
+  "sum_week": true,
+  "sum_week_count": true,
+  "sum_extra": true,
+  "streak_chip": true,
+  "pet_caption": true
+}

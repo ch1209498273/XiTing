@@ -1,0 +1,1194 @@
+[
+  {
+    "sha256": "634E36D7A81F7E7FF922883BCF245609A6D0C23174A5F8AC6DA47C9F468A7051",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\AboutActivity.kt"
+  },
+  {
+    "sha256": "24FE3893350122C3CCB8E1FA62318B427F40C7FA9F22A496574F8DBB3298EC07",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\AccessibilityUi.kt"
+  },
+  {
+    "sha256": "004BABBC8E0E8C57F7EF27809606B4A7B140960B750F77D5D50A99839B750741",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\AchievementCelebration.kt"
+  },
+  {
+    "sha256": "62023FB386ADC479E8EC156B35B3E952100FD24D12AA16A07FA356275B0BDCF8",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\AchievementHistory.kt"
+  },
+  {
+    "sha256": "344269A0E674AF6214E7DDFE3DD65A579A2843F6B9E38C0F5942433BD8502576",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\Achievements.kt"
+  },
+  {
+    "sha256": "C831E1D52107BC75318E580788483CD0B55A22B898B72640E4BE33997DE04CF2",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\AppearanceSettings.kt"
+  },
+  {
+    "sha256": "4F1C156D4003BADCA3CE5B8BF599E210A0FAF244781F8E237953EA8F09F901EE",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\AppLocales.kt"
+  },
+  {
+    "sha256": "40E23009995B93B92C2F7E49B2FE99CFBE1BA64DD17126B81100F8DB7525E3D0",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BackupFlow.kt"
+  },
+  {
+    "sha256": "BB7973C772138A7BBCCA4402A58DE899AD7490CE84A00B8C7CAC9096EEDE51B1",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BackupManagement.kt"
+  },
+  {
+    "sha256": "260515B435B9F685A47E56612432B4729B7276521CD9D2457381B0E45AABA9AF",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BackupManager.kt"
+  },
+  {
+    "sha256": "5DAD753F99E6C98A39C8BF2DD2041D5D1F2DF2CBB1FDEAFA9E6D944DD25ACF88",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BackupSummary.kt"
+  },
+  {
+    "sha256": "55E3AC91EF27B057B67BA877B9935238F58B6D09BFA3AE29518F40C3876DA4D0",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BadgeMotion.kt"
+  },
+  {
+    "sha256": "89B08D681F852FD5F28DD32AEA9FCA1531292E466103BF75AD2518A9A1DFB5B5",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\Badges.kt"
+  },
+  {
+    "sha256": "D1822F6C757A0F3A9704C87EBCBFDC3CAB014E05ED651C414E7EC6E60931FF58",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BadgeView.kt"
+  },
+  {
+    "sha256": "3E24C57096F682F0F3E40D022BE9EDFF7FA06A6B188106B064BA01DAD55BA109",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BarChartView.kt"
+  },
+  {
+    "sha256": "BFCB4B10BDD4309AE8D78EA85F3172F18BE6808ABA68D3588319FCE883978230",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BlackOverlay.kt"
+  },
+  {
+    "sha256": "DAD995835356F1DC69012965ED61227C4F02EE9DCD5C7B02CFF1470DF9779B38",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BootReceiver.kt"
+  },
+  {
+    "sha256": "49D1CE7030080049B3293D5BDEBC5C8358AAA5E58B0EF21F3BAECC8C4C4B4594",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\BubblePetView.kt"
+  },
+  {
+    "sha256": "B2FD11BB3F0E37D23ACD8611AE456943B4D602BE4DC667E90C501E9944D4AE5D",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\CaptionService.kt"
+  },
+  {
+    "sha256": "336417DE67D13D08F4B20DC2A56630A6C45355FA7DB2DF4E9E282980A4AE3633",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\CompleteBackup.kt"
+  },
+  {
+    "sha256": "A8234A35D85E6CD2F8E956406467FE874F39DB1546C931743646844E5E304967",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\CrashLog.kt"
+  },
+  {
+    "sha256": "41D6F466DE5CFDEAA6471EDF68A251347C4F9519E1CF8424007B95ADD4862271",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\CurtainTimerPanel.kt"
+  },
+  {
+    "sha256": "EE8EC4FAC6C8FF3917AAD0D1704619DD0B33CB77C891A842337955F415DC3ADE",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\EnergyStore.kt"
+  },
+  {
+    "sha256": "6B06CAA1F7828867D08B35C6C9405B75F1078C2E90F603108BB338D78251011A",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\EpisodeTimerTarget.kt"
+  },
+  {
+    "sha256": "911E4A86DEB4FD659AC1E95ED23EAD2FBD9899DDC8A46274AD949D12A4A849D3",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\EvolutionDialog.kt"
+  },
+  {
+    "sha256": "339AE5FE68A6DF2FF049A54CF90EE7292B4EBB4F1604AD6B3204DD5590EB28DF",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\FirstSuccessFlow.kt"
+  },
+  {
+    "sha256": "E5713DE78430B0F9C5D8EB1538052C7C334B36CA23A2A99796BB5C37E377A648",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\FirstUseGuide.kt"
+  },
+  {
+    "sha256": "582C9AFBF0F7360F410902FD0A3A7C458EFC9FD4E78FB8B07B721B84CBDAC324",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\HistoryDeletion.kt"
+  },
+  {
+    "sha256": "C96F79BC9A8E92C344C28FC304568EF7E434E52B4E8ECEA084760088247902A4",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\HistoryManagement.kt"
+  },
+  {
+    "sha256": "809F6E35D7327AAA581522774C0FEAEBE884939E9598C7D14410C128EBED7D90",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\HistoryStore.kt"
+  },
+  {
+    "sha256": "E970288246BDA99261088D5ABA0B18BA901B9A2A8B4EAD88BDBC50BE83CA6C10",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\IconStyle.kt"
+  },
+  {
+    "sha256": "90EDB33F805F71DCBB283721DB839518DEFE5C50D42EFA5B7E81CEB67C15DB56",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\ListeningPresetRules.kt"
+  },
+  {
+    "sha256": "DA825425BBB86732F18F0B67A6ADC051FA91411441F25815979338F744E3E748",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\ListeningPresets.kt"
+  },
+  {
+    "sha256": "0BD11F229F0BDBB9F31BD8A0D3E06423A236EC075347448ED9204411C1079A9B",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\ListeningScenes.kt"
+  },
+  {
+    "sha256": "986DEF2ED2152B621031A1A3E0C4A49A7C5F36C69C41DCBD64FE5C28ED30FD5D",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\MainActivity.kt"
+  },
+  {
+    "sha256": "2BD49BBAD2A787B53C238F05CD0E84CFD65105B2A74BA483B543DB8455A3ECAD",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\MainDialogs.kt"
+  },
+  {
+    "sha256": "1BDF0B2DC53DB337A1A1CDD1944FD5648DF99EA62FC561A4E39EA421F40D76C8",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\MainSupport.kt"
+  },
+  {
+    "sha256": "6C9AE6AE54303D317ABB0348F219D1542289FFBDF95FEBDD98CC481CB8A99AA3",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\MeasMath.kt"
+  },
+  {
+    "sha256": "05A3E353F88704586E34DBC83ABF552F594FB03364C3885AA38852FE95B372D9",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\MonthReport.kt"
+  },
+  {
+    "sha256": "65A193634E9DD4021B70286788E136C52D5647D8E9C5EA0AF2C77E399A9C2170",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\NotificationBadge.kt"
+  },
+  {
+    "sha256": "6CC5E5182E0336B64C4F201382A0867A14143CF1669DDBD79A4696822E6310CB",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\NotificationListener.kt"
+  },
+  {
+    "sha256": "41C605D332359B22F9390AF73AF7D2865FBE83E8332A790DAA1E5C5846074089",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\NowPlaying.kt"
+  },
+  {
+    "sha256": "819D25C3BDD9940CB326E4CE024FBDD28BC03DD89ACBD8D7B9826D49B55AB4CC",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\OverlayService.kt"
+  },
+  {
+    "sha256": "78B7B90CC599105246643AF1B8FB000AE2709A53BF4430F0AFCAC375017DA3D0",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PetForm.kt"
+  },
+  {
+    "sha256": "C0D2B36643C927A3C0F15499283EAF67C4CA890447BD312A9E66144E8D83657F",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PetGrowth.kt"
+  },
+  {
+    "sha256": "2747DAF6EE154AB5EB1B7D87569357563A4D5C9E50EF7B6A1FE9CDB80BD0EED0",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PetMotion.kt"
+  },
+  {
+    "sha256": "4C8F009D384C596869FEA61BE0FDBE319BE525DB988EEEBF5BB814A281D883A6",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PetPalette.kt"
+  },
+  {
+    "sha256": "F1F587D0B475A281C6A82B33443D1932A720E5428212E5316550FB070CD7DF40",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PetPreviewDialog.kt"
+  },
+  {
+    "sha256": "E7A9538631FABBE93E848A0447B7DCF9C8F12E983042607EE178B87EE91BA666",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PetRenderer.kt"
+  },
+  {
+    "sha256": "9EEEAB27247AB6DD0F369B19C555FF7BD5A67D9F356A686ECB21EB24115D1548",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PetSkins.kt"
+  },
+  {
+    "sha256": "D7D89EA304292C686D7776B489C21105AC11FDD1847D3ACFE63A9C9E0D71B781",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PetView.kt"
+  },
+  {
+    "sha256": "AEE0493649E538D6CD253F26BAD5F5B8648AE60CC3139CB896BA8A03CC9C9A01",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PlaybackMath.kt"
+  },
+  {
+    "sha256": "34C1C6DF6E7DBABB7B507A332BB5F3955151061C8A588EDDD4DCCFA92F4DDD0F",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PlaybackSelection.kt"
+  },
+  {
+    "sha256": "8EF3390760012CC51676B29BBC27F8344E817B2C14EA7725243567AF7DD67098",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PlaybackSourceObserver.kt"
+  },
+  {
+    "sha256": "21EE629720C9EEA87D6349215DA873EB76BA2E9CA4916211E4E808985B7C8F8B",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PlaybackSources.kt"
+  },
+  {
+    "sha256": "34C5FD7EFD43A78190CE29FB94F5EE4CE12BBB1535A1BC9B2CF93A887994C0CE",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PlayerIdentity.kt"
+  },
+  {
+    "sha256": "F4BC697BA00F9CDE7A472E2BB99D10DAB890DC56C2288975C21CC6502D39E16E",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PlayerRows.kt"
+  },
+  {
+    "sha256": "4F8AA67CAD92A32224B955FB35C0C0C02AA1548F75E6E564BB53E326205E0000",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PlayerTimerDefaults.kt"
+  },
+  {
+    "sha256": "631CD6A9E16EC220C3DCBE5BC025A98750FFB8AB92462C97791B56BF521CFD48",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PosterFlow.kt"
+  },
+  {
+    "sha256": "7371BCC8A413CB45DBAF7D9A850E3E5784B94AEAB4872A2AB6E8B1E9A9355726",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PosterLayout.kt"
+  },
+  {
+    "sha256": "82937B699D32C65AA3BCD405AD15144E1447D5BEC0F391224150100F8D94B2EE",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\PowerCalib.kt"
+  },
+  {
+    "sha256": "1C03CEFAFB8B32DEFD93F3C9ABB818AF1FA36A41DD03FB923525A66F816BDB78",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\Prefs.kt"
+  },
+  {
+    "sha256": "0130B9BA64F7C07E8A81F8BB172DB8A0B71EDE5F4B9E48DE101EAA281592503D",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\ReliabilityUi.kt"
+  },
+  {
+    "sha256": "68812B107B18CAF753D3A7A5A41E38AAD88423BA82F4486B44DAFD38D0FD8233",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\ReportPoster.kt"
+  },
+  {
+    "sha256": "8BBA8EBF83F3C5DC91EB1D67CD07A353E5EFEA4C35F1652D6A82C5451418CFC2",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\RestoreSnapshot.kt"
+  },
+  {
+    "sha256": "AC103AA8C992EFCB24B95B8F1D067B8C11661902AC54B81A8DD3A37DE20829E6",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\ServiceRecovery.kt"
+  },
+  {
+    "sha256": "8FCFB936D33BA0F56267BCC0E5735C2B99F709FD7C70ECFC4225D22A1C4150FF",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SessionConsoleUi.kt"
+  },
+  {
+    "sha256": "A7D5C200B785ED4722B8DFB85184D461983B4FBC0AD7585D359B2516187453EF",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SessionCoordinator.kt"
+  },
+  {
+    "sha256": "78EFE65BB7D2F5239D1CE264D59CA674C0CAA8627D410333680C4BE31EEB043C",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SessionDiagnostics.kt"
+  },
+  {
+    "sha256": "996B46C5988CD4626EE2BA9913B510CAEC0D4712DCB8EEC2F17F6DE614667757",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SessionLog.kt"
+  },
+  {
+    "sha256": "6E6B0DD2029540B5E2EE5331B0F73C55FBE3F48D85BDF56A8CFA20CA2A973A58",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SessionOutcomeStore.kt"
+  },
+  {
+    "sha256": "478115AA57C1A4BD89363A014C6E1D643BBBC9E76778A0EE6F1F76258B8F419E",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SessionRuntime.kt"
+  },
+  {
+    "sha256": "90B1018B25A18EECD40B9F2F03636F78FE1478AF627777B2BB77521487F3D75E",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SharePoster.kt"
+  },
+  {
+    "sha256": "891BABD09EF11182B0CF24F23194F3A98B295A56B4A7209E8A3BBD541E028AD5",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SkinGallery.kt"
+  },
+  {
+    "sha256": "660831F1BD3D57157E7803B2627A1AFB4E7FDF19DACED778938727275AF753FD",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SleepTimerPolicy.kt"
+  },
+  {
+    "sha256": "B06A1E39987ABB6918CD58975126A3655315EC1A5C27CC23CD7012AB8E7B6A37",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\Stats.kt"
+  },
+  {
+    "sha256": "92AC4C6DD881056A5C1218FCC2CACD193414755CA0B1E0F08D9AF64AFFC46A05",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\Streaks.kt"
+  },
+  {
+    "sha256": "1C7CF0EC955D2A61966ACED28A2833F2756A0156E7A11048B0310B66FF684678",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SuggestJobService.kt"
+  },
+  {
+    "sha256": "47C2AB42F5541A5B6100E35C98D876F292FBB0B6479968D9FB0984A91A801008",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SuggestNotify.kt"
+  },
+  {
+    "sha256": "AECA63DF84B1E655BFEAF35E5BCDDEAACBF28AAE8ED555879FDDFD731EB4E0BA",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SupportDiagnostics.kt"
+  },
+  {
+    "sha256": "51216FD321623612D00E39D3C95DEA1D19EEC655798BE0CD0759C6731A0D18DA",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\SupportPolicy.kt"
+  },
+  {
+    "sha256": "6E7E23276B9684E02413C8D3AC7A600472589A19EE3D3F3CFAAFBD88F3FED598",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\TimerController.kt"
+  },
+  {
+    "sha256": "BE844E3C34955185B75B66712E9C99ABF4056FD0B7B75E2695AC775A43BE2958",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\TimerDialogs.kt"
+  },
+  {
+    "sha256": "79A0573256E1FCF419029712C3A660BCCB60B04588514C66B982D71F6D2A8FCB",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\TimerPlaybackTarget.kt"
+  },
+  {
+    "sha256": "47C5AEB9DF5BE0CB47091BD2877FC16E6309961F11F378E72764660BF0D761C5",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\TimerRequest.kt"
+  },
+  {
+    "sha256": "7EBA0615191FAF06687C98B1809FC4DCDE234F046895BC13C280607094D5D4A1",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\UpgradeUi.kt"
+  },
+  {
+    "sha256": "CCE94A188416FB11DAB6FF117968C151F584EE1A5103FBE6D64F50D0CCF5796F",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\WakeLockMetrics.kt"
+  },
+  {
+    "sha256": "0AAC61AD04FA41B431599BD0219D5D08EDEB48AB815DABA79ABA4DFCB397AAB1",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\WeekReport.kt"
+  },
+  {
+    "sha256": "3BEAF0265B8AB7FBD752E86951F170E8E35D13B483F236E327C4D2AF1D7AE967",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\WidgetData.kt"
+  },
+  {
+    "sha256": "6A47EAEC62245F843453320A007AAE4EFD7F1EAFA856894FF78AB79B29A67383",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\XiTingApp.kt"
+  },
+  {
+    "sha256": "1A3067ED5AFA6E8D9C129450827B19F8F33EE834E3691117721050DE95E8C100",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\XiTingTile.kt"
+  },
+  {
+    "sha256": "CDA0FA837693CEDB452AB73F6057038C59FBE50ABF3B5A8F570D4591C02DBF5E",
+    "path": "app\\src\\main\\java\\com\\lujinyu\\xiting\\XiTingWidget.kt"
+  },
+  {
+    "sha256": "C1298AC7BD3E6E6590686ECCCFF77FB62F4EF26BBEEAEA734775E4B54BC437C1",
+    "path": "app\\src\\main\\res\\drawable\\bg_achievement_icon.xml"
+  },
+  {
+    "sha256": "F55DFA24B5DE32BFD0766E788F735171231DCBBD7A55AECB12EDEF67D355EB5A",
+    "path": "app\\src\\main\\res\\drawable\\bg_card_selected.xml"
+  },
+  {
+    "sha256": "4166055B6EA4D059C3E39E2FF6EA3D4372975347F32B0A477702C3C427D580A2",
+    "path": "app\\src\\main\\res\\drawable\\bg_card.xml"
+  },
+  {
+    "sha256": "526900597930A7CB09118C2AF8900E5BFC74EE124773BFD4032A3491915C3000",
+    "path": "app\\src\\main\\res\\drawable\\bg_hero.xml"
+  },
+  {
+    "sha256": "B6D8904E02323E2F13C825E47BD3EE4AC68AF2CCD7C56120D72F9625F199F080",
+    "path": "app\\src\\main\\res\\drawable\\bg_icon_blue.xml"
+  },
+  {
+    "sha256": "6EC2DDDA5C0DFAF3FB55F6CB767F9D63C865F18862FA6BCBC34313EC12CFD8FC",
+    "path": "app\\src\\main\\res\\drawable\\bg_icon_green.xml"
+  },
+  {
+    "sha256": "842A5BCEF07E94FF1115F2D2606886F4CB71561DA1E3F39074B1091540263A95",
+    "path": "app\\src\\main\\res\\drawable\\bg_icon_orange.xml"
+  },
+  {
+    "sha256": "E5FF66702DAE06B8D635FDFDDD08B88D381CEF1FE092674469A866E7426408DE",
+    "path": "app\\src\\main\\res\\drawable\\bg_nav_item.xml"
+  },
+  {
+    "sha256": "E193417B8412EFBB89AFB9A852FB94EB4C2BACA22E0431B7CA6B69F92AA27EFD",
+    "path": "app\\src\\main\\res\\drawable\\bg_pill_hero_off.xml"
+  },
+  {
+    "sha256": "7115709C21C31AE84EFEF07407957823B4E54FCB76253D73B7FF52B4D148196F",
+    "path": "app\\src\\main\\res\\drawable\\bg_pill_off.xml"
+  },
+  {
+    "sha256": "14B75C4043E41833CAAA20C6B83C0DD41EA96D12E1B90FBB2645BFF72FB4DC9C",
+    "path": "app\\src\\main\\res\\drawable\\bg_pill_on.xml"
+  },
+  {
+    "sha256": "0B814EF9CF21958A10B35386BF38466CBD335B2624658AB8C6EDF1E965B376A7",
+    "path": "app\\src\\main\\res\\drawable\\bg_thumb_selected.xml"
+  },
+  {
+    "sha256": "2AD362CBA7615DCD2E6B4FEE1EA0FB0BA790712E25E5D909433FB1DE8A39E2AD",
+    "path": "app\\src\\main\\res\\drawable\\exit_pill_bg.xml"
+  },
+  {
+    "sha256": "129FF2695DF36727845208CD7E8629E62768CA69EE8A32807992077985586EFA",
+    "path": "app\\src\\main\\res\\drawable\\ic_c100_foreground.xml"
+  },
+  {
+    "sha256": "965F58FFD79C66BEBF1EF0FEE2A770F09FE2F419ECEA26D98F9E0F5C4B2461DD",
+    "path": "app\\src\\main\\res\\drawable\\ic_c100_monochrome.xml"
+  },
+  {
+    "sha256": "3BA2066B54BD07A7C2B62F1BF49415326C07386B0945B4B957B3996044A094EE",
+    "path": "app\\src\\main\\res\\drawable\\ic_crown_foreground.xml"
+  },
+  {
+    "sha256": "D4EB06C00442465136407FCF78F1E8677C784294FD000136DA1FD0E58E2C5B5A",
+    "path": "app\\src\\main\\res\\drawable\\ic_crown_monochrome.xml"
+  },
+  {
+    "sha256": "24907E2E5D51F1AA3FC0BC3D713C785F031CCC32547EA84BD55F73A97BD93454",
+    "path": "app\\src\\main\\res\\drawable\\ic_launcher_foreground.xml"
+  },
+  {
+    "sha256": "4FAD25BEB5300E9A252089BD3DAB00446B9A9152FFBC2F44592FA58FD1ACD8F6",
+    "path": "app\\src\\main\\res\\drawable\\ic_launcher_monochrome.xml"
+  },
+  {
+    "sha256": "EFEF3E25E9F7FC6DD53B2DA953DE41539EA3E8FB78852FA6CA4F1161B320344A",
+    "path": "app\\src\\main\\res\\drawable\\ic_marathon_foreground.xml"
+  },
+  {
+    "sha256": "872291A7157C256967314846BAE63DD7B1B8CF6428B52481581134EEAC9F77EE",
+    "path": "app\\src\\main\\res\\drawable\\ic_marathon_monochrome.xml"
+  },
+  {
+    "sha256": "13D263B8DB05607E389DB28271459CC1FA6ABA427196912D50051B2971B39524",
+    "path": "app\\src\\main\\res\\drawable\\ic_media_next.xml"
+  },
+  {
+    "sha256": "C7649DB9CB3F7E710D16BEC0EA4AF910454435C4FA507BD8C5B0B8E03C44DCB1",
+    "path": "app\\src\\main\\res\\drawable\\ic_media_pause.xml"
+  },
+  {
+    "sha256": "B22BC3C3FA25FEFEC5769107BC90599567C3B6C0BA55455858D8F41229CCF4FC",
+    "path": "app\\src\\main\\res\\drawable\\ic_media_play.xml"
+  },
+  {
+    "sha256": "5932E85E4DAE433DBB39AAD82F9D7E899341FE986EC7A2D008F69A70A32AA3BF",
+    "path": "app\\src\\main\\res\\drawable\\ic_media_prev.xml"
+  },
+  {
+    "sha256": "FC5EC5A0BB95B4F1ED4BBF6B791FD7C836622801B2D525D8412846817CB1E892",
+    "path": "app\\src\\main\\res\\drawable\\ic_nav_home.xml"
+  },
+  {
+    "sha256": "FD82452996388721423DA5D808C0BE5431E2947DF81EA3E1122EAC4B7753A5B9",
+    "path": "app\\src\\main\\res\\drawable\\ic_nav_settings.xml"
+  },
+  {
+    "sha256": "32BF3C9050B406444675F42D0869E70224B773DC5DB57908BC49DCA4BBD49538",
+    "path": "app\\src\\main\\res\\drawable\\ic_nav_stats.xml"
+  },
+  {
+    "sha256": "38862649102EF19F03B3E42DA7F8EA0D077CF36A61335E3695E0623534433330",
+    "path": "app\\src\\main\\res\\drawable\\ic_notif.xml"
+  },
+  {
+    "sha256": "25CAB1F1D0D7CF158614A54FAE772161A8490416800043C822ECD46CEB077547",
+    "path": "app\\src\\main\\res\\drawable\\ic_row_battery.xml"
+  },
+  {
+    "sha256": "4840B9BC396CE7D5675EFD91FE8E210D859128BD66D7FA454325C4D3F9F93DE9",
+    "path": "app\\src\\main\\res\\drawable\\ic_row_notify.xml"
+  },
+  {
+    "sha256": "8B564A2CD8415795A5A00150F2205811468A4EEC9D2C5E94055FB41C2283F51F",
+    "path": "app\\src\\main\\res\\drawable\\ic_row_overlay.xml"
+  },
+  {
+    "sha256": "0C56C0236E093057A405E9988AEB718C29363F4446F5A9D59E47A6C0516331BC",
+    "path": "app\\src\\main\\res\\drawable\\ic_shield.xml"
+  },
+  {
+    "sha256": "70C026D4F46068B56C853465FA1960124B04119DD6524BF799FC09FF9995DF2A",
+    "path": "app\\src\\main\\res\\drawable\\ic_timer.xml"
+  },
+  {
+    "sha256": "D5B30A4A334E81842B18752890167FF027A759F8C402D29EF064C106F8A37BD9",
+    "path": "app\\src\\main\\res\\drawable\\ic_week_foreground.xml"
+  },
+  {
+    "sha256": "71768B8BC263D5EB2166860654A96A7FBA5254BCB14439698C2A9DDEE4B1B348",
+    "path": "app\\src\\main\\res\\drawable\\ic_week_monochrome.xml"
+  },
+  {
+    "sha256": "24D526A3605199CB4BB0202E17112EAE95AF0B264C24D46DC25137291148299D",
+    "path": "app\\src\\main\\res\\drawable\\widget_bg.xml"
+  },
+  {
+    "sha256": "16D49698223F7419A957CBF6DF9C1AD52A7E62D9325929D9BB721D0742C51E08",
+    "path": "app\\src\\main\\res\\drawable\\widget_btn.xml"
+  },
+  {
+    "sha256": "9494B23826E1073C153B31C32C6ED8AAC6639097117BC4BD6E6F9CB85ABC21A1",
+    "path": "app\\src\\main\\res\\layout\\activity_about.xml"
+  },
+  {
+    "sha256": "23F01C5E9A5CBC803D22C14490DFDBA6E57687942E907E298239D96BE912DF78",
+    "path": "app\\src\\main\\res\\layout\\activity_main.xml"
+  },
+  {
+    "sha256": "44D65960CF8DB9F56D2BE6697BD3822C6BC32AC76A1A9118FBF678E1219C297E",
+    "path": "app\\src\\main\\res\\layout\\dialog_achievements.xml"
+  },
+  {
+    "sha256": "3F3B01735EDE015DB62EDB62C893480F07187692056EF624AB911923A5706220",
+    "path": "app\\src\\main\\res\\layout\\dialog_skin_picker.xml"
+  },
+  {
+    "sha256": "1BCD09A8DF25EC30779B9F9B27F7122162407F174BBBDC3C99B2A86E949D7D2F",
+    "path": "app\\src\\main\\res\\layout\\page_home.xml"
+  },
+  {
+    "sha256": "BD4D8FBE57033A656B9C0F30F35C2D67FE3768121E40D09A94D01BA3B314226F",
+    "path": "app\\src\\main\\res\\layout\\page_settings.xml"
+  },
+  {
+    "sha256": "5A23899A476E32FFF5CA8803C1FB40D13BD8A33B74FB2D3C576DCFCB21E23AFC",
+    "path": "app\\src\\main\\res\\layout\\page_stats.xml"
+  },
+  {
+    "sha256": "A26B666D962585A1F9956EDADE350FB158DFF5E76010CC5611EDD992A689A0DB",
+    "path": "app\\src\\main\\res\\layout\\widget_compact.xml"
+  },
+  {
+    "sha256": "37E0191A0C5F5701C81CE1C596D4D65F2610F05AD2B29B23BA1B29B5A19A1414",
+    "path": "app\\src\\main\\res\\layout\\widget_large.xml"
+  },
+  {
+    "sha256": "2A862001F37CA4D931BB5830094B95E326B39FEB0A3CC01F5157320F66BC4CD8",
+    "path": "app\\src\\main\\res\\layout\\widget_main.xml"
+  },
+  {
+    "sha256": "88A8F1B4A07609B134D337D5588C1660965EDC2E63C83773FDF7E739FFA56288",
+    "path": "app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_c100.xml"
+  },
+  {
+    "sha256": "2EF0AB834269EECC5AA543399AD6E88171A16307DF78677A0BA2D7F998D6EAE0",
+    "path": "app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_crown.xml"
+  },
+  {
+    "sha256": "C72F3613F3C5A147F31BFE35F1B10ECB41D96A735FF4192B30766C21E004CED6",
+    "path": "app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_marathon.xml"
+  },
+  {
+    "sha256": "CC0DFD2FBD6F741F01C138759A60CC17D0EF5F151DAAC3B670C64DF23D6EAE3E",
+    "path": "app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+  },
+  {
+    "sha256": "B74137EAF699B934E581D61BFEB77EF18826FA770C3E3CB9550DD521AD8EFEBF",
+    "path": "app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_week.xml"
+  },
+  {
+    "sha256": "CC0DFD2FBD6F741F01C138759A60CC17D0EF5F151DAAC3B670C64DF23D6EAE3E",
+    "path": "app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher.xml"
+  },
+  {
+    "sha256": "2C62DF967A90D103D419660977C0A4E0CC59630FF7FB903206837D704660107E",
+    "path": "app\\src\\main\\res\\values\\colors.xml"
+  },
+  {
+    "sha256": "6619998D0A0486DAE9F3D07DFBCCBD3165379BF0A616F028CD569F50C15240DB",
+    "path": "app\\src\\main\\res\\values\\diag50_strings.xml"
+  },
+  {
+    "sha256": "0AE9E87E4E5FBC2444E1A61AAFD5A747DFA8C9BE359F64294480F34C228C4889",
+    "path": "app\\src\\main\\res\\values\\extras_strings.xml"
+  },
+  {
+    "sha256": "8B5CF264E13CD66D0FF14361401941B7B79793AF016E89DF115F44BE22596B3D",
+    "path": "app\\src\\main\\res\\values\\flow_strings.xml"
+  },
+  {
+    "sha256": "1E3F5D50A877870CA8FC5672B02E90214DC1A3CA3224E1027CDCC84B0BBB4192",
+    "path": "app\\src\\main\\res\\values\\history_strings.xml"
+  },
+  {
+    "sha256": "017794761BB8CE925A43C08CE8930D4628B85931994D9709E67A4EDE46AB7534",
+    "path": "app\\src\\main\\res\\values\\ids.xml"
+  },
+  {
+    "sha256": "2A4251937BEAAB5DBBF51DD0B8CE3576A43B83F8ED6A90DE62D5C73E2F559FE9",
+    "path": "app\\src\\main\\res\\values\\player_identity_strings.xml"
+  },
+  {
+    "sha256": "4C24D93C54EE40A58BEA27FDFD91233AB6D279E163AEA5E3893849A53F794526",
+    "path": "app\\src\\main\\res\\values\\reliability_strings.xml"
+  },
+  {
+    "sha256": "99263D818626716E1F975770A09D82C03C64A2EB808A63FF69FCC41FBAC3B1E6",
+    "path": "app\\src\\main\\res\\values\\strings.xml"
+  },
+  {
+    "sha256": "D8A966A399DB740A89763E4530D95DE422B95ADC656DDC90CA76D0E211E0C166",
+    "path": "app\\src\\main\\res\\values\\support_strings.xml"
+  },
+  {
+    "sha256": "F2B1C6308FE89F83B4BCC7D1B7EE7E8B5E7188489048D633F6D9A4A254A14575",
+    "path": "app\\src\\main\\res\\values\\themes.xml"
+  },
+  {
+    "sha256": "1958C1EB06E18616A38D80C5E0A08F393B0F8C5857E647BF7B297814FF13C246",
+    "path": "app\\src\\main\\res\\values\\ui_correction_strings.xml"
+  },
+  {
+    "sha256": "B697D1E8C9D4089F93101CA337E965D5D972C9D9492FAB4E0BD5A4C922348F44",
+    "path": "app\\src\\main\\res\\values\\upgrade_colors.xml"
+  },
+  {
+    "sha256": "98AC250814ACE75E1B8E88D5E5721C7214CB976990F85757828C427809111F72",
+    "path": "app\\src\\main\\res\\values\\upgrade_ids.xml"
+  },
+  {
+    "sha256": "90A090F66139CD204AF7EE1CCFA656E7CA9422147B9CB4B21ACC985E3023B1A3",
+    "path": "app\\src\\main\\res\\values\\upgrade_strings.xml"
+  },
+  {
+    "sha256": "F767FE11025CA496DDB57CE972AFC078BE9D503BC8DF86958126353D1F598AEF",
+    "path": "app\\src\\main\\res\\values\\v50_strings.xml"
+  },
+  {
+    "sha256": "E0EA6BFECDA05170DC53C15DC9D94F79966185417E7E138C664D0C95C485C43C",
+    "path": "app\\src\\main\\res\\values-de\\diag50_strings.xml"
+  },
+  {
+    "sha256": "782B43DA4D275EB87D77E5CD4442275FA5404E83004D44806445C053744C5C51",
+    "path": "app\\src\\main\\res\\values-de\\extras_strings.xml"
+  },
+  {
+    "sha256": "086DA417C9047E867FB3303E95D2D55164AD1D9A63957FBA12604D34E404067B",
+    "path": "app\\src\\main\\res\\values-de\\flow_strings.xml"
+  },
+  {
+    "sha256": "DF69D685D944A9EFE50424761A2CC991B9A9B09B833D16FEB5E5543E1B066B96",
+    "path": "app\\src\\main\\res\\values-de\\history_strings.xml"
+  },
+  {
+    "sha256": "461650061E5716364B17A85235C5019D0A2866EF795F29D35C78516DFDBD4F81",
+    "path": "app\\src\\main\\res\\values-de\\player_identity_strings.xml"
+  },
+  {
+    "sha256": "D01A221D98510345AEB2DED47E3B2413849E97C803FAD88D5321651DFCD498BD",
+    "path": "app\\src\\main\\res\\values-de\\reliability_strings.xml"
+  },
+  {
+    "sha256": "A58E6D66CAE7F31DA49F365E2ECFABB1055FE0A4096EC8BC99D3A65849FEB210",
+    "path": "app\\src\\main\\res\\values-de\\strings.xml"
+  },
+  {
+    "sha256": "B6164A2291D279A3FB5ECEEAFAA6C1B00C4AF60E0D097A9E466D7D3667CA3852",
+    "path": "app\\src\\main\\res\\values-de\\support_strings.xml"
+  },
+  {
+    "sha256": "3ABFCD8320BB09154A107CF347FFF13C0A906771485F4A959FA0F2708B811F04",
+    "path": "app\\src\\main\\res\\values-de\\ui_correction_strings.xml"
+  },
+  {
+    "sha256": "F2004341CEBD3C1C3A752F260B9EC764A7F7A361A6DD635DA872BA61BD770319",
+    "path": "app\\src\\main\\res\\values-de\\upgrade_strings.xml"
+  },
+  {
+    "sha256": "0AC41692A5648225BA0CA12A176FEE49A5AC2CE9A4A1C82BA13BD076CC8418D5",
+    "path": "app\\src\\main\\res\\values-de\\v50_strings.xml"
+  },
+  {
+    "sha256": "DB5EC235AE4351BE8FF3259CD038CC1F4CCF0CAE9A0F3C943D7C022A8D8E3F05",
+    "path": "app\\src\\main\\res\\values-en\\diag50_strings.xml"
+  },
+  {
+    "sha256": "8B2A6D8329BFAD06CD03999BF832AFA164560EDFEF611B9ABE0EFEDC04636818",
+    "path": "app\\src\\main\\res\\values-en\\extras_strings.xml"
+  },
+  {
+    "sha256": "AE7230663C9256940CB1EE9E4FEB1A7C656B12DF2CADBC50CF842124B92C85FA",
+    "path": "app\\src\\main\\res\\values-en\\flow_strings.xml"
+  },
+  {
+    "sha256": "8137F55C22F35A5715723E72DEBA768E84E66CB984FA45AD51EA910345381BA7",
+    "path": "app\\src\\main\\res\\values-en\\history_strings.xml"
+  },
+  {
+    "sha256": "461650061E5716364B17A85235C5019D0A2866EF795F29D35C78516DFDBD4F81",
+    "path": "app\\src\\main\\res\\values-en\\player_identity_strings.xml"
+  },
+  {
+    "sha256": "46342C5F85C4AE0269E48FADDA7B693AA799E34C6309DB7C5C2C69553A2EA107",
+    "path": "app\\src\\main\\res\\values-en\\reliability_strings.xml"
+  },
+  {
+    "sha256": "323B63B51FAAC9C822158DCC25DC7A580DCA10F6FB654B19C5980EEC1988BD0E",
+    "path": "app\\src\\main\\res\\values-en\\strings.xml"
+  },
+  {
+    "sha256": "1431841EBB46EE8B5849591C815502510194A85D181E2F1925C4A9958EAB199C",
+    "path": "app\\src\\main\\res\\values-en\\support_strings.xml"
+  },
+  {
+    "sha256": "83A8E3DCE9220132C9A80E5978C08062594BEA0B5A456B9FD49485C43826537F",
+    "path": "app\\src\\main\\res\\values-en\\ui_correction_strings.xml"
+  },
+  {
+    "sha256": "428FBC52D3285E01A8E48334FC68CB804DB6928B9516CAACFFB4FC0053E9A850",
+    "path": "app\\src\\main\\res\\values-en\\upgrade_strings.xml"
+  },
+  {
+    "sha256": "CFCB8F9A5CCC8D368E8A8CFF447454F88A773B11A1CDE08FC662E998A8B5AB9B",
+    "path": "app\\src\\main\\res\\values-en\\v50_strings.xml"
+  },
+  {
+    "sha256": "C9485735D2DC6861777CA9B24D1C439E197E648A25939357467A105B202F1EA0",
+    "path": "app\\src\\main\\res\\values-es\\diag50_strings.xml"
+  },
+  {
+    "sha256": "7195F71E09A92DFB7495408C76A764F1935CEA788563CC6E8611868E070B4DB9",
+    "path": "app\\src\\main\\res\\values-es\\extras_strings.xml"
+  },
+  {
+    "sha256": "9A4CEAA306678EA8DD08B2B60B73CBC0CF3C7DE6C0FA21F797D5005E2044A6A7",
+    "path": "app\\src\\main\\res\\values-es\\flow_strings.xml"
+  },
+  {
+    "sha256": "AEE7FE7F4EB11205E4CA4B45692FCA9867445CC3129A29F3DDAF01B451794D1C",
+    "path": "app\\src\\main\\res\\values-es\\history_strings.xml"
+  },
+  {
+    "sha256": "0A3857ED349EF430FD684BC1D745D5C08B8AA481412649AC3AF262ACD0ED3FC9",
+    "path": "app\\src\\main\\res\\values-es\\player_identity_strings.xml"
+  },
+  {
+    "sha256": "333A196C392C30C6675A1DEF31D97F5BCD90771B94E5CCA620BC72A29A0583E9",
+    "path": "app\\src\\main\\res\\values-es\\reliability_strings.xml"
+  },
+  {
+    "sha256": "CF70FF9CD1A8AE7A5C2B0F5DEA470DA6EB46E3F0DE5AD46BE98EC84F31377A67",
+    "path": "app\\src\\main\\res\\values-es\\strings.xml"
+  },
+  {
+    "sha256": "7F592DAC2C3E07DDEAB1DA746434159AFC80A541D39EB21C83FAA4561E9A5D06",
+    "path": "app\\src\\main\\res\\values-es\\support_strings.xml"
+  },
+  {
+    "sha256": "B506992E4EB54FE442EF2CD5F8C2F151AC84775F5DF20F735DC301379589376A",
+    "path": "app\\src\\main\\res\\values-es\\ui_correction_strings.xml"
+  },
+  {
+    "sha256": "08634F30A1562CA916CADEA250D1DEC5053CD665CDEF3F7A61883B4E52BE7FD5",
+    "path": "app\\src\\main\\res\\values-es\\upgrade_strings.xml"
+  },
+  {
+    "sha256": "39FF75E046552C95AA6F271DBCBBBD33A2871361272CD140082F5A6607813365",
+    "path": "app\\src\\main\\res\\values-es\\v50_strings.xml"
+  },
+  {
+    "sha256": "7E75E1FF5F0A42322C28E6E3638B1EA6F209CDDBE4A881FDEBF07DEC27260101",
+    "path": "app\\src\\main\\res\\values-fr\\diag50_strings.xml"
+  },
+  {
+    "sha256": "2067F3C3FD884A7CEA8874DDC79FD69EF00B77106B44CB5D0F6EF96B5CD8FC4D",
+    "path": "app\\src\\main\\res\\values-fr\\extras_strings.xml"
+  },
+  {
+    "sha256": "3A5CBC6F0B5F1991D24CFD83496A78B9C1E6DB42F0B0FC4EC13EAF6A0DC0C633",
+    "path": "app\\src\\main\\res\\values-fr\\flow_strings.xml"
+  },
+  {
+    "sha256": "9F4B6FDF71EFBDEC905183FC9528773340222341A5209FD682BB9C137272C893",
+    "path": "app\\src\\main\\res\\values-fr\\history_strings.xml"
+  },
+  {
+    "sha256": "7572657C334E3F7C1F99025E7EFA2DED48351355255DB323E8206C0AE72B58E7",
+    "path": "app\\src\\main\\res\\values-fr\\player_identity_strings.xml"
+  },
+  {
+    "sha256": "7733E44209FF7132286E2EE8CBC063591A1BDD58A9A3A2B73482E0DB02644CF5",
+    "path": "app\\src\\main\\res\\values-fr\\reliability_strings.xml"
+  },
+  {
+    "sha256": "651CF1578C0A2D1D33B2138AA9CD8C8D20A2B83C00B91C93A7B6258485B55AB3",
+    "path": "app\\src\\main\\res\\values-fr\\strings.xml"
+  },
+  {
+    "sha256": "7920947C006078C89158BF2F0C992FE9DDE759C8D58A532A3FC62B737F324621",
+    "path": "app\\src\\main\\res\\values-fr\\support_strings.xml"
+  },
+  {
+    "sha256": "488A849117493F0CE575A37FAB055F8393B02A6A0CD3F63F5E3D51CE6F2F4EE1",
+    "path": "app\\src\\main\\res\\values-fr\\ui_correction_strings.xml"
+  },
+  {
+    "sha256": "568D3503182FB908B0B94C59E8265E6323032F220CD759E894AEB18C740E6F28",
+    "path": "app\\src\\main\\res\\values-fr\\upgrade_strings.xml"
+  },
+  {
+    "sha256": "CFF3A2DF70B2182229B8525E64691831B02FA015E8740A11869414E81BD5922A",
+    "path": "app\\src\\main\\res\\values-fr\\v50_strings.xml"
+  },
+  {
+    "sha256": "F7C5B8BDF7F1573631EF19CEA5BF47F4035AA69A98997566264FAED492C6C909",
+    "path": "app\\src\\main\\res\\values-ja\\diag50_strings.xml"
+  },
+  {
+    "sha256": "651540E6F1FF7FBB87AA83AD54FAE985E265DFA3A4FA26C912E947317867C004",
+    "path": "app\\src\\main\\res\\values-ja\\extras_strings.xml"
+  },
+  {
+    "sha256": "7D6FEC7FEF00D9785CD6991E29269FF44F0C69D2F7228D57195FEE3FD5DF0E21",
+    "path": "app\\src\\main\\res\\values-ja\\flow_strings.xml"
+  },
+  {
+    "sha256": "BEC59F5192DFE82A43A2E0E11701B328FA513C029405225902C941F38A3F914F",
+    "path": "app\\src\\main\\res\\values-ja\\history_strings.xml"
+  },
+  {
+    "sha256": "6FB6B078430828649344F90FE4F2853551F3481200E6A4843189ED098FBBBFDA",
+    "path": "app\\src\\main\\res\\values-ja\\player_identity_strings.xml"
+  },
+  {
+    "sha256": "DA3CD11A2021D678797531044AA3FC693EC69C2A4C39E83ABC5A8AE15ED8C211",
+    "path": "app\\src\\main\\res\\values-ja\\reliability_strings.xml"
+  },
+  {
+    "sha256": "8B7C439F17392E76506E0CF78C2AEE859DF5790A4CF8CA4EB393DF26B13D29D3",
+    "path": "app\\src\\main\\res\\values-ja\\strings.xml"
+  },
+  {
+    "sha256": "4319E82CBD2542014826B0D37FA08399F9A92836F2D51EB43DDE6FD2C806813C",
+    "path": "app\\src\\main\\res\\values-ja\\support_strings.xml"
+  },
+  {
+    "sha256": "2667F0E1669E30C9CEAE629E28A28DF849700E08E43EB41EA64D04CC9AB87B9B",
+    "path": "app\\src\\main\\res\\values-ja\\ui_correction_strings.xml"
+  },
+  {
+    "sha256": "786FA8E63E12835A9C295CC4E2D9EBB3342B726F558D09C0EE7A7235A0F22ACE",
+    "path": "app\\src\\main\\res\\values-ja\\upgrade_strings.xml"
+  },
+  {
+    "sha256": "97FCF905AD23165AC5A8C0739E33A70DEE535C63AE25BF0901FFE58CB6279595",
+    "path": "app\\src\\main\\res\\values-ja\\v50_strings.xml"
+  },
+  {
+    "sha256": "57897B1BED6EAAD57194EED110959F8587BDF290C7FB579ABC58159EBEE830BB",
+    "path": "app\\src\\main\\res\\values-ko\\diag50_strings.xml"
+  },
+  {
+    "sha256": "7779FFBA0768EC2D783272226147A782DE99E4AF62A35C408FE436FA2D32BC2D",
+    "path": "app\\src\\main\\res\\values-ko\\extras_strings.xml"
+  },
+  {
+    "sha256": "EE65BA7C629ECF5992D483A57084D66D86499E7BAAFC793C15A91F037D147A98",
+    "path": "app\\src\\main\\res\\values-ko\\flow_strings.xml"
+  },
+  {
+    "sha256": "77849AC153028C29B4FAF2818FC37138986D84C49DF2160A8CD72315D77FD595",
+    "path": "app\\src\\main\\res\\values-ko\\history_strings.xml"
+  },
+  {
+    "sha256": "F6C06C95BAAEA0CB57BDD30ED852DD4311612E922ED04848235CA11DE9398559",
+    "path": "app\\src\\main\\res\\values-ko\\player_identity_strings.xml"
+  },
+  {
+    "sha256": "DF50F556D119C606283929B5B4BDA3F7202B8DCEA26F80378BB073DB7D86B9AA",
+    "path": "app\\src\\main\\res\\values-ko\\reliability_strings.xml"
+  },
+  {
+    "sha256": "6F6B65EDBFC423C18E9D10815A98A9BC5CB031605CE051A5A3649F0258529097",
+    "path": "app\\src\\main\\res\\values-ko\\strings.xml"
+  },
+  {
+    "sha256": "F3896BF18767F6DACD3B53ADBA627FD8E86B55547ED7BD52A1F93F1B11E8ABE5",
+    "path": "app\\src\\main\\res\\values-ko\\support_strings.xml"
+  },
+  {
+    "sha256": "4DAB95B903E7B461BC6F370660D8201D949CF26ABC9CF12E0946E2730D4E308C",
+    "path": "app\\src\\main\\res\\values-ko\\ui_correction_strings.xml"
+  },
+  {
+    "sha256": "E45376E675D464D5C52FD44D328D9D4483EB345E6647DA2E1E386E2F0F09F4B3",
+    "path": "app\\src\\main\\res\\values-ko\\upgrade_strings.xml"
+  },
+  {
+    "sha256": "2DE65079569BA1C7EA98FC87F7E65ED6FFBAF66E68E3DB35322DD602ADAF90AE",
+    "path": "app\\src\\main\\res\\values-ko\\v50_strings.xml"
+  },
+  {
+    "sha256": "93034B8C6E2BE02ACE8C7554233A9BCC269BD047A3E9BD67F326D4CB2AA28C05",
+    "path": "app\\src\\main\\res\\values-night\\colors.xml"
+  },
+  {
+    "sha256": "982A1010266F225D9284CFBDA169F480EF0CB261D9756FE934EFC5E1052356B5",
+    "path": "app\\src\\main\\res\\values-night\\themes.xml"
+  },
+  {
+    "sha256": "26B1C4550B3844138D8697304C8A3622A40F5F8BF4A16304A7F816F0FA8CD6A2",
+    "path": "app\\src\\main\\res\\values-night\\upgrade_colors.xml"
+  },
+  {
+    "sha256": "3156AC6C4D055E9C8A596089A8A07A2D68306776A01B2D33A002D6E6CBC8F237",
+    "path": "app\\src\\main\\res\\values-ru\\diag50_strings.xml"
+  },
+  {
+    "sha256": "CA28C1197B36B494B3D43828BD1B0D92029850E63FBB0D02217DE70CDD424BAF",
+    "path": "app\\src\\main\\res\\values-ru\\extras_strings.xml"
+  },
+  {
+    "sha256": "62271E87410EFD511E0F1AD3121FD52365EC23322CE77A8F5D11BB9E7C0B1466",
+    "path": "app\\src\\main\\res\\values-ru\\flow_strings.xml"
+  },
+  {
+    "sha256": "5A0BB823B4F724828F46F447DFB4F0D06B3731C093C2E26999F417D0E7F7FC73",
+    "path": "app\\src\\main\\res\\values-ru\\history_strings.xml"
+  },
+  {
+    "sha256": "F36EBD02B83CFDCACB9ADE9195B30192EEA2834155662F5C4E48DB3EAD79865D",
+    "path": "app\\src\\main\\res\\values-ru\\player_identity_strings.xml"
+  },
+  {
+    "sha256": "D100CA5C600C3BF6FF263DD915ECA6C071A20915967B561F200712C1FDE324FD",
+    "path": "app\\src\\main\\res\\values-ru\\reliability_strings.xml"
+  },
+  {
+    "sha256": "9B9290766CAECD49E69173A2C80B96994F7CC7E0C4B61278CB29A852323EFA2D",
+    "path": "app\\src\\main\\res\\values-ru\\strings.xml"
+  },
+  {
+    "sha256": "0F5A309450F3A38685DA65D2835D22158094E76ED59C3E78A8F64BA3E7D6668E",
+    "path": "app\\src\\main\\res\\values-ru\\support_strings.xml"
+  },
+  {
+    "sha256": "3E22A9CA2E7953243A9E5AA96041F9BB0FAE77CCFD0763F4EB151E79875FF9CD",
+    "path": "app\\src\\main\\res\\values-ru\\ui_correction_strings.xml"
+  },
+  {
+    "sha256": "3A848AA012D0A3CDC0C35E9F7A17F9D84031392128A444F50767167FA2F34E54",
+    "path": "app\\src\\main\\res\\values-ru\\upgrade_strings.xml"
+  },
+  {
+    "sha256": "1058A208EEA502D33DA0FDFE258048F70A98DFD9BC929A1AA15289D3B9FFAB11",
+    "path": "app\\src\\main\\res\\values-ru\\v50_strings.xml"
+  },
+  {
+    "sha256": "86D9670429E1E48B91F1E559853311C382A6B2D6679E59E109C0FAC575669C66",
+    "path": "app\\src\\main\\res\\xml\\backup_rules.xml"
+  },
+  {
+    "sha256": "E8C65D6317BE0DEED57C187D727E0DF70E9E8AE94A22DD2FB7964735E8147A1C",
+    "path": "app\\src\\main\\res\\xml\\caption_service_config.xml"
+  },
+  {
+    "sha256": "4A6AF761D6B169D307784F0437A5587E265F11E4EA7231271C21A16BA219E5A5",
+    "path": "app\\src\\main\\res\\xml\\data_extraction_rules.xml"
+  },
+  {
+    "sha256": "9421C4D2698AAD3C25E31B1CC2CEAE34BABED9CE4BF5EB1ABD4A84CF94524BBE",
+    "path": "app\\src\\main\\res\\xml\\locales_config.xml"
+  },
+  {
+    "sha256": "91F3B49716130B12AEC72C50CEF01585DD7C51F478F49EFE54450AD30E747F90",
+    "path": "app\\src\\main\\res\\xml\\widget_info_compact.xml"
+  },
+  {
+    "sha256": "D1C8ED32E8B1E2D48E40F68B0983C4E9F06BF18ACA9D40CDD1EA212A95CE96A6",
+    "path": "app\\src\\main\\res\\xml\\widget_info_large.xml"
+  },
+  {
+    "sha256": "50423F2DADE63C1EA3A94528EF6FAD225FDFE64DCC05ACFC3EEFFC0C141B9E01",
+    "path": "app\\src\\main\\res\\xml\\widget_info.xml"
+  },
+  {
+    "sha256": "7B3BC817BB78BCFD61BC9A6CD91325F2065D8FF7B63015F25CAF774D045A3311",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\HistoryDeviceChecks.kt"
+  },
+  {
+    "sha256": "C2587F7C4A6B884A9195BCF11F6BFC5D90D8C60807733D38CB1B9CEE5CB2918C",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\HistoryPerformanceProbe.kt"
+  },
+  {
+    "sha256": "461C9BE2234791851C0FF60DC5380EBE157A274513CE5752B387E8D61F541416",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\IncrementDialogChecks.kt"
+  },
+  {
+    "sha256": "790868FC3E542389DAB2CF4277FB615723BB21FC36FE810FC4276E1EFADA25DC",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\ListeningFlowDeviceChecks.kt"
+  },
+  {
+    "sha256": "A362038CB4776307C8F260D28635AA8C362A74EDA2F5546AA08A53FAF69D19CA",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\ListeningPanelChecks.kt"
+  },
+  {
+    "sha256": "DBAE943E70EDD60622DF550AFD905D9DA1D506BD5216A16494987CB198016CB0",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\PersonalizationDeviceChecks.kt"
+  },
+  {
+    "sha256": "C93794BED88E95CD59D16E3468168F7ABF29288E1E0FBEC17563B3B9FE3F7249",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\PetDeviceTest.kt"
+  },
+  {
+    "sha256": "EF52C02AC015C4A3DD38D2CF6FF6D5D51D965A5058C4948036BD756C8DA7BD8C",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\ReliabilityDeviceChecks.kt"
+  },
+  {
+    "sha256": "60F930B83FB52D2E79D4CF2F627A32AA310DE6EFB0C0E1E745B7711DD11B2711",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\SessionOutcomeDeviceChecks.kt"
+  },
+  {
+    "sha256": "0779837513F90613A1D489B44C85906B119CE98B2CB7F6005AA8A99F3577C8C4",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\SessionUiDeviceChecks.kt"
+  },
+  {
+    "sha256": "26F23CC24A066A2A08F488A1077F9C86AA088A5E257ACCDBE7D96006FC71D229",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\SupportDeviceChecks.kt"
+  },
+  {
+    "sha256": "4172F4A790A8FA546776014DFC359DC0FB1C94B4B6C43B673FEE65AB0AB05987",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\TimerContractDeviceChecks.kt"
+  },
+  {
+    "sha256": "B6A88A6D1944CD2F8B3B2B9524161681CF9DC9258B1AA176B53F94B01261C477",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\UiCorrectionDeviceChecks.kt"
+  },
+  {
+    "sha256": "3F646E0C82E8DCA5679EAF601B5A5AB1A5467B28D59BFC4CFB68BACE25D13EAA",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\UpgradeDeviceChecks.kt"
+  },
+  {
+    "sha256": "FDF05FF0DD782F5C75A2D3BE473303EB053DEAC5D9BC3C63EA6AE8B5D1F5B964",
+    "path": "app\\src\\androidTest\\java\\com\\lujinyu\\xiting\\V50SessionDeviceChecks.kt"
+  },
+  {
+    "sha256": "CC62DF8ABEF46ED4C1CBDDD0FA261B054B08205C12974AFAC5FA523E156BD421",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\AchievementHistoryTest.kt"
+  },
+  {
+    "sha256": "2674F2C2B4F8801E414D1D37F90D45D85E2D1AED13E5DB6D2BDDEB87E671510B",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\AchievementsTest.kt"
+  },
+  {
+    "sha256": "6A416144F4D70F975A1B76C87101E80AE42BB259BA2BA474E8BBDC761C2E0F97",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\BackupImportTest.kt"
+  },
+  {
+    "sha256": "170FCBA4F7F5C7FEA2FEC3A56DD820671C101B174D37F0C32C2E93F37AAFFDFD",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\BackupProgressTest.kt"
+  },
+  {
+    "sha256": "7395BC24E75A1E18E9205E090A2248C91A491108000FAC7E48F4837FDB68A972",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\BackupSummaryTest.kt"
+  },
+  {
+    "sha256": "3A9E71C13702324E3BDCA9CC9B8780F119ADA95E85563A1BDD0BD630D517F7C5",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\BadgeMotionTest.kt"
+  },
+  {
+    "sha256": "44E36C1FC763FD0ABFBA1246A85AE3D7E817A7ADE8B78C5FADFD735E3AB6A21D",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\BadgesTest.kt"
+  },
+  {
+    "sha256": "D2F6A0B78ABB26ACDBBC77486353037C6435FBC12165DF320C5D0EB3A06ABB52",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\CompleteBackupTest.kt"
+  },
+  {
+    "sha256": "5F05C4D7015F409B25FBAADA3B031CC553FC0156F7DE0F54DAA4DE0FE557D3AD",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\EnergyStoreTest.kt"
+  },
+  {
+    "sha256": "94A6B647DDB8D23391A15F22BC8AD05518943207BBCC803EA81B8C15237DEDDA",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\HistoryDeletionTest.kt"
+  },
+  {
+    "sha256": "D92E476E20D95C6B356744EA64CF333E2022A87D37695C72C8AE8A50F0F279E9",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\HistoryExportTest.kt"
+  },
+  {
+    "sha256": "B04161FFB178E7EEA1028AF4F6F0CE06C95CD8DE88D8167EC189AA27B290D3AC",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\HistoryMonthKeyTest.kt"
+  },
+  {
+    "sha256": "A450F518B464F66E6C3F4BB281E488E683FEC810B644BE07DB6A0838476FE03E",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\ListeningPresetRulesTest.kt"
+  },
+  {
+    "sha256": "F0F4389C406D763A6D039826CEAE0CD48065053EC0736BBC1632DD81BF243767",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\MeasMathTest.kt"
+  },
+  {
+    "sha256": "77822B3EDA07A2DD236F8AFB348B56E58B7987AB7B7CC83E3EDCB693D47015C7",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\MonthReportTest.kt"
+  },
+  {
+    "sha256": "46AC2832BDBF93D3E4524C4471BA861E4EB014BDFD6A023AD99F16161A0C9342",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PetGlowTest.kt"
+  },
+  {
+    "sha256": "0063E83745234C76D8BDAC7F156BFC7910EA6BE69C8E1322420937158E4A4E43",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PetGrowthTest.kt"
+  },
+  {
+    "sha256": "532C4C5E6140FC3E8E3A3BD8CF6F0B5DFD667B1B13DE692EAC77AACB54463EEA",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PetMotionTest.kt"
+  },
+  {
+    "sha256": "2FD0E3C35184A8FFB23D456496AAB1B3F55BA93634B05910171C92D172091547",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PetPaletteTest.kt"
+  },
+  {
+    "sha256": "20981CF64B2059B66DEB5456A2191427A9253727EB83EEEF4BA527FAE7507558",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PlaybackMathTest.kt"
+  },
+  {
+    "sha256": "458DA53C5EEC9DF40FE5B0E39EAC09C5AB17BD77A07CC51F07D88C6FDBAB5245",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PlayerIdentityTest.kt"
+  },
+  {
+    "sha256": "77DB834A0BD34EC5A9DB5EAC92F54C3E2359C49CFCF4F210F601309D5C535D79",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PlayerTimerDefaultsTest.kt"
+  },
+  {
+    "sha256": "3AF694D8249FA70CFA587D41B86A93053E2E1D8847A75B60ECBED19B44D2B35E",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PosterLayoutTest.kt"
+  },
+  {
+    "sha256": "1CEDAA37A244E900DF8D5F89670BE2F183D047A2AD25A25BF49F58A489C35599",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\PrefsKeysTest.kt"
+  },
+  {
+    "sha256": "63DD0A4763A2CB66034566B698A4E3D737BEDFF5033285F20D02D74FAB8213F9",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\SeekMathTest.kt"
+  },
+  {
+    "sha256": "51794B801C78307F6709691216CBB5F47963DD413679408AC08AD406B1F075B7",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\SessionCoordinatorTest.kt"
+  },
+  {
+    "sha256": "3E8659654FFE67E707927E284A04B32801A1DAA58FADD5009793BEF18FAF5C76",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\SessionDiagnosticsTest.kt"
+  },
+  {
+    "sha256": "424CCD5AD7EEA8FE73CDA6E0205BC4C3DE6EB9A043CEC55FE03971FBC4A428B5",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\SessionLogParseTest.kt"
+  },
+  {
+    "sha256": "794A4B9AA6BCD5D32C137426C5DBB68CD6923D2E65253EDF1049E3E287D5575D",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\SessionOutcomeStoreTest.kt"
+  },
+  {
+    "sha256": "87DB5BD43DCD1F88275FE288F808D143E01E86A3533FE4AEDEFA66C1ADE61009",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\SleepTimerPolicyTest.kt"
+  },
+  {
+    "sha256": "5E9774B319359F3D3DAF6CCFA5E3439FFB43EC3183D0EC82FDC505DB471C517A",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\StreaksTest.kt"
+  },
+  {
+    "sha256": "C9AB2838C86583EEF1A208BA8767207065C5AF517A758CBEFF9E41B2DE56A6D9",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\SupportPolicyTest.kt"
+  },
+  {
+    "sha256": "CDE06C38E6F84BE0668C5E3CA5FE275E3111930A1142D157871002BB1FA392C4",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\WakeLockMetricsTest.kt"
+  },
+  {
+    "sha256": "82496CE779884A0E79C7E481FC1262F47A651CA75DFDC2CD955068BB68CFA880",
+    "path": "app\\src\\test\\java\\com\\lujinyu\\xiting\\WeekReportTest.kt"
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "state": [
+    "active=true",
+    "state=PlaybackState {state=PLAYING(3), position=559235, buffered position=0, speed=1.0, updated=1975923276, actions=823, custom actions=[Action:mName='like, mIcon=2131236666, mExtras=null, Action:mName='close, mIcon=2131236660, mExtras=null], active item id=-1, error=null}"
+  ],
+  "phase": "actual-screen-wake",
+  "time": "2026-10-14T22:06:03.5237356+08:00"
+}

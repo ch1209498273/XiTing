@@ -1,0 +1,3 @@
+Physical size: 1080x2340
+Physical density: 440
+null

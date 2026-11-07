@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.MeasMathTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-10-14T15:49:02.246Z" hostname="DESKTOP-4AAHQ1P" time="0.003">
+  <properties/>
+  <testcase name="正常段给出速率" classname="com.lujinyu.xiting.MeasMathTest" time="0.001"/>
+  <testcase name="极大累计时长不溢出" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="无效电荷读数拒绝且不溢出" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="异常高速率被丢弃" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="短于两分钟的段被丢弃" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="1500mA边界按电荷单位过滤" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="黑屏样本不足时不给结论" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="累计时长越长省电越多" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="黑屏反而更耗电时不给结论" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="零时长段被丢弃" classname="com.lujinyu.xiting.MeasMathTest" time="0.001"/>
+  <testcase name="亮屏样本不足时不给结论" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="亮屏比黑屏耗电多时算出正数" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="计数器上升时丢弃（充电中）" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="计数器不变时丢弃" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <testcase name="恰好两分钟的段保留" classname="com.lujinyu.xiting.MeasMathTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

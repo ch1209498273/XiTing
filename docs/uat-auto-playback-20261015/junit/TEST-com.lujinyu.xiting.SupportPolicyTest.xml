@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.SupportPolicyTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-14T16:56:29.794Z" hostname="DESKTOP-4AAHQ1P" time="0.002">
+  <properties/>
+  <testcase name="missingServiceWithActivePlaybackOffersStart" classname="com.lujinyu.xiting.SupportPolicyTest" time="0.001"/>
+  <testcase name="incompleteOrNegativeFeedbackNeverClaimsSuccess" classname="com.lujinyu.xiting.SupportPolicyTest" time="0.0"/>
+  <testcase name="stoppedPlaybackGoesToPlayerBeforeBatterySettings" classname="com.lujinyu.xiting.SupportPolicyTest" time="0.0"/>
+  <testcase name="bothUserConfirmationsAreRequired" classname="com.lujinyu.xiting.SupportPolicyTest" time="0.0"/>
+  <testcase name="missingOverlayWinsOverOtherIssues" classname="com.lujinyu.xiting.SupportPolicyTest" time="0.0"/>
+  <testcase name="mediaAccessDenialIsNotMistakenForNoPlayer" classname="com.lujinyu.xiting.SupportPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

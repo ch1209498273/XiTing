@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.SessionLogParseTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-13T15:38:24.195Z" hostname="DESKTOP-4AAHQ1P" time="0.006">
+  <properties/>
+  <testcase name="类型错误的记录只丢自己" classname="com.lujinyu.xiting.SessionLogParseTest" time="0.004"/>
+  <testcase name="缺字段的记录只丢自己，其余照常读出" classname="com.lujinyu.xiting.SessionLogParseTest" time="0.0"/>
+  <testcase name="空数组" classname="com.lujinyu.xiting.SessionLogParseTest" time="0.0"/>
+  <testcase name="全损坏时返回空且计数正确（不会静默当成成功）" classname="com.lujinyu.xiting.SessionLogParseTest" time="0.0"/>
+  <testcase name="空对象与非对象元素都只丢自己" classname="com.lujinyu.xiting.SessionLogParseTest" time="0.0"/>
+  <testcase name="字段值完整保留" classname="com.lujinyu.xiting.SessionLogParseTest" time="0.0"/>
+  <testcase name="全部合法时原样读出" classname="com.lujinyu.xiting.SessionLogParseTest" time="0.001"/>
+  <testcase name="语法级非法交给调用方抛出不吞" classname="com.lujinyu.xiting.SessionLogParseTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

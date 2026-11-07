@@ -1,0 +1,348 @@
+--- before/app\build.gradle.kts
++++ after/app\build.gradle.kts
+@@ -26,7 +26,7 @@
+ val distId = (project.findProperty("dist") as String?) ?: "public-github"
+ val buildId = UUID.randomUUID().toString().replace("-", "").take(8)
+ val buildTs = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+-val appVersion = "5.1.9"
++val appVersion = "6.0.0"
+ 
+ android {
+     namespace = "com.lujinyu.xiting"
+@@ -37,7 +37,7 @@
+         minSdk = 26
+         testInstrumentationRunner = "com.lujinyu.xiting.PetDeviceTest"
+         targetSdk = 35
+-        versionCode = 98
++        versionCode = 99
+         versionName = appVersion
+ 
+         // 溯源水印：界面页脚 + 隐藏资产 + 资源表三处冗余
+--- before/app\src\main\AndroidManifest.xml
++++ after/app\src\main\AndroidManifest.xml
+@@ -32,6 +32,14 @@
+         android:localeConfig="@xml/locales_config"
+         android:theme="@style/Theme.XiTing">
+ 
++        <activity android:name=".listening.ListeningActivity" android:exported="true">
++            <intent-filter>
++                <action android:name="android.intent.action.SEND" />
++                <category android:name="android.intent.category.DEFAULT" />
++                <data android:mimeType="text/plain" />
++            </intent-filter>
++        </activity>
++
+         <!--
+           启动图标走 activity-alias（成就图标换肤，IconStyle）：
+           MainActivity 本体不带 LAUNCHER filter，由 alias 代理——任意时刻
+--- before/app\src\main\java\com\lujinyu\xiting\BackupManager.kt
++++ after/app\src\main\java\com\lujinyu\xiting\BackupManager.kt
+@@ -34,7 +34,7 @@
+      * 用 `optXxx(key, 默认值)` 自然回落；只有将来真要**含义变更**时才需要
+      * 区分版本。加版本号是为了将来能改语义，不是为了现在这层。
+      */
+-    const val CURRENT_VERSION = 4
++    const val CURRENT_VERSION = 5
+ 
+     private val REL_DIR = Environment.DIRECTORY_DOWNLOADS + "/XiTing"
+ 
+@@ -51,7 +51,7 @@
+ 
+     /** 组装备份 JSON（自动备份与手动导出共用同一格式） */
+     @Synchronized
+-    fun buildBackupJson(ctx: Context): JSONObject = SessionLog.withDataLock {
++    fun buildBackupJson(ctx: Context): JSONObject = SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked {
+         check(RestoreSnapshot.recoverPending(ctx)) { "Pending restore must settle before backup" }
+         val prefs = ctx.prefs()
+         SessionLog.sessions(ctx) // initialize lifetime aggregates before snapshotting them
+@@ -77,7 +77,8 @@
+             .put("ach_history", JSONArray(AchievementHistory.encode(Achievements.history(ctx))))
+             .put("pending_energy", CompleteBackup.pending(JSONArray(prefs.getString(Prefs.ENERGY_PENDING,"[]")),System.currentTimeMillis()))
+             .put("extras",CompleteBackup.encode(prefs))
+-    }
++            .put("listening_library",com.lujinyu.xiting.listening.ListeningStore.export(ctx))
++    } }
+ 
+     /** 导出到用户所选位置（SAF 手动备份） */
+     @Synchronized
+@@ -105,7 +106,7 @@
+             val gp = EnergyStore.collectedTotal(ctx)
+             val sessText = ctx.filesDir.resolve("sessions.json").takeIf { it.exists() }?.readText() ?: "[]"
+             // 防护：本地为空（重装后未恢复）时不覆盖既有备份，避免毁掉历史数据
+-            if (SessionOutcomeStore.list(ctx).isEmpty() && gp <= 0 && EnergyStore.pending(ctx).isEmpty() && HistoryStore.totalCount(ctx)==0L && (sessText == "[]" || sessText.isBlank())) {
++            if (com.lujinyu.xiting.listening.ListeningStore.count(ctx)==0 && SessionOutcomeStore.list(ctx).isEmpty() && gp <= 0 && EnergyStore.pending(ctx).isEmpty() && HistoryStore.totalCount(ctx)==0L && (sessText == "[]" || sessText.isBlank())) {
+                 Log.i(TAG, "本地为空，跳过备份覆盖（保护历史备份）")
+                 return
+             }
+@@ -188,13 +189,13 @@
+     fun readFromUri(ctx: Context, uri: Uri): JSONObject? {
+         return try {
+             ctx.contentResolver.openInputStream(uri)?.use { input ->
+-                // A normal 500-session backup is small. Bound external input before JSON parsing.
++                // v5 adds up to 16MiB of local library rows; bound the whole external document to 20MiB.
+                 val bytes=java.io.ByteArrayOutputStream()
+                 val buffer=ByteArray(8192)
+                 while(true) {
+                     val count=input.read(buffer)
+                     if(count<0)break
+-                    if(bytes.size()+count>1_048_576)return null
++                    if(bytes.size()+count>20*1_048_576)return null
+                     bytes.write(buffer,0,count)
+                 }
+                 JSONObject(bytes.toString("UTF-8")).takeIf { isReadableBackup(it) }
+@@ -211,7 +212,7 @@
+ 
+     /** 把备份数据恢复到本地（成长值/会话/分享状态/养成进度） */
+     @Synchronized
+-    fun restore(ctx: Context, obj: JSONObject): Boolean = SessionLog.withDataLock { restoreLocked(ctx,obj) }
++    fun restore(ctx: Context, obj: JSONObject): Boolean = SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked { restoreLocked(ctx,obj) } }
+ 
+     private fun restoreLocked(ctx: Context, obj: JSONObject): Boolean {
+         if(!isReadableBackup(obj) || OverlayService.isRunning)return false
+@@ -250,6 +251,8 @@
+                 Log.i(TAG, "导入会话 ${kept.length()} 条（原文件 ${arr.length()} 条，超限或结构不合法者已丢弃）")
+             }
+             obj.optJSONArray("session_outcomes")?.let { SessionOutcomeStore.restore(ctx,it) }
++            if(obj.has("listening_library"))com.lujinyu.xiting.listening.ListeningStore.replace(ctx,obj.getJSONObject("listening_library"))
++            ed.putBoolean("listening_clean_confirmed_v1",false).remove("listening_last_clean_v1")
+             check(ed.commit()) { "Restored preferences could not be persisted" }
+             // v4.0：聚合是明细的派生数据（累计/最长/连续天数/月口径），恢复后必须重算，
+             // 否则聚合还停留在恢复前的值。备份文件本身不带聚合（派生数据不进备份）。
+--- before/app\src\main\java\com\lujinyu\xiting\BlackOverlay.kt
++++ after/app\src\main\java\com\lujinyu\xiting\BlackOverlay.kt
+@@ -22,6 +22,7 @@
+ import android.view.WindowManager
+ import android.widget.FrameLayout
+ import android.widget.LinearLayout
++import android.widget.Toast
+ import android.widget.TextView
+ 
+ /**
+@@ -302,6 +303,21 @@
+             background=surface(0xff111613.toInt(),24).apply { setStroke(dp(1),0xff2b3630.toInt()) }
+         }
+         stack.addView(content,LinearLayout.LayoutParams(-1,-2))
++        if(!demo && recordSession && context.prefs().getBoolean(com.lujinyu.xiting.listening.ListeningStore.MARK_SHOW,false)) {
++            stack.addView(TextView(context).apply {
++                tag="listening_mark";text=context.getString(R.string.listen_mark);textSize=14f
++                setTextColor(0xffb7d8c5.toInt());gravity=Gravity.CENTER;minHeight=dp(48)
++                setOnClickListener {
++                    if(!awake || !isShowing || !isEnabled)return@setOnClickListener
++                    isEnabled=false
++                    com.lujinyu.xiting.listening.ListeningRecorder.mark(context) {ok->
++                        isEnabled=true
++                        Toast.makeText(context,if(ok)R.string.listen_marked else R.string.listen_storage_error,Toast.LENGTH_SHORT).show()
++                    }
++                    main.removeCallbacks(relockRunnable);main.postDelayed(relockRunnable,RELLOCK_DELAY_MS)
++                }
++            },LinearLayout.LayoutParams(-1,-2))
++        }
+         stack.addView(pill,LinearLayout.LayoutParams(-1,-2).apply { topMargin=dp(14) })
+         setup.setOnClickListener { openTimerEditor(stack,pill) }
+         var landscape=false
+@@ -491,6 +507,7 @@
+             unlockPill = pill
+             mediaRow = media
+             isShowing = true
++            if(recordSession && !demo)com.lujinyu.xiting.listening.ListeningRecorder.start(context)
+             sessionStart = if(recordSession)System.currentTimeMillis() else 0L
+             sessionStartElapsed = SystemClock.elapsedRealtime()
+             // 省电实测：记下会话开始时的能量计数器读数，作为差值法的起点
+@@ -529,6 +546,7 @@
+     }
+ 
+     fun hide() {
++        if(recordSession && !demo && isShowing)com.lujinyu.xiting.listening.ListeningRecorder.stop(context)
+         PlaybackSelection.endAutomaticCurtain()
+         main.removeCallbacks(relockRunnable)
+         awake = false
+--- before/app\src\main\java\com\lujinyu\xiting\CompleteBackup.kt
++++ after/app\src\main\java\com\lujinyu\xiting\CompleteBackup.kt
+@@ -7,7 +7,8 @@
+ /** v3 additions: explicit whitelist, never import permissions, running state or media tokens. */
+ internal object CompleteBackup {
+     private fun integer(v:Any?):Long?=when(v) { is Int->v.toLong();is Long->v;else->null }
+-    private val booleans=setOf(Prefs.DIRECT_UNLOCK,Prefs.BLACK_INFO_SHOW,Prefs.BLACK_TIMER_SHOW,Prefs.BLACK_MEDIA_CONTROLS,
++    private val booleans=setOf(com.lujinyu.xiting.listening.ListeningStore.AUTO,com.lujinyu.xiting.listening.ListeningStore.MARK_SHOW,
++        com.lujinyu.xiting.listening.ListeningStore.INTRO,"listening_clean_confirmed_v1",Prefs.DIRECT_UNLOCK,Prefs.BLACK_INFO_SHOW,Prefs.BLACK_TIMER_SHOW,Prefs.BLACK_MEDIA_CONTROLS,
+         Prefs.SWITCH_HEADSET,Prefs.TIMER_PAUSE_KEEP_BLACK,Prefs.SUGGEST_NOTIFY,"auto_backup_enabled","session_recap_enabled",FirstSuccessFlow.COMPLETE)
+     private val strings=setOf(Prefs.LANG,"appearance_mode_v1","home_entry_order_v1","listening_presets_v1")
+     private val longs=setOf(Prefs.STATS_TOTAL_MS,Prefs.STATS_TOTAL_COUNT,Prefs.STATS_MAX_SINGLE,Prefs.LAST_RARE_DAY)
+@@ -17,10 +18,14 @@
+             out.put(key,if(value is Set<*>)JSONArray(value.toList()) else value)
+         (p.all["listening_scene_v1"] as? String)?.takeIf { it in setOf("sleep","episode","continuous") }?.let { out.put("listening_scene_v1",it) }
+         (p.all[PlayerTimerDefaults.KEY] as? String)?.let(PlayerTimerDefaults::sanitize)?.let { out.put(PlayerTimerDefaults.KEY,it) }
++        out.put(com.lujinyu.xiting.listening.ListeningStore.DAYS,(p.all[com.lujinyu.xiting.listening.ListeningStore.DAYS] as? Int)?.takeIf { it in setOf(0,30,90,180) } ?: 90)
+         out.put(Prefs.ENERGY_CARRY_MS,p.getLong(Prefs.ENERGY_CARRY_MS,0L))
+     }
+     fun apply(raw:JSONObject?,ed:SharedPreferences.Editor) {
+         if(raw==null)return
++        (raw.opt(com.lujinyu.xiting.listening.ListeningStore.DAYS) as? Int)?.takeIf { it in setOf(0,30,90,180) }?.let {
++            ed.putInt(com.lujinyu.xiting.listening.ListeningStore.DAYS,it)
++        }
+         for(key in booleans) (raw.opt(key) as? Boolean)?.let { ed.putBoolean(key,it) }
+         for(key in strings) (raw.opt(key) as? String)?.takeIf { it.length<=8192 }?.let { ed.putString(key,it) }
+         (raw.opt(PlayerTimerDefaults.KEY) as? String)?.let(PlayerTimerDefaults::sanitize)?.let { ed.putString(PlayerTimerDefaults.KEY,it) }
+--- before/app\src\main\java\com\lujinyu\xiting\MainActivity.kt
++++ after/app\src\main\java\com\lujinyu\xiting\MainActivity.kt
+@@ -110,6 +110,9 @@
+         navSettings.setOnClickListener { switchTab(TAB_SETTINGS) }
+ 
+         bindHome()
++        findViewById<View>(R.id.listening_recent).setOnClickListener {
++            startActivity(Intent(this,com.lujinyu.xiting.listening.ListeningActivity::class.java))
++        }
+         bindStats()
+         bindSettings()
+         bindUpgradeUi()
+@@ -1057,6 +1060,11 @@
+             OverlayService.instance?.reapplyBlack() // 黑幕显示中即时生效（无闪屏重挂）
+         }
+ 
++        val switchMark=page.findViewById<android.widget.Switch>(R.id.switch_listening_mark)
++        switchMark.isChecked=prefs.getBoolean(com.lujinyu.xiting.listening.ListeningStore.MARK_SHOW,false)
++        switchMark.setOnCheckedChangeListener { _,checked ->
++            prefs.edit().putBoolean(com.lujinyu.xiting.listening.ListeningStore.MARK_SHOW,checked).apply()
++        }
+         val switchBlackTimer=page.findViewById<android.widget.Switch>(R.id.switch_black_timer)
+         switchBlackTimer.isChecked=prefs.getBoolean(Prefs.BLACK_TIMER_SHOW,false)
+         switchBlackTimer.setOnCheckedChangeListener { _,checked ->
+--- before/app\src\main\java\com\lujinyu\xiting\OverlayService.kt
++++ after/app\src\main\java\com\lujinyu\xiting\OverlayService.kt
+@@ -486,6 +486,7 @@
+ 
+     override fun onDestroy() {
+         if(!::prefs.isInitialized) { super.onDestroy();return }
++        if(timerEndAt>0)com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"interrupted",listeningTimerId)
+         stopPauseObservation?.invoke();stopPauseObservation=null
+         try { observedPlayer?.unregisterCallback(playerCallback) } catch(_:RuntimeException) {}
+         observedPlayer=null
+@@ -882,7 +883,9 @@
+         ServiceRecovery.timer(this,timerEndAt,false)
+         main.removeCallbacks(timerTick);main.post(timerTick);refreshNotification()
+     }
++    private var listeningTimerId:String?=null
+     fun cancelTimer() {
++        com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"cancelled",listeningTimerId)
+         stopPauseObservation?.invoke();stopPauseObservation=null
+         timerController.cancel()
+         ServiceRecovery.timer(this,0,false)
+@@ -896,6 +899,7 @@
+             if(!reading.valid) {
+                 target.close();episodeTarget=null;timerTarget?.close();timerTarget=null;timerEndAt=0
+                 ServiceRecovery.timer(this,0,false)
++                com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"ended",listeningTimerId)
+                 episodeWaiting=false;timerResult=R.string.timer_episode_changed
+                 if(!isAnyBlackShowing()) showTimerResult()
+                 refreshNotification()
+@@ -916,10 +920,13 @@
+         }
+         if (SystemClock.elapsedRealtime() >= timerEndAt) {
+             timerEndAt = 0
++            val completedListeningId=listeningTimerId
++            com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,if(timerPauseKeepBlack)"ended" else "returned",completedListeningId)
+             ServiceRecovery.timer(this,0,false)
+             episodeTarget?.close();episodeTarget=null;episodeWaiting=false
+             if(timerPauseKeepBlack) {
+                 val outcome=if(hasMediaAccess())timerTarget?.pause() ?: PauseDecision.UNAVAILABLE else PauseDecision.UNAVAILABLE
++                if(outcome==PauseDecision.ALREADY_PAUSED)com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"pause_confirmed",completedListeningId)
+                 SessionRuntime.pause(this,when(outcome) {
+                     PauseDecision.REQUEST->PauseReport.REQUESTED
+                     PauseDecision.ALREADY_PAUSED->PauseReport.ALREADY_PAUSED
+@@ -936,6 +943,8 @@
+                     stopPauseObservation?.invoke()
+                     val completedId=SessionRuntime.snapshot().id
+                     stopPauseObservation=timerTarget?.observePause(main) { report ->
++                        if(report==PauseReport.CONFIRMED || report==PauseReport.ALREADY_PAUSED)
++                            com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"pause_confirmed",completedListeningId)
+                         SessionRuntime.pause(this,report,completedId);refreshNotification()
+                     }
+                 }
+@@ -1022,6 +1031,9 @@
+             Toast.makeText(this, lstr(R.string.toast_timer_cancelled), Toast.LENGTH_SHORT).show()
+         }
+         refreshNotification()
++        if(next>0)listeningTimerId=com.lujinyu.xiting.listening.ListeningRecorder.acceptedTimer(this,
++            com.lujinyu.xiting.listening.ListeningRecorder.captureController(this,controller) ?: if(controller==null)com.lujinyu.xiting.listening.ListeningRecorder.capture(this) else null)
++        else com.lujinyu.xiting.listening.ListeningRecorder.timerEnded(this,"cancelled",listeningTimerId)
+         return TimerAcceptance(true)
+     }
+ 
+--- before/app\src\main\java\com\lujinyu\xiting\RestoreSnapshot.kt
++++ after/app\src\main\java\com\lujinyu\xiting\RestoreSnapshot.kt
+@@ -15,6 +15,23 @@
+     }
+     fun available(ctx:Context)=exists(file(ctx))
+     fun isPending(ctx:Context)=exists(journal(ctx))
++    private fun library(ctx:Context,name:String):java.io.File {
++        require(name.matches(Regex("listening-rollback-[a-f0-9]{32}\\.json")))
++        return ctx.filesDir.resolve(name)
++    }
++    private fun restoreLibrary(ctx:Context,payload:JSONObject) {
++        if(!payload.has("listening_snapshot"))return
++        val source=library(ctx,payload.getString("listening_snapshot"))
++        val bytes=AtomicFile(source).openRead().use {input->
++            val out=java.io.ByteArrayOutputStream();val buffer=ByteArray(8192)
++            while(true){val n=input.read(buffer);if(n<0)break;check(out.size()+n<=16*1024*1024);out.write(buffer,0,n)};out.toByteArray()
++        }
++        com.lujinyu.xiting.listening.ListeningStore.replace(ctx,JSONObject(String(bytes,Charsets.UTF_8)))
++    }
++    private fun cleanLibrarySnapshots(ctx:Context) {
++        val retained=try {JSONObject(String(read(file(ctx)),Charsets.UTF_8)).optString("listening_snapshot")}catch(_:Exception){return}
++        ctx.filesDir.listFiles()?.filter {it.name.startsWith("listening-rollback-") && it.name.endsWith(".json") && it.name!=retained}?.forEach {AtomicFile(it).delete()}
++    }
+     fun capture(ctx:Context) {
+         val values=JSONObject()
+         for((key,value) in ctx.prefs().all) {
+@@ -25,16 +42,19 @@
+         val payload=JSONObject().put("prefs",values).put("sessions",if(sessions.exists())sessions.readText() else JSONObject.NULL)
+         val outcomes=ctx.filesDir.resolve(SessionOutcomeStore.FILE_NAME)
+         payload.put("session_outcomes",if(exists(outcomes))String(read(outcomes),Charsets.UTF_8) else JSONObject.NULL)
++        val libraryName="listening-rollback-"+java.util.UUID.randomUUID().toString().replace("-","")+".json"
++        write(library(ctx,libraryName),com.lujinyu.xiting.listening.ListeningStore.export(ctx).toString().toByteArray(Charsets.UTF_8))
++        payload.put("listening_snapshot",libraryName)
+         val bytes=payload.toString().toByteArray(Charsets.UTF_8)
+         write(file(ctx),bytes)
+         write(journal(ctx),bytes)
+     }
+-    fun finish(ctx:Context) { val marker=journal(ctx);AtomicFile(marker).delete();check(!exists(marker)) }
+-    fun recoverPending(ctx:Context):Boolean = synchronized(BackupManager) { SessionLog.withDataLock {
++    fun finish(ctx:Context) { val marker=journal(ctx);AtomicFile(marker).delete();check(!exists(marker));cleanLibrarySnapshots(ctx) }
++    fun recoverPending(ctx:Context):Boolean = synchronized(BackupManager) { SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked {
+         val marker=journal(ctx)
+         if(!exists(marker))true else try { applyPayload(ctx,JSONObject(String(read(marker),Charsets.UTF_8)));finish(ctx);true } catch(_:Exception) { false }
+-    } }
+-    fun undo(ctx:Context):Boolean = synchronized(BackupManager) { SessionLog.withDataLock { undoLocked(ctx) } }
++    } } }
++    fun undo(ctx:Context):Boolean = synchronized(BackupManager) { SessionLog.withDataLock { com.lujinyu.xiting.listening.ListeningStore.locked { undoLocked(ctx) } } }
+     private fun undoLocked(ctx:Context):Boolean {
+         if(OverlayService.isRunning)return false
+         val source=file(ctx);if(!exists(source))return false
+@@ -46,6 +66,7 @@
+         } catch(_:Exception) { false }
+     }
+     private fun applyPayload(ctx:Context,payload:JSONObject) {
++            restoreLibrary(ctx,payload)
+             val values=payload.getJSONObject("prefs")
+             val ed=ctx.prefs().edit().clear()
+             for(key in values.keys()) {
+--- before/app\src\main\res\layout\page_home.xml
++++ after/app\src\main\res\layout\page_home.xml
+@@ -8,6 +8,7 @@
+             </LinearLayout>
+             <ImageView android:layout_width="56dp" android:layout_height="56dp" android:background="@drawable/bg_pill_hero_off" android:contentDescription="@null" android:padding="14dp" android:src="@drawable/ic_row_overlay" android:tint="#FFFFFFFF" />
+         </LinearLayout>
++        <TextView android:id="@+id/listening_recent" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:gravity="center_vertical" android:text="@string/listen_home_entry" android:textSize="15sp" android:textColor="@color/brand" android:background="?android:attr/selectableItemBackground" android:paddingStart="8dp" android:paddingEnd="8dp" />
+         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:baselineAligned="false" android:orientation="horizontal">
+             <LinearLayout android:id="@+id/timer_chip" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/bg_card" android:elevation="1dp" android:foreground="?android:attr/selectableItemBackground" android:gravity="center_vertical" android:orientation="horizontal" android:padding="12dp">
+                 <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_icon_green" android:contentDescription="@null" android:padding="8dp" android:src="@drawable/ic_timer" android:tint="@color/brand" />
+--- before/app\src\main\res\layout\page_settings.xml
++++ after/app\src\main\res\layout\page_settings.xml
+@@ -20,6 +20,7 @@
+                 </LinearLayout>
+                 <Switch android:id="@+id/switch_black_timer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:contentDescription="@string/switch_black_timer" />
+             </LinearLayout>
++            <Switch android:id="@+id/switch_listening_mark" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="64dp" android:text="@string/listen_mark_toggle" android:contentDescription="@string/listen_mark_toggle" android:textColor="@color/text_primary" android:textSize="15sp" />
+             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider_soft" />
+             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="76dp" android:gravity="center_vertical" android:orientation="horizontal">
+                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">

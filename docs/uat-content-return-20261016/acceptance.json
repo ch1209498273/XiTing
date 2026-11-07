@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-16",
+  "scope": "content return feasibility probe",
+  "environment": "Android15 API35 emulator ARM64 translation",
+  "productionFeature": "not_implemented",
+  "mainApkProbeAbsent": true,
+  "inputChecks": 5,
+  "build": "passed",
+  "bili": {
+    "positionShare": "03:28",
+    "httpMediaUri": false,
+    "version": "9.15.0",
+    "systemShare": "verified",
+    "sameContentReturn": "verified",
+    "freshReturnPositionMs": 215208
+  },
+  "iqiyi": {
+    "copyLink": "verified",
+    "activeUsableMediaSource": "none on public episode playback",
+    "version": "17.10.0",
+    "webToSameEpisode": "verified"
+  },
+  "douyin": {
+    "result": "native abort before stable share verification",
+    "version": "32.2.6 official standalone",
+    "installed": true
+  },
+  "pending": [
+    "identity stability across content switch",
+    "black curtain mark audio continuity",
+    "other versions and devices",
+    "product implementation"
+  ]
+}

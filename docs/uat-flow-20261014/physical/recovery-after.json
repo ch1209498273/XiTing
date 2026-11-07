@@ -1,0 +1,14 @@
+[
+  {
+    "text": "运行中",
+    "resource-id": "com.lujinyu.xiting:id/pill_status"
+  },
+  {
+    "text": "息屏听剧运行中",
+    "resource-id": "com.lujinyu.xiting:id/hero_title"
+  },
+  {
+    "text": "未设置",
+    "resource-id": "com.lujinyu.xiting:id/timer_state"
+  }
+]

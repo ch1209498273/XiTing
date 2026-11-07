@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.PosterLayoutTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-14T03:30:11.486Z" hostname="DESKTOP-4AAHQ1P" time="0.025">
+  <properties/>
+  <testcase name="fiveLinesIsRejected" classname="com.lujinyu.xiting.PosterLayoutTest" time="0.006"/>
+  <testcase name="moreLinesNeverGrowThePet" classname="com.lujinyu.xiting.PosterLayoutTest" time="0.009"/>
+  <testcase name="bothRatiosOneToFourLinesHaveNoVerticalOverlap" classname="com.lujinyu.xiting.PosterLayoutTest" time="0.002"/>
+  <testcase name="squareRatioShrinksPetAgainstPortrait" classname="com.lujinyu.xiting.PosterLayoutTest" time="0.005"/>
+  <testcase name="portrait34ThreeLinesMatchesLegacyCoordinates" classname="com.lujinyu.xiting.PosterLayoutTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

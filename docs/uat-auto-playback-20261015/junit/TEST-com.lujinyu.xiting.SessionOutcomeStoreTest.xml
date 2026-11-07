@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.SessionOutcomeStoreTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-14T16:56:29.756Z" hostname="DESKTOP-4AAHQ1P" time="0.016">
+  <properties/>
+  <testcase name="invalid categories time order and coerced timestamps are rejected" classname="com.lujinyu.xiting.SessionOutcomeStoreTest" time="0.004"/>
+  <testcase name="all documented categories round trip" classname="com.lujinyu.xiting.SessionOutcomeStoreTest" time="0.002"/>
+  <testcase name="local clock rollback does not apply external future filter" classname="com.lujinyu.xiting.SessionOutcomeStoreTest" time="0.0"/>
+  <testcase name="pause feedback refines one id without changing end or regressing confirmation" classname="com.lujinyu.xiting.SessionOutcomeStoreTest" time="0.004"/>
+  <testcase name="far future rows cannot occupy retained history" classname="com.lujinyu.xiting.SessionOutcomeStoreTest" time="0.0"/>
+  <testcase name="retention uses known end or unknown start and keeps newest hundred" classname="com.lujinyu.xiting.SessionOutcomeStoreTest" time="0.002"/>
+  <testcase name="unknown end stays null and only public fields survive" classname="com.lujinyu.xiting.SessionOutcomeStoreTest" time="0.003"/>
+  <testcase name="id is idempotent and first end result wins" classname="com.lujinyu.xiting.SessionOutcomeStoreTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

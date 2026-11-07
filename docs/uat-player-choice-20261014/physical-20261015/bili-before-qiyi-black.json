@@ -1,0 +1,8 @@
+{
+  "phase": "before",
+  "time": "2026-10-15T00:41:28.8816526+08:00",
+  "state": [
+    "active=true",
+    "state=PlaybackState {state=PAUSED(2), position=156852, buffered position=0, speed=1.0, updated=1985206539, actions=823, custom actions=[Action:mName='mode, mIcon=2131236679, mExtras=null, Action:mName='close, mIcon=2131236660, mExtras=null], active item id=-1, error=null}"
+  ]
+}

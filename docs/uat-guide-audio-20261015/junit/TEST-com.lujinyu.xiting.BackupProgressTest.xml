@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.BackupProgressTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-14T17:31:41.878Z" hostname="DESKTOP-4AAHQ1P" time="0.017">
+  <properties/>
+  <testcase name="未知皮肤 id 不应被接受" classname="com.lujinyu.xiting.BackupProgressTest" time="0.012"/>
+  <testcase name="跳过空串与非字符串元素" classname="com.lujinyu.xiting.BackupProgressTest" time="0.0"/>
+  <testcase name="字符串数组转集合" classname="com.lujinyu.xiting.BackupProgressTest" time="0.0"/>
+  <testcase name="重复项去重" classname="com.lujinyu.xiting.BackupProgressTest" time="0.0"/>
+  <testcase name="经典配色是所有皮肤的起点 恢复时必须带上" classname="com.lujinyu.xiting.BackupProgressTest" time="0.0"/>
+  <testcase name="v2 正常字段可读出" classname="com.lujinyu.xiting.BackupProgressTest" time="0.001"/>
+  <testcase name="形态越界被夹到合法区间" classname="com.lujinyu.xiting.BackupProgressTest" time="0.001"/>
+  <testcase name="bubble_uses_pet 缺失时不能当成 false" classname="com.lujinyu.xiting.BackupProgressTest" time="0.0"/>
+  <testcase name="v1 备份不含养成字段" classname="com.lujinyu.xiting.BackupProgressTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

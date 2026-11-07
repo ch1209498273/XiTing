@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.BackupImportTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-13T15:38:23.980Z" hostname="DESKTOP-4AAHQ1P" time="0.003">
+  <properties/>
+  <testcase name="非对象元素被丢弃" classname="com.lujinyu.xiting.BackupImportTest" time="0.0"/>
+  <testcase name="全是非对象时不抛异常" classname="com.lujinyu.xiting.BackupImportTest" time="0.001"/>
+  <testcase name="缺字段的记录被丢弃" classname="com.lujinyu.xiting.BackupImportTest" time="0.0"/>
+  <testcase name="上限为 0 时不保留任何记录" classname="com.lujinyu.xiting.BackupImportTest" time="0.0"/>
+  <testcase name="空数组" classname="com.lujinyu.xiting.BackupImportTest" time="0.0"/>
+  <testcase name="超过上限时截断" classname="com.lujinyu.xiting.BackupImportTest" time="0.001"/>
+  <testcase name="结构完整的记录原样放行" classname="com.lujinyu.xiting.BackupImportTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

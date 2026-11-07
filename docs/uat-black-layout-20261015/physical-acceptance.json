@@ -1,0 +1,11 @@
+{
+  "device": "OPPO PME110",
+  "version": "5.1.6",
+  "actualCurtainEnabled": true,
+  "musicControlCheck": "网易云音乐：实际黑幕暂停PAUSED，恢复PLAYING，返回PlayerActivity",
+  "date": "2026-10-15",
+  "userAnswer": "显示正常，声音连续",
+  "timerCheck": "15分钟撤幕定时受理，延长15分钟后29:08后撤幕，取消后未开启",
+  "finalTimer": "未设置",
+  "player": "抖音"
+}

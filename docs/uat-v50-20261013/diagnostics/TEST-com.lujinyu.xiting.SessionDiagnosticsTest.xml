@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.lujinyu.xiting.SessionDiagnosticsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-13T14:05:57.337Z" hostname="DESKTOP-4AAHQ1P" time="0.009">
+  <properties/>
+  <testcase name="longModelIsBoundedAndControlCharactersAreRemoved" classname="com.lujinyu.xiting.SessionDiagnosticsTest" time="0.008"/>
+  <testcase name="structuredTextOnlyContainsApprovedFields" classname="com.lujinyu.xiting.SessionDiagnosticsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

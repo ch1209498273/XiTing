@@ -1,0 +1,12 @@
+{
+  "v50_strings.xml": {
+    "languages": 8,
+    "keys": 42,
+    "keys_and_placeholders_equal": true
+  },
+  "diag50_strings.xml": {
+    "languages": 8,
+    "keys": 4,
+    "keys_and_placeholders_equal": true
+  }
+}

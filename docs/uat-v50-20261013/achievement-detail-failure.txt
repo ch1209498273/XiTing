@@ -1,0 +1,18 @@
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: Restore history null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: Used XiTing before and uninstalled it? Your backup lives in Download/XiTing (XiTing-backup.json) and can restore growth & stats in one tap.
+
+New here? Tap "No thanks". null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: null null
+com.lujinyu.xiting: NO THANKS null
+com.lujinyu.xiting: CHOOSE BACKUP FILE null

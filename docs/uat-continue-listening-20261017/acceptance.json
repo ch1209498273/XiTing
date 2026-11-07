@@ -1,0 +1,58 @@
+{
+  "version": "6.0.0",
+  "code": 99,
+  "apk": "docs/升级候选/XiTing-v6.0.0-code99.apk",
+  "sha256": "03f06834befa19ed63452bcfa92eb3aa46b04a899e3d5d7867876e95ce4efec0",
+  "signerSha256": "cd40e01da2c2267c1076a2a56fe57cc0c4ae64f3fa56335d4b8561d44a2608ff",
+  "platformAllowlist": false,
+  "build": "passed: Debug, AndroidTest, Release, lintDebug",
+  "unitTests": {
+    "passed": 232,
+    "failed": 0,
+    "log": "green-policy-final.log"
+  },
+  "nativeGroups": {
+    "library_data": "passed",
+    "library_ui": "passed",
+    "library_recording": "passed",
+    "library_perf": "passed",
+    "black_timer_visibility": "passed",
+    "black_layout": "passed",
+    "black_timer_layout": "passed"
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 76
+  },
+  "i18n": {
+    "locales": 8,
+    "newKeys": 59
+  },
+  "controlledBrowserTimer": {
+    "source": "Chrome HTML audio fixture",
+    "oneMinutePauseConfirmed": true,
+    "curtainRemained": true,
+    "timerOriginStatus": "pause_confirmed",
+    "audibleContinuity": "not measured: emulator audio output disabled"
+  },
+  "realAppPaths": {
+    "bilibili": "actual system share -> production preview -> save -> same public video; actual black mark and note; explicit merge preserved data",
+    "iqiyi": "known public shortlink -> explicit paste -> save -> web -> same series episode 1 in native app; no stale previous title in black panel; no automatic title/position claim",
+    "douyin": "not revalidated in this run; prior emulator runtime failures are not compatibility pass"
+  },
+  "signedUpgradeApi26": {
+    "status": "passed",
+    "from": "signed v5.1.9 code98",
+    "to": "signed v6.0.0 code99",
+    "existingInfoPreferencePreserved": true,
+    "timerDisplayDefault": false,
+    "markDisplayDefault": false,
+    "genericShareSave": true,
+    "darkFontScale1_3": true,
+    "cleanupPreviewAndClearCancel": true,
+    "isolation": "new temporary userdata; existing API35 data preserved"
+  },
+  "physicalUat": "passed within scope: OPPO PME110 Android16/API36, Bili9.14.0; upgrade, audible black continuity user-confirmed, automatic record, actual system share/save, web-to-native return, manual mark/note, cleanup preview/cancel, confirmed timed pause/origin, system settings preserved; see physical-uat.json",
+  "publicRelease": "published 2026-10-18: GitHub v6.0.0 latest and Pgyer build21, independently verified",
+  "overall": "development, simulator and scoped physical UAT passed; publicly published"
+}

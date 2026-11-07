@@ -1,0 +1,11 @@
+{
+  "version": "5.0.1",
+  "installInPlace": true,
+  "uiStartClicked": true,
+  "serviceRunning": true,
+  "bubblePresent": true,
+  "curtainOpened": true,
+  "curtainClosed": true,
+  "audioRetested": false,
+  "playerNamePhoneVerified": false
+}

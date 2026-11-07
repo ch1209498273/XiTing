@@ -1,0 +1,79 @@
+{
+  "version": "6.2.0",
+  "versionCode": 101,
+  "publishedDate": "2026-11-07",
+  "timezone": "Asia/Shanghai",
+  "sourceCommit": "93c9494cfd2b536c9f77ba7d04a404b098e7203a",
+  "tag": "v6.2.0",
+  "tagLandingVerified": "git ls-remote --tags origin 返回 93c9494，与本地 HEAD 一致",
+  "commitsSinceV610": ["b4b500f", "3bce4b7", "6b0b90f", "72760a5", "3a5d10c", "f8b7c04", "93c9494"],
+  "github": {
+    "url": "https://github.com/ch1209498273/XiTing/releases/tag/v6.2.0",
+    "releaseId": 437411669,
+    "draft": false,
+    "prerelease": false,
+    "latest": true,
+    "publishedAt": "2026-11-07T07:21:38Z",
+    "apk": "https://github.com/ch1209498273/XiTing/releases/download/v6.2.0/XiTing-6.2.0.apk",
+    "assetBytesReportedByApi": 1316304
+  },
+  "pgyer": {
+    "url": "https://www.pgyer.com/xipingtingju",
+    "build": 23,
+    "version": "6.2.0",
+    "uploadedAt": "2026-11-07 15:21:48"
+  },
+  "apk": {
+    "sha256": "c17cf4f499f07bcbd5b476485e2b0574a5a1d0b012632f3ae2897f1cac002ba6",
+    "bytes": 1316304,
+    "deltaFromV610": "-72 bytes",
+    "signerDn": "CN=XiTing Release, OU=XiTing, O=ch1209498273, C=CN",
+    "signerSha256": "cd40e01da2c2267c1076a2a56fe57cc0c4ae64f3fa56335d4b8561d44a2608ff",
+    "sameSignerAsV600V610": true,
+    "sizeNote": "体积几乎不变不等于清理没生效：release 走 R8，本次 mapping/release/usage.txt 有 6931 行剔除记录；v6.1.0 未留 usage 记录，无法直接比对"
+  },
+  "shippedSymbolsVerifiedInApk": {
+    "present": ["setting_entry_order", "playback_source_card", "常用入口顺序", "恢复默认顺序"],
+    "absent": ["bg_nav_item", "on_brand", "v50_scenes"],
+    "method": "aapt dump resources / dump strings 对 release 包直接检索，不采信构建日志"
+  },
+  "prepublicationChecks": {
+    "jvmClasses": 38,
+    "jvmPassed": 247,
+    "jvmFailed": 0,
+    "lintErrors": 0,
+    "lintWarnings": 14,
+    "lintWarningsAtV610": 77,
+    "unusedResources": 0,
+    "unusedResourcesAtV610": 63,
+    "i18n": "passed (357/357 x 8 locales)",
+    "deviceChecks": {
+      "correctionOnly": "PASS",
+      "incrementDialogs": "PASS (96 dialogs x 8 languages x 2 themes)",
+      "defaultFlow": "PASS",
+      "sessionText": "PASS",
+      "appChoices": "PASS"
+    },
+    "emulatorUat": "docs/uat-notification-access-20261105/RESULTS.md（v6.1.0 轮，本轮沿用其判据）"
+  },
+  "remoteCi": [
+    {"headSha": "93c9494", "url": "https://github.com/ch1209498273/XiTing/actions/runs/42350948549", "conclusion": "success"},
+    {"headSha": "f8b7c04", "url": "https://github.com/ch1209498273/XiTing/actions/runs/42350846241", "conclusion": "success"}
+  ],
+  "releaseProcessNote": "本次以 -SkipTests 运行 release.ps1：门禁（单测/lint/i18n/五组设备检查）在发版前已单独跑过并记录。跳过测试段同时也是为了绕开该脚本第 2 步的挂起缺陷（子 powershell + Gradle 守护进程占住重定向句柄），该缺陷仍未根治，已记在 v6.1.0 的 publication.json。",
+  "physicalUat": {
+    "status": "not_tested",
+    "reason": "本版全部证据仍来自模拟器 api35",
+    "pendingItems": [
+      "真机装 v6.2.0 验证「常用入口顺序」在 ColorOS 上的实际手感",
+      "「新播放器出现→定时弹窗单选变亮」这半条（v6.1.0 起遗留）",
+      "抖音对注入 KEYCODE_MEDIA_PREVIOUS 是否响应（由探针在真机自行给答案）"
+    ]
+  },
+  "unverified": [
+    "真机未覆盖（连续两版）",
+    "会话刷新后半条未证",
+    "R8 剔除量与体积关系仅有本次 usage 记录，无 v6.1.0 对照"
+  ],
+  "release": "published"
+}

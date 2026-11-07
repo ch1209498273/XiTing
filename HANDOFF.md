@@ -20,7 +20,7 @@
 `D:\AI任务\zcode\息屏听剧` —— OPPO/ColorOS 的「息屏听剧」App。
 
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**黑幕遮罩并降低窗口亮度，非系统真正关屏**）而声音继续。
-纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，v6.1.0 正式安装包 1,316,376 bytes。
+纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，v6.2.0 正式安装包 1,316,304 bytes。
 
 - 包名 `com.lujinyu.xiting`，versionCode 101 / versionName 6.2.0
 - `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节 + docs/targetsdk36_黑幕兼容预研.md）**
@@ -89,6 +89,8 @@
 
 **2026-11-07 发版前清理（已随 v6.2.0 发布，提交 `9248fa8`）**：死 import 实测 13 条 / 6 个文件（我上一轮口头说的"约 20 条"是旧口径，把已清掉的算进去了）。未使用资源 63 条逐条验证后才删：先确认全仓没有 `getIdentifier` 之类动态取名，再把扫描面扩到 `AndroidManifest.xml`、`tools/*.py`、`*.kts`、根目录 json——62 条零真实引用（59 字符串 × 8 语言包 + 1 drawable + 2 color 文件），删完 `bg_nav_item.xml` 后 `on_brand` 悬空，属预期级联，`values/` 与 `values-night/` 的 `upgrade_colors.xml` 各只剩它一条，整文件删除。**又一处自己的分类错误当场纠正**：`v50_scenes` 我先前判成"测试在用"，实际 `UiCorrectionDeviceChecks:17` 用的是字符串字面量 tag `"v50_scenes"`，不是 `R.string.v50_scenes`——文本匹配骗了我，它确是孤儿，一并删 8 个语言包。结果 lint 警告 77 → 14、未使用资源 63 → 0、错误仍 0；单测 38 类 247 例 0 失败；i18n 各包同步 357/357；设备检查 `correctionOnly`、`incrementDialogs`（96 对话框）、默认全流程、`session_text`、`app_choices` 全 PASS。
 
+发布符号（外部核对，不采信脚本 stdout）：标签 `v6.2.0` → `93c9494`；GitHub Release id 437411669，非 draft、latest=true，资产 `XiTing-6.2.0.apk` **1,316,304 bytes**，sha256 `c17cf4f499f0…`；签名者证书摘要与 v6.0.0/v6.1.0 相同（同一把发布键）；蒲公英 build 23。release 包内 `aapt dump` 检索到 `setting_entry_order`/`playback_source_card` 与「常用入口顺序」「恢复默认顺序」，而已删的 `bg_nav_item`/`on_brand`/`v50_scenes` 在包内 0 命中——加进去的和删掉的都在包里验过。CI 42350948549 success。完整字段见 `docs/releases/v6.2.0-publication.json`。
+
 **发版脚本踩到一件事，别再犯**：`release.ps1` 第 2 步用 `powershell -File tools\run_tests.ps1 *> 文件` 调子进程，子进程已写完全绿日志并退出主逻辑，但 **Gradle 守护进程继承了重定向句柄**，父进程等管道关闭而长时间不返回（这次卡了一个多小时，日志停在"== 单测 =="）。处置办法：卡住时先看 `release_tests.txt` 的时间戳与结论行判断是"没跑完"还是"没返回"；确认全绿后停掉进程，还原已被 step 1 改写但未提交的 `build.gradle.kts`，单独补跑 `lint` 与 `i18n check` 两道门禁，再用 `-SkipTests` 重跑脚本完成发布。根治办法（未做）：脚本改用 `cmd /c` 或直接内联调用，或跑完显式 `--stop` 守护进程。
 
 **v6.0.0 / code99 是上一版**（2026-10-18 公开发布 GitHub latest 与蒲公英 build21）。本版交付「接着听与随手标记」：SQLite 内容库与旧时长统计分离、最近听过、系统分享接收与显式粘贴、黑幕标记与备注、睡前定时起点、90 天期限与清理预览、备份 v5。验收范围**只覆盖 OPPO PME110 + 哔哩哔哩 9.14.0**，抖音本轮未重新验证，手机首屏 ≤500ms 未实测——详见 `docs/uat-continue-listening-20261017/RESULTS.md` 与第八节。
@@ -138,7 +140,7 @@ v4.1.0：PetRenderer 共享五阶轮廓，PetMotion 独立动作时序；统计�
 `tools/i18n_shot.ps1`（7 语言 × 3 页面截图巡检，cmd locale 免前台切换）、
 `tools/i18n.py`（多语言同步 / 校验）。
 
-**APK 体积：v6.1.0 = 1,316,376 bytes（1,285.5 KiB，十进制约 1.32 MB；GitHub 资产显示 1285KB）**，比 v6.0.0 的 1,288,112 bytes 多 28,264 bytes（+2.2%，来自首页第四行布局、新图标底色与两处新入口）。历史轨迹 159 KB（图标矢量化后）→ 304 KB → 505 KB（v5.1.3）→ 1,221,152（v5.1.4，一次性 +715 KB，原因是内置离线中英引导语音，见第八节）→ 1,288,112（v6.0.0）→ **1,316,376（v6.1.0）**。别再用「约 304 KB」这个数。
+**APK 体积：v6.1.0 = 1,316,376 bytes（1,285.5 KiB，十进制约 1.32 MB；GitHub 资产显示 1285KB）**，比 v6.0.0 的 1,288,112 bytes 多 28,264 bytes（+2.2%，来自首页第四行布局、新图标底色与两处新入口）。历史轨迹 159 KB（图标矢量化后）→ 304 KB → 505 KB（v5.1.3）→ 1,221,152（v5.1.4，一次性 +715 KB，原因是内置离线中英引导语音，见第八节）→ 1,288,112（v6.0.0）→ 1,316,376（v6.1.0）→ **1,316,304（v6.2.0，仅 −72 字节）**。（v6.2.0 只掉 72 字节：本次 release 构建的 R8 `mapping/release/usage.txt` 有 6931 行剔除记录，说明未引用代码在发布包里本就被剥掉，删源码几乎不减体积。v6.1.0 未留 usage 记录，无法直接比对，只能说本次确实有大量剔除。）别再用「约 304 KB」这个数。
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1

@@ -172,13 +172,7 @@ Si vous êtes nouveau, appuyez sur « Non merci ».</string>
     <string name="state_todo">À faire</string>
     <string name="keepalive_btn_battery">Réglages batterie</string>
     <string name="keepalive_btn_ok">J\'ai compris</string>
-    <string name="locale_dlg_title">Accès aux notifications requis</string>
-    <string name="locale_dlg_msg">« Finir cet épisode » doit lire la progression de lecture en cours.
-Autorisez l\'accès aux notifications pour Écoute écran off dans les paramètres système (utilisé uniquement pour lire la progression).
-
-Sans autorisation, le compte à rebours normal fonctionne aussi.</string>
     <string name="locale_dlg_go">Autoriser</string>
-    <string name="locale_dlg_fallback">Utiliser le minuteur</string>
     <string name="toast_no_progress">Progression de lecture illisible : lisez un épisode d\'abord, ou utilisez le compte à rebours.</string>
     <string name="ach_dlg_title_fmt">Réalisations %1$d/%2$d</string>
     <string name="ach_dlg_hint">Touchez un badge débloqué pour voir sa médaille et rejouer l’animation</string>
@@ -350,7 +344,6 @@ Ce projet n\'a aucun lien avec YouTube, Google ou une quelconque plateforme vid�
     <string name="week_share_text">Cette semaine : %1$s sur %2$d jours, économie estimée : %3$d mAh\nCréature : %4$s\nDonnées locales, sans publicité ni permission Internet\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Minutes personnalisées</string>
     <string name="timer_custom_hint">1 à 600 minutes</string>
-    <string name="timer_custom_bad">Saisissez au moins 1 minute</string>
     <string name="evolve_fmt">🎉 Évolution ! %1$s → %2$s</string>
 
     <!-- Per-stage spirit gestures -->

@@ -39,7 +39,6 @@
     <string name="v50_end_timer">计划到期</string>
     <string name="v50_end_unknown">结束原因未知</string>
     <string name="v50_no_records">还没有会话结果</string>
-    <string name="v50_recap_enabled">显示上次会话回顾</string>
     <string name="v50_settings_tools">数据、诊断与回顾</string>
     <string name="v50_target_changed">播放器内容已改变。请检查新的目标与结束动作，再次确认；已填写的时长保留。</string>
 </resources>

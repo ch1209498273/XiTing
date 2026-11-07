@@ -37,9 +37,6 @@ internal object PlayerRows {
     fun adapter(ctx: Context, sources: List<MediaController>): ArrayAdapter<String> =
         rows(ctx, sources, expanded = false)
 
-    fun listAdapter(ctx: Context, sources: List<MediaController>): ArrayAdapter<String> =
-        rows(ctx, sources, expanded = true)
-
     private fun rows(ctx: Context, sources: List<MediaController>, expanded: Boolean): ArrayAdapter<String> =
         object : ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item,
             if (sources.isEmpty()) listOf(ctx.getString(R.string.ui_no_session))

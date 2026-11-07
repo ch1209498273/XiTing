@@ -39,7 +39,6 @@
     <string name="v50_end_timer">Minuterie écoulée</string>
     <string name="v50_end_unknown">Motif de fin inconnu</string>
     <string name="v50_no_records">Aucun résultat de session</string>
-    <string name="v50_recap_enabled">Afficher le bilan précédent</string>
     <string name="v50_settings_tools">Données, diagnostic et bilan</string>
     <string name="v50_target_changed">Le contenu a changé. Vérifiez la nouvelle cible et l’action finale, puis confirmez à nouveau. La durée est conservée.</string>
 </resources>

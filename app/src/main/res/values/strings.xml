@@ -191,10 +191,7 @@
     <string name="keepalive_btn_ok">知道了</string>
 
     <!-- 动态文案：听完这集 -->
-    <string name="locale_dlg_title">需要「通知使用权」</string>
-    <string name="locale_dlg_msg">「听完这集」需要读取正在播放的剧集进度。\n请在系统设置中允许息屏听剧的「通知使用权」（仅用于读取播放进度，不做他用）。\n\n不想授权也可以用普通倒计时。</string>
     <string name="locale_dlg_go">去授权</string>
-    <string name="locale_dlg_fallback">用倒计时</string>
     <string name="toast_no_progress">没读到播放进度：先播放一集再选，或改用倒计时</string>
 
     <!-- 动态文案：成就与精灵 -->
@@ -384,7 +381,6 @@
     <!-- 自定义定时 -->
     <string name="timer_custom">自定义分钟</string>
     <string name="timer_custom_hint">1–600 分钟</string>
-    <string name="timer_custom_bad">请输入 1 以上的分钟数</string>
     <string name="evolve_fmt">🎉 进化！%1$s → %2$s</string>
 
     <!-- Per-stage spirit gestures -->

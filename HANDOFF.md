@@ -55,6 +55,20 @@
 
 **留给下一次的同类问题**：`ListeningScenes`、`finishThisEpisode`、`HomeEntryOrder` 之外，还要不要再给 `SessionConsoleUi.card/label`（控制台已撤，但 `card()` 仍在 main 里）做一次去留判定，本轮没动。
 
+**2026-11-06 生产面死代码清点（工作区，未发布）**：把上一轮用在测试面的办法搬到 main 源码。口径修正了两次才可信：第一版把框架回调（`onStartCommand`/`onUpgrade`/`afterTextChanged`）也算成"零引用"，报出 44 条，是噪声；滤掉 `override` 后 18 条；再区分"全仓零引用"与"只有测试在用"，真纯死代码是 11 个，另有 8 个属"生产不调、测试在守"。第二版还暴露我自己的一个减法错误：`fun MainActivity.xxx` 这类扩展函数没被 `fun name` 匹配上，导致 5 条被误报成"有 1 处引用"。
+
+删除的 12 个（含二阶 1 个）：`finishThisEpisode`、`showCustomTimerDialog`、`pulseBadge`、`selectApp`、`listAdapter`、`calibrated`、`calibratedSavingMah`、`recapSwitch`、`refreshSessionConsole`、`showSessionRecords`、`scrollToGrowth`，以及删完才浮现的 `setTimerIntent`（它只被那两个已删弹窗用过）。**没删** `bindSessionConsole`——它不在名单里，diff 里那条看似删除的行只是文件末尾换行被脚本吃掉后的重写假象，已补回换行。
+
+顺带清掉本轮改动文件里被删成死的 import 13 条（MainActivity 6、SessionConsoleUi 4、MainDialogs 2、MainSupport 1）。其他文件里另有 20 余条死 import 属存量，没顺手动。
+
+孤儿字符串按 lint 的 `UnusedResources` 逐条与 HEAD 的代码引用数比对后删了 5 条 × 8 语言包（`locale_dlg_title/msg/fallback`、`timer_custom_bad`、`v50_recap_enabled`，共 58 行含翻译换行）。`player_choice_intro` 与 `ui_choose_player` 虽已无生产引用，但各有一条测试在用，保留——删它们会红。
+
+保留的 8 个"仅测试在用"：`bindSessionConsole`、`orderedIds`、`showListeningPresets`、`isDemoAudioPlaying`、`distinctListenDays`、`filterImportSessions`、`mergePlayerCatalog`、`player_choice_intro`/`ui_choose_player` 两条文案。它们的共同问题是**逻辑被测试锁着，生产却从不走**，去留要逐个判政策，不能当死代码删。
+
+门禁：单测 39 类 244 例 0 失败；lint 错误 0、警告 77；i18n 388/388（删掉 4 条 strings.xml 条目后各包同步）；设备检查默认全流程 + `session_text` + `app_choices` 三组全 PASS。
+
+两处如实挂账：其一，警告数从 v6.1.0 的 76 变成 77，那 +1 **我没能归因**——发布时的逐条清单没存，无法比对；已实测确认本轮删除没有新增任何孤儿资源（63 条 `UnusedResources` 与 HEAD 代码引用逐个对过，命中 0）。其二，扫描器只认静态引用，靠反射或按名字拼出来的引用它看不见，所以删除清单仍需以编译与三组设备检查为准，本轮均为绿。
+
 **发版脚本踩到一件事，别再犯**：`release.ps1` 第 2 步用 `powershell -File tools\run_tests.ps1 *> 文件` 调子进程，子进程已写完全绿日志并退出主逻辑，但 **Gradle 守护进程继承了重定向句柄**，父进程等管道关闭而长时间不返回（这次卡了一个多小时，日志停在"== 单测 =="）。处置办法：卡住时先看 `release_tests.txt` 的时间戳与结论行判断是"没跑完"还是"没返回"；确认全绿后停掉进程，还原已被 step 1 改写但未提交的 `build.gradle.kts`，单独补跑 `lint` 与 `i18n check` 两道门禁，再用 `-SkipTests` 重跑脚本完成发布。根治办法（未做）：脚本改用 `cmd /c` 或直接内联调用，或跑完显式 `--stop` 守护进程。
 
 **v6.0.0 / code99 是上一版**（2026-10-18 公开发布 GitHub latest 与蒲公英 build21）。本版交付「接着听与随手标记」：SQLite 内容库与旧时长统计分离、最近听过、系统分享接收与显式粘贴、黑幕标记与备注、睡前定时起点、90 天期限与清理预览、备份 v5。验收范围**只覆盖 OPPO PME110 + 哔哩哔哩 9.14.0**，抖音本轮未重新验证，手机首屏 ≤500ms 未实测——详见 `docs/uat-continue-listening-20261017/RESULTS.md` 与第八节。

@@ -95,12 +95,6 @@ class PetView(context: Context, attrs: AttributeSet? = null) : View(context, att
     private var badgeGlowAt = 0L
 
     /** 交互高亮：让指定格徽章脉冲一下（成就弹窗点某条时调用，复用新解锁的 glow 通道） */
-    fun pulseBadge(index: Int) {
-        if (index !in badges.indices) return
-        badgeGlowIndex = index
-        badgeGlowAt = System.currentTimeMillis()
-        invalidate()
-    }
 
     // 收集动画内部状态
     private data class FlyBall(val value: Int, val sx: Float, val sy: Float, val startAt: Long)

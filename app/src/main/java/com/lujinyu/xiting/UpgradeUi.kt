@@ -72,7 +72,3 @@ internal fun MainActivity.refreshUpgradeUi() {
     }
     AccessibilityUi.apply(window.decorView)
 }
-internal fun MainActivity.scrollToGrowth() {
-    val panel=pageStats.findViewById<View>(R.id.growth_panel)
-    (pageStats as? android.widget.ScrollView)?.smoothScrollTo(0,panel.top)
-}

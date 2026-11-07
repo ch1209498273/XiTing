@@ -39,7 +39,6 @@
     <string name="v50_end_timer">タイマー満了</string>
     <string name="v50_end_unknown">終了理由不明</string>
     <string name="v50_no_records">セッション結果はまだありません</string>
-    <string name="v50_recap_enabled">前回のセッションを表示</string>
     <string name="v50_settings_tools">データ・診断・振り返り</string>
     <string name="v50_target_changed">再生内容が変わりました。新しい対象と終了操作を確認し、もう一度確定してください。入力した時間は保持されます。</string>
 </resources>

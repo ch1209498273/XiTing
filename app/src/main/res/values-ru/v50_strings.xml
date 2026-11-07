@@ -39,7 +39,6 @@
     <string name="v50_end_timer">Время таймера истекло</string>
     <string name="v50_end_unknown">Причина завершения неизвестна</string>
     <string name="v50_no_records">Результатов пока нет</string>
-    <string name="v50_recap_enabled">Показывать итог прошлого сеанса</string>
     <string name="v50_settings_tools">Данные, диагностика и итоги</string>
     <string name="v50_target_changed">Содержимое плеера изменилось. Проверьте новую цель и действие завершения, затем подтвердите снова. Длительность сохранена.</string>
 </resources>

@@ -39,7 +39,6 @@
     <string name="v50_end_timer">Timer abgelaufen</string>
     <string name="v50_end_unknown">Endgrund unbekannt</string>
     <string name="v50_no_records">Noch keine Sitzungsergebnisse</string>
-    <string name="v50_recap_enabled">Letzte Sitzung anzeigen</string>
     <string name="v50_settings_tools">Daten, Diagnose und Rückblick</string>
     <string name="v50_target_changed">Playerinhalt geändert. Prüfe das neue Ziel und die Endaktion und bestätige erneut. Die Dauer bleibt erhalten.</string>
 </resources>

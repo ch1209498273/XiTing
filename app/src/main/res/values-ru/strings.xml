@@ -172,13 +172,7 @@
     <string name="state_todo">Не сделано</string>
     <string name="keepalive_btn_battery">Настройки батареи</string>
     <string name="keepalive_btn_ok">Понятно</string>
-    <string name="locale_dlg_title">Нужен доступ к уведомлениям</string>
-    <string name="locale_dlg_msg">Функции « Дослушать серию » нужно читать прогресс воспроизведения.
-Разрешите доступ к уведомлениям в настройках системы (используется только для чтения прогресса).
-
-Без разрешения работает обычный обратный отсчёт.</string>
     <string name="locale_dlg_go">Разрешить</string>
-    <string name="locale_dlg_fallback">Использовать таймер</string>
     <string name="toast_no_progress">Не удалось прочитать прогресс: сначала включите серию или используйте таймер.</string>
     <string name="ach_dlg_title_fmt">Достижения %1$d/%2$d</string>
     <string name="ach_dlg_hint">Нажмите на открытый значок, чтобы увидеть медаль и повторить анимацию</string>
@@ -350,7 +344,6 @@
     <string name="week_share_text">За неделю: %1$s за %2$d дней, оценка экономии: %3$d мАч\nДух: %4$s\nЛокальные данные без рекламы и разрешения на Интернет\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Свои минуты</string>
     <string name="timer_custom_hint">1-600 минут</string>
-    <string name="timer_custom_bad">Введите хотя бы 1 минуту</string>
     <string name="evolve_fmt">🎉 Эволюция! %1$s → %2$s</string>
 
     <!-- Per-stage spirit gestures -->

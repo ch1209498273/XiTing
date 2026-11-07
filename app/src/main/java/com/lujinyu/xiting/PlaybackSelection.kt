@@ -76,12 +76,6 @@ internal object PlaybackSelection {
         }
     }
     fun cached(): MediaController? = resolve(emptyList())
-    fun selectApp(pkg:String,controller:MediaController?=null) {
-        require(pkg.isNotBlank())
-        revision++
-        if(controller!=null) { require(controller.packageName==pkg);select(controller) }
-        else { clear();preferredPackage=pkg }
-    }
     fun clear() { endAutomaticCurtain();revision++;token = null; releaseController(); destroyed = false;preferredPackage=null }
     private fun releaseController() {
         callback?.let { try { retained?.unregisterCallback(it) } catch (_: RuntimeException) { } }

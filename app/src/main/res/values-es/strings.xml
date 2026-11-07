@@ -172,13 +172,7 @@ Si eres nuevo, pulsa « No, gracias ».</string>
     <string name="state_todo">Pendiente</string>
     <string name="keepalive_btn_battery">Ajustes de batería</string>
     <string name="keepalive_btn_ok">Entendido</string>
-    <string name="locale_dlg_title">Se necesita acceso a notificaciones</string>
-    <string name="locale_dlg_msg">« Terminar este capítulo » necesita leer el progreso de reproducción.
-Permite el acceso a las notificaciones de Escucha con pantalla apagada en los ajustes del sistema (solo para leer el progreso).
-
-Sin permiso, el temporizador normal también sirve.</string>
     <string name="locale_dlg_go">Permitir</string>
-    <string name="locale_dlg_fallback">Usar temporizador</string>
     <string name="toast_no_progress">No se pudo leer el progreso: reproduce un capítulo primero o usa el temporizador.</string>
     <string name="ach_dlg_title_fmt">Logros %1$d/%2$d</string>
     <string name="ach_dlg_hint">Toca una insignia desbloqueada para ver la medalla y repetir la animación</string>
@@ -350,7 +344,6 @@ Este proyecto no tiene relación con YouTube, Google ni ninguna plataforma de v�
     <string name="week_share_text">Esta semana: %1$s en %2$d días, ahorro estimado: %3$d mAh\nEspíritu: %4$s\nDatos locales, sin anuncios ni permiso de Internet\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Minutos a medida</string>
     <string name="timer_custom_hint">1-600 minutos</string>
-    <string name="timer_custom_bad">Introduce al menos 1 minuto</string>
     <string name="evolve_fmt">🎉 ¡Evolución! %1$s → %2$s</string>
 
     <!-- Per-stage spirit gestures -->

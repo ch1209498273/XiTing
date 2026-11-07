@@ -2,11 +2,7 @@ package com.lujinyu.xiting
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
-import android.view.View
 import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.Switch
 import android.widget.TextView
 
 /** Every surface translates the same independent state dimensions. No inferred playback success. */
@@ -65,12 +61,5 @@ internal object SessionConsoleUi {
         }
         builder.show()
     }
-    internal fun recapSwitch(activity:MainActivity) = Switch(activity).apply {
-        text=activity.getString(R.string.v50_recap_enabled);minHeight=(48*resources.displayMetrics.density).toInt()
-        isChecked=activity.prefs().getBoolean("session_recap_enabled",true)
-        setOnCheckedChangeListener { _,enabled -> activity.prefs().edit().putBoolean("session_recap_enabled",enabled).apply() }
-    }
 }
 internal fun MainActivity.bindSessionConsole() = Unit
-internal fun MainActivity.refreshSessionConsole() = Unit
-internal fun MainActivity.showSessionRecords() = SessionConsoleUi.records(this)

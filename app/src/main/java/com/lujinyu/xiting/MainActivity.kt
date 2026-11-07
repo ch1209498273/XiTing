@@ -3,21 +3,15 @@ package com.lujinyu.xiting
 
 import android.Manifest
 import android.app.Activity
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.MediaMetadata
-import android.media.session.MediaSessionManager
-import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
-import android.os.SystemClock
 import android.provider.Settings
 import android.view.View
 import android.widget.ImageView
@@ -532,56 +526,6 @@ private fun checkRestore() {
     }
 
     /** 听完这集再关：读取正在播放会话的进度，定时到本集片尾（个性化·定时关闭选项） */
-    internal fun finishThisEpisode():Boolean {
-        val mgr = getSystemService(Context.MEDIA_SESSION_SERVICE) as? MediaSessionManager
-        val comp = ComponentName(this, NotificationListener::class.java)
-        val sessions = try {
-            mgr?.getActiveSessions(comp)
-        } catch (e: SecurityException) {
-            null // 未授予通知使用权
-        }
-        if (sessions == null) {
-            android.app.AlertDialog.Builder(this)
-                .setTitle(getString(R.string.locale_dlg_title))
-                .setMessage(getString(R.string.locale_dlg_msg))
-                .setPositiveButton(getString(R.string.locale_dlg_go)) { _, _ ->
-                    try { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) } catch (_: Exception) {}
-                }
-                .setNegativeButton(getString(R.string.locale_dlg_fallback)) { _, _ ->
-                    startService(
-                        Intent(this, OverlayService::class.java)
-                            .setAction(OverlayService.ACTION_SET_TIMER)
-                            .putExtra(OverlayService.EXTRA_MINUTES, 30L)
-                    )
-                }
-                .show()
-            return false
-        }
-        var bestRemaining = -1L
-        var bestToken:android.media.session.MediaSession.Token?=null
-        val desiredToken=queryNowPlaying()?.controller?.sessionToken
-        for (c in sessions.filter { it.sessionToken==desiredToken }) {
-            val target=EpisodeTimerTarget(c)
-            val reading=target.read();target.close()
-            if(!reading.valid) continue
-            val rem=reading.remainingMs
-            if (rem > 0 && (bestRemaining < 0 || rem < bestRemaining)) { bestRemaining = rem;bestToken=c.sessionToken }
-        }
-        if (bestRemaining <= 0) {
-            Toast.makeText(this, getString(R.string.toast_no_progress), Toast.LENGTH_LONG).show()
-            return false
-        }
-        val endAt = System.currentTimeMillis() + bestRemaining + 4000 // 集尾缓冲4秒
-        startService(
-            Intent(this, OverlayService::class.java)
-                .setAction(OverlayService.ACTION_SET_TIMER)
-                .putExtra(OverlayService.EXTRA_END_AT, endAt)
-                .putExtra(OverlayService.EXTRA_TIMER_SESSION,bestToken)
-                .putExtra(OverlayService.EXTRA_TIMER_EPISODE,true)
-        )
-        postRefresh()
-        return true
-    }
 
     /**
      * 「省电估算」卡片：现在只展示**样本数量等级**与采样进度，不再引导用户去做 6 分钟测试。

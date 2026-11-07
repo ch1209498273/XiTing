@@ -172,13 +172,7 @@ Für neue Nutzer: « Nein danke » antippen.</string>
     <string name="state_todo">Offen</string>
     <string name="keepalive_btn_battery">Zu den Akku-Einstellungen</string>
     <string name="keepalive_btn_ok">Verstanden</string>
-    <string name="locale_dlg_title">Benachrichtigungszugriff nötig</string>
-    <string name="locale_dlg_msg">« Diese Folge fertig » muss den Wiedergabefortschritt lesen.
-Erlaube in den Systemeinstellungen den Benachrichtigungszugriff (wird nur zum Lesen des Fortschritts genutzt).
-
-Ohne Berechtigung funktioniert der normale Countdown genauso.</string>
     <string name="locale_dlg_go">Erlauben</string>
-    <string name="locale_dlg_fallback">Timer verwenden</string>
     <string name="toast_no_progress">Wiedergabefortschritt nicht lesbar: erst eine Folge abspielen oder den Countdown verwenden.</string>
     <string name="ach_dlg_title_fmt">Erfolge %1$d/%2$d</string>
     <string name="ach_dlg_hint">Tippe auf ein freigeschaltetes Abzeichen, um die Medaille und Animation zu sehen</string>
@@ -350,7 +344,6 @@ Dieses Projekt steht in keiner Verbindung zu YouTube, Google oder einer Video-Pl
     <string name="week_share_text">Diese Woche %1$s an %2$d Tagen, geschätzt %3$d mAh gespart\nGeist: %4$s\nLokale Daten, ohne Werbung oder Internetberechtigung\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Eigene Minuten</string>
     <string name="timer_custom_hint">1-600 Minuten</string>
-    <string name="timer_custom_bad">Bitte mindestens 1 Minute eingeben</string>
     <string name="evolve_fmt">🎉 Entwickelt! %1$s → %2$s</string>
 
     <!-- Per-stage spirit gestures -->

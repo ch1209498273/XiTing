@@ -172,13 +172,7 @@
     <string name="state_todo">未完了</string>
     <string name="keepalive_btn_battery">バッテリー設定へ</string>
     <string name="keepalive_btn_ok">了解</string>
-    <string name="locale_dlg_title">「通知の読み取り権限」が必要です</string>
-    <string name="locale_dlg_msg">「この話まで聴く」は再生中の話数を読み取る必要があります。
-システム設定で画面オフ再生の「通知の読み取り権限」を許可してください（再生位置の読み取りのみに使用し、他の目的には使いません）。
-
-権限を付与しない場合も通常のカウントダウンタイマーで利用できます。</string>
     <string name="locale_dlg_go">権限を付与</string>
-    <string name="locale_dlg_fallback">タイマーを使う</string>
     <string name="toast_no_progress">再生位置を読み取れませんでした：先に1話再生してから選ぶか、タイマーを使ってください</string>
     <string name="ach_dlg_title_fmt">精霊の実績 %1$d/%2$d</string>
     <string name="ach_dlg_hint">獲得済みバッジをタップしてメダルとアニメーションを表示</string>
@@ -350,7 +344,6 @@
     <string name="week_share_text">今週は%2$d日で%1$s、推定節電%3$d mAh\n精霊：%4$s\n端末内記録、広告・インターネット権限なし\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">分数を指定</string>
     <string name="timer_custom_hint">1〜600 分</string>
-    <string name="timer_custom_bad">1 分以上を入力してください</string>
     <string name="evolve_fmt">🎉 進化！%1$s → %2$s</string>
 
     <!-- Per-stage spirit gestures -->

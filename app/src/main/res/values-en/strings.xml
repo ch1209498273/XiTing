@@ -164,10 +164,7 @@
     <string name="state_todo">Pending</string>
     <string name="keepalive_btn_battery">Battery settings</string>
     <string name="keepalive_btn_ok">Got it</string>
-    <string name="locale_dlg_title">Notification access needed</string>
-    <string name="locale_dlg_msg">\"Finish this episode\" reads the current playback progress.\nAllow \"Notification access\" for XiTing in system settings (used only to read playback progress).\n\nOr just use the regular timer.</string>
     <string name="locale_dlg_go">Grant</string>
-    <string name="locale_dlg_fallback">Use timer</string>
     <string name="toast_no_progress">No playback progress found — play an episode first, or use the timer</string>
     <string name="ach_dlg_title_fmt">Pet Achievements %1$d/%2$d</string>
     <string name="ach_dlg_hint">Tap an unlocked badge to view its medal and replay the animation</string>
@@ -332,7 +329,6 @@
     <string name="week_share_text">This week: %1$s on %2$d days; estimated saving %3$d mAh\nMy spirit: %4$s\nLocal records, no ads or Internet permission\nhttps://github.com/ch1209498273/XiTing</string>
     <string name="timer_custom">Custom minutes</string>
     <string name="timer_custom_hint">1-600 minutes</string>
-    <string name="timer_custom_bad">Enter at least 1 minute</string>
     <string name="evolve_fmt">🎉 Evolved! %1$s → %2$s</string>
 
     <!-- Per-stage spirit gestures -->

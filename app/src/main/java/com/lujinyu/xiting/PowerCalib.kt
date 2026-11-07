@@ -205,15 +205,6 @@ object PowerCalib {
     // ────────────────────────── 旧接口（保留兼容，不再写入）──────────────────────────
 
     /** 旧：瞬时电流均值。已不再用于折算，保留仅供旧 UI 读取 */
-    fun calibrated(ctx: Context): Triple<Long, Long, Long>? {
-        val p = ctx.prefs()
-        val on = p.getLong(K_ON_UA, 0L)
-        val off = p.getLong(K_OFF_UA, 0L)
-        val ts = p.getLong(K_TS, 0L)
-        return if (ts == 0L || on <= off) null else Triple(off, on, ts)
-    }
 
     /** 旧：按旧校准折算。已让位给 [savingMah] */
-    fun calibratedSavingMah(ctx: Context, totalMs: Long): Int? =
-        savingMah(ctx, totalMs)
 }

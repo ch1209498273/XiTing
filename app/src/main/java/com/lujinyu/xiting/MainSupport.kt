@@ -2,7 +2,6 @@
 package com.lujinyu.xiting
 
 import android.content.Context
-import android.content.Intent
 import java.util.Calendar
 import java.util.Locale
 
@@ -47,9 +46,3 @@ internal fun Context.dayLabel(daysAgo: Int): String = when (daysAgo) {
             c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH))
     }
 }
-
-/** 定时 Intent（抽出来给预设与自定义两处共用） */
-internal fun Context.setTimerIntent(minutes: Long): Intent =
-    Intent(this, OverlayService::class.java)
-        .setAction(OverlayService.ACTION_SET_TIMER)
-        .putExtra(OverlayService.EXTRA_MINUTES, minutes)

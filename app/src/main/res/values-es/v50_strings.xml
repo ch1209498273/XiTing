@@ -39,7 +39,6 @@
     <string name="v50_end_timer">Temporizador agotado</string>
     <string name="v50_end_unknown">Motivo de finalización desconocido</string>
     <string name="v50_no_records">Aún no hay resultados</string>
-    <string name="v50_recap_enabled">Mostrar resumen de la última sesión</string>
     <string name="v50_settings_tools">Datos, diagnóstico y resumen</string>
     <string name="v50_target_changed">El contenido cambió. Revisa el nuevo destino y la acción final y confirma otra vez. Se conserva la duración.</string>
 </resources>

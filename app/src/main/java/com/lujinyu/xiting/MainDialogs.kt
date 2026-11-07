@@ -1,8 +1,6 @@
 // XiTing · (c) 2026 ch1209498273 · 非商业许可（见LICENSE）· 溯源ID见应用页脚与assets/.trace
 package com.lujinyu.xiting
 
-import android.content.Context
-import android.content.Intent
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -132,37 +130,6 @@ internal fun MainActivity.showAchievements(): android.app.AlertDialog {
         return dlg
     }
 
-/**
- * 自定义定时分钟数。
- *
- * 输入限 1..600（10 小时）：下限避免 0 被当成「取消」，上限防止误输入
- * 一个巨大的数，结果定时形同虚设。
- */
-internal fun MainActivity.showCustomTimerDialog() {
-        val input = android.widget.EditText(this).apply {
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            hint = getString(R.string.timer_custom_hint)
-            setPadding((16 * resources.displayMetrics.density).toInt(),
-                       (12 * resources.displayMetrics.density).toInt(),
-                       (16 * resources.displayMetrics.density).toInt(),
-                       (12 * resources.displayMetrics.density).toInt())
-        }
-        android.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.timer_custom))
-            .setView(input)
-            .setPositiveButton(getString(R.string.dlg_ok)) { _, _ ->
-                val min = input.text.toString().trim().toIntOrNull()
-                if (min == null || min < 1) {
-                    Toast.makeText(this, getString(R.string.timer_custom_bad), Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-                val clamped = min.coerceAtMost(MAX_CUSTOM_TIMER_MIN)
-                startService(setTimerIntent(clamped.toLong()))
-                postRefresh()
-            }
-            .setNegativeButton(getString(R.string.dlg_cancel), null)
-            .show()
-    }
 
 /**
  * 悬浮球样式：只决定「文字 / 精灵」。

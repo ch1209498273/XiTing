@@ -2,7 +2,7 @@
 
 给下一个接手此项目的 agent / 开发者。读完这一份就能接着干，不用翻整段对话。
 
-> 当前版本：2026-11-06 · **v6.1.0 / versionCode 100**。当前能力与验收范围见 [v6.1.0](docs/releases/v6.1.0.md)。以下 v4.x 内容作为历史交接资料保留。
+> 当前版本：2026-11-07 · **v6.2.0 / versionCode 101**。当前能力与验收范围见 [v6.2.0](docs/releases/v6.2.0.md)。以下 v4.x 内容作为历史交接资料保留。
 > v4.0 主体（10 项功能/优化 + 全量聚合数据架构）见下方清单。
 > v4.0：成就图标换肤（五枚徽章图标，ColorOS 验证）、听剧月报/年报海报 + 跨月本地推送、
 > 全量历史聚合（明细裁剪 60 天，派生数据不进备份）、摸头互动、黑幕剧名加播放 App 名、
@@ -22,7 +22,7 @@
 核心功能：在任意视频 App 播放时，点悬浮球让屏幕全黑（**黑幕遮罩并降低窗口亮度，非系统真正关屏**）而声音继续。
 纯 Kotlin + 纯 Android SDK，**零第三方依赖、无 INTERNET 权限**，v6.1.0 正式安装包 1,316,376 bytes。
 
-- 包名 `com.lujinyu.xiting`，versionCode 100 / versionName 6.1.0
+- 包名 `com.lujinyu.xiting`，versionCode 101 / versionName 6.2.0
 - `minSdk 26` / **`targetSdk 35`（刻意不升，见第五节 + docs/targetsdk36_黑幕兼容预研.md）**
 - 主源码 **12,631 行** Kotlin（`wc -l app/src/main/java/**/*.kt` 实测，2026-10-18 校正。此前本行写「约 6800 行」，已过期一倍），单模块
 - **38 个 JVM 单测文件 / 232 项**，另有 **26 个 androidTest 设备检查文件**（见第八节口径）
@@ -37,7 +37,7 @@
 
 发布符号（逐项外部核对，不采信脚本 stdout）：标签 `v6.1.0` → `f701a37`（`git ls-remote` 与本地 HEAD 一致，符合"标签打在 release 提交"的惯例）；GitHub Release id 436500792，非 draft、非 prerelease、latest=true，资产 `XiTing-6.1.0.apk` **1,316,376 bytes**，sha256 `225e290b21e8…`；签名者 `CN=XiTing Release, O=ch1209498273`，证书摘要与 v6.0.0 相同（同一把发布键，非 debug）；蒲公英 build 22 / 6.1.0，公开页已核。release 包内直接 `aapt dump` 检索到 `row_media`/`pill_media` 与「未授权读取媒体控制」「通知使用权」——即新入口确实在发出去的包里，而不只在源码里。CI run 42221354903 completed/success。全部字段见 `docs/releases/v6.1.0-publication.json`。
 
-**2026-11-06 接上「常用入口排序」与「播放来源」卡片（工作区，未发布，属 v6.1.0 之后）**：起因是报障用户那条链暴露的同类缺陷——代码写了、测试调了、生产界面进不去。用户知情后仍选最重档，故本轮接线。
+**2026-11-06 接上「常用入口排序」与「播放来源」卡片（已随 v6.2.0 发布，属 v6.1.0 之后）**：起因是报障用户那条链暴露的同类缺陷——代码写了、测试调了、生产界面进不去。用户知情后仍选最重档，故本轮接线。
 
 - **先纠正一处误判**：`playback_source_card` 被无条件 GONE **不是漏接**。它当时的文案是「请选择播放器」「选择配合使用的应用」，服务的是 v5.0.1 已撤掉的播放器选择流程；留着就是指向不存在界面的死入口。所以本轮不是把可见性翻过来，而是把内容改成不承担"选择"语义：`np!=null` 显示来源与能力，`hasSelection` 显示"所选来源现在怎么了"，两者都不成立仍 GONE。`PlaybackSelection` 是 memory-only 且 `select()` 无生产调用点，故 `hasSelection` 分支目前只由测试与黑幕自动目标路径触发，属防御分支，已如实标注。
 - **契约只退役一半**：`PlaybackAppDeviceChecks` 里"定时弹窗内不出现选择播放器文案"（`ui_choose_player`）原样保留；只把卡片可见性扩成新断言。断言承重已实测：装**旧包**（无卡片逻辑）跑 → FAIL `Source card stayed hidden while a session is readable`；装新包 → `PASS: listening flow device checks`。这条红不是刻意造的，是我漏跑 `assembleDebug` 只跑了 `compileDebugKotlin` 撞出来的，正好当反向证据留下。
@@ -55,7 +55,7 @@
 
 **留给下一次的同类问题**：`ListeningScenes`、`finishThisEpisode`、`HomeEntryOrder` 之外，还要不要再给 `SessionConsoleUi.card/label`（控制台已撤，但 `card()` 仍在 main 里）做一次去留判定，本轮没动。
 
-**2026-11-06 生产面死代码清点（工作区，未发布）**：把上一轮用在测试面的办法搬到 main 源码。口径修正了两次才可信：第一版把框架回调（`onStartCommand`/`onUpgrade`/`afterTextChanged`）也算成"零引用"，报出 44 条，是噪声；滤掉 `override` 后 18 条；再区分"全仓零引用"与"只有测试在用"，真纯死代码是 11 个，另有 8 个属"生产不调、测试在守"。第二版还暴露我自己的一个减法错误：`fun MainActivity.xxx` 这类扩展函数没被 `fun name` 匹配上，导致 5 条被误报成"有 1 处引用"。
+**2026-11-06 生产面死代码清点（已随 v6.2.0 发布）**：把上一轮用在测试面的办法搬到 main 源码。口径修正了两次才可信：第一版把框架回调（`onStartCommand`/`onUpgrade`/`afterTextChanged`）也算成"零引用"，报出 44 条，是噪声；滤掉 `override` 后 18 条；再区分"全仓零引用"与"只有测试在用"，真纯死代码是 11 个，另有 8 个属"生产不调、测试在守"。第二版还暴露我自己的一个减法错误：`fun MainActivity.xxx` 这类扩展函数没被 `fun name` 匹配上，导致 5 条被误报成"有 1 处引用"。
 
 删除的 12 个（含二阶 1 个）：`finishThisEpisode`、`showCustomTimerDialog`、`pulseBadge`、`selectApp`、`listAdapter`、`calibrated`、`calibratedSavingMah`、`recapSwitch`、`refreshSessionConsole`、`showSessionRecords`、`scrollToGrowth`，以及删完才浮现的 `setTimerIntent`（它只被那两个已删弹窗用过）。**没删** `bindSessionConsole`——它不在名单里，diff 里那条看似删除的行只是文件末尾换行被脚本吃掉后的重写假象，已补回换行。
 
@@ -69,7 +69,7 @@
 
 两处如实挂账：其一，警告数从 v6.1.0 的 76 变成 77，那 +1 **我没能归因**——发布时的逐条清单没存，无法比对；已实测确认本轮删除没有新增任何孤儿资源（63 条 `UnusedResources` 与 HEAD 代码引用逐个对过，命中 0）。其二，扫描器只认静态引用，靠反射或按名字拼出来的引用它看不见，所以删除清单仍需以编译与三组设备检查为准，本轮均为绿。
 
-**2026-11-06 「仅测试在用」的定性与覆盖搬家（工作区，未发布）**：上一轮留下 8 条"生产不调、测试在守"的，本轮逐个定性。判据要干净：`git log -S"名字("` 会被定义行本身污染（`fun MainActivity.bindSessionConsole()` 里就含 `bindSessionConsole(`），所以改成在指定版本树里 grep 后**剔除定义行**再数——结果是这 7 条在 `3b5db09`（把它们发布出去的提交）和 HEAD 的非定义引用都是 0。也就是说它们不是回退残骸，是**生下来就没接线**：用户从来没拿到过这些行为，而测试把它们算作已覆盖。
+**2026-11-06 「仅测试在用」的定性与覆盖搬家（已随 v6.2.0 发布）**：上一轮留下 8 条"生产不调、测试在守"的，本轮逐个定性。判据要干净：`git log -S"名字("` 会被定义行本身污染（`fun MainActivity.bindSessionConsole()` 里就含 `bindSessionConsole(`），所以改成在指定版本树里 grep 后**剔除定义行**再数——结果是这 7 条在 `3b5db09`（把它们发布出去的提交）和 HEAD 的非定义引用都是 0。也就是说它们不是回退残骸，是**生下来就没接线**：用户从来没拿到过这些行为，而测试把它们算作已覆盖。
 
 分三种处置。
 
@@ -86,6 +86,8 @@
 **我自己的错**：写分类时把 `showListeningPresets` 列进"保留"，动手时却删了它，是编译把这条自相矛盾抓出来的（`IncrementDialogChecks:33` 仍在调）。教训：分类结论和执行清单必须同一轮对账，不能凭上一段的说法写下一段的代码。
 
 承重实测：把 `validBackupSessions` 的时长下限从 `60_000L` 放到 `1L` → 恰好 `BackupImportTest 时长不足一分钟被丢弃` 与 `BackupSummaryTest` 各红 1 条，还原后全绿。门禁：单测 38 类 247 例 0 失败（-3 无用例、+7 导入新用例、-1 空集合用例）；lint 错误 0/警告 77，无一条指向本轮文件；i18n 通过；设备检查 `incrementDialogs`（96 个对话框 × 8 语言 × 2 主题）、`session_text`、`app_choices`、默认全流程全 PASS；二阶孤儿扫描归零。
+
+**2026-11-07 发版前清理（已随 v6.2.0 发布，提交 `9248fa8`）**：死 import 实测 13 条 / 6 个文件（我上一轮口头说的"约 20 条"是旧口径，把已清掉的算进去了）。未使用资源 63 条逐条验证后才删：先确认全仓没有 `getIdentifier` 之类动态取名，再把扫描面扩到 `AndroidManifest.xml`、`tools/*.py`、`*.kts`、根目录 json——62 条零真实引用（59 字符串 × 8 语言包 + 1 drawable + 2 color 文件），删完 `bg_nav_item.xml` 后 `on_brand` 悬空，属预期级联，`values/` 与 `values-night/` 的 `upgrade_colors.xml` 各只剩它一条，整文件删除。**又一处自己的分类错误当场纠正**：`v50_scenes` 我先前判成"测试在用"，实际 `UiCorrectionDeviceChecks:17` 用的是字符串字面量 tag `"v50_scenes"`，不是 `R.string.v50_scenes`——文本匹配骗了我，它确是孤儿，一并删 8 个语言包。结果 lint 警告 77 → 14、未使用资源 63 → 0、错误仍 0；单测 38 类 247 例 0 失败；i18n 各包同步 357/357；设备检查 `correctionOnly`、`incrementDialogs`（96 对话框）、默认全流程、`session_text`、`app_choices` 全 PASS。
 
 **发版脚本踩到一件事，别再犯**：`release.ps1` 第 2 步用 `powershell -File tools\run_tests.ps1 *> 文件` 调子进程，子进程已写完全绿日志并退出主逻辑，但 **Gradle 守护进程继承了重定向句柄**，父进程等管道关闭而长时间不返回（这次卡了一个多小时，日志停在"== 单测 =="）。处置办法：卡住时先看 `release_tests.txt` 的时间戳与结论行判断是"没跑完"还是"没返回"；确认全绿后停掉进程，还原已被 step 1 改写但未提交的 `build.gradle.kts`，单独补跑 `lint` 与 `i18n check` 两道门禁，再用 `-SkipTests` 重跑脚本完成发布。根治办法（未做）：脚本改用 `cmd /c` 或直接内联调用，或跑完显式 `--stop` 守护进程。
 
@@ -803,6 +805,7 @@ OPPO PME110 / Android 16（API 36）实测确认：
 | v5.1.9 / 98 | 设置新增「黑幕显示睡前定时」，独立键 `black_timer_show`，新老用户一律默认关闭 | `黑幕定时显示开关与真机调试约束_20261017.md` |
 | v6.0.0 / 99 | SQLite 内容库与时长统计分离、最近听过、系统分享接收与显式粘贴、黑幕标记与备注、定时起点、90 天期限与清理预览、备份 v5、手动确认后合并重复链接。已发布 | `uat-continue-listening-20261017/RESULTS.md`、`docs/releases/v6.0.0.md` |
 | v6.1.0 / 100 | 通知使用权入口 0→3（首页第四行、定时弹窗「去授权」、设置页「诊断与自检」）；定时弹窗改实时重读+焦点刷新；黑幕切集键常驻+注入兜底+探针判死；防误触可配置；最近听过有标题即记；首屏 10 条；EN 电池状态位歧义修复。已发布 | `docs/uat-notification-access-20261105/RESULTS.md`、`docs/releases/v6.1.0.md` |
+| v6.2.0 / 101 | 首页入口排序接上消费者并给出设置入口；播放来源卡片改按状态显示并去掉死可点；接上从没跑过的 `session_text`；备份导入等用例从死路径搬到 `validBackupSessions`/`epochDayOf`；删 12 个零引用死函数；清 13 条死 import 与 63 条未使用资源（lint 警告 77→14）。已发布 | `docs/releases/v6.2.0.md`、提交 `b4b500f 3bce4b7 6b0b90f 72760a5 9248fa8` |
 
 ### 八·1 关键代码落点
 

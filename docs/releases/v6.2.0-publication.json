@@ -5,7 +5,15 @@
   "timezone": "Asia/Shanghai",
   "sourceCommit": "93c9494cfd2b536c9f77ba7d04a404b098e7203a",
   "tag": "v6.2.0",
-  "tagLandingVerified": "git ls-remote --tags origin 返回 93c9494，与本地 HEAD 一致",
+  "tagLandingVerified": "git ls-remote --tags origin 返回 535d417（2026-11-12 按用户要求把标签从 release 提交移到当前提交）",
+  "tagMoved": {
+    "date": "2026-11-12",
+    "from": "93c9494cfd2b536c9f77ba7d04a404b098e7203a",
+    "to": "535d41736de2737c6d51c26e27bea11ce6eb537d",
+    "reason": "用户要求标签跟随当前提交；93c9494..535d417 之间 app/ 与构建配置 diff 为空，仅文档与 .gitignore 变化，故标签移动不改变已发布 APK 的代码来源",
+    "apkStillBuiltFrom": "93c9494cfd2b536c9f77ba7d04a404b098e7203a",
+    "sideEffect": "GitHub Release 页的 source code 归档随之变为 535d417 的树（含真机验收证据）；APK 资产与 sha256 不变"
+  },
   "commitsSinceV610": ["b4b500f", "3bce4b7", "6b0b90f", "72760a5", "3a5d10c", "f8b7c04", "93c9494"],
   "github": {
     "url": "https://github.com/ch1209498273/XiTing/releases/tag/v6.2.0",

@@ -1,0 +1,188 @@
+{
+  "version": "6.2.0",
+  "code": 101,
+  "branch": "master",
+  "baseCommit": "963142a",
+  "releasedFrom": "93c9494",
+  "date": "2026-11-12",
+  "device": {
+    "model": "PME110",
+    "android": "16",
+    "sdk": 36,
+    "serial": "3B164H006DY00000",
+    "resolution": "1080x2344",
+    "locale": "zh-CN",
+    "theme": "浅色（跟随系统）",
+    "fontScale": "1.0（未改动）"
+  },
+  "install": {
+    "method": "adb install -r（不带 -g）",
+    "from": "6.0.0/code99",
+    "to": "6.2.0/code101",
+    "result": "Success",
+    "purpose": "验升级安装与签名连续性，不新增任何授权",
+    "apkBytes": 1316304,
+    "apkSha256": "c17cf4f499f07bcbd5b476485e2b0574a5a1d0b012632f3ae2897f1cac002ba6",
+    "signerSha256": "cd40e01da2c2267c1076a2a56fe57cc0c4ae64f3fa56335d4b8561d44a2608ff",
+    "permissionsSurvivedUpgrade": true
+  },
+  "scope": "只补模拟器覆盖不到的那一层：真实第三方播放器在放视频时，本机的定时弹窗/黑幕/来源卡片/自检面板表现",
+  "checks": {
+    "homeFourPermissionRows": {
+      "pass": true,
+      "values": "悬浮窗权限 已开启 / 电池后台加白 已加白 / 通知权限 已开启 / 通知使用权 已开启",
+      "evidence": "02-home-permissions.xml/.png"
+    },
+    "timerDialogGrantedButNoSession": {
+      "pass": true,
+      "radioEnabled": false,
+      "hint": "暂时无法确定播放来源，可用黑幕和定时返回",
+      "grantButtonPresent": false,
+      "evidence": "03-timer-dialog-granted.xml/.png"
+    },
+    "entryOrderDefaultSequence": {
+      "pass": true,
+      "value": "定时 → 播放器 → 演示 → 权限",
+      "evidence": "05-entry-order-dialog.xml/.png"
+    },
+    "entryOrderPromoteWritesPref": {
+      "pass": true,
+      "value": "提升「演示」后列表变为 演示 → 定时 → 播放器 → 权限",
+      "evidence": "06-entry-order-after-promote-demo.xml"
+    },
+    "entryOrderPromoteVisibleOnHome": {
+      "pass": false,
+      "nature": "已知限制，非缺陷",
+      "reason": "该机 first_success_confirmed_v1 为真，btn_first_use 处于 GONE，被提升的是不可见节点",
+      "remedy": "要在肉眼层面验这一档，需在首次引导未完成的机器（模拟器靶场）上跑"
+    },
+    "entryOrderPromoteVisibleGroupReordersHome": {
+      "pass": true,
+      "value": "提升「权限」后：服务与权限整组上移到最近听过之下，睡前定时/防杀保活被挤到节能统计之后；未参与排序的节点原地不动",
+      "evidence": "07-home-order-permissions-top.xml/.png"
+    },
+    "entryOrderResetMatchesBaseline": {
+      "pass": true,
+      "value": "恢复默认后与改动前逐坐标一致（睡前定时 y=594、服务与权限 y=1274）",
+      "evidence": "08-home-order-restored.xml/.png"
+    },
+    "realPlayerSessionReadable": {
+      "pass": true,
+      "player": "com.youku.phone",
+      "session": "PlayAudioMediaSession",
+      "state": "PLAYING(3)",
+      "actions": 550,
+      "actionsHex": "0x226",
+      "actionsDecode": "PAUSE + STOP + SKIP_TO_ITEM_WITH_ID + PREPARE_FROM_SEARCH（不含 ACTION_PLAY）",
+      "audioFocusOwner": "com.youku",
+      "evidence": "media-session.log"
+    },
+    "timerDialogRadioEnablesOnRealPlayback": {
+      "pass": true,
+      "radioEnabled": true,
+      "sourceHeading": "优酷视频",
+      "capabilityLine": "播放中 · 可请求暂停",
+      "grantButtonPresent": false,
+      "evidence": "09-timer-dialog-youku.xml/.png",
+      "note": "这是报障那一格在真机上的正面证据"
+    },
+    "backgroundAudioContinuesInBlackOverlay": {
+      "pass": true,
+      "value": "进黑幕期间优酷保持 PLAYING(3)",
+      "evidence": "black-overlay.log"
+    },
+    "overlayControlsEnabledOnRealSession": {
+      "pass": true,
+      "controls": "上一集 / 播放暂停 / 下一集 / 返回播放器 全部 clickable=true",
+      "sourceLabel": "优酷视频",
+      "evidence": "10-black-overlay-youku-controls.xml/.png"
+    },
+    "pauseInjectionRoundTrip": {
+      "pass": true,
+      "value": "PLAYING → PAUSED → PLAYING，两次都成",
+      "evidence": "media-session.log"
+    },
+    "pauseInjectionFirstAttemptFailed": {
+      "pass": true,
+      "nature": "时序而非缺陷",
+      "reason": "第一次点控件前黑幕已自动重新锁定，点击被锁定层吃掉；重解锁后同一坐标立即生效",
+      "evidence": "black-overlay.log（logcat 出现 sleep: 重新锁定）"
+    },
+    "skipToNextEpisodeOutcome": {
+      "pass": false,
+      "nature": "判据不足",
+      "verified": "请求已发出、会话存活、position 由 0 变 90000 ms",
+      "notVerified": "是否真的换集",
+      "reason": "优酷 metadata 恒为 null，集号在会话侧读不出来"
+    },
+    "homeSourceCardShowsWithSession": {
+      "pass": true,
+      "value": "图标 + 优酷视频 + 播放中 · 可请求暂停",
+      "evidence": "11-home-source-card-youku.xml/.png"
+    },
+    "homeSourceCardHidesWithoutSession": {
+      "pass": true,
+      "value": "force-stop 播放器后节点不再出现在界面树，屏上也读不到「优酷视频」",
+      "evidence": "12-home-source-card-hidden.xml/.png"
+    },
+    "diagnosticsPanelReachableOnDevice": {
+      "pass": true,
+      "rows": "悬浮窗权限 是 / 通知使用权 是 / 通知已开启 是 / 电池优化已豁免 是 / 可读取媒体会话 否 / 媒体正在播放 否 / 会话声明支持暂停 否 / 支持快进后退 否 / 支持切集 否 / 助手服务运行中 是 / 黑幕正在显示 否",
+      "alsoVisible": "设置页「检查更新 当前 v6.2.0」，与 dumpsys package 的 versionName 一致",
+      "evidence": "13-diagnostics-panel.xml/.png"
+    },
+    "iqiyiPlayback": {
+      "pass": false,
+      "nature": "未覆盖",
+      "sessionReadable": true,
+      "actions": 566,
+      "stateStuckAt": "NONE(0)",
+      "reason": "详情页点播放器区与点选集均不出声，页面含 VIP 开通提示，疑会员/广告门槛"
+    },
+    "douyinPlayback": {
+      "pass": false,
+      "nature": "未覆盖",
+      "sessionReadable": true,
+      "activeFlag": true,
+      "actions": 566,
+      "stateStuckAt": "STOPPED(1)",
+      "reason": "卡在 SplashActivity，无障碍树 186 节点零文本，KEYCODE_MEDIA_PLAY 不改变状态"
+    },
+    "bilibili": {
+      "pass": null,
+      "nature": "不适用",
+      "reason": "本机未安装（pm list packages 无 bilibili）；上一轮计划里「抖音未装、B站在装」的说法是错的，已更正"
+    },
+    "userTimerNotArmed": {
+      "pass": true,
+      "value": "弹窗一律点「取消」，验收结束时首页仍显示「未设置」"
+    }
+  },
+  "systemSettingsGuard": {
+    "commandsNeverRun": [
+      "settings put system accelerometer_rotation",
+      "settings put system user_rotation",
+      "settings put system font_scale",
+      "wm user-rotation"
+    ],
+    "before": { "accelerometer_rotation": "0", "user_rotation": "0", "font_scale": "1.0" },
+    "after": { "accelerometer_rotation": "1", "user_rotation": "0", "font_scale": "1.0" },
+    "drift": "accelerometer_rotation 0 → 1",
+    "attribution": "视频 App 为横屏播放临时改写（本机已知行为）；本轮用 force-stop 收尾，App 未走到自身还原逻辑",
+    "restoredByAgent": false,
+    "restoreInstruction": "下拉控制中心关闭「自动旋转」；或明确指定后由我按 0 写回并读回验证"
+  },
+  "notVerified": [
+    "爱奇艺/抖音/B站 的播放联动（前两家进不到 PLAYING，第三家未安装）",
+    "黑幕内 ±30 秒与剧名显示（依赖 metadata，优酷不给）",
+    "「演示」组排序的可见效果（该机该按钮为 GONE）",
+    "切集是否真的换集（会话侧读不到集号）",
+    "耗电与后台存活实验（本轮未做）"
+  ],
+  "openDecision": {
+    "item": "本目录是否入库",
+    "issue": "02/07/08/11/12 截图含本人使用总量（今日 5时15分 / 近7天 33时32分 / 累计 94时40分）；09/11 角落有优酷小窗一帧公开剧集画面。仓库是公开的。",
+    "status": "未定之前不提交"
+  },
+  "release": "v6.2.0 已于 2026-11-07 发布（GitHub release 437411669 / pgyer build 23），本轮为发布后真机复核，不改版本号"
+}

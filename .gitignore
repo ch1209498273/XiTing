@@ -31,7 +31,8 @@ uat/
 物料/
 小红书/
 .cowork-temp/
-tools/__pycache__/
+# 证据目录现在也带 python 驱动（docs/uat-*/drive.py），运行即生成，故全局排除
+__pycache__/
 
 # 本地构建/测试日志
 *.log

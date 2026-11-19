@@ -1,0 +1,44 @@
+{
+  "version": "6.2.1",
+  "versionCode": 102,
+  "publishedDate": "2026-11-19",
+  "timezone": "Asia/Shanghai",
+  "sourceCommit": "04e368f0d4794f86bc013bf4e3c2b0fc41884d40",
+  "tag": "v6.2.1",
+  "github": {
+    "url": "https://github.com/ch1209498273/XiTing/releases/tag/v6.2.1",
+    "releaseId": 450745266,
+    "publishedAt": "2026-11-19T00:59:20Z",
+    "draft": false,
+    "prerelease": false,
+    "latest": true,
+    "apk": "https://github.com/ch1209498273/XiTing/releases/download/v6.2.1/XiTing-6.2.1.apk",
+    "assetDigestMatchesLocalApk": true
+  },
+  "pgyer": {
+    "url": "https://www.pgyer.com/xipingtingju",
+    "build": 24,
+    "version": "6.2.1",
+    "uploadedAt": "2026-11-19 08:59:22",
+    "publicPageVerified": true
+  },
+  "apk": {
+    "sha256": "70ba371edab327029c0d3c8e586b8994a82565ceead3fa38d16fe996d4cdec50",
+    "bytes": 1316308,
+    "signerSha256": "cd40e01da2c2267c1076a2a56fe57cc0c4ae64f3fa56335d4b8561d44a2608ff",
+    "sameSignerAsV620": true
+  },
+  "prepublicationChecks": {
+    "jvmPassed": 247,
+    "jvmFailed": 0,
+    "lintErrors": 0,
+    "lintWarnings": 14,
+    "i18n": "passed",
+    "homeEntryOrder": "Android 35 模拟器验证新旧引导状态",
+    "physicalUat": "优酷一分钟定时补验使用 v6.2.0，详见 v6.2.0.md"
+  },
+  "remoteCi": {
+    "url": "https://github.com/ch1209498273/XiTing/actions/runs/44433344555"
+  },
+  "release": "published"
+}

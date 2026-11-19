@@ -24,5 +24,51 @@ internal class UiCorrectionDeviceChecks(private val i:Instrumentation) {
             } catch(t:Throwable){error=t} }
             error?.let { throw it }
         } finally { i.runOnMainSync { a.finish() } }
+        checkHomeEntryOrder()
+    }
+
+    private fun checkHomeEntryOrder() {
+        val ctx = i.targetContext
+        val prefs = ctx.prefs()
+        val complete = FirstSuccessFlow.COMPLETE
+        val previous = prefs.getBoolean(complete, false).takeIf { prefs.contains(complete) }
+        val previousTab = prefs.getInt(Prefs.LAST_TAB, 0).takeIf { prefs.contains(Prefs.LAST_TAB) }
+        try {
+            for (guideCompleted in listOf(true, false)) {
+                prefs.edit().putBoolean(complete, guideCompleted).commit()
+                val activity = i.startActivitySync(Intent(ctx, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as MainActivity
+                var error: Throwable? = null
+                i.runOnMainSync {
+                    try {
+                        activity.findViewById<View>(R.id.nav_settings).performClick()
+                        val dialog = activity.showHomeEntryOrder()
+                        try {
+                            val adapter = dialog.listView.adapter
+                            val labels = (0 until adapter.count).map { adapter.getItem(it).toString() }
+                            val demo = activity.getString(R.string.extras_entry_demo)
+                            check(activity.getString(R.string.extras_entry_timer) in labels)
+                            check(activity.getString(R.string.extras_entry_permissions) in labels)
+                            check((demo in labels) == !guideCompleted) {
+                                "Entry order lists the demo only before the first-use guide is completed"
+                            }
+                        } finally {
+                            dialog.dismiss()
+                        }
+                    } catch (failure: Throwable) {
+                        error = failure
+                    } finally {
+                        activity.finish()
+                    }
+                }
+                error?.let { throw it }
+                i.waitForIdleSync()
+            }
+        } finally {
+            val editor = prefs.edit()
+            if (previous == null) editor.remove(complete) else editor.putBoolean(complete, previous)
+            if (previousTab == null) editor.remove(Prefs.LAST_TAB) else editor.putInt(Prefs.LAST_TAB, previousTab)
+            editor.commit()
+        }
     }
 }

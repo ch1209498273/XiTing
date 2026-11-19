@@ -1,4 +1,4 @@
-﻿# 一键发版：bump 版本号 → 测试 → 构建 → 提交推送 → GitHub Release → 蒲公英
+﻿# 一键发版：计算版本号 → 跑门禁 → 写入版本号并构建 → 提交推送 → GitHub Release → 蒲公英
 #
 # 用法：
 #   powershell -ExecutionPolicy Bypass -File tools\release.ps1 -Version 3.6.1 -Notes "更新说明（可多行）"
@@ -24,7 +24,7 @@ New-Item -ItemType Directory -Force -Path ".cowork-temp" | Out-Null
 
 if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "版本号格式应为 x.y.z：$Version" }
 
-# ---- 1. bump ----
+# ---- 1. 计算版本号 ----
 $kts = "app\build.gradle.kts"
 $text = [System.IO.File]::ReadAllText($kts)
 $vm = [regex]::Match($text, 'val appVersion = "(\d+\.\d+\.\d+)"')
@@ -36,7 +36,6 @@ Write-Host ("版本 {0} → {1} ｜ versionCode {2} → {3}" -f $vm.Groups[1].Va
 $text2 = $text.Replace($vm.Value, "val appVersion = `"$Version`"")
 $text2 = $text2.Replace($vc.Value, "versionCode = $newCode")
 if ($text2 -eq $text) { throw "版本号替换未生效，手动检查" }
-[System.IO.File]::WriteAllText((Resolve-Path $kts), $text2, (New-Object System.Text.UTF8Encoding($false)))
 
 if (-not (Test-Path "keystore.properties")) {
     Write-Host "!! 没有 keystore.properties：release 包会用 debug 签名。"
@@ -46,21 +45,23 @@ if (-not (Test-Path "keystore.properties")) {
 # ---- 2. 测试 + 门禁 ----
 if (-not $SkipTests) {
     Write-Host "== 单测 =="
-    powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1 *> .cowork-temp\release_tests.txt
+    # 直接调用单测脚本；单测脚本和这里的 Gradle 任务都在结束时关闭守护进程。
+    & "$PSScriptRoot\run_tests.ps1" -GradlePath $GradlePath *> .cowork-temp\release_tests.txt
     if ($LASTEXITCODE -ne 0) { throw "测试失败，见 .cowork-temp\release_tests.txt" }
     Get-Content .cowork-temp\release_tests.txt -Encoding UTF8 | Select-String "合计" | Select-Object -First 1
 
     # lint 门禁：lintVital 只查 fatal，forceDarkAllowed 那个 NewApi 就是这么漏进 v3.6.2 的
     Write-Host "== lint 门禁 =="
-    & $GradlePath lint --console=plain *> .cowork-temp\release_lint.txt
+    & $GradlePath lint --no-daemon --console=plain *> .cowork-temp\release_lint.txt
     if ($LASTEXITCODE -ne 0) { throw "lint 失败，见 .cowork-temp\release_lint.txt" }
     python tools\i18n.py check
     if ($LASTEXITCODE -ne 0) { throw "多语言不完整（i18n check），见上方输出" }
 }
 
-# ---- 3. 构建 ----
+# ---- 3. 写入版本号并构建 ----
+[System.IO.File]::WriteAllText((Resolve-Path $kts), $text2, (New-Object System.Text.UTF8Encoding($false)))
 Write-Host "== 构建 =="
-& $GradlePath assembleRelease --console=plain *> .cowork-temp\release_build.txt
+& $GradlePath assembleRelease --no-daemon --console=plain *> .cowork-temp\release_build.txt
 if ($LASTEXITCODE -ne 0) { throw "构建失败，见 .cowork-temp\release_build.txt" }
 Get-Content .cowork-temp\release_build.txt -Encoding UTF8 | Select-String "BUILD SUCCESSFUL" | Select-Object -First 1
 $apk = "app\build\outputs\apk\release\app-release.apk"

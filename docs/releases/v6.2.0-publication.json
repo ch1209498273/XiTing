@@ -68,19 +68,20 @@
     {"headSha": "93c9494", "url": "https://github.com/ch1209498273/XiTing/actions/runs/42350948549", "conclusion": "success"},
     {"headSha": "f8b7c04", "url": "https://github.com/ch1209498273/XiTing/actions/runs/42350846241", "conclusion": "success"}
   ],
-  "releaseProcessNote": "本次以 -SkipTests 运行 release.ps1：门禁（单测/lint/i18n/五组设备检查）在发版前已单独跑过并记录。跳过测试段同时也是为了绕开该脚本第 2 步的挂起缺陷（子 powershell + Gradle 守护进程占住重定向句柄），该缺陷仍未根治，已记在 v6.1.0 的 publication.json。",
+  "releaseProcessNote": "本次以 -SkipTests 运行 release.ps1。门禁（单测/lint/i18n/五组设备检查）已在发布前单独跑过。发布时，脚本第 2 步仍有挂起问题，子 PowerShell 启动的 Gradle 守护进程会占住重定向句柄。",
   "physicalUat": {
-    "status": "not_tested",
-    "reason": "本版全部证据仍来自模拟器 api35",
+    "status": "partial",
+    "device": "OPPO PME110 / Android 16 (API 36)",
+    "results": [
+      "2026-11-12：优酷出声时可选择暂停并保持黑幕，黑幕内手动暂停和恢复成功；首页来源卡片随会话显示和隐藏，入口排序与设置自检已复核",
+      "2026-11-19：优酷一分钟定时到点由 PLAYING 变为 PAUSED，全屏黑幕保留，定时结束后首页显示未设置"
+    ],
     "pendingItems": [
-      "真机装 v6.2.0 验证「常用入口顺序」在 ColorOS 上的实际手感",
-      "「新播放器出现→定时弹窗单选变亮」这半条（v6.1.0 起遗留）",
-      "抖音对注入 KEYCODE_MEDIA_PREVIOUS 是否响应（由探针在真机自行给答案）"
+      "B 站、爱奇艺和抖音在 v6.2.0 上的播放联动",
+      "优酷切集结果和暂停未确认时的提示"
     ]
   },
   "unverified": [
-    "真机未覆盖（连续两版）",
-    "会话刷新后半条未证",
     "R8 剔除量与体积关系仅有本次 usage 记录，无 v6.1.0 对照"
   ],
   "release": "published"

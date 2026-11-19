@@ -3,6 +3,7 @@ package com.lujinyu.xiting
 import android.app.AlertDialog
 import android.content.Context
 import android.content.res.Configuration
+import android.view.View
 
 object AppearanceSettings {
     private const val KEY = "appearance_mode_v1"
@@ -32,12 +33,19 @@ object AppearanceSettings {
 object HomeEntryOrder {
     private const val KEY = "home_entry_order_v1"
     fun keys(ctx: Context): List<String> = HomeEntryOrderRules.normalize(ctx.prefs().getString(KEY, "") ?: "")
-    fun orderedIds(ctx: Context): List<Int> = keys(ctx).map { key -> when (key) {
+    fun orderedIds(ctx: Context): List<Int> = keys(ctx).map(::entryId)
+
+    fun visibleKeys(ctx: Context, home: View): List<String> = keys(ctx).filter { key ->
+        // 首页在设置页后面，读取入口自身的可见性。
+        home.findViewById<View>(entryId(key))?.visibility == View.VISIBLE
+    }
+
+    private fun entryId(key: String): Int = when (key) {
         "timer" -> R.id.timer_chip
         "player" -> R.id.playback_source_card
         "demo" -> R.id.btn_first_use
         else -> R.id.home_permissions_title
-    } }
+    }
     fun promote(ctx: Context, key: String) {
         if (key !in HomeEntryOrderRules.defaults) return
         ctx.prefs().edit().putString(KEY, (listOf(key) + keys(ctx).filter { it != key }).joinToString(",")).apply()
@@ -61,7 +69,7 @@ internal fun MainActivity.showAppearanceSettings(): AlertDialog {
 }
 
 internal fun MainActivity.showHomeEntryOrder(): AlertDialog {
-    val keys = HomeEntryOrder.keys(this)
+    val keys = HomeEntryOrder.visibleKeys(this, pageHome)
     return AlertDialog.Builder(this).setTitle(R.string.extras_entry_order)
         .setItems(keys.map { HomeEntryOrder.label(this, it) }.toTypedArray()) { _, which ->
             HomeEntryOrder.promote(this, keys[which]); recreate()

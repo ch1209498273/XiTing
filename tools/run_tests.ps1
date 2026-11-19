@@ -24,6 +24,9 @@
 .PARAMETER KeepMirror
     保留镜像目录以便排查（默认跑完即删）。
 
+.PARAMETER GradlePath
+    显式指定 Gradle 可执行文件。未指定时使用已安装的同版本 Gradle 或项目 wrapper。
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File tools\run_tests.ps1
 
@@ -35,15 +38,17 @@ param(
     [ValidateSet('debug', 'release')]
     [string]$Variant = 'debug',
 
-    [switch]$KeepMirror
+    [switch]$KeepMirror,
+
+    [string]$GradlePath
 )
 
 $ErrorActionPreference = 'Stop'
 
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 $Task        = "test${Variant}UnitTest"
-$Stamp       = Get-Date -Format 'yyyyMMdd-HHmmss'
-$MirrorRoot  = Join-Path $env:TEMP ("xiting-test-" + $Stamp)
+$TempRoot    = (Resolve-Path -LiteralPath $env:TEMP).ProviderPath
+$MirrorRoot  = Join-Path $TempRoot ("xiting-test-" + [guid]::NewGuid().ToString('N'))
 
 # 只镜像构建与测试真正需要的文件；密钥、APK、过程物料一律不碰
 $IncludeDirs = @('gradle', 'app\src', 'tools', 'docs')
@@ -58,6 +63,7 @@ $IncludeFiles = @(
 )
 
 function Resolve-Gradle {
+    if ($GradlePath) { return (Get-Command $GradlePath -CommandType Application -ErrorAction Stop).Source }
     # 优先用 wrapper；wrapper 首次运行要下 128MB 发行包（国内较慢），
     # 因此若本机 SDK 里已有同版本 gradle 就直接用它。
     $sdkGradle = 'C:\Users\MR\AppData\Local\Android\Sdk\gradle-9.1.0\bin\gradle.bat'
@@ -109,7 +115,7 @@ foreach ($f in @('build.gradle.kts', 'proguard-rules.pro')) {
 Write-Step '执行单测（首次可能要拉取依赖，请稍候）…'
 Push-Location $MirrorRoot
 try {
-    & $gradle $Task --console=plain --rerun-tasks
+    & $gradle $Task --no-daemon --console=plain --rerun-tasks
     $exitCode = $LASTEXITCODE
 } finally {
     Pop-Location
@@ -168,7 +174,9 @@ if ($KeepMirror) {
     Write-Host ''
     Write-Step "已保留镜像目录：$MirrorRoot（-KeepMirror）" -ForegroundColor Yellow
 } else {
-    Remove-Item -LiteralPath $MirrorRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $resolvedMirror = (Resolve-Path -LiteralPath $MirrorRoot).ProviderPath
+    if ((Split-Path -Parent $resolvedMirror) -ne $TempRoot) { throw "镜像目录不在临时目录中：$resolvedMirror" }
+    Remove-Item -LiteralPath $resolvedMirror -Recurse -Force
     Write-Host ''
     Write-Step '镜像目录已清理'
 }
